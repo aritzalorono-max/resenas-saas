@@ -1,0 +1,159 @@
+"use client";
+
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    businessName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    setLoading(true);
+    const supabase = createClient();
+
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
+      setLoading(false);
+      return;
+    }
+
+    if (data.user) {
+      const { error: bizError } = await supabase.from("businesses").insert({
+        user_id: data.user.id,
+        name: formData.businessName,
+      });
+
+      if (bizError) {
+        console.error("Error creating business:", bizError);
+      }
+    }
+
+    router.push("/dashboard");
+    router.refresh();
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-xl p-8">
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Crea tu cuenta</h1>
+      <p className="text-gray-500 mb-6">Empieza a recopilar reseñas en minutos</p>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
+            Nombre de tu negocio
+          </label>
+          <input
+            id="businessName"
+            name="businessName"
+            type="text"
+            value={formData.businessName}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+            placeholder="Ej: Cafetería El Sol"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+            placeholder="tu@email.com"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            Contraseña
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+            placeholder="Mínimo 6 caracteres"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            Confirmar contraseña
+          </label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+            placeholder="••••••••"
+          />
+        </div>
+
+        {error && (
+          <div className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-lg transition"
+        >
+          {loading ? "Creando cuenta..." : "Crear cuenta gratis"}
+        </button>
+      </form>
+
+      <p className="text-center text-sm text-gray-500 mt-6">
+        ¿Ya tienes cuenta?{" "}
+        <Link href="/login" className="text-brand-600 font-medium hover:underline">
+          Inicia sesión
+        </Link>
+      </p>
+    </div>
+  );
+}
