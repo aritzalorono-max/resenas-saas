@@ -54,25 +54,29 @@ export default function ConfiguracionPage() {
     setSuccess(false);
     setSaving(true);
 
-    const supabase = createClient();
-    const { error: updateError } = await supabase
-      .from("businesses")
-      .update({
-        name: form.name.trim(),
-        google_maps_url: form.google_maps_url.trim() || null,
-        welcome_message: form.welcome_message.trim() || DEFAULT_WELCOME,
-      })
-      .eq("id", business!.id);
+    try {
+      const supabase = createClient();
+      const { error: updateError } = await supabase
+        .from("businesses")
+        .update({
+          name: form.name.trim(),
+          google_maps_url: form.google_maps_url.trim() || null,
+          welcome_message: form.welcome_message.trim() || DEFAULT_WELCOME,
+        })
+        .eq("id", business!.id);
 
-    setSaving(false);
+      if (updateError) {
+        setError("Error al guardar los cambios");
+        return;
+      }
 
-    if (updateError) {
-      setError("Error al guardar los cambios");
-      return;
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch {
+      setError("Error de conexión. Inténtalo de nuevo.");
+    } finally {
+      setSaving(false);
     }
-
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
   }
 
   if (loading) {
