@@ -8,8 +8,8 @@ import {
 import { twilioClient, TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber } from "@/lib/twilio";
 import { NextResponse } from "next/server";
 import twilio from "twilio";
+import type { BusinessTone } from "@/types";
 
-// Validate Twilio webhook signature
 function validateTwilioSignature(request: Request, body: string): boolean {
   const authToken = process.env.TWILIO_AUTH_TOKEN!;
   const signature = request.headers.get("x-twilio-signature") ?? "";
@@ -24,7 +24,6 @@ export async function POST(request: Request) {
   try {
     const rawBody = await request.text();
 
-    // Validate in production
     if (process.env.NODE_ENV === "production") {
       const isValid = validateTwilioSignature(request, rawBody);
       if (!isValid) {
@@ -37,12 +36,9 @@ export async function POST(request: Request) {
     const messageBody = params.get("Body") ?? "";
 
     if (!fromNumber || !messageBody) {
-      return new Response("<Response/>", {
-        headers: { "Content-Type": "text/xml" },
-      });
+      return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
     }
 
-    // Normalize phone: extract digits from "whatsapp:+34612345678"
     const normalizedPhone = fromNumber.replace("whatsapp:", "").replace(/\s/g, "");
     const phoneVariants = [
       normalizedPhone,
@@ -52,7 +48,6 @@ export async function POST(request: Request) {
 
     const supabase = await createServiceClient();
 
-    // Find the most recent pending request for this phone
     const { data: reviewRequest } = await supabase
       .from("review_requests")
       .select("*, businesses(*)")
@@ -63,20 +58,17 @@ export async function POST(request: Request) {
       .single();
 
     if (!reviewRequest) {
-      return new Response("<Response/>", {
-        headers: { "Content-Type": "text/xml" },
-      });
+      return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
     }
 
     const business = reviewRequest.businesses as {
       name: string;
       google_maps_url: string | null;
+      tone: BusinessTone | null;
     };
 
-    // Analyze sentiment with Claude
     const sentiment = await analyzeSentiment(messageBody);
 
-    // Update the review request
     await supabase
       .from("review_requests")
       .update({
@@ -88,44 +80,49 @@ export async function POST(request: Request) {
       })
       .eq("id", reviewRequest.id);
 
-    // Build follow-up message
+    const tone: BusinessTone = business.tone ?? "tuteo";
     let followUpMessage: string;
 
     if (sentiment.sentiment === "positive" && business.google_maps_url) {
       followUpMessage = buildPositiveFollowUp(
         reviewRequest.customer_name,
         business.name,
-        business.google_maps_url
+        business.google_maps_url,
+        tone
       );
     } else if (sentiment.sentiment === "negative") {
       followUpMessage = buildNegativeFollowUp(
         reviewRequest.customer_name,
-        business.name
+        business.name,
+        tone
       );
     } else if (business.google_maps_url) {
       followUpMessage = buildNeutralFollowUp(
         reviewRequest.customer_name,
         business.name,
-        business.google_maps_url
+        business.google_maps_url,
+        tone
       );
     } else {
-      followUpMessage = `¡Gracias por tu respuesta, ${reviewRequest.customer_name}! 😊 Tu opinión es muy importante para ${business.name}.`;
+      const name = reviewRequest.customer_name;
+      const biz = business.name;
+      followUpMessage =
+        tone === "usted"
+          ? `¡Gracias por su respuesta, ${name}! 😊 Su opinión es muy importante para ${biz}.`
+          : tone === "juvenil"
+          ? `¡Gracias por responder, ${name}! 😊 ¡Tu opinión nos ayuda un montón en ${biz}!`
+          : `¡Gracias por tu respuesta, ${name}! 😊 Tu opinión es muy importante para ${biz}.`;
     }
 
-    // Send follow-up via Twilio
     await twilioClient.messages.create({
       from: TWILIO_WHATSAPP_NUMBER,
       to: formatWhatsAppNumber(reviewRequest.customer_phone),
       body: followUpMessage,
     });
 
-    return new Response("<Response/>", {
-      headers: { "Content-Type": "text/xml" },
-    });
+    return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
   } catch (error) {
     console.error("Twilio webhook error:", error);
-    return new Response("<Response/>", {
-      headers: { "Content-Type": "text/xml" },
-    });
+    return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
   }
 }

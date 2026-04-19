@@ -1,11 +1,15 @@
 export type ReviewStatus = "pending" | "positive" | "negative" | "neutral" | "no_response";
+export type BusinessTone = "tuteo" | "usted" | "juvenil";
 
 export interface Business {
   id: string;
   user_id: string;
   name: string;
+  description: string | null;
+  website_url: string | null;
   google_maps_url: string | null;
   welcome_message: string;
+  tone: BusinessTone;
   created_at: string;
   updated_at: string;
 }

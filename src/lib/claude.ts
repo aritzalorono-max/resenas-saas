@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { SentimentResult } from "@/types";
+import type { BusinessTone, SentimentResult } from "@/types";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -43,11 +43,35 @@ export async function analyzeSentiment(
   return result;
 }
 
+// ─── Follow-up message builders by tone ──────────────────────────────────────
+
 export function buildPositiveFollowUp(
   customerName: string,
   businessName: string,
-  googleMapsUrl: string
+  googleMapsUrl: string,
+  tone: BusinessTone = "tuteo"
 ): string {
+  if (tone === "usted") {
+    return `¡Qué alegría saber eso, ${customerName}! 🙌 Nos encanta que haya tenido una buena experiencia en ${businessName}.
+
+¿Se animaría a dejar su opinión en Google Maps? Con solo un minuto de su tiempo ayudaría a más personas a encontrarnos:
+
+👉 ${googleMapsUrl}
+
+¡Muchas gracias de corazón! 💚`;
+  }
+
+  if (tone === "juvenil") {
+    return `¡Genial, ${customerName}! 🔥 ¡Nos alegra un montón que te haya ido bien en ${businessName}!
+
+¿Nos echas una mano dejando una reseña en Google? ¡Nos ayuda muchísimo! 🙏
+
+👉 ${googleMapsUrl}
+
+¡Eres lo más! 💚✨`;
+  }
+
+  // tuteo (default)
   return `¡Qué alegría saber eso, ${customerName}! 🙌 Nos encanta que hayas tenido una buena experiencia en ${businessName}.
 
 ¿Te animarías a dejar tu opinión en Google Maps? Con solo un minuto de tu tiempo ayudarías a más personas a encontrarnos:
@@ -57,7 +81,28 @@ export function buildPositiveFollowUp(
 ¡Muchas gracias de corazón! 💚`;
 }
 
-export function buildNegativeFollowUp(customerName: string, businessName: string): string {
+export function buildNegativeFollowUp(
+  customerName: string,
+  businessName: string,
+  tone: BusinessTone = "tuteo"
+): string {
+  if (tone === "usted") {
+    return `Gracias por su honestidad, ${customerName}. Lamentamos que su experiencia no haya sido la que esperaba 😔
+
+En ${businessName} tomamos muy en serio cada opinión. Si quiere contarnos qué ocurrió para poder mejorar, no dude en responder a este mensaje.
+
+Su opinión es muy valiosa para nosotros. ¡Esperamos poder atenderle pronto y darle la experiencia que merece! 🙏`;
+  }
+
+  if (tone === "juvenil") {
+    return `Vaya, ${customerName}, nos sabe muy mal que no haya ido bien 😕
+
+En ${businessName} queremos mejorar y tu opinión nos ayuda un montón. ¿Nos cuentas qué pasó? 💬
+
+¡Ojalá podamos verte pronto y darte una experiencia mucho mejor! 🙌`;
+  }
+
+  // tuteo (default)
   return `Gracias por tu honestidad, ${customerName}. Lamentamos que tu experiencia no haya sido la que esperabas 😔
 
 En ${businessName} tomamos muy en serio cada opinión. Si quieres contarnos qué ocurrió para poder mejorar, no dudes en responder a este mensaje.
@@ -68,9 +113,31 @@ Tu opinión es muy valiosa para nosotros. ¡Esperamos poder verte pronto y darte
 export function buildNeutralFollowUp(
   customerName: string,
   businessName: string,
-  googleMapsUrl: string
+  googleMapsUrl: string,
+  tone: BusinessTone = "tuteo"
 ): string {
-  return `Gracias por tu respuesta, ${customerName}! 😊 Nos alegra que hayas pasado por ${businessName}.
+  if (tone === "usted") {
+    return `Gracias por su respuesta, ${customerName} 😊 Nos alegra que haya pasado por ${businessName}.
+
+Si quiere compartir su experiencia en Google Maps, nos ayudaría mucho:
+
+👉 ${googleMapsUrl}
+
+¡Hasta pronto! 💚`;
+  }
+
+  if (tone === "juvenil") {
+    return `¡Gracias por responder, ${customerName}! 😊 ¡Mola que hayas pasado por ${businessName}!
+
+Si te apetece, puedes dejar tu opinión en Google, ¡nos ayuda un montón!
+
+👉 ${googleMapsUrl}
+
+¡Nos vemos pronto! 🙌`;
+  }
+
+  // tuteo (default)
+  return `Gracias por tu respuesta, ${customerName} 😊 Nos alegra que hayas pasado por ${businessName}.
 
 Si quieres compartir tu experiencia en Google Maps, nos ayudaría mucho:
 

@@ -9,8 +9,11 @@ CREATE TABLE IF NOT EXISTS businesses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
+  description TEXT,
+  website_url TEXT,
   google_maps_url TEXT,
   welcome_message TEXT DEFAULT '¡Hola {nombre}! Soy el equipo de {negocio}. ¿Cómo fue tu experiencia con nosotros hoy? Tu opinión nos ayuda a mejorar 😊',
+  tone TEXT NOT NULL DEFAULT 'tuteo' CHECK (tone IN ('tuteo', 'usted', 'juvenil')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id)
