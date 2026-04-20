@@ -6,40 +6,24 @@
  *
  * Flujo:
  *   1. Verificar que el usuario está autenticado
- *   2. Validar los datos del formulario
- *   3. Obtener la configuración del negocio
- *   4. Enviar el WhatsApp via Twilio
- *   5. Guardar la solicitud en Supabase
+ *   2. Validar y sanear los inputs (nombre + teléfono)
+ *   3. Comprobar rate limiting por negocio
+ *   4. Obtener la configuración del negocio
+ *   5. Enviar el WhatsApp via Twilio
+ *   6. Guardar la solicitud en Supabase
  */
 
 import { createClient } from "@/lib/supabase/server";
 import { sendWhatsAppMessage } from "@/lib/twilio";
 import { getBusinessByUserId } from "@/lib/business";
 import { createReviewRequest } from "@/lib/review-requests";
+import { validateCustomerName, validatePhone } from "@/lib/validation";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
 
-// ---------------------------------------------------------------------------
-// Tipos del endpoint
-// ---------------------------------------------------------------------------
-
-interface RequestBody {
-  customer_name: string;
-  customer_phone: string;
-}
-
-interface SuccessResponse {
-  success: true;
-  data: object;
-}
-
-interface ErrorResponse {
-  error: string;
-}
-
-// ---------------------------------------------------------------------------
-// Handler
-// ---------------------------------------------------------------------------
+interface SuccessResponse { success: true; data: object }
+interface ErrorResponse   { error: string }
 
 export async function POST(
   request: Request
@@ -48,63 +32,59 @@ export async function POST(
 
   // ── 1. Autenticación ──────────────────────────────────────────────────────
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
     logger.warn("Intento de acceso sin sesión activa");
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  logger.info(`Usuario autenticado: ${user.id}`);
-
-  // ── 2. Validación del cuerpo de la petición ───────────────────────────────
-  let body: RequestBody;
+  // ── 2. Parsear y validar inputs ───────────────────────────────────────────
+  let rawBody: Record<string, unknown>;
   try {
-    body = (await request.json()) as RequestBody;
+    rawBody = (await request.json()) as Record<string, unknown>;
   } catch {
     logger.warn("Cuerpo de la petición no es JSON válido");
-    return NextResponse.json(
-      { error: "El cuerpo de la petición no es válido" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "El cuerpo de la petición no es JSON válido" }, { status: 400 });
   }
 
-  const customerName = body.customer_name?.trim();
-  const customerPhone = body.customer_phone?.trim();
+  const nameResult  = validateCustomerName(rawBody.customer_name);
+  const phoneResult = validatePhone(rawBody.customer_phone);
 
-  if (!customerName) {
-    return NextResponse.json(
-      { error: "El nombre del cliente es obligatorio" },
-      { status: 400 }
-    );
+  if (!nameResult.valid) {
+    return NextResponse.json({ error: nameResult.error! }, { status: 400 });
+  }
+  if (!phoneResult.valid) {
+    return NextResponse.json({ error: phoneResult.error! }, { status: 400 });
   }
 
-  if (!customerPhone) {
-    return NextResponse.json(
-      { error: "El teléfono del cliente es obligatorio" },
-      { status: 400 }
-    );
-  }
+  const customerName  = nameResult.sanitized!;
+  const customerPhone = phoneResult.sanitized!;
 
-  logger.info(`Procesando solicitud para: ${customerName} (${customerPhone})`);
+  logger.info(`Input validado: ${customerName} (${customerPhone})`);
 
-  // ── 3. Obtener configuración del negocio ──────────────────────────────────
+  // ── 3. Obtener negocio ────────────────────────────────────────────────────
   const business = await getBusinessByUserId(supabase, user.id);
 
   if (!business) {
-    logger.warn(`No se encontró negocio para el usuario ${user.id}`);
+    logger.warn(`Negocio no encontrado para usuario ${user.id}`);
     return NextResponse.json(
       { error: "Negocio no encontrado. Completa tu perfil en Configuración primero." },
       { status: 404 }
     );
   }
 
-  logger.info(`Negocio encontrado: ${business.name} (${business.id})`);
+  // ── 4. Rate limiting ──────────────────────────────────────────────────────
+  const rateLimit = await checkRateLimit(supabase, business.id);
 
-  // ── 4. Construir y enviar el WhatsApp ─────────────────────────────────────
+  if (!rateLimit.allowed) {
+    logger.warn(`Rate limit superado para negocio ${business.id} (${rateLimit.count} envíos recientes)`);
+    return NextResponse.json({ error: rateLimit.error! }, { status: 429 });
+  }
+
+  logger.info(`Negocio: ${business.name} | Envíos recientes: ${rateLimit.count}`);
+
+  // ── 5. Enviar WhatsApp ────────────────────────────────────────────────────
   const messageText = business.welcome_message
     .replace("{nombre}", customerName)
     .replace("{negocio}", business.name);
@@ -112,19 +92,16 @@ export async function POST(
   let messageSid: string;
   try {
     messageSid = await sendWhatsAppMessage(customerPhone, messageText);
-    logger.info(`WhatsApp enviado correctamente. SID: ${messageSid}`);
+    logger.info(`WhatsApp enviado. SID: ${messageSid}`);
   } catch (twilioError) {
     logger.error("Error al enviar el WhatsApp via Twilio", twilioError);
     return NextResponse.json(
-      {
-        error:
-          "No se pudo enviar el WhatsApp. Comprueba que el número es correcto y que el cliente ha aceptado el sandbox de Twilio.",
-      },
+      { error: "No se pudo enviar el WhatsApp. Comprueba que el número es correcto y que el cliente ha aceptado el sandbox de Twilio." },
       { status: 502 }
     );
   }
 
-  // ── 5. Guardar en base de datos ───────────────────────────────────────────
+  // ── 6. Guardar en base de datos ───────────────────────────────────────────
   let reviewRequest: object;
   try {
     reviewRequest = await createReviewRequest(supabase, {
@@ -133,15 +110,15 @@ export async function POST(
       customer_phone: customerPhone,
       twilio_message_sid: messageSid,
     });
-    logger.info(`Solicitud guardada en BD. ID: ${(reviewRequest as { id: string }).id}`);
+    logger.info(`Solicitud guardada. ID: ${(reviewRequest as { id: string }).id}`);
   } catch (dbError) {
-    logger.error("Error al guardar la solicitud en la base de datos", dbError);
+    logger.error("Error al guardar la solicitud en la BD", dbError);
     return NextResponse.json(
       { error: "El mensaje fue enviado pero no se pudo guardar el registro. Contacta con soporte." },
       { status: 500 }
     );
   }
 
-  logger.info(`Flujo completado: solicitud enviada y guardada para ${customerName}`);
+  logger.info(`Flujo completado para ${customerName}`);
   return NextResponse.json({ success: true, data: reviewRequest });
 }

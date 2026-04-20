@@ -108,10 +108,27 @@ export default function ClientesPage() {
     e.preventDefault();
     setError("");
     setSuccess(false);
+
+    // Validación client-side antes de llamar a la API
+    if (!form.customer_name.trim()) {
+      setError("El nombre del cliente es obligatorio");
+      return;
+    }
+    if (form.customer_name.trim().length > 100) {
+      setError("El nombre no puede superar los 100 caracteres");
+      return;
+    }
+
+    const digits = form.customer_phone.replace(/\D/g, "");
+    if (!digits || digits.length < 6) {
+      setError("Introduce un número de teléfono válido");
+      return;
+    }
+
     setLoading(true);
 
-    // Strip any leading zeros and combine with country dial code
-    const localNumber = form.customer_phone.replace(/^\+?\d*\s*/, "").replace(/\D/g, "");
+    // Combinar prefijo de país con el número local
+    const localNumber = form.customer_phone.replace(/\D/g, "");
     const fullPhone = `${country.dial}${localNumber}`;
 
     try {
