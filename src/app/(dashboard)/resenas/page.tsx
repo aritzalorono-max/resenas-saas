@@ -1,12 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import type { ReviewRequest } from "@/types";
 
-const STATUS_CONFIG: Record<string, { label: string; badge: string; icon: string }> = {
-  pending: { label: "Pendiente", badge: "bg-yellow-100 text-yellow-800", icon: "⏳" },
-  positive: { label: "Positiva", badge: "bg-green-100 text-green-800", icon: "😊" },
-  negative: { label: "Negativa", badge: "bg-red-100 text-red-800", icon: "😞" },
-  neutral: { label: "Neutral", badge: "bg-gray-100 text-gray-700", icon: "😐" },
-  no_response: { label: "Sin respuesta", badge: "bg-gray-100 text-gray-500", icon: "📭" },
+const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
+  pending:     { label: "Pendiente",     badge: "bg-amber-100 text-amber-700",  dot: "bg-amber-400"  },
+  positive:    { label: "Positiva",      badge: "bg-green-100 text-green-700",  dot: "bg-green-500"  },
+  negative:    { label: "Negativa",      badge: "bg-red-100 text-red-600",      dot: "bg-red-400"    },
+  neutral:     { label: "Neutral",       badge: "bg-gray-100 text-gray-600",    dot: "bg-gray-400"   },
+  no_response: { label: "Sin respuesta", badge: "bg-gray-100 text-gray-500",    dot: "bg-gray-300"   },
 };
 
 export default async function ResenasPage({
@@ -37,32 +37,35 @@ export default async function ResenasPage({
   const { data: requests } = await query as { data: ReviewRequest[] | null };
 
   const filterTabs = [
-    { value: "all", label: "Todas" },
-    { value: "positive", label: "Positivas" },
-    { value: "negative", label: "Negativas" },
-    { value: "neutral", label: "Neutrales" },
-    { value: "pending", label: "Pendientes" },
+    { value: "all",         label: "Todas"      },
+    { value: "positive",    label: "Positivas"  },
+    { value: "negative",    label: "Negativas"  },
+    { value: "neutral",     label: "Neutrales"  },
+    { value: "pending",     label: "Pendientes" },
+    { value: "no_response", label: "Sin resp."  },
   ];
 
+  const active = filterStatus ?? "all";
+
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Reseñas y respuestas</h1>
-        <p className="text-gray-500 mt-1">Historial de todas las solicitudes enviadas</p>
+    <div className="animate-fade-in">
+      <div className="mb-6">
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Reseñas y respuestas</h1>
+        <p className="text-gray-400 text-sm mt-1">Historial de todas las solicitudes enviadas</p>
       </div>
 
       {/* Filter tabs */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {filterTabs.map((tab) => {
-          const isActive = (filterStatus ?? "all") === tab.value;
+          const isActive = active === tab.value;
           return (
             <a
               key={tab.value}
               href={tab.value === "all" ? "/resenas" : `/resenas?status=${tab.value}`}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+              className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-brand-600 text-white"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300"
+                  ? "bg-brand-600 text-white shadow-sm"
+                  : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700"
               }`}
             >
               {tab.label}
@@ -72,9 +75,22 @@ export default async function ResenasPage({
       </div>
 
       {!requests?.length ? (
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-16 text-center text-gray-400">
-          <p className="text-4xl mb-3">📭</p>
-          <p className="font-medium text-gray-600">No hay solicitudes en este filtro</p>
+        <div className="bg-white rounded-2xl border border-gray-200 px-6 py-16 flex flex-col items-center text-center">
+          <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+            </svg>
+          </div>
+          <p className="font-semibold text-gray-700">
+            {active === "all"
+              ? "Aún no hay solicitudes"
+              : `No hay solicitudes ${filterTabs.find(t => t.value === active)?.label.toLowerCase() ?? ""}`}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {active === "all"
+              ? "Las solicitudes que envíes aparecerán aquí"
+              : "Prueba a cambiar el filtro de arriba"}
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -83,24 +99,24 @@ export default async function ResenasPage({
             return (
               <div
                 key={req.id}
-                className="bg-white rounded-xl border border-gray-200 p-5"
+                className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-card hover:shadow-card-hover transition-shadow"
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="font-semibold text-gray-900">{req.customer_name}</span>
-                      <span className="text-gray-400 text-sm">{req.customer_phone}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-gray-900 text-sm">{req.customer_name}</span>
+                      <span className="text-gray-400 text-xs">{req.customer_phone}</span>
                     </div>
 
                     {req.customer_response ? (
-                      <p className="text-gray-700 text-sm mt-2 bg-gray-50 rounded-lg px-3 py-2 italic">
+                      <p className="text-gray-700 text-sm mt-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 italic">
                         &ldquo;{req.customer_response}&rdquo;
                       </p>
                     ) : (
-                      <p className="text-gray-400 text-sm mt-1 italic">Sin respuesta aún</p>
+                      <p className="text-gray-400 text-xs mt-1.5 italic">Sin respuesta todavía</p>
                     )}
 
-                    <div className="flex items-center gap-4 mt-3">
+                    <div className="flex items-center gap-4 mt-3 flex-wrap">
                       <span className="text-xs text-gray-400">
                         Enviado: {new Date(req.created_at).toLocaleDateString("es-ES", {
                           day: "numeric", month: "short", year: "numeric",
@@ -115,8 +131,8 @@ export default async function ResenasPage({
                           })}
                         </span>
                       )}
-                      {req.sentiment_score !== null && (
-                        <span className="text-xs text-gray-400">
+                      {req.sentiment_score !== null && req.sentiment_score !== undefined && (
+                        <span className="text-xs text-gray-400 tabular-nums">
                           Score: {(req.sentiment_score * 100).toFixed(0)}%
                         </span>
                       )}
@@ -124,12 +140,17 @@ export default async function ResenasPage({
                   </div>
 
                   <div className="flex flex-col items-end gap-2 shrink-0">
-                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1 ${config.badge}`}>
-                      <span>{config.icon}</span>
+                    <span className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${config.badge}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
                       {config.label}
                     </span>
                     {req.follow_up_sent && (
-                      <span className="text-xs text-gray-400">Follow-up enviado ✓</span>
+                      <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <svg className="w-3 h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                        Follow-up enviado
+                      </span>
                     )}
                   </div>
                 </div>
