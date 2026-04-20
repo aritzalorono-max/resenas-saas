@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 import type { ReviewRequest } from "@/types";
 
 const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
@@ -9,12 +10,18 @@ const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string 
   no_response: { label: "Sin respuesta", badge: "bg-gray-100 text-gray-500",    dot: "bg-gray-300"   },
 };
 
+const PAGE_SIZE = 20;
+
 export default async function ResenasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; page?: string }>;
 }) {
-  const { status: filterStatus } = await searchParams;
+  const { status: filterStatus, page: pageParam } = await searchParams;
+  const page    = Math.max(1, parseInt(pageParam ?? "1", 10));
+  const offset  = (page - 1) * PAGE_SIZE;
+  const active  = filterStatus ?? "all";
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -24,17 +31,29 @@ export default async function ResenasPage({
     .eq("user_id", user!.id)
     .single();
 
-  let query = supabase
+  const businessId = business?.id ?? "";
+
+  // Total count for pagination
+  let countQuery = supabase
+    .from("review_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("business_id", businessId);
+  if (active !== "all") countQuery = countQuery.eq("status", active);
+  const { count: total } = await countQuery;
+
+  // Paginated rows
+  let dataQuery = supabase
     .from("review_requests")
     .select("*")
-    .eq("business_id", business?.id ?? "")
-    .order("created_at", { ascending: false });
+    .eq("business_id", businessId)
+    .order("created_at", { ascending: false })
+    .range(offset, offset + PAGE_SIZE - 1);
+  if (active !== "all") dataQuery = dataQuery.eq("status", active);
+  const { data: requests } = await dataQuery as { data: ReviewRequest[] | null };
 
-  if (filterStatus && filterStatus !== "all") {
-    query = query.eq("status", filterStatus);
-  }
-
-  const { data: requests } = await query as { data: ReviewRequest[] | null };
+  const totalPages  = Math.ceil((total ?? 0) / PAGE_SIZE);
+  const hasNext     = page < totalPages;
+  const hasPrev     = page > 1;
 
   const filterTabs = [
     { value: "all",         label: "Todas"      },
@@ -45,13 +64,22 @@ export default async function ResenasPage({
     { value: "no_response", label: "Sin resp."  },
   ];
 
-  const active = filterStatus ?? "all";
+  function buildHref(newPage: number, newStatus?: string) {
+    const s = newStatus ?? active;
+    const params = new URLSearchParams();
+    if (s !== "all") params.set("status", s);
+    if (newPage > 1) params.set("page", String(newPage));
+    const qs = params.toString();
+    return `/resenas${qs ? `?${qs}` : ""}`;
+  }
 
   return (
     <div className="animate-fade-in">
       <div className="mb-6">
         <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Reseñas y respuestas</h1>
-        <p className="text-gray-400 text-sm mt-1">Historial de todas las solicitudes enviadas</p>
+        <p className="text-gray-400 text-sm mt-1">
+          {total != null ? `${total} solicitud${total !== 1 ? "es" : ""} en total` : "Historial de todas las solicitudes"}
+        </p>
       </div>
 
       {/* Filter tabs */}
@@ -59,9 +87,9 @@ export default async function ResenasPage({
         {filterTabs.map((tab) => {
           const isActive = active === tab.value;
           return (
-            <a
+            <Link
               key={tab.value}
-              href={tab.value === "all" ? "/resenas" : `/resenas?status=${tab.value}`}
+              href={buildHref(1, tab.value)}
               className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
                 isActive
                   ? "bg-brand-600 text-white shadow-sm"
@@ -69,7 +97,7 @@ export default async function ResenasPage({
               }`}
             >
               {tab.label}
-            </a>
+            </Link>
           );
         })}
       </div>
@@ -84,80 +112,116 @@ export default async function ResenasPage({
           <p className="font-semibold text-gray-700">
             {active === "all"
               ? "Aún no hay solicitudes"
-              : `No hay solicitudes ${filterTabs.find(t => t.value === active)?.label.toLowerCase() ?? ""}`}
+              : `No hay solicitudes en "${filterTabs.find(t => t.value === active)?.label}"`}
           </p>
           <p className="text-xs text-gray-400 mt-1">
             {active === "all"
               ? "Las solicitudes que envíes aparecerán aquí"
-              : "Prueba a cambiar el filtro de arriba"}
+              : "Prueba a cambiar el filtro"}
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {requests.map((req) => {
-            const config = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.pending;
-            return (
-              <div
-                key={req.id}
-                className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-card hover:shadow-card-hover transition-shadow"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-gray-900 text-sm">{req.customer_name}</span>
-                      <span className="text-gray-400 text-xs">{req.customer_phone}</span>
-                    </div>
+        <>
+          <div className="space-y-3">
+            {requests.map((req) => {
+              const config = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.pending;
+              return (
+                <div
+                  key={req.id}
+                  className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-card hover:shadow-card-hover transition-shadow"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-gray-900 text-sm">{req.customer_name}</span>
+                        <span className="text-gray-400 text-xs">{req.customer_phone}</span>
+                      </div>
 
-                    {req.customer_response ? (
-                      <p className="text-gray-700 text-sm mt-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 italic">
-                        &ldquo;{req.customer_response}&rdquo;
-                      </p>
-                    ) : (
-                      <p className="text-gray-400 text-xs mt-1.5 italic">Sin respuesta todavía</p>
-                    )}
+                      {req.customer_response ? (
+                        <p className="text-gray-700 text-sm mt-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 italic">
+                          &ldquo;{req.customer_response}&rdquo;
+                        </p>
+                      ) : (
+                        <p className="text-gray-400 text-xs mt-1.5 italic">Sin respuesta todavía</p>
+                      )}
 
-                    <div className="flex items-center gap-4 mt-3 flex-wrap">
-                      <span className="text-xs text-gray-400">
-                        Enviado: {new Date(req.created_at).toLocaleDateString("es-ES", {
-                          day: "numeric", month: "short", year: "numeric",
-                          hour: "2-digit", minute: "2-digit"
-                        })}
-                      </span>
-                      {req.responded_at && (
+                      <div className="flex items-center gap-4 mt-3 flex-wrap">
                         <span className="text-xs text-gray-400">
-                          Respondió: {new Date(req.responded_at).toLocaleDateString("es-ES", {
-                            day: "numeric", month: "short",
+                          {new Date(req.created_at).toLocaleDateString("es-ES", {
+                            day: "numeric", month: "short", year: "numeric",
                             hour: "2-digit", minute: "2-digit"
                           })}
                         </span>
-                      )}
-                      {req.sentiment_score !== null && req.sentiment_score !== undefined && (
-                        <span className="text-xs text-gray-400 tabular-nums">
-                          Score: {(req.sentiment_score * 100).toFixed(0)}%
+                        {req.responded_at && (
+                          <span className="text-xs text-green-600">
+                            ✓ Respondió {new Date(req.responded_at).toLocaleDateString("es-ES", {
+                              day: "numeric", month: "short",
+                              hour: "2-digit", minute: "2-digit"
+                            })}
+                          </span>
+                        )}
+                        {req.sentiment_score !== null && req.sentiment_score !== undefined && (
+                          <span className="text-xs text-gray-400 tabular-nums">
+                            Score: {(req.sentiment_score * 100).toFixed(0)}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <span className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${config.badge}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+                        {config.label}
+                      </span>
+                      {req.follow_up_sent && (
+                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                          <svg className="w-3 h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                          Follow-up enviado
                         </span>
                       )}
                     </div>
                   </div>
-
-                  <div className="flex flex-col items-end gap-2 shrink-0">
-                    <span className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${config.badge}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
-                      {config.label}
-                    </span>
-                    {req.follow_up_sent && (
-                      <span className="text-xs text-gray-400 flex items-center gap-1">
-                        <svg className="w-3 h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
-                        Follow-up enviado
-                      </span>
-                    )}
-                  </div>
                 </div>
+              );
+            })}
+          </div>
+
+          {/* Paginación */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex items-center justify-between">
+              <p className="text-sm text-gray-500">
+                Página {page} de {totalPages}
+                <span className="text-gray-400"> · {total} solicitudes</span>
+              </p>
+              <div className="flex gap-2">
+                {hasPrev && (
+                  <Link
+                    href={buildHref(page - 1)}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-brand-300 hover:text-brand-700 transition"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                    Anterior
+                  </Link>
+                )}
+                {hasNext && (
+                  <Link
+                    href={buildHref(page + 1)}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-brand-300 hover:text-brand-700 transition"
+                  >
+                    Siguiente
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </Link>
+                )}
               </div>
-            );
-          })}
-        </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
