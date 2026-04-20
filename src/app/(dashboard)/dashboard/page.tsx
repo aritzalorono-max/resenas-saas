@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import type { ReviewRequest, BusinessStats } from "@/types";
 import { RingChart } from "@/components/ui/RingChart";
+import { AlertTriangle } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending:     { label: "Pendiente",      color: "bg-amber-100 text-amber-700"  },
@@ -62,7 +63,7 @@ export default async function DashboardPage() {
       {/* Alerta Google Maps */}
       {!business?.google_maps_url && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-start gap-3 animate-slide-up">
-          <span className="text-amber-500 text-lg shrink-0 mt-0.5">⚠️</span>
+          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" strokeWidth={1.75} />
           <div>
             <p className="font-semibold text-amber-800 text-sm">Configura tu enlace de Google Maps</p>
             <p className="text-sm text-amber-700 mt-0.5">

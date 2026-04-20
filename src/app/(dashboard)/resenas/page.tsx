@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import type { ReviewRequest } from "@/types";
+import { Check } from "lucide-react";
 
 const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
   pending:     { label: "Pendiente",     badge: "bg-amber-100 text-amber-700",  dot: "bg-amber-400"  },
@@ -153,8 +154,9 @@ export default async function ResenasPage({
                           })}
                         </span>
                         {req.responded_at && (
-                          <span className="text-xs text-green-600">
-                            ✓ Respondió {new Date(req.responded_at).toLocaleDateString("es-ES", {
+                          <span className="text-xs text-green-600 flex items-center gap-1">
+                            <Check className="w-3 h-3" strokeWidth={2.5} />
+                            Respondió {new Date(req.responded_at).toLocaleDateString("es-ES", {
                               day: "numeric", month: "short",
                               hour: "2-digit", minute: "2-digit"
                             })}
