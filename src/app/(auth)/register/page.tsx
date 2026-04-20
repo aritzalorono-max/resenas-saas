@@ -8,7 +8,6 @@ import Link from "next/link";
 export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    businessName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -49,14 +48,7 @@ export default function RegisterPage() {
     }
 
     if (data.user) {
-      const { error: bizError } = await supabase.from("businesses").insert({
-        user_id: data.user.id,
-        name: formData.businessName,
-      });
-
-      if (bizError) {
-        console.error("Error creating business:", bizError);
-      }
+      await supabase.from("businesses").insert({ user_id: data.user.id, name: "" });
     }
 
     router.push("/dashboard");
@@ -69,22 +61,6 @@ export default function RegisterPage() {
       <p className="text-gray-500 mb-6">Empieza a recopilar reseñas en minutos</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre de tu negocio
-          </label>
-          <input
-            id="businessName"
-            name="businessName"
-            type="text"
-            value={formData.businessName}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-            placeholder="Ej: Cafetería El Sol"
-          />
-        </div>
-
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
             Email
