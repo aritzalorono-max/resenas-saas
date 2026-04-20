@@ -1,128 +1,148 @@
-import { createServiceClient } from "@/lib/supabase/server";
-import {
-  analyzeSentiment,
-  buildPositiveFollowUp,
-  buildNegativeFollowUp,
-  buildNeutralFollowUp,
-} from "@/lib/claude";
-import { twilioClient, TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber } from "@/lib/twilio";
-import { NextResponse } from "next/server";
-import twilio from "twilio";
-import type { BusinessTone } from "@/types";
+/**
+ * POST /api/twilio-webhook
+ *
+ * Recibe las respuestas de los clientes por WhatsApp (webhook de Twilio),
+ * analiza el sentimiento con Claude y envía un mensaje de seguimiento adaptado.
+ *
+ * Flujo:
+ *   1. Validar la firma de Twilio (solo en producción)
+ *   2. Extraer el número y el mensaje del cuerpo del webhook
+ *   3. Buscar la solicitud de reseña pendiente para ese número
+ *   4. Analizar el sentimiento con Claude AI
+ *   5. Actualizar el registro en la base de datos
+ *   6. Enviar el mensaje de seguimiento apropiado
+ */
 
-function validateTwilioSignature(request: Request, body: string): boolean {
+import { createServiceClient } from "@/lib/supabase/server";
+import { analyzeSentiment } from "@/lib/claude";
+import { twilioClient, TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants } from "@/lib/twilio";
+import { findPendingRequestByPhone, updateReviewRequestWithSentiment } from "@/lib/review-requests";
+import { buildFollowUpMessage } from "@/lib/messages";
+import { logger } from "@/lib/logger";
+import twilio from "twilio";
+
+// ---------------------------------------------------------------------------
+// Validación de firma de Twilio
+// ---------------------------------------------------------------------------
+
+/**
+ * Comprueba que la petición proviene realmente de Twilio
+ * usando el algoritmo HMAC-SHA1 con el auth token como clave.
+ * Solo se activa en producción para permitir pruebas locales.
+ */
+function validateTwilioSignature(request: Request, rawBody: string): boolean {
   const authToken = process.env.TWILIO_AUTH_TOKEN!;
   const signature = request.headers.get("x-twilio-signature") ?? "";
-  const url = request.url;
 
-  return twilio.validateRequest(authToken, signature, url, Object.fromEntries(
-    new URLSearchParams(body)
-  ));
+  return twilio.validateRequest(
+    authToken,
+    signature,
+    request.url,
+    Object.fromEntries(new URLSearchParams(rawBody))
+  );
 }
 
-export async function POST(request: Request) {
+/** Respuesta vacía válida para Twilio (no dispara ningún mensaje adicional) */
+function twilioEmptyResponse(): Response {
+  return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
+}
+
+// ---------------------------------------------------------------------------
+// Handler
+// ---------------------------------------------------------------------------
+
+export async function POST(request: Request): Promise<Response> {
+  logger.info("Webhook de Twilio recibido");
+
+  let rawBody: string;
   try {
-    const rawBody = await request.text();
+    rawBody = await request.text();
+  } catch {
+    logger.error("No se pudo leer el cuerpo del webhook");
+    return twilioEmptyResponse();
+  }
 
-    if (process.env.NODE_ENV === "production") {
-      const isValid = validateTwilioSignature(request, rawBody);
-      if (!isValid) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-      }
+  // ── 1. Validar firma (producción) ─────────────────────────────────────────
+  if (process.env.NODE_ENV === "production") {
+    const isValid = validateTwilioSignature(request, rawBody);
+    if (!isValid) {
+      logger.warn("Firma de Twilio inválida — petición rechazada");
+      return twilioEmptyResponse();
     }
+    logger.info("Firma de Twilio validada correctamente");
+  }
 
-    const params = new URLSearchParams(rawBody);
-    const fromNumber = params.get("From") ?? "";
-    const messageBody = params.get("Body") ?? "";
+  // ── 2. Extraer datos del webhook ──────────────────────────────────────────
+  const params = new URLSearchParams(rawBody);
+  const fromNumber = params.get("From") ?? "";
+  const messageBody = params.get("Body") ?? "";
 
-    if (!fromNumber || !messageBody) {
-      return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
-    }
+  if (!fromNumber || !messageBody) {
+    logger.warn("Webhook sin número de origen o sin cuerpo de mensaje", { fromNumber, messageBody });
+    return twilioEmptyResponse();
+  }
 
-    const normalizedPhone = fromNumber.replace("whatsapp:", "").replace(/\s/g, "");
-    const phoneVariants = [
-      normalizedPhone,
-      normalizedPhone.replace("+34", ""),
-      normalizedPhone.replace("+", ""),
-    ];
+  logger.info(`Mensaje recibido de ${fromNumber}: "${messageBody.slice(0, 60)}..."`);
 
-    const supabase = await createServiceClient();
+  // ── 3. Buscar solicitud pendiente ─────────────────────────────────────────
+  const supabase = await createServiceClient();
+  const phoneVariants = getPhoneVariants(fromNumber);
 
-    const { data: reviewRequest } = await supabase
-      .from("review_requests")
-      .select("*, businesses(*)")
-      .in("customer_phone", phoneVariants)
-      .eq("status", "pending")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
+  logger.info("Buscando solicitud pendiente para variantes de número", phoneVariants);
 
-    if (!reviewRequest) {
-      return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
-    }
+  const reviewRequest = await findPendingRequestByPhone(supabase, phoneVariants);
 
-    const business = reviewRequest.businesses as {
-      name: string;
-      google_maps_url: string | null;
-      tone: BusinessTone | null;
-    };
+  if (!reviewRequest) {
+    logger.warn(`No se encontró solicitud pendiente para ${fromNumber}`);
+    return twilioEmptyResponse();
+  }
 
-    const sentiment = await analyzeSentiment(messageBody);
+  logger.info(`Solicitud encontrada: ${reviewRequest.id} (cliente: ${reviewRequest.customer_name})`);
 
-    await supabase
-      .from("review_requests")
-      .update({
-        status: sentiment.sentiment,
-        customer_response: messageBody,
-        sentiment_score: sentiment.score,
-        responded_at: new Date().toISOString(),
-        follow_up_sent: true,
-      })
-      .eq("id", reviewRequest.id);
+  const { businesses: business } = reviewRequest;
 
-    const tone: BusinessTone = business.tone ?? "tuteo";
-    let followUpMessage: string;
+  // ── 4. Analizar sentimiento con Claude ────────────────────────────────────
+  let sentiment: Awaited<ReturnType<typeof analyzeSentiment>>;
+  try {
+    sentiment = await analyzeSentiment(messageBody);
+    logger.info(
+      `Sentimiento detectado: ${sentiment.sentiment} (score: ${sentiment.score})`,
+      { summary: sentiment.summary }
+    );
+  } catch (aiError) {
+    logger.error("Error al analizar sentimiento con Claude", aiError);
+    return twilioEmptyResponse();
+  }
 
-    if (sentiment.sentiment === "positive" && business.google_maps_url) {
-      followUpMessage = buildPositiveFollowUp(
-        reviewRequest.customer_name,
-        business.name,
-        business.google_maps_url,
-        tone
-      );
-    } else if (sentiment.sentiment === "negative") {
-      followUpMessage = buildNegativeFollowUp(
-        reviewRequest.customer_name,
-        business.name,
-        tone
-      );
-    } else if (business.google_maps_url) {
-      followUpMessage = buildNeutralFollowUp(
-        reviewRequest.customer_name,
-        business.name,
-        business.google_maps_url,
-        tone
-      );
-    } else {
-      const name = reviewRequest.customer_name;
-      const biz = business.name;
-      followUpMessage =
-        tone === "usted"
-          ? `¡Gracias por su respuesta, ${name}! 😊 Su opinión es muy importante para ${biz}.`
-          : tone === "juvenil"
-          ? `¡Gracias por responder, ${name}! 😊 ¡Tu opinión nos ayuda un montón en ${biz}!`
-          : `¡Gracias por tu respuesta, ${name}! 😊 Tu opinión es muy importante para ${biz}.`;
-    }
+  // ── 5. Actualizar registro en base de datos ───────────────────────────────
+  try {
+    await updateReviewRequestWithSentiment(supabase, reviewRequest.id, messageBody, sentiment);
+    logger.info(`Solicitud ${reviewRequest.id} actualizada con sentimiento: ${sentiment.sentiment}`);
+  } catch (dbError) {
+    logger.error("Error al actualizar la solicitud en la BD", dbError);
+    // Continuamos para intentar enviar el mensaje de seguimiento igualmente
+  }
 
+  // ── 6. Construir y enviar mensaje de seguimiento ──────────────────────────
+  const followUpMessage = buildFollowUpMessage({
+    customerName: reviewRequest.customer_name,
+    businessName: business.name,
+    googleMapsUrl: business.google_maps_url,
+    sentiment: sentiment.sentiment,
+    tone: business.tone ?? "tuteo",
+  });
+
+  try {
     await twilioClient.messages.create({
       from: TWILIO_WHATSAPP_NUMBER,
       to: formatWhatsAppNumber(reviewRequest.customer_phone),
       body: followUpMessage,
     });
-
-    return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
-  } catch (error) {
-    console.error("Twilio webhook error:", error);
-    return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
+    logger.info(`Mensaje de seguimiento enviado a ${reviewRequest.customer_phone}`);
+  } catch (twilioError) {
+    logger.error("Error al enviar el mensaje de seguimiento via Twilio", twilioError);
   }
+
+  logger.info(`Flujo completado para solicitud ${reviewRequest.id}`);
+  return twilioEmptyResponse();
 }

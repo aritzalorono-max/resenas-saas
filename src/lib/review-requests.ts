@@ -1,0 +1,99 @@
+/**
+ * Operaciones de base de datos para la entidad ReviewRequest (solicitud de reseña).
+ *
+ * Centraliza todos los accesos a la tabla `review_requests` de Supabase
+ * para que los API routes no contengan lógica de persistencia directa.
+ */
+
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ReviewRequest, ReviewRequestWithBusiness, SentimentResult } from "@/types";
+
+// ---------------------------------------------------------------------------
+// Lectura
+// ---------------------------------------------------------------------------
+
+/**
+ * Busca la solicitud de reseña pendiente más reciente para un número de teléfono.
+ *
+ * Acepta múltiples variantes del número (con/sin prefijo) para cubrir
+ * distintos formatos que puede devolver Twilio.
+ * Devuelve null si no hay ninguna solicitud pendiente para ese número.
+ */
+export async function findPendingRequestByPhone(
+  supabase: SupabaseClient,
+  phoneVariants: string[]
+): Promise<ReviewRequestWithBusiness | null> {
+  const { data } = await supabase
+    .from("review_requests")
+    .select("*, businesses(*)")
+    .in("customer_phone", phoneVariants)
+    .eq("status", "pending")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  return (data as ReviewRequestWithBusiness) ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Escritura
+// ---------------------------------------------------------------------------
+
+/**
+ * Parámetros necesarios para crear una nueva solicitud de reseña.
+ */
+export interface CreateReviewRequestParams {
+  business_id: string;
+  customer_name: string;
+  customer_phone: string;
+  twilio_message_sid: string;
+}
+
+/**
+ * Crea un registro de solicitud de reseña en la base de datos.
+ * El estado inicial siempre es "pending" hasta que el cliente responda.
+ * Lanza un error si la inserción falla.
+ */
+export async function createReviewRequest(
+  supabase: SupabaseClient,
+  params: CreateReviewRequestParams
+): Promise<ReviewRequest> {
+  const { data, error } = await supabase
+    .from("review_requests")
+    .insert({ ...params, status: "pending" })
+    .select()
+    .single();
+
+  if (error || !data) {
+    throw new Error(`Error al crear la solicitud de reseña: ${error?.message ?? "sin datos"}`);
+  }
+
+  return data as ReviewRequest;
+}
+
+/**
+ * Actualiza una solicitud de reseña con el resultado del análisis de sentimiento.
+ * Marca también que el mensaje de seguimiento ha sido enviado.
+ * Lanza un error si la actualización falla.
+ */
+export async function updateReviewRequestWithSentiment(
+  supabase: SupabaseClient,
+  requestId: string,
+  customerResponse: string,
+  sentiment: SentimentResult
+): Promise<void> {
+  const { error } = await supabase
+    .from("review_requests")
+    .update({
+      status: sentiment.sentiment,
+      customer_response: customerResponse,
+      sentiment_score: sentiment.score,
+      responded_at: new Date().toISOString(),
+      follow_up_sent: true,
+    })
+    .eq("id", requestId);
+
+  if (error) {
+    throw new Error(`Error al actualizar la solicitud ${requestId}: ${error.message}`);
+  }
+}

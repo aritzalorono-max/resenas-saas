@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 import type { Business, BusinessTone } from "@/types";
 
-const DEFAULT_WELCOME =
-  "¡Hola {nombre}! Soy el equipo de {negocio}. ¿Cómo fue tu experiencia con nosotros hoy? Tu opinión nos ayuda a mejorar 😊";
+// Alias local para no cambiar el resto del componente
+const DEFAULT_WELCOME = DEFAULT_WELCOME_MESSAGE;
 
 const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; example: string }[] = [
   {
