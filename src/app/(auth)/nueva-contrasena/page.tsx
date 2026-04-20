@@ -3,29 +3,35 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
-export default function LoginPage() {
+export default function NuevaContrasenaPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
     setLoading(true);
-
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error: updateError } = await supabase.auth.updateUser({ password });
+    setLoading(false);
 
-    if (signInError) {
-      setError("Email o contraseña incorrectos");
-      setLoading(false);
+    if (updateError) {
+      setError("No se pudo actualizar la contraseña. El enlace puede haber expirado.");
       return;
     }
 
@@ -35,39 +41,37 @@ export default function LoginPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Iniciar sesión</h1>
-      <p className="text-gray-500 mb-6">Accede a tu panel de ReseñasYa</p>
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Nueva contraseña</h1>
+      <p className="text-gray-500 mb-6 text-sm">
+        Elige una contraseña segura para tu cuenta.
+      </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            Nueva contraseña
           </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-            placeholder="tu@email.com"
-          />
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Contraseña
-            </label>
-            <Link href="/recuperar" className="text-xs text-brand-600 hover:underline font-medium">
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </div>
           <input
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+            autoFocus
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+            placeholder="Mínimo 6 caracteres"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            Confirmar contraseña
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             required
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
             placeholder="••••••••"
@@ -85,16 +89,9 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-lg transition"
         >
-          {loading ? "Entrando..." : "Entrar"}
+          {loading ? "Guardando..." : "Guardar nueva contraseña"}
         </button>
       </form>
-
-      <p className="text-center text-sm text-gray-500 mt-6">
-        ¿No tienes cuenta?{" "}
-        <Link href="/register" className="text-brand-600 font-medium hover:underline">
-          Regístrate gratis
-        </Link>
-      </p>
     </div>
   );
 }
