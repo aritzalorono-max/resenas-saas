@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { Upload, FileSpreadsheet, Download, X, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 interface Country {
   code: string;
@@ -42,6 +43,7 @@ const STORAGE_KEY     = "resenas_ya_country";
 const DEFAULT_COUNTRY = COUNTRIES[0];
 const MAX_RETRIES     = 2;
 const RETRY_DELAY_MS  = 1500;
+const SEND_DELAY_MS   = 400;
 
 function loadCountry(): Country {
   if (typeof window === "undefined") return DEFAULT_COUNTRY;
@@ -64,8 +66,6 @@ async function sendWithRetry(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-
-  // Solo reintenta en errores de servidor (5xx), no en errores de cliente (4xx)
   if (!res.ok && res.status >= 500 && retries > 0) {
     await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
     return sendWithRetry(payload, retries - 1);
@@ -73,9 +73,103 @@ async function sendWithRetry(
   return res;
 }
 
+// ── Bulk helpers ──────────────────────────────────────────────────────────────
+
+interface BulkRow {
+  id: number;
+  name: string;
+  rawPhone: string;
+  phone: string;
+  nameError: string | null;
+  phoneError: string | null;
+}
+
+interface BulkResult {
+  success: number;
+  errors: { name: string; reason: string }[];
+}
+
+function normalizePhone(raw: string, dialCode: string): string {
+  const s = String(raw).trim().replace(/[\s\-().]/g, "");
+  if (s.startsWith("+")) return s;
+  if (s.startsWith("00")) return "+" + s.slice(2);
+  return `${dialCode}${s.replace(/^0+/, "")}`;
+}
+
+function validateBulkRow(name: string, phone: string) {
+  const nameError = !name.trim()
+    ? "Nombre vacío"
+    : name.trim().length > 100
+    ? "Nombre demasiado largo"
+    : null;
+  const digits = phone.replace(/\D/g, "");
+  const phoneError = digits.length < 6 ? "Teléfono inválido" : null;
+  return { nameError, phoneError };
+}
+
+// Normalize diacritics for header matching
+function norm(s: string) {
+  return s.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").trim();
+}
+
+function findCol(headers: string[], keywords: string[]): number {
+  return headers.findIndex((h) => keywords.includes(norm(h)));
+}
+
+async function parseFileToRows(file: File, dialCode: string): Promise<BulkRow[]> {
+  let pairs: [string, string][] = [];
+
+  if (file.name.toLowerCase().endsWith(".csv") || file.name.toLowerCase().endsWith(".txt")) {
+    const text = await file.text();
+    const lines = text.split(/\r?\n/).filter((l) => l.trim());
+    if (!lines.length) return [];
+    const sep = lines[0].includes(";") ? ";" : ",";
+    const headers = lines[0].split(sep).map((h) => h.replace(/^["']|["']$/g, "").trim());
+    const ni = findCol(headers, ["nombre", "name", "cliente", "customer", "customer_name"]);
+    const pi = findCol(headers, ["telefono", "phone", "tel", "movil", "whatsapp", "celular", "tlf", "tlfno"]);
+    const colN = ni >= 0 ? ni : 0;
+    const colP = pi >= 0 ? pi : 1;
+    const start = ni >= 0 || pi >= 0 ? 1 : 0;
+    pairs = lines.slice(start).map((line) => {
+      const cells = line.split(sep).map((c) => c.trim().replace(/^["']|["']$/g, ""));
+      return [cells[colN] ?? "", cells[colP] ?? ""];
+    });
+  } else {
+    // XLSX — dynamic import so it only loads when used
+    const XLSX = await import("xlsx");
+    const ab = await file.arrayBuffer();
+    const wb = XLSX.read(ab);
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const raw = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, raw: false, defval: "" });
+    if (!raw.length) return [];
+    const firstRow = raw[0].map((c) => String(c));
+    const ni = findCol(firstRow, ["nombre", "name", "cliente", "customer", "customer_name"]);
+    const pi = findCol(firstRow, ["telefono", "phone", "tel", "movil", "whatsapp", "celular", "tlf", "tlfno"]);
+    const colN = ni >= 0 ? ni : 0;
+    const colP = pi >= 0 ? pi : 1;
+    const start = ni >= 0 || pi >= 0 ? 1 : 0;
+    pairs = raw.slice(start).map((row) => [String(row[colN] ?? ""), String(row[colP] ?? "")]);
+  }
+
+  return pairs
+    .filter(([n, p]) => n || p)
+    .map(([n, p], idx) => {
+      const phone = normalizePhone(p, dialCode);
+      const { nameError, phoneError } = validateBulkRow(n.trim(), phone);
+      return { id: idx, name: n.trim(), rawPhone: p, phone, nameError, phoneError };
+    });
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export default function ClientesPage() {
   const router = useRouter();
+
+  // Shared
+  const [mode, setMode] = useState<"manual" | "bulk">("manual");
   const [country, setCountry] = useState<Country>(DEFAULT_COUNTRY);
+
+  // Manual form
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({ customer_name: "", customer_phone: "" });
@@ -85,6 +179,16 @@ export default function ClientesPage() {
   const [error, setError] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef   = useRef<HTMLInputElement>(null);
+
+  // Bulk upload
+  const [bulkRows, setBulkRows]       = useState<BulkRow[]>([]);
+  const [bulkFileName, setBulkFileName] = useState("");
+  const [bulkParseError, setBulkParseError] = useState("");
+  const [sendStatus, setSendStatus]   = useState<"idle" | "sending" | "done">("idle");
+  const [sendProgress, setSendProgress] = useState(0);
+  const [sendResult, setSendResult]   = useState<BulkResult | null>(null);
+  const [dragOver, setDragOver]       = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { setCountry(loadCountry()); }, []);
 
@@ -108,6 +212,16 @@ export default function ClientesPage() {
     localStorage.setItem(STORAGE_KEY, c.code);
     setDropdownOpen(false);
     setSearch("");
+    // Re-normalize bulk phones when country changes
+    if (bulkRows.length) {
+      setBulkRows((rows) =>
+        rows.map((r) => {
+          const phone = normalizePhone(r.rawPhone, c.dial);
+          const { nameError, phoneError } = validateBulkRow(r.name, phone);
+          return { ...r, phone, nameError, phoneError };
+        })
+      );
+    }
   }
 
   const filteredCountries = COUNTRIES.filter(
@@ -116,48 +230,26 @@ export default function ClientesPage() {
       c.dial.includes(search)
   );
 
-  async function handleSubmit(e: React.FormEvent) {
+  // ── Manual submit ────────────────────────────────────────────────────────────
+  async function handleManualSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSuccess(false);
 
-    if (!form.customer_name.trim()) {
-      setError("El nombre del cliente es obligatorio");
-      return;
-    }
-    if (form.customer_name.trim().length > 100) {
-      setError("El nombre no puede superar los 100 caracteres");
-      return;
-    }
+    if (!form.customer_name.trim()) { setError("El nombre del cliente es obligatorio"); return; }
+    if (form.customer_name.trim().length > 100) { setError("El nombre no puede superar los 100 caracteres"); return; }
     const digits = form.customer_phone.replace(/\D/g, "");
-    if (!digits || digits.length < 6) {
-      setError("Introduce un número de teléfono válido");
-      return;
-    }
+    if (!digits || digits.length < 6) { setError("Introduce un número de teléfono válido"); return; }
 
     setLoading(true);
     setRetrying(false);
-
     const fullPhone = `${country.dial}${digits}`;
-
-    // Simula el estado de "reintentando" después del primer intento fallido
-    const retryTimer = setTimeout(() => {
-      setRetrying(true);
-    }, RETRY_DELAY_MS + 200);
+    const retryTimer = setTimeout(() => setRetrying(true), RETRY_DELAY_MS + 200);
 
     try {
-      const res = await sendWithRetry({
-        customer_name: form.customer_name.trim(),
-        customer_phone: fullPhone,
-      });
-
+      const res = await sendWithRetry({ customer_name: form.customer_name.trim(), customer_phone: fullPhone });
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error ?? "Error al enviar la solicitud");
-        return;
-      }
-
+      if (!res.ok) { setError(data.error ?? "Error al enviar la solicitud"); return; }
       setSuccess(true);
       setForm({ customer_name: "", customer_phone: "" });
     } catch {
@@ -169,6 +261,69 @@ export default function ClientesPage() {
     }
   }
 
+  // ── Bulk handlers ────────────────────────────────────────────────────────────
+  async function handleFileSelect(file: File) {
+    setBulkParseError("");
+    setSendResult(null);
+    setSendStatus("idle");
+    setSendProgress(0);
+    setBulkFileName(file.name);
+    try {
+      const rows = await parseFileToRows(file, country.dial);
+      if (!rows.length) {
+        setBulkParseError("No se encontraron filas con datos en el archivo.");
+        setBulkRows([]);
+        return;
+      }
+      setBulkRows(rows);
+    } catch (err) {
+      setBulkParseError("No se pudo leer el archivo. Comprueba que sea un Excel (.xlsx) o CSV (.csv) válido.");
+      setBulkRows([]);
+      console.error(err);
+    }
+  }
+
+  function clearBulkFile() {
+    setBulkRows([]);
+    setBulkFileName("");
+    setBulkParseError("");
+    setSendResult(null);
+    setSendStatus("idle");
+    setSendProgress(0);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleBulkSend() {
+    const valid = bulkRows.filter((r) => !r.nameError && !r.phoneError);
+    if (!valid.length) return;
+    setSendStatus("sending");
+    setSendProgress(0);
+    const result: BulkResult = { success: 0, errors: [] };
+
+    for (let i = 0; i < valid.length; i++) {
+      const row = valid[i];
+      try {
+        const res = await sendWithRetry({ customer_name: row.name, customer_phone: row.phone });
+        if (res.ok) {
+          result.success++;
+        } else {
+          const data = await res.json().catch(() => ({}));
+          result.errors.push({ name: row.name, reason: data.error ?? `Error ${res.status}` });
+        }
+      } catch {
+        result.errors.push({ name: row.name, reason: "Error de conexión" });
+      }
+      setSendProgress(i + 1);
+      if (i < valid.length - 1) await new Promise((r) => setTimeout(r, SEND_DELAY_MS));
+    }
+
+    setSendResult(result);
+    setSendStatus("done");
+  }
+
+  const validCount   = bulkRows.filter((r) => !r.nameError && !r.phoneError).length;
+  const invalidCount = bulkRows.length - validCount;
+
   return (
     <div className="max-w-lg animate-fade-in">
       <div className="mb-5 lg:mb-8">
@@ -178,179 +333,442 @@ export default function ClientesPage() {
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-card">
-        {success ? (
-          <div className="text-center py-8 animate-fade-in">
-            <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">¡WhatsApp enviado!</h2>
-            <p className="text-gray-500 mb-6 text-sm max-w-xs mx-auto">
-              El cliente recibirá el mensaje en su WhatsApp en breve.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => setSuccess(false)}
-                className="flex-1 bg-brand-600 hover:bg-brand-700 active:bg-brand-800
-                           text-white font-semibold py-3.5 rounded-xl transition text-base"
-              >
-                Enviar otro
-              </button>
-              <button
-                onClick={() => router.push("/resenas")}
-                className="flex-1 border border-gray-300 text-gray-700 font-semibold
-                           py-3.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition text-base"
-              >
-                Ver reseñas
-              </button>
-            </div>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="customer_name" className="block text-sm font-semibold text-gray-700 mb-2">
-                Nombre del cliente
-              </label>
-              <input
-                id="customer_name"
-                name="customer_name"
-                type="text"
-                value={form.customer_name}
-                onChange={(e) => setForm((p) => ({ ...p, customer_name: e.target.value }))}
-                required
-                disabled={loading}
-                autoComplete="off"
-                className="w-full px-4 py-3.5 border border-gray-300 rounded-xl
-                           focus:ring-2 focus:ring-brand-500 focus:border-transparent
-                           outline-none transition text-base disabled:opacity-60 disabled:bg-gray-50"
-                placeholder="Ej: María García"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="customer_phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                Teléfono (WhatsApp)
-              </label>
-
-              <div className={`flex rounded-xl border overflow-visible transition
-                ${loading ? "border-gray-200 opacity-60" : "border-gray-300 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent"}`}>
-                {/* Country selector */}
-                <div ref={dropdownRef} className="relative shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => !loading && setDropdownOpen((o) => !o)}
-                    disabled={loading}
-                    className="flex items-center gap-1.5 px-3 py-3.5 bg-gray-50 hover:bg-gray-100
-                               active:bg-gray-200 border-r border-gray-300 rounded-l-xl
-                               transition h-full text-sm font-medium text-gray-700 whitespace-nowrap
-                               min-w-[80px] justify-center disabled:cursor-not-allowed"
-                    aria-label="Seleccionar país"
-                  >
-                    <span className="text-xl leading-none">{country.flag}</span>
-                    <span className="text-gray-500 text-xs">{country.dial}</span>
-                    <svg
-                      className={`w-3 h-3 text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
-                      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
-                      aria-hidden="true"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {dropdownOpen && (
-                    <div className="absolute left-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
-                      <div className="p-2 border-b border-gray-100">
-                        <input
-                          ref={searchRef}
-                          type="text"
-                          value={search}
-                          onChange={(e) => setSearch(e.target.value)}
-                          placeholder="Buscar país o prefijo..."
-                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-brand-400"
-                        />
-                      </div>
-                      <div className="max-h-56 overflow-y-auto">
-                        {filteredCountries.length === 0 ? (
-                          <p className="text-sm text-gray-400 text-center py-4">Sin resultados</p>
-                        ) : (
-                          filteredCountries.map((c) => (
-                            <button
-                              key={c.code}
-                              type="button"
-                              onClick={() => selectCountry(c)}
-                              className={`w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-brand-50 transition text-left ${
-                                c.code === country.code ? "bg-brand-50 font-semibold text-brand-700" : "text-gray-700"
-                              }`}
-                            >
-                              <span className="text-lg">{c.flag}</span>
-                              <span className="flex-1 truncate">{c.name}</span>
-                              <span className="text-gray-400 text-xs">{c.dial}</span>
-                            </button>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Phone input */}
-                <input
-                  id="customer_phone"
-                  name="customer_phone"
-                  type="tel"
-                  inputMode="numeric"
-                  value={form.customer_phone}
-                  onChange={(e) => setForm((p) => ({ ...p, customer_phone: e.target.value }))}
-                  required
-                  disabled={loading}
-                  className="flex-1 px-4 py-3.5 outline-none text-base rounded-r-xl bg-white min-w-0 disabled:bg-gray-50"
-                  placeholder="612 345 678"
-                />
-              </div>
-              <p className="text-xs text-gray-400 mt-1.5">
-                {country.flag} {country.dial} — número local sin prefijo
-              </p>
-            </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-100 text-red-700 text-sm rounded-xl px-4 py-3 flex items-start gap-2">
-                <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                </svg>
-                <span>{error}</span>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800
-                         disabled:opacity-70 text-white font-bold py-4 rounded-xl
-                         transition text-base flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                  </svg>
-                  {retrying ? "Reintentando envío..." : "Enviando WhatsApp..."}
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  Enviar por WhatsApp
-                </>
-              )}
-            </button>
-          </form>
-        )}
+      {/* ── Mode tabs ─────────────────────────────────────────────────────── */}
+      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl mb-5">
+        {(["manual", "bulk"] as const).map((m) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition ${
+              mode === m ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {m === "manual" ? "Un contacto" : "Importar Excel"}
+          </button>
+        ))}
       </div>
 
+      {mode === "manual" ? (
+        /* ── Manual form ───────────────────────────────────────────────────── */
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 shadow-card">
+          {success ? (
+            <div className="text-center py-8 animate-fade-in">
+              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">¡WhatsApp enviado!</h2>
+              <p className="text-gray-500 mb-6 text-sm max-w-xs mx-auto">
+                El cliente recibirá el mensaje en su WhatsApp en breve.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => setSuccess(false)}
+                  className="flex-1 bg-brand-600 hover:bg-brand-700 active:bg-brand-800
+                             text-white font-semibold py-3.5 rounded-xl transition text-base"
+                >
+                  Enviar otro
+                </button>
+                <button
+                  onClick={() => router.push("/resenas")}
+                  className="flex-1 border border-gray-300 text-gray-700 font-semibold
+                             py-3.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition text-base"
+                >
+                  Ver reseñas
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleManualSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="customer_name" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Nombre del cliente
+                </label>
+                <input
+                  id="customer_name"
+                  name="customer_name"
+                  type="text"
+                  value={form.customer_name}
+                  onChange={(e) => setForm((p) => ({ ...p, customer_name: e.target.value }))}
+                  required
+                  disabled={loading}
+                  autoComplete="off"
+                  className="w-full px-4 py-3.5 border border-gray-300 rounded-xl
+                             focus:ring-2 focus:ring-brand-500 focus:border-transparent
+                             outline-none transition text-base disabled:opacity-60 disabled:bg-gray-50"
+                  placeholder="Ej: María García"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="customer_phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Teléfono (WhatsApp)
+                </label>
+                <div className={`flex rounded-xl border overflow-visible transition
+                  ${loading ? "border-gray-200 opacity-60" : "border-gray-300 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent"}`}>
+                  <div ref={dropdownRef} className="relative shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => !loading && setDropdownOpen((o) => !o)}
+                      disabled={loading}
+                      className="flex items-center gap-1.5 px-3 py-3.5 bg-gray-50 hover:bg-gray-100
+                                 active:bg-gray-200 border-r border-gray-300 rounded-l-xl
+                                 transition h-full text-sm font-medium text-gray-700 whitespace-nowrap
+                                 min-w-[80px] justify-center disabled:cursor-not-allowed"
+                      aria-label="Seleccionar país"
+                    >
+                      <span className="text-xl leading-none">{country.flag}</span>
+                      <span className="text-gray-500 text-xs">{country.dial}</span>
+                      <svg
+                        className={`w-3 h-3 text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                        aria-hidden="true"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {dropdownOpen && (
+                      <div className="absolute left-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                        <div className="p-2 border-b border-gray-100">
+                          <input
+                            ref={searchRef}
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Buscar país o prefijo..."
+                            className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-brand-400"
+                          />
+                        </div>
+                        <div className="max-h-56 overflow-y-auto">
+                          {filteredCountries.length === 0 ? (
+                            <p className="text-sm text-gray-400 text-center py-4">Sin resultados</p>
+                          ) : (
+                            filteredCountries.map((c) => (
+                              <button
+                                key={c.code}
+                                type="button"
+                                onClick={() => selectCountry(c)}
+                                className={`w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-brand-50 transition text-left ${
+                                  c.code === country.code ? "bg-brand-50 font-semibold text-brand-700" : "text-gray-700"
+                                }`}
+                              >
+                                <span className="text-lg">{c.flag}</span>
+                                <span className="flex-1 truncate">{c.name}</span>
+                                <span className="text-gray-400 text-xs">{c.dial}</span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <input
+                    id="customer_phone"
+                    name="customer_phone"
+                    type="tel"
+                    inputMode="numeric"
+                    value={form.customer_phone}
+                    onChange={(e) => setForm((p) => ({ ...p, customer_phone: e.target.value }))}
+                    required
+                    disabled={loading}
+                    className="flex-1 px-4 py-3.5 outline-none text-base rounded-r-xl bg-white min-w-0 disabled:bg-gray-50"
+                    placeholder="612 345 678"
+                  />
+                </div>
+                <p className="text-xs text-gray-400 mt-1.5">
+                  {country.flag} {country.dial} — número local sin prefijo
+                </p>
+              </div>
+
+              {error && (
+                <div className="bg-red-50 border border-red-100 text-red-700 text-sm rounded-xl px-4 py-3 flex items-start gap-2">
+                  <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  </svg>
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800
+                           disabled:opacity-70 text-white font-bold py-4 rounded-xl
+                           transition text-base flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    {retrying ? "Reintentando envío..." : "Enviando WhatsApp..."}
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    Enviar por WhatsApp
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+        </div>
+      ) : (
+        /* ── Bulk upload ───────────────────────────────────────────────────── */
+        <div className="space-y-4">
+
+          {/* Drop zone / file selector */}
+          {!bulkFileName ? (
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOver(false);
+                const file = e.dataTransfer.files[0];
+                if (file) handleFileSelect(file);
+              }}
+              className={`bg-white border-2 border-dashed rounded-2xl p-8 text-center transition
+                ${dragOver ? "border-brand-400 bg-brand-50" : "border-gray-200 hover:border-gray-300"}`}
+            >
+              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Upload className="w-6 h-6 text-gray-400" strokeWidth={1.75} />
+              </div>
+              <p className="font-semibold text-gray-700 mb-1">Arrastra tu archivo aquí</p>
+              <p className="text-sm text-gray-400 mb-4">Compatible con Excel (.xlsx) y CSV (.csv)</p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition"
+                >
+                  Seleccionar archivo
+                </button>
+                <a
+                  href="/plantilla-resenasya.csv"
+                  download
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 font-medium transition"
+                >
+                  <Download className="w-4 h-4" strokeWidth={1.75} />
+                  Descargar plantilla
+                </a>
+              </div>
+              <p className="text-xs text-gray-400 mt-4">
+                La plantilla debe tener dos columnas: <strong>Nombre</strong> y <strong>Telefono</strong>
+              </p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls,.csv,.txt"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileSelect(file);
+                }}
+              />
+            </div>
+          ) : (
+            /* File loaded — preview table */
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
+              {/* File header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/80">
+                <div className="flex items-center gap-2 min-w-0">
+                  <FileSpreadsheet className="w-4 h-4 text-brand-600 shrink-0" strokeWidth={1.75} />
+                  <span className="text-sm font-medium text-gray-700 truncate">{bulkFileName}</span>
+                  {bulkRows.length > 0 && (
+                    <span className="text-xs text-gray-400 shrink-0">· {bulkRows.length} filas</span>
+                  )}
+                </div>
+                <button
+                  onClick={clearBulkFile}
+                  className="text-gray-400 hover:text-gray-600 transition p-1 rounded-lg hover:bg-gray-100"
+                  aria-label="Quitar archivo"
+                >
+                  <X className="w-4 h-4" strokeWidth={2} />
+                </button>
+              </div>
+
+              {bulkParseError ? (
+                <div className="px-4 py-8 text-center">
+                  <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" strokeWidth={1.75} />
+                  <p className="text-sm text-red-600 font-medium">{bulkParseError}</p>
+                </div>
+              ) : (
+                <>
+                  {/* Stats */}
+                  <div className="flex items-center gap-4 px-4 py-2.5 border-b border-gray-100 text-xs font-medium">
+                    <span className="flex items-center gap-1 text-green-600">
+                      <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2} />
+                      {validCount} válidos
+                    </span>
+                    {invalidCount > 0 && (
+                      <span className="flex items-center gap-1 text-red-500">
+                        <AlertCircle className="w-3.5 h-3.5" strokeWidth={2} />
+                        {invalidCount} con error
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Preview */}
+                  <div className="overflow-x-auto max-h-64 overflow-y-auto">
+                    <table className="w-full text-xs">
+                      <thead className="sticky top-0 bg-gray-50 border-b border-gray-100">
+                        <tr>
+                          <th className="text-left px-4 py-2 text-gray-400 font-medium w-8">#</th>
+                          <th className="text-left px-4 py-2 text-gray-500 font-medium">Nombre</th>
+                          <th className="text-left px-4 py-2 text-gray-500 font-medium">Teléfono</th>
+                          <th className="px-4 py-2 w-6"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {bulkRows.map((row) => {
+                          const hasError = row.nameError || row.phoneError;
+                          return (
+                            <tr key={row.id} className={hasError ? "bg-red-50/40" : ""}>
+                              <td className="px-4 py-2 text-gray-300">{row.id + 1}</td>
+                              <td className="px-4 py-2">
+                                <span className={row.nameError ? "text-red-600" : "text-gray-700"}>
+                                  {row.name || <span className="italic text-gray-300">vacío</span>}
+                                </span>
+                                {row.nameError && (
+                                  <span className="block text-red-400 text-[10px]">{row.nameError}</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-2 font-mono">
+                                <span className={row.phoneError ? "text-red-600" : "text-gray-600"}>
+                                  {row.phone || <span className="italic text-gray-300 font-sans">vacío</span>}
+                                </span>
+                                {row.phoneError && (
+                                  <span className="block text-red-400 text-[10px] font-sans">{row.phoneError}</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-2">
+                                {hasError
+                                  ? <AlertCircle className="w-3.5 h-3.5 text-red-400" strokeWidth={2} />
+                                  : <CheckCircle2 className="w-3.5 h-3.5 text-green-500" strokeWidth={2} />
+                                }
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Country prefix selector */}
+          {bulkRows.length > 0 && sendStatus === "idle" && (
+            <div className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-card flex items-center gap-3">
+              <span className="text-xs text-gray-500 font-medium shrink-0">Prefijo por defecto:</span>
+              <select
+                value={country.code}
+                onChange={(e) => {
+                  const found = COUNTRIES.find((c) => c.code === e.target.value);
+                  if (found) selectCountry(found);
+                }}
+                className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+              >
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.flag} {c.name} ({c.dial})
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-400 hidden sm:block">Solo aplica a números sin prefijo</p>
+            </div>
+          )}
+
+          {/* Progress */}
+          {sendStatus === "sending" && (
+            <div className="bg-white rounded-2xl border border-gray-200 px-4 py-4 shadow-card">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-brand-600" strokeWidth={2} />
+                  Enviando {sendProgress} de {validCount}...
+                </span>
+                <span className="text-xs text-gray-400 tabular-nums">
+                  {Math.round((sendProgress / validCount) * 100)}%
+                </span>
+              </div>
+              <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                <div
+                  className="h-full bg-brand-500 rounded-full transition-all duration-300"
+                  style={{ width: `${(sendProgress / validCount) * 100}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-2">No cierres esta página mientras se envían los mensajes</p>
+            </div>
+          )}
+
+          {/* Results */}
+          {sendStatus === "done" && sendResult && (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
+              <div className="px-4 py-4 border-b border-gray-100 flex items-center gap-5 text-sm font-medium">
+                <span className="flex items-center gap-1.5 text-green-600">
+                  <CheckCircle2 className="w-4 h-4" strokeWidth={2} />
+                  {sendResult.success} enviados
+                </span>
+                {sendResult.errors.length > 0 && (
+                  <span className="flex items-center gap-1.5 text-red-500">
+                    <AlertCircle className="w-4 h-4" strokeWidth={2} />
+                    {sendResult.errors.length} con error
+                  </span>
+                )}
+              </div>
+              {sendResult.errors.length > 0 && (
+                <div className="px-4 py-3 space-y-1.5 max-h-40 overflow-y-auto border-b border-gray-100">
+                  {sendResult.errors.map((e, i) => (
+                    <p key={i} className="text-xs text-red-600">
+                      <span className="font-medium">{e.name}:</span> {e.reason}
+                    </p>
+                  ))}
+                </div>
+              )}
+              <div className="px-4 py-3 bg-gray-50 flex gap-3">
+                <button
+                  onClick={clearBulkFile}
+                  className="flex-1 border border-gray-300 text-gray-700 text-sm font-semibold py-2.5 rounded-xl hover:bg-gray-100 transition"
+                >
+                  Importar otro archivo
+                </button>
+                <button
+                  onClick={() => router.push("/resenas")}
+                  className="flex-1 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-2.5 rounded-xl transition"
+                >
+                  Ver reseñas →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Send button */}
+          {bulkRows.length > 0 && sendStatus === "idle" && validCount > 0 && (
+            <button
+              onClick={handleBulkSend}
+              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl
+                         transition text-base flex items-center justify-center gap-2 shadow-md shadow-brand-200"
+            >
+              <Upload className="w-5 h-5" strokeWidth={2} />
+              Enviar {validCount} WhatsApp{validCount !== 1 ? "s" : ""}
+              {invalidCount > 0 && (
+                <span className="text-brand-200 font-normal text-sm ml-1">
+                  ({invalidCount} omitidos)
+                </span>
+              )}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* How it works */}
       <div className="mt-5 bg-blue-50 border border-blue-100 rounded-2xl p-4">
         <h3 className="font-semibold text-blue-900 mb-2 text-sm">¿Cómo funciona?</h3>
         <ol className="text-sm text-blue-800 space-y-1.5 list-decimal list-inside">
