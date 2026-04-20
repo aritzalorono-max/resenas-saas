@@ -156,31 +156,33 @@ export default function ClientesPage() {
 
   return (
     <div className="max-w-lg">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Enviar solicitud de reseña</h1>
-        <p className="text-gray-500 mt-1">
-          Introduce los datos del cliente para enviarle un WhatsApp pidiendo su opinión
+      <div className="mb-5 lg:mb-8">
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Enviar solicitud de reseña</h1>
+        <p className="text-gray-500 text-sm mt-1">
+          Introduce los datos del cliente para enviarle un WhatsApp
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
         {success ? (
           <div className="text-center py-8">
-            <div className="text-5xl mb-4">✅</div>
+            <div className="text-6xl mb-4">✅</div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">¡WhatsApp enviado!</h2>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-500 mb-6 text-sm">
               El cliente recibirá el mensaje en su WhatsApp en breve.
             </p>
-            <div className="flex gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => setSuccess(false)}
-                className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-lg transition"
+                className="flex-1 bg-brand-600 hover:bg-brand-700 active:bg-brand-800
+                           text-white font-semibold py-3.5 rounded-xl transition text-base"
               >
                 Enviar otro
               </button>
               <button
                 onClick={() => router.push("/resenas")}
-                className="border border-gray-300 text-gray-700 font-semibold px-5 py-2.5 rounded-lg hover:bg-gray-50 transition"
+                className="flex-1 border border-gray-300 text-gray-700 font-semibold
+                           py-3.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition text-base"
               >
                 Ver reseñas
               </button>
@@ -191,7 +193,7 @@ export default function ClientesPage() {
             <div>
               <label
                 htmlFor="customer_name"
-                className="block text-sm font-medium text-gray-700 mb-1.5"
+                className="block text-sm font-semibold text-gray-700 mb-2"
               >
                 Nombre del cliente
               </label>
@@ -204,8 +206,10 @@ export default function ClientesPage() {
                   setForm((p) => ({ ...p, customer_name: e.target.value }))
                 }
                 required
-                autoFocus
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-lg"
+                autoComplete="off"
+                className="w-full px-4 py-3.5 border border-gray-300 rounded-xl
+                           focus:ring-2 focus:ring-brand-500 focus:border-transparent
+                           outline-none transition text-lg"
                 placeholder="Ej: María García"
               />
             </div>
@@ -213,18 +217,22 @@ export default function ClientesPage() {
             <div>
               <label
                 htmlFor="customer_phone"
-                className="block text-sm font-medium text-gray-700 mb-1.5"
+                className="block text-sm font-semibold text-gray-700 mb-2"
               >
                 Teléfono (WhatsApp)
               </label>
 
-              <div className="flex gap-0 rounded-lg border border-gray-300 overflow-visible focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent">
+              <div className="flex rounded-xl border border-gray-300 overflow-visible
+                              focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent">
                 {/* Country selector */}
                 <div ref={dropdownRef} className="relative shrink-0">
                   <button
                     type="button"
                     onClick={() => setDropdownOpen((o) => !o)}
-                    className="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 hover:bg-gray-100 border-r border-gray-300 rounded-l-lg transition h-full text-sm font-medium text-gray-700 whitespace-nowrap"
+                    className="flex items-center gap-1.5 px-3 py-3.5 bg-gray-50 hover:bg-gray-100
+                               active:bg-gray-200 border-r border-gray-300 rounded-l-xl
+                               transition h-full text-sm font-medium text-gray-700 whitespace-nowrap
+                               min-w-[80px] justify-center"
                   >
                     <span className="text-xl leading-none">{country.flag}</span>
                     <span className="text-gray-500">{country.dial}</span>
@@ -280,22 +288,23 @@ export default function ClientesPage() {
                   id="customer_phone"
                   name="customer_phone"
                   type="tel"
+                  inputMode="numeric"
                   value={form.customer_phone}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, customer_phone: e.target.value }))
                   }
                   required
-                  className="flex-1 px-4 py-2.5 outline-none text-lg rounded-r-lg bg-white min-w-0"
+                  className="flex-1 px-4 py-3.5 outline-none text-lg rounded-r-xl bg-white min-w-0"
                   placeholder="612 345 678"
                 />
               </div>
               <p className="text-xs text-gray-400 mt-1.5">
-                Número local sin el prefijo — ya está seleccionado {country.flag} {country.dial}
+                {country.flag} {country.dial} — número local sin prefijo
               </p>
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3">
+              <div className="bg-red-50 text-red-700 text-sm rounded-xl px-4 py-3 font-medium">
                 {error}
               </div>
             )}
@@ -303,7 +312,9 @@ export default function ClientesPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-bold py-3 rounded-lg transition text-lg flex items-center justify-center gap-2"
+              className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800
+                         disabled:opacity-60 text-white font-bold py-4 rounded-xl
+                         transition text-lg flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

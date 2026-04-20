@@ -24,7 +24,16 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Añade pb-safe (padding-bottom: env(safe-area-inset-bottom)) para notch de iOS
+    function ({ addUtilities }: { addUtilities: (u: Record<string, Record<string, string>>) => void }) {
+      addUtilities({
+        ".safe-bottom": {
+          "padding-bottom": "env(safe-area-inset-bottom, 0px)",
+        },
+      });
+    },
+  ],
 };
 
 export default config;
