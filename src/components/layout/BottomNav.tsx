@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Send, Star, Settings } from "lucide-react";
+import { Home, Send, Star, Settings, Printer } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard",     label: "Inicio",   Icon: Home     },
   { href: "/clientes",      label: "Enviar",   Icon: Send     },
   { href: "/resenas",       label: "Reseñas",  Icon: Star     },
   { href: "/configuracion", label: "Config",   Icon: Settings },
+  { href: "/cartel",        label: "Cartel",   Icon: Printer  },
 ];
 
 /** Barra de navegación inferior visible solo en móvil (< lg) */

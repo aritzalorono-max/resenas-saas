@@ -3,13 +3,14 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { Home, Send, Star, Settings } from "lucide-react";
+import { Home, Send, Star, Settings, Printer } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard",     label: "Inicio",           Icon: Home     },
   { href: "/clientes",      label: "Enviar solicitud",  Icon: Send     },
   { href: "/resenas",       label: "Reseñas",           Icon: Star     },
   { href: "/configuracion", label: "Configuración",     Icon: Settings },
+  { href: "/cartel",        label: "Cartel QR",         Icon: Printer  },
 ];
 
 function Logo() {
