@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { Home, Send, Star, Settings, Printer } from "lucide-react";
+import { Home, Send, Star, Settings, Printer, UserCircle } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard",     label: "Inicio",           Icon: Home     },
@@ -70,6 +70,13 @@ export default async function DashboardLayout({
 
         <div className="p-4 border-t border-gray-100 space-y-2">
           <p className="text-xs text-gray-400 truncate px-1">{user.email}</p>
+          <Link
+            href="/cuenta"
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition font-medium"
+          >
+            <UserCircle className="w-4 h-4 shrink-0" />
+            Mi cuenta
+          </Link>
           <LogoutButton />
         </div>
       </aside>
@@ -82,9 +89,14 @@ export default async function DashboardLayout({
           <Link href="/dashboard">
             <Logo />
           </Link>
-          {business && (
-            <span className="text-xs text-gray-400 truncate max-w-[160px]">{business.name}</span>
-          )}
+          <div className="flex items-center gap-3">
+            {business && (
+              <span className="text-xs text-gray-400 truncate max-w-[120px]">{business.name}</span>
+            )}
+            <Link href="/cuenta" aria-label="Mi cuenta">
+              <UserCircle className="w-6 h-6 text-gray-400 hover:text-gray-700 transition" />
+            </Link>
+          </div>
         </header>
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { GoogleButton } from "@/components/auth/GoogleButton";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -59,6 +60,17 @@ export default function RegisterPage() {
     <div className="bg-white rounded-2xl shadow-xl p-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Crea tu cuenta</h1>
       <p className="text-gray-500 mb-6">Empieza a recopilar reseñas en minutos</p>
+
+      <GoogleButton label="Registrarse con Google" />
+
+      <div className="relative my-5">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-white px-3 text-sm text-gray-400">o regístrate con email</span>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
