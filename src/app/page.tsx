@@ -416,11 +416,11 @@ export default function LandingPage() {
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">¿Cómo funciona?</h2>
               <p className="text-gray-500 text-lg">4 pasos para conseguir más reseñas de Google Maps</p>
             </div>
-            <div className="grid md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
               {steps.map((step) => (
                 <div key={step.number} className="text-center">
                   <div className="text-4xl font-extrabold text-brand-200 mb-3">{step.number}</div>
-                  <h3 className="font-bold text-gray-900 mb-2">{step.title}</h3>
+                  <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">{step.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
                 </div>
               ))}
@@ -519,8 +519,8 @@ export default function LandingPage() {
                 Incentivo activo → reseña 5★ verificada y recompensa enviada
               </p>
               <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
-                <div className="grid md:grid-cols-2 gap-x-10 gap-y-3">
-                  {/* Columna izquierda: el cliente responde bien y recibe la oferta */}
+                <div className="space-y-3 max-w-sm mx-auto md:max-w-none md:grid md:grid-cols-2 md:gap-x-10 md:space-y-0">
+                  {/* Columna izquierda */}
                   <div className="space-y-3">
                     <div className="flex justify-start">
                       <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-amber-100">
@@ -538,9 +538,8 @@ export default function LandingPage() {
                       </div>
                     </div>
                   </div>
-                  {/* Columna derecha: la captura y la recompensa */}
-                  <div className="space-y-3 md:pt-0 pt-2 md:border-l-0 border-t md:border-t-0 border-amber-200 md:pt-0 pt-3">
-                    <div className="hidden md:block h-[72px]" /> {/* spacer visual */}
+                  {/* Columna derecha */}
+                  <div className="space-y-3 pt-3 border-t border-amber-200 md:pt-0 md:border-t-0">
                     <div className="flex justify-end">
                       <div className="bg-brand-500 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-xs text-sm flex items-center gap-2">
                         <span className="text-lg">📸</span>

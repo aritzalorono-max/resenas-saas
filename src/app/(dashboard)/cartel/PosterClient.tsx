@@ -26,7 +26,7 @@ export function PosterClient({
   return (
     <div>
       {/* Botón de impresión — se oculta al imprimir */}
-      <div className="print:hidden mb-6 flex items-center justify-between">
+      <div className="print:hidden mb-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Cartel para imprimir</h1>
           <p className="text-sm text-gray-500 mt-0.5">
@@ -35,8 +35,8 @@ export function PosterClient({
         </div>
         <button
           onClick={() => window.print()}
-          className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white
-                     text-sm font-medium px-4 py-2.5 rounded-xl transition"
+          className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-700 active:bg-gray-800
+                     text-white text-sm font-medium px-5 py-3 rounded-xl transition w-full sm:w-auto shrink-0"
         >
           <Printer size={16} />
           Imprimir / Guardar PDF

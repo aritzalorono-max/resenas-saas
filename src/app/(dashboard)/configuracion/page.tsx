@@ -314,11 +314,11 @@ export default function ConfiguracionPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Enlace activo <span className="text-gray-400 font-normal">(el que recibirán tus clientes)</span>
             </label>
-            <div className="flex gap-2">
+            <div className="flex flex-col xs:flex-row gap-2">
               <select
                 value={form.activePlatformName}
                 onChange={(e) => setForm((p) => ({ ...p, activePlatformName: e.target.value }))}
-                className="shrink-0 w-36 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                className="xs:shrink-0 xs:w-36 w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
               >
                 {PLATFORMS.map((p) => (
                   <option key={p.name} value={p.name}>{p.name}</option>
@@ -386,36 +386,41 @@ export default function ConfiguracionPage() {
 
           {/* Añadir otra plataforma */}
           {addingPlatform ? (
-            <div className="flex gap-2 items-start pt-1">
-              <select
-                value={newPlatformName}
-                onChange={(e) => setNewPlatformName(e.target.value)}
-                className="shrink-0 w-36 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
-              >
-                {PLATFORMS.map((p) => (
-                  <option key={p.name} value={p.name}>{p.name}</option>
-                ))}
-              </select>
-              <input
-                type="url" value={newPlatformUrl}
-                onChange={(e) => setNewPlatformUrl(e.target.value)}
-                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
-                placeholder={newPlaceholder}
-                autoFocus
-              />
-              <button
-                type="button" onClick={handleAddPlatform} disabled={!newPlatformUrl.trim()}
-                className="shrink-0 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition"
-              >
-                Añadir
-              </button>
-              <button
-                type="button"
-                onClick={() => { setAddingPlatform(false); setNewPlatformUrl(""); }}
-                className="shrink-0 text-gray-400 hover:text-gray-600 text-sm px-2 py-2.5"
-              >
-                ✕
-              </button>
+            <div className="flex flex-col gap-2 pt-1">
+              <div className="flex gap-2">
+                <select
+                  value={newPlatformName}
+                  onChange={(e) => setNewPlatformName(e.target.value)}
+                  className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                >
+                  {PLATFORMS.map((p) => (
+                    <option key={p.name} value={p.name}>{p.name}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => { setAddingPlatform(false); setNewPlatformUrl(""); }}
+                  className="shrink-0 text-gray-400 hover:text-gray-600 p-2.5 rounded-lg hover:bg-gray-100 transition"
+                  aria-label="Cancelar"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="url" value={newPlatformUrl}
+                  onChange={(e) => setNewPlatformUrl(e.target.value)}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                  placeholder={newPlaceholder}
+                  autoFocus
+                />
+                <button
+                  type="button" onClick={handleAddPlatform} disabled={!newPlatformUrl.trim()}
+                  className="shrink-0 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition"
+                >
+                  Añadir
+                </button>
+              </div>
             </div>
           ) : (
             <button

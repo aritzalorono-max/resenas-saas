@@ -87,15 +87,15 @@ export default async function ResenasPage({
         </p>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-2 mb-6 flex-wrap">
+      {/* Filter tabs — horizontal scroll en móvil */}
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {filterTabs.map((tab) => {
           const isActive = active === tab.value;
           return (
             <Link
               key={tab.value}
               href={buildHref(1, tab.value)}
-              className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+              className={`shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
                 isActive
                   ? "bg-brand-600 text-white shadow-sm"
                   : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700"
@@ -196,34 +196,34 @@ export default async function ResenasPage({
 
           {/* Paginación */}
           {totalPages > 1 && (
-            <div className="mt-6 flex items-center justify-between">
-              <p className="text-sm text-gray-500">
-                Página {page} de {totalPages}
+            <div className="mt-6 flex flex-col sm:flex-row items-center gap-3 sm:justify-between">
+              <p className="text-sm text-gray-500 order-2 sm:order-1">
+                Pág. {page}/{totalPages}
                 <span className="text-gray-400"> · {total} solicitudes</span>
               </p>
-              <div className="flex gap-2">
-                {hasPrev && (
-                  <Link
-                    href={buildHref(page - 1)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-brand-300 hover:text-brand-700 transition"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                    </svg>
-                    Anterior
-                  </Link>
-                )}
-                {hasNext && (
-                  <Link
-                    href={buildHref(page + 1)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-brand-300 hover:text-brand-700 transition"
-                  >
-                    Siguiente
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                    </svg>
-                  </Link>
-                )}
+              <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
+                <Link
+                  href={hasPrev ? buildHref(page - 1) : "#"}
+                  aria-disabled={!hasPrev}
+                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition
+                    ${hasPrev ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                  Anterior
+                </Link>
+                <Link
+                  href={hasNext ? buildHref(page + 1) : "#"}
+                  aria-disabled={!hasNext}
+                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition
+                    ${hasNext ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
+                >
+                  Siguiente
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </Link>
               </div>
             </div>
           )}
