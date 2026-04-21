@@ -19,6 +19,12 @@ export type BusinessTone = "tuteo" | "usted" | "juvenil";
 // Entidades de base de datos
 // ---------------------------------------------------------------------------
 
+/** Enlace a una plataforma de reseñas configurada por el negocio */
+export interface ReviewPlatformLink {
+  name: string;
+  url: string;
+}
+
 /** Negocio registrado en la plataforma (uno por usuario) */
 export interface Business {
   id: string;
@@ -26,7 +32,10 @@ export interface Business {
   name: string;
   description: string | null;
   website_url: string | null;
+  /** URL de la plataforma de reseñas actualmente activa (se envía a los clientes) */
   google_maps_url: string | null;
+  /** Todas las plataformas de reseñas configuradas */
+  review_links: ReviewPlatformLink[];
   welcome_message: string;
   tone: BusinessTone;
   incentive_enabled: boolean;
@@ -55,7 +64,7 @@ export interface ReviewRequest {
  * Usado en el webhook para evitar una segunda consulta a la base de datos.
  */
 export interface ReviewRequestWithBusiness extends ReviewRequest {
-  businesses: Pick<Business, "name" | "google_maps_url" | "tone" | "incentive_enabled" | "incentive_description">;
+  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description">;
 }
 
 /** Estadísticas agregadas de un negocio (vista business_stats de Supabase) */

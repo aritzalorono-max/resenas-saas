@@ -6,7 +6,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Business } from "@/types";
+import type { Business, ReviewPlatformLink } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Lectura
@@ -42,6 +42,7 @@ export interface UpdateBusinessParams {
   description: string | null;
   website_url: string | null;
   google_maps_url: string | null;
+  review_links: ReviewPlatformLink[];
   welcome_message: string;
   tone: Business["tone"];
   incentive_enabled: boolean;

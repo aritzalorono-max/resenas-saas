@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
-import type { Business, BusinessTone } from "@/types";
+import type { Business, BusinessTone, ReviewPlatformLink } from "@/types";
 
-// Alias local para no cambiar el resto del componente
 const DEFAULT_WELCOME = DEFAULT_WELCOME_MESSAGE;
 
 const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; example: string }[] = [
@@ -13,13 +12,13 @@ const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; exam
     value: "tuteo",
     label: "Trato de tú",
     sublabel: "Cercano y amigable",
-    example: "¡Qué alegría saber eso, María! ¿Te animarías a dejar tu opinión...?",
+    example: "¡Qué alegría saber eso, María! ¿Te animarías a dejarnos una reseña...?",
   },
   {
     value: "usted",
     label: "Trato de usted",
     sublabel: "Formal y profesional",
-    example: "¡Qué alegría saber eso, María! ¿Se animaría a dejar su opinión...?",
+    example: "¡Qué alegría saber eso, María! ¿Se animaría a dejarnos una reseña...?",
   },
   {
     value: "juvenil",
@@ -29,6 +28,15 @@ const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; exam
   },
 ];
 
+const PREDEFINED_PLATFORMS: { name: string; placeholder: string }[] = [
+  { name: "Google Maps",  placeholder: "https://g.page/tu-negocio/review" },
+  { name: "Trustpilot",  placeholder: "https://www.trustpilot.com/review/tu-negocio.com" },
+  { name: "TripAdvisor", placeholder: "https://www.tripadvisor.es/Restaurant_Review-..." },
+  { name: "Booking.com", placeholder: "https://www.booking.com/hotel/..." },
+  { name: "Yelp",        placeholder: "https://www.yelp.com/biz/tu-negocio" },
+  { name: "Facebook",    placeholder: "https://www.facebook.com/tu-negocio/reviews" },
+];
+
 export default function ConfiguracionPage() {
   const [business, setBusiness] = useState<Business | null>(null);
   const [form, setForm] = useState({
@@ -36,6 +44,7 @@ export default function ConfiguracionPage() {
     description: "",
     website_url: "",
     google_maps_url: "",
+    review_links: [] as ReviewPlatformLink[],
     welcome_message: "",
     tone: "tuteo" as BusinessTone,
     incentive_enabled: false,
@@ -45,6 +54,12 @@ export default function ConfiguracionPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+
+  // Add-platform form state
+  const [showAddPlatform, setShowAddPlatform] = useState(false);
+  const [newPlatformName, setNewPlatformName] = useState("Google Maps");
+  const [customPlatformName, setCustomPlatformName] = useState("");
+  const [newPlatformUrl, setNewPlatformUrl] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -65,6 +80,7 @@ export default function ConfiguracionPage() {
           description: data.description ?? "",
           website_url: data.website_url ?? "",
           google_maps_url: data.google_maps_url ?? "",
+          review_links: data.review_links ?? [],
           welcome_message: data.welcome_message ?? DEFAULT_WELCOME,
           tone: data.tone ?? "tuteo",
           incentive_enabled: data.incentive_enabled ?? false,
@@ -82,6 +98,41 @@ export default function ConfiguracionPage() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
+  function handleAddPlatform() {
+    const name = newPlatformName === "__custom"
+      ? customPlatformName.trim()
+      : newPlatformName;
+    const url = newPlatformUrl.trim();
+    if (!name || !url) return;
+    if (form.review_links.some((l) => l.url === url)) return;
+
+    const newLinks = [...form.review_links, { name, url }];
+    setForm((p) => ({
+      ...p,
+      review_links: newLinks,
+      google_maps_url: p.google_maps_url || url,
+    }));
+    setShowAddPlatform(false);
+    setNewPlatformUrl("");
+    setNewPlatformName("Google Maps");
+    setCustomPlatformName("");
+  }
+
+  function handleRemovePlatform(url: string) {
+    const newLinks = form.review_links.filter((l) => l.url !== url);
+    setForm((p) => ({
+      ...p,
+      review_links: newLinks,
+      google_maps_url: p.google_maps_url === url
+        ? (newLinks[0]?.url ?? "")
+        : p.google_maps_url,
+    }));
+  }
+
+  function handleSetActivePlatform(url: string) {
+    setForm((p) => ({ ...p, google_maps_url: url }));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -96,7 +147,8 @@ export default function ConfiguracionPage() {
           name: form.name.trim(),
           description: form.description.trim() || null,
           website_url: form.website_url.trim() || null,
-          google_maps_url: form.google_maps_url.trim() || null,
+          google_maps_url: form.google_maps_url || null,
+          review_links: form.review_links,
           welcome_message: form.welcome_message.trim() || DEFAULT_WELCOME,
           tone: form.tone,
           incentive_enabled: form.incentive_enabled,
@@ -125,6 +177,9 @@ export default function ConfiguracionPage() {
       </div>
     );
   }
+
+  const currentPlaceholder =
+    PREDEFINED_PLATFORMS.find((p) => p.name === newPlatformName)?.placeholder ?? "https://...";
 
   return (
     <div className="max-w-2xl">
@@ -191,24 +246,144 @@ export default function ConfiguracionPage() {
               placeholder="https://www.tu-negocio.com"
             />
           </div>
+        </div>
 
+        {/* ── Plataformas de reseñas ── */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div>
-            <label htmlFor="google_maps_url" className="block text-sm font-medium text-gray-700 mb-1.5">
-              Enlace de Google Maps
-            </label>
-            <input
-              id="google_maps_url"
-              name="google_maps_url"
-              type="url"
-              value={form.google_maps_url}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-              placeholder="https://maps.google.com/..."
-            />
-            <p className="text-xs text-gray-400 mt-1.5">
-              Google Maps → tu negocio → Compartir → copiar enlace
+            <h2 className="font-semibold text-gray-900 text-lg">Plataformas de reseñas</h2>
+            <p className="text-sm text-gray-400 mt-0.5">
+              Añade los enlaces donde quieres recibir reseñas. La plataforma{" "}
+              <span className="font-medium text-brand-600">activa</span> es la que se envía a tus clientes.
             </p>
           </div>
+
+          {/* Lista de plataformas */}
+          {form.review_links.length > 0 ? (
+            <div className="space-y-2">
+              {form.review_links.map((link) => {
+                const isActive = link.url === form.google_maps_url;
+                return (
+                  <div
+                    key={link.url}
+                    className={`flex items-center gap-3 rounded-xl border-2 p-3.5 transition ${
+                      isActive
+                        ? "border-brand-500 bg-brand-50"
+                        : "border-gray-200 bg-white"
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className={`text-sm font-semibold ${isActive ? "text-brand-700" : "text-gray-800"}`}>
+                          {link.name}
+                        </p>
+                        {isActive && (
+                          <span className="text-xs font-medium bg-brand-500 text-white px-2 py-0.5 rounded-full">
+                            Activa
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">{link.url}</p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      {!isActive && (
+                        <button
+                          type="button"
+                          onClick={() => handleSetActivePlatform(link.url)}
+                          className="text-xs text-brand-600 font-semibold hover:text-brand-800"
+                        >
+                          Activar
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePlatform(link.url)}
+                        className="text-xs text-gray-400 hover:text-red-500 transition"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 text-center py-3">
+              No hay ninguna plataforma configurada todavía.
+            </p>
+          )}
+
+          {/* Formulario para añadir */}
+          {showAddPlatform ? (
+            <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Plataforma
+                </label>
+                <select
+                  value={newPlatformName}
+                  onChange={(e) => setNewPlatformName(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                >
+                  {PREDEFINED_PLATFORMS.map((p) => (
+                    <option key={p.name} value={p.name}>{p.name}</option>
+                  ))}
+                  <option value="__custom">Otra plataforma...</option>
+                </select>
+                {newPlatformName === "__custom" && (
+                  <input
+                    type="text"
+                    value={customPlatformName}
+                    onChange={(e) => setCustomPlatformName(e.target.value)}
+                    className="mt-2 w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                    placeholder="Nombre de la plataforma"
+                  />
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  URL de tu perfil en esa plataforma
+                </label>
+                <input
+                  type="url"
+                  value={newPlatformUrl}
+                  onChange={(e) => setNewPlatformUrl(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                  placeholder={newPlatformName === "__custom" ? "https://..." : currentPlaceholder}
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleAddPlatform}
+                  disabled={!newPlatformUrl.trim() || (newPlatformName === "__custom" && !customPlatformName.trim())}
+                  className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+                >
+                  Añadir
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddPlatform(false);
+                    setNewPlatformUrl("");
+                    setNewPlatformName("Google Maps");
+                    setCustomPlatformName("");
+                  }}
+                  className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2 rounded-lg border border-gray-200 bg-white transition"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowAddPlatform(true)}
+              className="w-full border-2 border-dashed border-gray-300 hover:border-brand-400 text-gray-500 hover:text-brand-600 text-sm font-medium py-3 rounded-xl transition"
+            >
+              + Añadir plataforma
+            </button>
+          )}
         </div>
 
         {/* ── Tono de comunicación ── */}
@@ -292,7 +467,7 @@ export default function ConfiguracionPage() {
           <div>
             <h2 className="font-semibold text-gray-900 text-lg">Incentivo por reseña 5 estrellas</h2>
             <p className="text-sm text-gray-400 mt-0.5">
-              Ofrece un regalo o descuento a los clientes que dejen una reseña de 5★ en Google Maps
+              Ofrece un regalo o descuento a los clientes que dejen la máxima puntuación en tu plataforma activa
             </p>
           </div>
 
@@ -323,7 +498,7 @@ export default function ConfiguracionPage() {
               <p className="text-xs text-gray-500 mt-0.5">
                 {form.incentive_enabled
                   ? "Los clientes satisfechos recibirán la oferta automáticamente"
-                  : "Actívalo para fomentar reseñas de 5 estrellas"}
+                  : "Actívalo para fomentar reseñas de máxima puntuación"}
               </p>
             </div>
           </button>
@@ -360,7 +535,7 @@ export default function ConfiguracionPage() {
 
           {!form.google_maps_url && form.incentive_enabled && (
             <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
-              Necesitas configurar tu enlace de Google Maps para que el incentivo funcione.
+              Necesitas configurar al menos una plataforma de reseñas y activarla para que el incentivo funcione.
             </div>
           )}
         </div>

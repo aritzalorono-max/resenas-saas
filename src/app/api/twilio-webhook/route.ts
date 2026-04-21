@@ -116,6 +116,8 @@ export async function POST(request: Request): Promise<Response> {
       const { businesses: business } = screenshotRequest;
       const tone = business.tone ?? "tuteo";
       const incentiveDescription = business.incentive_description ?? "";
+      const activePlatformName =
+        business.review_links?.find((l) => l.url === business.google_maps_url)?.name ?? "Google Maps";
 
       let screenshotResult: Awaited<ReturnType<typeof analyzeScreenshot>>;
       try {
@@ -141,7 +143,8 @@ export async function POST(request: Request): Promise<Response> {
           screenshotRequest.customer_name,
           business.name,
           incentiveDescription,
-          tone
+          tone,
+          activePlatformName
         );
 
         try {
@@ -191,6 +194,8 @@ export async function POST(request: Request): Promise<Response> {
 
   logger.info(`Solicitud encontrada: ${reviewRequest.id} (cliente: ${reviewRequest.customer_name})`);
   const { businesses: business } = reviewRequest;
+  const activePlatformName =
+    business.review_links?.find((l) => l.url === business.google_maps_url)?.name ?? "Google Maps";
 
   // ── 4. Analizar sentimiento con Claude ────────────────────────────────────
   let sentiment: Awaited<ReturnType<typeof analyzeSentiment>>;
@@ -231,6 +236,7 @@ export async function POST(request: Request): Promise<Response> {
     googleMapsUrl: business.google_maps_url,
     sentiment: sentiment.sentiment,
     tone: business.tone ?? "tuteo",
+    platformName: activePlatformName,
     incentiveEnabled: business.incentive_enabled,
     incentiveDescription: business.incentive_description,
   });

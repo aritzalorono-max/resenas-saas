@@ -44,8 +44,8 @@ Sé estricto: solo clasifica como "positive" cuando haya satisfacción evidente.
  * @returns Objeto con sentimiento, puntuación numérica y resumen textual
  * @throws Si la respuesta de Claude no es un JSON válido con la estructura esperada
  */
-const SCREENSHOT_SYSTEM_PROMPT = `Eres un verificador de reseñas de Google Maps.
-Tu tarea es analizar una imagen que debería ser una captura de pantalla de una reseña de Google Maps y determinar si muestra claramente una puntuación de 5 estrellas.
+const SCREENSHOT_SYSTEM_PROMPT = `Eres un verificador de reseñas de plataformas como Google Maps, Trustpilot, TripAdvisor, Yelp, Booking.com, Facebook y otras.
+Tu tarea es analizar una imagen que debería ser una captura de pantalla de una reseña publicada y determinar si muestra la puntuación máxima posible en esa plataforma.
 
 Responde SIEMPRE con un JSON válido con esta estructura exacta:
 {
@@ -54,10 +54,22 @@ Responde SIEMPRE con un JSON válido con esta estructura exacta:
   "reason": "explicación breve en español (máximo 100 caracteres)"
 }
 
-Criterios:
-- "isFiveStars": true SOLO si se ven claramente 5 estrellas rellenas en una reseña de Google Maps
-- Si la imagen es borrosa, no es de Google Maps, o muestra menos de 5 estrellas, devuelve false
-- Sé conservador: en caso de duda, devuelve false`;
+Criterios por plataforma — "isFiveStars" es true SOLO si se ve claramente la puntuación máxima:
+- Google Maps: 5 estrellas amarillas completamente rellenas
+- Trustpilot: 5 estrellas verdes / etiqueta "Excelente"
+- TripAdvisor: 5 círculos/burbujas completamente rellenos
+- Booking.com: puntuación igual o superior a 9.0 sobre 10
+- Yelp: 5 estrellas completamente rellenas
+- Facebook: 5 estrellas en una recomendación
+- Otras plataformas: la puntuación máxima reconocible
+
+Causas para devolver false:
+- La imagen es borrosa o ilegible
+- No parece ser una reseña de ninguna plataforma conocida
+- La puntuación visible es menor que el máximo
+- Solo se ven textos sin calificación visible
+
+Sé conservador: en caso de duda, devuelve false.`;
 
 /**
  * Descarga una imagen de Twilio (requiere Basic Auth) y analiza con Claude vision

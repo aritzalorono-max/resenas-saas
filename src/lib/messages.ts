@@ -18,6 +18,7 @@ interface TemplateVars {
   negocio?: string;
   url?: string;
   incentivo?: string;
+  plataforma?: string;
 }
 
 function applyTemplate(template: string, vars: TemplateVars): string {
@@ -25,7 +26,8 @@ function applyTemplate(template: string, vars: TemplateVars): string {
     .replace(/{nombre}/g, vars.nombre ?? "")
     .replace(/{negocio}/g, vars.negocio ?? "")
     .replace(/{url}/g, vars.url ?? "")
-    .replace(/{incentivo}/g, vars.incentivo ?? "");
+    .replace(/{incentivo}/g, vars.incentivo ?? "")
+    .replace(/{plataforma}/g, vars.plataforma ?? "");
 }
 
 // ---------------------------------------------------------------------------
@@ -39,13 +41,15 @@ function applyTemplate(template: string, vars: TemplateVars): string {
 export function buildPositiveFollowUp(
   customerName: string,
   businessName: string,
-  googleMapsUrl: string,
-  tone: BusinessTone = "tuteo"
+  reviewUrl: string,
+  tone: BusinessTone = "tuteo",
+  platformName = "Google Maps"
 ): string {
   return applyTemplate(MESSAGE_TEMPLATES[tone].positive, {
     nombre: customerName,
     negocio: businessName,
-    url: googleMapsUrl,
+    url: reviewUrl,
+    plataforma: platformName,
   });
 }
 
@@ -71,13 +75,15 @@ export function buildNegativeFollowUp(
 export function buildNeutralFollowUp(
   customerName: string,
   businessName: string,
-  googleMapsUrl: string,
-  tone: BusinessTone = "tuteo"
+  reviewUrl: string,
+  tone: BusinessTone = "tuteo",
+  platformName = "Google Maps"
 ): string {
   return applyTemplate(MESSAGE_TEMPLATES[tone].neutral, {
     nombre: customerName,
     negocio: businessName,
-    url: googleMapsUrl,
+    url: reviewUrl,
+    plataforma: platformName,
   });
 }
 
@@ -106,17 +112,21 @@ export function buildFollowUpMessage(params: {
   googleMapsUrl: string | null;
   sentiment: "positive" | "negative" | "neutral";
   tone: BusinessTone;
+  platformName?: string;
   incentiveEnabled?: boolean;
   incentiveDescription?: string | null;
 }): string {
-  const { customerName, businessName, googleMapsUrl, sentiment, tone, incentiveEnabled, incentiveDescription } = params;
+  const {
+    customerName, businessName, googleMapsUrl, sentiment, tone,
+    platformName = "Google Maps", incentiveEnabled, incentiveDescription,
+  } = params;
 
   if (sentiment === "positive" && googleMapsUrl && incentiveEnabled && incentiveDescription) {
-    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone);
+    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone, platformName);
   }
 
   if (sentiment === "positive" && googleMapsUrl) {
-    return buildPositiveFollowUp(customerName, businessName, googleMapsUrl, tone);
+    return buildPositiveFollowUp(customerName, businessName, googleMapsUrl, tone, platformName);
   }
 
   if (sentiment === "negative") {
@@ -124,7 +134,7 @@ export function buildFollowUpMessage(params: {
   }
 
   if (googleMapsUrl) {
-    return buildNeutralFollowUp(customerName, businessName, googleMapsUrl, tone);
+    return buildNeutralFollowUp(customerName, businessName, googleMapsUrl, tone, platformName);
   }
 
   return buildFallbackFollowUp(customerName, businessName, tone);
@@ -137,31 +147,35 @@ export function buildFollowUpMessage(params: {
 export function buildIncentiveFollowUp(
   customerName: string,
   businessName: string,
-  googleMapsUrl: string,
+  reviewUrl: string,
   incentiveDescription: string,
-  tone: BusinessTone = "tuteo"
+  tone: BusinessTone = "tuteo",
+  platformName = "Google Maps"
 ): string {
   return applyTemplate(MESSAGE_TEMPLATES[tone].positive_incentive, {
     nombre: customerName,
     negocio: businessName,
-    url: googleMapsUrl,
+    url: reviewUrl,
     incentivo: incentiveDescription,
+    plataforma: platformName,
   });
 }
 
 /**
- * Mensaje de confirmación cuando la captura muestra 5★ verificadas.
+ * Mensaje de confirmación cuando la captura muestra la puntuación máxima verificada.
  */
 export function buildScreenshotVerifiedMessage(
   customerName: string,
   businessName: string,
   incentiveDescription: string,
-  tone: BusinessTone = "tuteo"
+  tone: BusinessTone = "tuteo",
+  platformName = "Google Maps"
 ): string {
   return applyTemplate(MESSAGE_TEMPLATES[tone].screenshot_verified, {
     nombre: customerName,
     negocio: businessName,
     incentivo: incentiveDescription,
+    plataforma: platformName,
   });
 }
 

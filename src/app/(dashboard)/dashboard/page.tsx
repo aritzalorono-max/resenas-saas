@@ -67,9 +67,9 @@ export default async function DashboardPage() {
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-start gap-3 animate-slide-up">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" strokeWidth={1.75} />
           <div>
-            <p className="font-semibold text-amber-800 text-sm">Configura tu enlace de Google Maps</p>
+            <p className="font-semibold text-amber-800 text-sm">Configura tu plataforma de reseñas</p>
             <p className="text-sm text-amber-700 mt-0.5">
-              Sin el enlace no podemos redirigir a tus clientes satisfechos a dejar reseña.{" "}
+              Sin un enlace activo no podemos redirigir a tus clientes satisfechos a dejar reseña.{" "}
               <Link href="/configuracion" className="underline font-semibold">
                 Configurar →
               </Link>
