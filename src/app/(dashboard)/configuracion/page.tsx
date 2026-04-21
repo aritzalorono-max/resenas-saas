@@ -89,10 +89,11 @@ export default function ConfiguracionPage() {
     incentive_enabled: false,
     incentive_description: "",
   });
-  const [loading, setLoading]   = useState(true);
-  const [saving, setSaving]     = useState(false);
-  const [success, setSuccess]   = useState(false);
-  const [error, setError]       = useState("");
+  const [loading, setLoading]       = useState(true);
+  const [saving, setSaving]         = useState(false);
+  const [success, setSuccess]       = useState(false);
+  const [error, setError]           = useState("");
+  const [generatingMsg, setGeneratingMsg] = useState(false);
   const [toneExpanded, setToneExpanded]       = useState(false);
   const [addingPlatform, setAddingPlatform]   = useState(false);
   const [newPlatformName, setNewPlatformName] = useState("Google Maps");
@@ -136,6 +137,30 @@ export default function ConfiguracionPage() {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+  }
+
+  async function handleGenerateMessage() {
+    setGeneratingMsg(true);
+    try {
+      const res = await fetch("/api/generate-welcome-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          description: form.description,
+          tone: form.tone,
+          platformName: form.activePlatformName,
+        }),
+      });
+      const data = await res.json();
+      if (data.message) {
+        setForm((p) => ({ ...p, welcome_message: data.message }));
+      }
+    } catch {
+      // silencioso — el usuario puede seguir editando manualmente
+    } finally {
+      setGeneratingMsg(false);
+    }
   }
 
   function handleActivatePlatform(link: ReviewPlatformLink) {
@@ -458,18 +483,46 @@ export default function ConfiguracionPage() {
 
         {/* ── Mensaje inicial de WhatsApp ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-          <div>
-            <h2 className="font-semibold text-gray-900 text-lg">Mensaje inicial de WhatsApp</h2>
-            <p className="text-sm text-gray-400 mt-0.5">
-              Usa <code className="bg-gray-100 px-1 rounded">{"{nombre}"}</code> y{" "}
-              <code className="bg-gray-100 px-1 rounded">{"{negocio}"}</code> como variables
-            </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="font-semibold text-gray-900 text-lg">Mensaje inicial de WhatsApp</h2>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Usa <code className="bg-gray-100 px-1 rounded">{"{nombre}"}</code> y{" "}
+                <code className="bg-gray-100 px-1 rounded">{"{negocio}"}</code> como variables
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleGenerateMessage}
+              disabled={generatingMsg || !form.name}
+              className="shrink-0 flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              title={!form.name ? "Introduce primero el nombre del negocio" : "Generar mensaje con IA"}
+            >
+              {generatingMsg ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                  Generando...
+                </>
+              ) : (
+                <>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+                  </svg>
+                  Generar con IA
+                </>
+              )}
+            </button>
           </div>
 
           <textarea
             id="welcome_message" name="welcome_message" value={form.welcome_message}
             onChange={handleChange} rows={4}
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition resize-none"
+            placeholder="Escribe el mensaje o usa el botón ✨ para generarlo con IA"
           />
 
           {form.welcome_message && (
