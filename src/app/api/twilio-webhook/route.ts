@@ -4,20 +4,41 @@
  * Recibe las respuestas de los clientes por WhatsApp (webhook de Twilio),
  * analiza el sentimiento con Claude y envía un mensaje de seguimiento adaptado.
  *
- * Flujo:
+ * Flujo normal (sin incentivo o sin imagen):
  *   1. Validar la firma de Twilio (solo en producción)
  *   2. Extraer el número y el mensaje del cuerpo del webhook
  *   3. Buscar la solicitud de reseña pendiente para ese número
  *   4. Analizar el sentimiento con Claude AI
  *   5. Actualizar el registro en la base de datos
  *   6. Enviar el mensaje de seguimiento apropiado
+ *
+ * Flujo con incentivo (positivo + incentive_enabled):
+ *   - En vez del mensaje estándar, se envía el mensaje de oferta de incentivo
+ *   - El estado pasa a awaiting_screenshot en BD
+ *
+ * Flujo de captura (awaiting_screenshot + imagen adjunta):
+ *   1. Detectar imagen en NumMedia / MediaUrl0
+ *   2. Buscar solicitud awaiting_screenshot para ese número
+ *   3. Claude vision analiza si muestra 5★ en Google Maps
+ *   4. Si sí → enviar mensaje de recompensa + marcar como rewarded
+ *   5. Si no → pedir captura más clara
  */
 
 import { createServiceClient } from "@/lib/supabase/server";
-import { analyzeSentiment } from "@/lib/claude";
+import { analyzeSentiment, analyzeScreenshot } from "@/lib/claude";
 import { twilioClient, TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants } from "@/lib/twilio";
-import { findPendingRequestByPhone, updateReviewRequestWithSentiment } from "@/lib/review-requests";
-import { buildFollowUpMessage } from "@/lib/messages";
+import {
+  findPendingRequestByPhone,
+  findAwaitingScreenshotByPhone,
+  updateReviewRequestWithSentiment,
+  updateToAwaitingScreenshot,
+  updateToRewarded,
+} from "@/lib/review-requests";
+import {
+  buildFollowUpMessage,
+  buildScreenshotVerifiedMessage,
+  buildScreenshotRetryMessage,
+} from "@/lib/messages";
 import { logger } from "@/lib/logger";
 import twilio from "twilio";
 
@@ -25,11 +46,6 @@ import twilio from "twilio";
 // Validación de firma de Twilio
 // ---------------------------------------------------------------------------
 
-/**
- * Comprueba que la petición proviene realmente de Twilio
- * usando el algoritmo HMAC-SHA1 con el auth token como clave.
- * Solo se activa en producción para permitir pruebas locales.
- */
 function validateTwilioSignature(request: Request, rawBody: string): boolean {
   const authToken = process.env.TWILIO_AUTH_TOKEN!;
   const signature = request.headers.get("x-twilio-signature") ?? "";
@@ -42,7 +58,6 @@ function validateTwilioSignature(request: Request, rawBody: string): boolean {
   );
 }
 
-/** Respuesta vacía válida para Twilio (no dispara ningún mensaje adicional) */
 function twilioEmptyResponse(): Response {
   return new Response("<Response/>", { headers: { "Content-Type": "text/xml" } });
 }
@@ -76,20 +91,97 @@ export async function POST(request: Request): Promise<Response> {
   const params = new URLSearchParams(rawBody);
   const fromNumber = params.get("From") ?? "";
   const messageBody = params.get("Body") ?? "";
+  const numMedia = parseInt(params.get("NumMedia") ?? "0", 10);
+  const mediaUrl = numMedia > 0 ? (params.get("MediaUrl0") ?? "") : "";
+  const hasImage = numMedia > 0 && mediaUrl.length > 0;
 
-  if (!fromNumber || !messageBody) {
-    logger.warn("Webhook sin número de origen o sin cuerpo de mensaje", { fromNumber, messageBody });
+  if (!fromNumber) {
+    logger.warn("Webhook sin número de origen");
     return twilioEmptyResponse();
   }
 
-  logger.info(`Mensaje recibido de ${fromNumber}: "${messageBody.slice(0, 60)}..."`);
+  logger.info(`Mensaje recibido de ${fromNumber} | media: ${numMedia} | body: "${messageBody.slice(0, 60)}"`);
 
-  // ── 3. Buscar solicitud pendiente ─────────────────────────────────────────
   const supabase = await createServiceClient();
   const phoneVariants = getPhoneVariants(fromNumber);
 
-  logger.info("Buscando solicitud pendiente para variantes de número", phoneVariants);
+  // ── 3a. Flujo de captura: imagen adjunta ──────────────────────────────────
+  if (hasImage) {
+    logger.info("Imagen detectada — buscando solicitud awaiting_screenshot");
 
+    const screenshotRequest = await findAwaitingScreenshotByPhone(supabase, phoneVariants);
+
+    if (screenshotRequest) {
+      logger.info(`Solicitud awaiting_screenshot encontrada: ${screenshotRequest.id}`);
+      const { businesses: business } = screenshotRequest;
+      const tone = business.tone ?? "tuteo";
+      const incentiveDescription = business.incentive_description ?? "";
+
+      let screenshotResult: Awaited<ReturnType<typeof analyzeScreenshot>>;
+      try {
+        screenshotResult = await analyzeScreenshot(mediaUrl);
+        logger.info(
+          `Análisis de captura: isFiveStars=${screenshotResult.isFiveStars} (confidence: ${screenshotResult.confidence})`,
+          { reason: screenshotResult.reason }
+        );
+      } catch (aiError) {
+        logger.error("Error al analizar la captura con Claude", aiError);
+        return twilioEmptyResponse();
+      }
+
+      if (screenshotResult.isFiveStars) {
+        try {
+          await updateToRewarded(supabase, screenshotRequest.id);
+          logger.info(`Solicitud ${screenshotRequest.id} marcada como rewarded`);
+        } catch (dbError) {
+          logger.error("Error al actualizar la solicitud a rewarded", dbError);
+        }
+
+        const verifiedMsg = buildScreenshotVerifiedMessage(
+          screenshotRequest.customer_name,
+          business.name,
+          incentiveDescription,
+          tone
+        );
+
+        try {
+          await twilioClient.messages.create({
+            from: TWILIO_WHATSAPP_NUMBER,
+            to: formatWhatsAppNumber(screenshotRequest.customer_phone),
+            body: verifiedMsg,
+          });
+          logger.info(`Mensaje de recompensa enviado a ${screenshotRequest.customer_phone}`);
+        } catch (twilioError) {
+          logger.error("Error al enviar el mensaje de recompensa", twilioError);
+        }
+      } else {
+        const retryMsg = buildScreenshotRetryMessage(screenshotRequest.customer_name, tone);
+
+        try {
+          await twilioClient.messages.create({
+            from: TWILIO_WHATSAPP_NUMBER,
+            to: formatWhatsAppNumber(screenshotRequest.customer_phone),
+            body: retryMsg,
+          });
+          logger.info(`Mensaje de reintento de captura enviado a ${screenshotRequest.customer_phone}`);
+        } catch (twilioError) {
+          logger.error("Error al enviar el mensaje de reintento", twilioError);
+        }
+      }
+
+      return twilioEmptyResponse();
+    }
+
+    logger.info("No se encontró solicitud awaiting_screenshot para esta imagen — continuando flujo normal");
+  }
+
+  // ── 3b. Flujo normal: buscar solicitud pendiente ──────────────────────────
+  if (!messageBody) {
+    logger.warn("Webhook sin cuerpo de mensaje y sin imagen procesable");
+    return twilioEmptyResponse();
+  }
+
+  logger.info("Buscando solicitud pendiente para variantes de número", phoneVariants);
   const reviewRequest = await findPendingRequestByPhone(supabase, phoneVariants);
 
   if (!reviewRequest) {
@@ -98,7 +190,6 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   logger.info(`Solicitud encontrada: ${reviewRequest.id} (cliente: ${reviewRequest.customer_name})`);
-
   const { businesses: business } = reviewRequest;
 
   // ── 4. Analizar sentimiento con Claude ────────────────────────────────────
@@ -115,12 +206,22 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // ── 5. Actualizar registro en base de datos ───────────────────────────────
+  const useIncentive =
+    sentiment.sentiment === "positive" &&
+    business.google_maps_url &&
+    business.incentive_enabled &&
+    business.incentive_description;
+
   try {
-    await updateReviewRequestWithSentiment(supabase, reviewRequest.id, messageBody, sentiment);
-    logger.info(`Solicitud ${reviewRequest.id} actualizada con sentimiento: ${sentiment.sentiment}`);
+    if (useIncentive) {
+      await updateToAwaitingScreenshot(supabase, reviewRequest.id, messageBody, sentiment.score);
+      logger.info(`Solicitud ${reviewRequest.id} → awaiting_screenshot (incentivo activo)`);
+    } else {
+      await updateReviewRequestWithSentiment(supabase, reviewRequest.id, messageBody, sentiment);
+      logger.info(`Solicitud ${reviewRequest.id} actualizada con sentimiento: ${sentiment.sentiment}`);
+    }
   } catch (dbError) {
     logger.error("Error al actualizar la solicitud en la BD", dbError);
-    // Continuamos para intentar enviar el mensaje de seguimiento igualmente
   }
 
   // ── 6. Construir y enviar mensaje de seguimiento ──────────────────────────
@@ -130,6 +231,8 @@ export async function POST(request: Request): Promise<Response> {
     googleMapsUrl: business.google_maps_url,
     sentiment: sentiment.sentiment,
     tone: business.tone ?? "tuteo",
+    incentiveEnabled: business.incentive_enabled,
+    incentiveDescription: business.incentive_description,
   });
 
   try {

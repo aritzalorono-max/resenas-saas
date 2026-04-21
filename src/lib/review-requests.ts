@@ -35,6 +35,26 @@ export async function findPendingRequestByPhone(
   return (data as ReviewRequestWithBusiness) ?? null;
 }
 
+/**
+ * Busca la solicitud en estado awaiting_screenshot para un número de teléfono.
+ * Se usa cuando el cliente envía una captura de pantalla para reclamar el incentivo.
+ */
+export async function findAwaitingScreenshotByPhone(
+  supabase: SupabaseClient,
+  phoneVariants: string[]
+): Promise<ReviewRequestWithBusiness | null> {
+  const { data } = await supabase
+    .from("review_requests")
+    .select("*, businesses(*)")
+    .in("customer_phone", phoneVariants)
+    .eq("status", "awaiting_screenshot")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  return (data as ReviewRequestWithBusiness) ?? null;
+}
+
 // ---------------------------------------------------------------------------
 // Escritura
 // ---------------------------------------------------------------------------
@@ -95,5 +115,49 @@ export async function updateReviewRequestWithSentiment(
 
   if (error) {
     throw new Error(`Error al actualizar la solicitud ${requestId}: ${error.message}`);
+  }
+}
+
+/**
+ * Cambia el estado de una solicitud positiva a awaiting_screenshot.
+ * Se llama cuando se envía el mensaje de incentivo con petición de captura.
+ */
+export async function updateToAwaitingScreenshot(
+  supabase: SupabaseClient,
+  requestId: string,
+  customerResponse: string,
+  sentimentScore: number
+): Promise<void> {
+  const { error } = await supabase
+    .from("review_requests")
+    .update({
+      status: "awaiting_screenshot",
+      customer_response: customerResponse,
+      sentiment_score: sentimentScore,
+      responded_at: new Date().toISOString(),
+      follow_up_sent: true,
+    })
+    .eq("id", requestId);
+
+  if (error) {
+    throw new Error(`Error al actualizar la solicitud ${requestId} a awaiting_screenshot: ${error.message}`);
+  }
+}
+
+/**
+ * Cambia el estado de una solicitud awaiting_screenshot a rewarded.
+ * Se llama cuando Claude verifica las 5 estrellas en la captura.
+ */
+export async function updateToRewarded(
+  supabase: SupabaseClient,
+  requestId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from("review_requests")
+    .update({ status: "rewarded" })
+    .eq("id", requestId);
+
+  if (error) {
+    throw new Error(`Error al actualizar la solicitud ${requestId} a rewarded: ${error.message}`);
   }
 }

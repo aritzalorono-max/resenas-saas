@@ -4,11 +4,13 @@
 
 /** Estado de una solicitud de reseña a lo largo de su ciclo de vida */
 export type ReviewStatus =
-  | "pending"      // enviada, esperando respuesta del cliente
-  | "positive"     // respuesta positiva confirmada por la IA
-  | "negative"     // respuesta negativa confirmada por la IA
-  | "neutral"      // respuesta ambigua o sin opinión clara
-  | "no_response"; // el cliente no respondió en el tiempo esperado
+  | "pending"              // enviada, esperando respuesta del cliente
+  | "positive"             // respuesta positiva confirmada por la IA
+  | "negative"             // respuesta negativa confirmada por la IA
+  | "neutral"              // respuesta ambigua o sin opinión clara
+  | "no_response"          // el cliente no respondió en el tiempo esperado
+  | "awaiting_screenshot"  // incentivo activo: esperando captura de 5★
+  | "rewarded";            // captura verificada y recompensa enviada
 
 /** Tono de comunicación que el negocio quiere usar con sus clientes */
 export type BusinessTone = "tuteo" | "usted" | "juvenil";
@@ -27,6 +29,8 @@ export interface Business {
   google_maps_url: string | null;
   welcome_message: string;
   tone: BusinessTone;
+  incentive_enabled: boolean;
+  incentive_description: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -51,7 +55,7 @@ export interface ReviewRequest {
  * Usado en el webhook para evitar una segunda consulta a la base de datos.
  */
 export interface ReviewRequestWithBusiness extends ReviewRequest {
-  businesses: Pick<Business, "name" | "google_maps_url" | "tone">;
+  businesses: Pick<Business, "name" | "google_maps_url" | "tone" | "incentive_enabled" | "incentive_description">;
 }
 
 /** Estadísticas agregadas de un negocio (vista business_stats de Supabase) */
@@ -79,4 +83,11 @@ export interface SentimentResult {
   score: number;
   /** Resumen breve de la opinión en español */
   summary: string;
+}
+
+/** Resultado del análisis de captura de pantalla de reseña de Google Maps */
+export interface ScreenshotResult {
+  isFiveStars: boolean;
+  confidence: number;
+  reason: string;
 }

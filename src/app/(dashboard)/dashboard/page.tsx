@@ -5,11 +5,13 @@ import { RingChart } from "@/components/ui/RingChart";
 import { AlertTriangle } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending:     { label: "Pendiente",      color: "bg-amber-100 text-amber-700"  },
-  positive:    { label: "Positiva",       color: "bg-green-100 text-green-700"  },
-  negative:    { label: "Negativa",       color: "bg-red-100 text-red-600"      },
-  neutral:     { label: "Neutral",        color: "bg-gray-100 text-gray-600"    },
-  no_response: { label: "Sin respuesta",  color: "bg-gray-100 text-gray-500"    },
+  pending:              { label: "Pendiente",        color: "bg-amber-100 text-amber-700"   },
+  positive:             { label: "Positiva",         color: "bg-green-100 text-green-700"   },
+  negative:             { label: "Negativa",         color: "bg-red-100 text-red-600"       },
+  neutral:              { label: "Neutral",          color: "bg-gray-100 text-gray-600"     },
+  no_response:          { label: "Sin respuesta",    color: "bg-gray-100 text-gray-500"     },
+  awaiting_screenshot:  { label: "Esp. captura",     color: "bg-purple-100 text-purple-700" },
+  rewarded:             { label: "Recompensado",     color: "bg-brand-100 text-brand-700"   },
 };
 
 export default async function DashboardPage() {

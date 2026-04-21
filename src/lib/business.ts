@@ -44,6 +44,8 @@ export interface UpdateBusinessParams {
   google_maps_url: string | null;
   welcome_message: string;
   tone: Business["tone"];
+  incentive_enabled: boolean;
+  incentive_description: string | null;
 }
 
 /**

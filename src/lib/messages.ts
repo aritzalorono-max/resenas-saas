@@ -17,13 +17,15 @@ interface TemplateVars {
   nombre?: string;
   negocio?: string;
   url?: string;
+  incentivo?: string;
 }
 
 function applyTemplate(template: string, vars: TemplateVars): string {
   return template
     .replace(/{nombre}/g, vars.nombre ?? "")
     .replace(/{negocio}/g, vars.negocio ?? "")
-    .replace(/{url}/g, vars.url ?? "");
+    .replace(/{url}/g, vars.url ?? "")
+    .replace(/{incentivo}/g, vars.incentivo ?? "");
 }
 
 // ---------------------------------------------------------------------------
@@ -96,6 +98,7 @@ export function buildFallbackFollowUp(
 
 /**
  * Punto de entrada unificado: elige el mensaje correcto según sentimiento y configuración.
+ * Cuando hay incentivo activo y el sentimiento es positivo, usa positive_incentive en su lugar.
  */
 export function buildFollowUpMessage(params: {
   customerName: string;
@@ -103,8 +106,14 @@ export function buildFollowUpMessage(params: {
   googleMapsUrl: string | null;
   sentiment: "positive" | "negative" | "neutral";
   tone: BusinessTone;
+  incentiveEnabled?: boolean;
+  incentiveDescription?: string | null;
 }): string {
-  const { customerName, businessName, googleMapsUrl, sentiment, tone } = params;
+  const { customerName, businessName, googleMapsUrl, sentiment, tone, incentiveEnabled, incentiveDescription } = params;
+
+  if (sentiment === "positive" && googleMapsUrl && incentiveEnabled && incentiveDescription) {
+    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone);
+  }
 
   if (sentiment === "positive" && googleMapsUrl) {
     return buildPositiveFollowUp(customerName, businessName, googleMapsUrl, tone);
@@ -119,4 +128,51 @@ export function buildFollowUpMessage(params: {
   }
 
   return buildFallbackFollowUp(customerName, businessName, tone);
+}
+
+/**
+ * Mensaje con oferta de incentivo: pide reseña 5★ + captura de pantalla.
+ * Se usa cuando el negocio tiene el incentivo activo y la opinión es positiva.
+ */
+export function buildIncentiveFollowUp(
+  customerName: string,
+  businessName: string,
+  googleMapsUrl: string,
+  incentiveDescription: string,
+  tone: BusinessTone = "tuteo"
+): string {
+  return applyTemplate(MESSAGE_TEMPLATES[tone].positive_incentive, {
+    nombre: customerName,
+    negocio: businessName,
+    url: googleMapsUrl,
+    incentivo: incentiveDescription,
+  });
+}
+
+/**
+ * Mensaje de confirmación cuando la captura muestra 5★ verificadas.
+ */
+export function buildScreenshotVerifiedMessage(
+  customerName: string,
+  businessName: string,
+  incentiveDescription: string,
+  tone: BusinessTone = "tuteo"
+): string {
+  return applyTemplate(MESSAGE_TEMPLATES[tone].screenshot_verified, {
+    nombre: customerName,
+    negocio: businessName,
+    incentivo: incentiveDescription,
+  });
+}
+
+/**
+ * Mensaje pidiendo una captura más clara cuando no se pueden ver las 5★.
+ */
+export function buildScreenshotRetryMessage(
+  customerName: string,
+  tone: BusinessTone = "tuteo"
+): string {
+  return applyTemplate(MESSAGE_TEMPLATES[tone].screenshot_retry, {
+    nombre: customerName,
+  });
 }

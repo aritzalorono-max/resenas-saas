@@ -38,6 +38,8 @@ export default function ConfiguracionPage() {
     google_maps_url: "",
     welcome_message: "",
     tone: "tuteo" as BusinessTone,
+    incentive_enabled: false,
+    incentive_description: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -65,6 +67,8 @@ export default function ConfiguracionPage() {
           google_maps_url: data.google_maps_url ?? "",
           welcome_message: data.welcome_message ?? DEFAULT_WELCOME,
           tone: data.tone ?? "tuteo",
+          incentive_enabled: data.incentive_enabled ?? false,
+          incentive_description: data.incentive_description ?? "",
         });
       }
       setLoading(false);
@@ -95,6 +99,8 @@ export default function ConfiguracionPage() {
           google_maps_url: form.google_maps_url.trim() || null,
           welcome_message: form.welcome_message.trim() || DEFAULT_WELCOME,
           tone: form.tone,
+          incentive_enabled: form.incentive_enabled,
+          incentive_description: form.incentive_description.trim() || null,
         })
         .eq("id", business!.id);
 
@@ -277,6 +283,84 @@ export default function ConfiguracionPage() {
                   .replace("{nombre}", "María")
                   .replace("{negocio}", form.name || "tu negocio")}
               </p>
+            </div>
+          )}
+        </div>
+
+        {/* ── Incentivo 5★ ── */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+          <div>
+            <h2 className="font-semibold text-gray-900 text-lg">Incentivo por reseña 5 estrellas</h2>
+            <p className="text-sm text-gray-400 mt-0.5">
+              Ofrece un regalo o descuento a los clientes que dejen una reseña de 5★ en Google Maps
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setForm((p) => ({ ...p, incentive_enabled: !p.incentive_enabled }))}
+            className={`flex items-center gap-3 w-full text-left rounded-xl border-2 p-4 transition ${
+              form.incentive_enabled
+                ? "border-brand-500 bg-brand-50"
+                : "border-gray-200 hover:border-gray-300 bg-white"
+            }`}
+          >
+            <span
+              className={`relative shrink-0 w-10 h-6 rounded-full transition-colors ${
+                form.incentive_enabled ? "bg-brand-500" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                  form.incentive_enabled ? "translate-x-5" : "translate-x-1"
+                }`}
+              />
+            </span>
+            <div>
+              <p className={`font-semibold text-sm ${form.incentive_enabled ? "text-brand-700" : "text-gray-700"}`}>
+                {form.incentive_enabled ? "Incentivo activado" : "Incentivo desactivado"}
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {form.incentive_enabled
+                  ? "Los clientes satisfechos recibirán la oferta automáticamente"
+                  : "Actívalo para fomentar reseñas de 5 estrellas"}
+              </p>
+            </div>
+          </button>
+
+          {form.incentive_enabled && (
+            <div>
+              <label htmlFor="incentive_description" className="block text-sm font-medium text-gray-700 mb-1.5">
+                ¿Qué ofreces a cambio? *
+              </label>
+              <input
+                id="incentive_description"
+                name="incentive_description"
+                type="text"
+                value={form.incentive_description}
+                onChange={handleChange}
+                maxLength={200}
+                required={form.incentive_enabled}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+                placeholder="Ej: 25% de descuento en tu próxima visita con el código GRACIAS25"
+              />
+              <p className="text-xs text-gray-400 mt-1.5">
+                Este texto aparecerá en el mensaje que recibe el cliente. Sé claro y específico.
+              </p>
+              {form.incentive_description && (
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mt-3">
+                  <p className="text-xs font-medium text-gray-500 mb-1">Vista previa del mensaje:</p>
+                  <p className="text-xs text-gray-700 italic">
+                    &ldquo;...¡te regalamos {form.incentive_description}! Cuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla...&rdquo;
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!form.google_maps_url && form.incentive_enabled && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
+              Necesitas configurar tu enlace de Google Maps para que el incentivo funcione.
             </div>
           )}
         </div>

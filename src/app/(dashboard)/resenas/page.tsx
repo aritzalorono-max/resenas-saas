@@ -4,11 +4,13 @@ import type { ReviewRequest } from "@/types";
 import { Check } from "lucide-react";
 
 const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
-  pending:     { label: "Pendiente",     badge: "bg-amber-100 text-amber-700",  dot: "bg-amber-400"  },
-  positive:    { label: "Positiva",      badge: "bg-green-100 text-green-700",  dot: "bg-green-500"  },
-  negative:    { label: "Negativa",      badge: "bg-red-100 text-red-600",      dot: "bg-red-400"    },
-  neutral:     { label: "Neutral",       badge: "bg-gray-100 text-gray-600",    dot: "bg-gray-400"   },
-  no_response: { label: "Sin respuesta", badge: "bg-gray-100 text-gray-500",    dot: "bg-gray-300"   },
+  pending:             { label: "Pendiente",      badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-400"   },
+  positive:            { label: "Positiva",       badge: "bg-green-100 text-green-700",   dot: "bg-green-500"   },
+  negative:            { label: "Negativa",       badge: "bg-red-100 text-red-600",       dot: "bg-red-400"     },
+  neutral:             { label: "Neutral",        badge: "bg-gray-100 text-gray-600",     dot: "bg-gray-400"    },
+  no_response:         { label: "Sin respuesta",  badge: "bg-gray-100 text-gray-500",     dot: "bg-gray-300"    },
+  awaiting_screenshot: { label: "Esp. captura",   badge: "bg-purple-100 text-purple-700", dot: "bg-purple-400"  },
+  rewarded:            { label: "Recompensado",   badge: "bg-brand-100 text-brand-700",   dot: "bg-brand-500"   },
 };
 
 const PAGE_SIZE = 20;
@@ -57,12 +59,14 @@ export default async function ResenasPage({
   const hasPrev     = page > 1;
 
   const filterTabs = [
-    { value: "all",         label: "Todas"      },
-    { value: "positive",    label: "Positivas"  },
-    { value: "negative",    label: "Negativas"  },
-    { value: "neutral",     label: "Neutrales"  },
-    { value: "pending",     label: "Pendientes" },
-    { value: "no_response", label: "Sin resp."  },
+    { value: "all",                label: "Todas"        },
+    { value: "positive",           label: "Positivas"    },
+    { value: "negative",           label: "Negativas"    },
+    { value: "neutral",            label: "Neutrales"    },
+    { value: "pending",            label: "Pendientes"   },
+    { value: "no_response",        label: "Sin resp."    },
+    { value: "awaiting_screenshot", label: "Captura"     },
+    { value: "rewarded",           label: "Recompensados"},
   ];
 
   function buildHref(newPage: number, newStatus?: string) {
