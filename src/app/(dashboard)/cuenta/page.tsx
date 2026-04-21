@@ -18,6 +18,9 @@ export default function CuentaPage() {
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
 
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -67,6 +70,7 @@ export default function CuentaPage() {
   }
 
   async function handleLogout() {
+    setLogoutLoading(true);
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");
@@ -216,7 +220,7 @@ export default function CuentaPage() {
           Cierra tu sesión en este dispositivo. Podrás volver a entrar cuando quieras.
         </p>
         <button
-          onClick={handleLogout}
+          onClick={() => setShowLogoutModal(true)}
           className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-lg transition"
         >
           <LogOut className="w-4 h-4" />
@@ -245,7 +249,39 @@ export default function CuentaPage() {
         </button>
       </div>
 
-      {/* Modal de confirmación */}
+      {/* Modal cerrar sesión */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
+                <LogOut className="w-5 h-5 text-gray-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">¿Cerrar sesión?</h3>
+            </div>
+            <p className="text-sm text-gray-500 mb-6">
+              Se cerrará tu sesión en este dispositivo. Podrás volver a entrar cuando quieras.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 rounded-lg transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleLogout}
+                disabled={logoutLoading}
+                className="flex-1 bg-gray-800 hover:bg-gray-900 disabled:opacity-60 text-white font-semibold py-2.5 rounded-lg transition"
+              >
+                {logoutLoading ? "Saliendo..." : "Cerrar sesión"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal eliminar cuenta */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full">
