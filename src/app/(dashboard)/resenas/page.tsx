@@ -130,65 +130,71 @@ export default async function ResenasPage({
           <div className="space-y-3">
             {requests.map((req) => {
               const config = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.pending;
+              const sentDate = new Date(req.created_at).toLocaleDateString("es-ES", {
+                day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+              });
+              const respDate = req.responded_at
+                ? new Date(req.responded_at).toLocaleDateString("es-ES", {
+                    day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+                  })
+                : null;
+
               return (
                 <div
                   key={req.id}
-                  className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-card hover:shadow-card-hover transition-shadow"
+                  className="bg-white rounded-2xl border border-gray-200 p-4 shadow-card"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-gray-900 text-sm">{req.customer_name}</span>
-                        <span className="text-gray-400 text-xs">{req.customer_phone}</span>
-                      </div>
+                  {/* Fila 1: nombre + badge */}
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <p className="font-semibold text-gray-900 text-sm truncate leading-snug">
+                      {req.customer_name}
+                    </p>
+                    <span className={`shrink-0 flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${config.badge}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${config.dot}`} />
+                      {config.label}
+                    </span>
+                  </div>
 
-                      {req.customer_response ? (
-                        <p className="text-gray-700 text-sm mt-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 italic">
-                          &ldquo;{req.customer_response}&rdquo;
-                        </p>
-                      ) : (
-                        <p className="text-gray-400 text-xs mt-1.5 italic">Sin respuesta todavía</p>
-                      )}
+                  {/* Fila 2: teléfono · fecha */}
+                  <p className="text-xs text-gray-400 mb-3">
+                    {req.customer_phone}
+                    <span className="mx-1.5 text-gray-200">·</span>
+                    {sentDate}
+                  </p>
 
-                      <div className="flex items-center gap-4 mt-3 flex-wrap">
-                        <span className="text-xs text-gray-400">
-                          {new Date(req.created_at).toLocaleDateString("es-ES", {
-                            day: "numeric", month: "short", year: "numeric",
-                            hour: "2-digit", minute: "2-digit"
-                          })}
+                  {/* Respuesta del cliente */}
+                  {req.customer_response ? (
+                    <p className="text-gray-700 text-sm bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 italic line-clamp-3 mb-3">
+                      &ldquo;{req.customer_response}&rdquo;
+                    </p>
+                  ) : (
+                    <p className="text-gray-300 text-xs italic mb-3">Sin respuesta todavía</p>
+                  )}
+
+                  {/* Fila inferior: respondió + follow-up + score */}
+                  {(respDate || req.follow_up_sent || req.sentiment_score != null) && (
+                    <div className="flex items-center gap-3 flex-wrap pt-2.5 border-t border-gray-50">
+                      {respDate && (
+                        <span className="text-xs text-green-600 flex items-center gap-1">
+                          <Check className="w-3 h-3 shrink-0" strokeWidth={2.5} />
+                          Respondió {respDate}
                         </span>
-                        {req.responded_at && (
-                          <span className="text-xs text-green-600 flex items-center gap-1">
-                            <Check className="w-3 h-3" strokeWidth={2.5} />
-                            Respondió {new Date(req.responded_at).toLocaleDateString("es-ES", {
-                              day: "numeric", month: "short",
-                              hour: "2-digit", minute: "2-digit"
-                            })}
-                          </span>
-                        )}
-                        {req.sentiment_score !== null && req.sentiment_score !== undefined && (
-                          <span className="text-xs text-gray-400 tabular-nums">
-                            Score: {(req.sentiment_score * 100).toFixed(0)}%
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-2 shrink-0">
-                      <span className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${config.badge}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
-                        {config.label}
-                      </span>
+                      )}
                       {req.follow_up_sent && (
                         <span className="text-xs text-gray-400 flex items-center gap-1">
-                          <svg className="w-3 h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <svg className="w-3 h-3 text-brand-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                           </svg>
                           Follow-up enviado
                         </span>
                       )}
+                      {req.sentiment_score != null && (
+                        <span className="text-xs text-gray-400 tabular-nums hidden sm:inline">
+                          Score {(req.sentiment_score * 100).toFixed(0)}%
+                        </span>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
               );
             })}
