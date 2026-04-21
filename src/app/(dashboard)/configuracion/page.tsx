@@ -255,6 +255,23 @@ export default function ConfiguracionPage() {
                 placeholder={activePlaceholder}
               />
             </div>
+            {form.google_maps_url ? (
+              <p className="text-xs text-gray-400 mt-2">
+                Enlace que se enviará a los clientes:{" "}
+                <a
+                  href={form.google_maps_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-600 hover:underline font-medium break-all"
+                >
+                  {form.google_maps_url}
+                </a>
+              </p>
+            ) : (
+              <p className="text-xs text-gray-400 mt-2">
+                Introduce el enlace para que tus clientes puedan dejar su reseña.
+              </p>
+            )}
           </div>
 
           {/* Plataformas adicionales */}
