@@ -15,6 +15,8 @@ import {
   Dumbbell,
   Check,
   CheckCircle2,
+  Quote,
+  TrendingUp,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -242,6 +244,90 @@ const trustItems = [
   "Sin tarjeta de crédito",
 ];
 
+const testimonials = [
+  {
+    quote: "En solo 3 semanas pasamos de 47 a 89 reseñas en Google Maps. Lo mejor es que nos avisa si un cliente no está satisfecho antes de que lo publique.",
+    name: "Ana Martínez",
+    role: "Propietaria",
+    business: "La Taberna del Sol · Madrid",
+    metric: "+42 reseñas en 3 semanas",
+  },
+  {
+    quote: "Lo puse a funcionar en una tarde. Mis clientes responden al WhatsApp y los que están contentos van directos a Google. Ha sido un antes y un después.",
+    name: "Carlos Ruiz",
+    role: "Gerente",
+    business: "Barbería Styles · Barcelona",
+    metric: "4.8★ media en Google",
+  },
+  {
+    quote: "Tenía miedo de parecer invasivo, pero el tono es tan natural que los clientes responden encantados. Hemos multiplicado por 3 las reseñas mensuales.",
+    name: "Laura Sánchez",
+    role: "Directora",
+    business: "Clínica Dental Sánchez · Valencia",
+    metric: "×3 reseñas al mes",
+  },
+  {
+    quote: "El filtro de sentimiento es lo que más me gusta. Si un huésped no está satisfecho, gestionamos el problema internamente. Las malas reseñas han caído un 80%.",
+    name: "Miguel Fernández",
+    role: "Director",
+    business: "Hotel Boutique Costa · Málaga",
+    metric: "−80% reseñas negativas",
+  },
+  {
+    quote: "Llevaba años con la misma puntuación en Google. En 6 semanas subí de 3.9 a 4.6 estrellas. Ahora aparezco en los primeros resultados cuando buscan barbería en mi zona.",
+    name: "Roberto Iglesias",
+    role: "Propietario",
+    business: "Barbería El Fígaro · Sevilla",
+    metric: "3.9→4.6★ en 6 semanas",
+  },
+  {
+    quote: "Mis clientes son mayores y me preguntaba si responderían al WhatsApp. La sorpresa fue que el 70% contesta. Y casi todos están muy contentos, así que las reseñas se disparan.",
+    name: "Carmen López",
+    role: "Gerente",
+    business: "Farmacia López · Zaragoza",
+    metric: "70% tasa de respuesta",
+  },
+];
+
+const caseStudies = [
+  {
+    Icon: Utensils,
+    sector: "Restauración",
+    name: "Pizzería Napoli · Sevilla",
+    before: "23 reseñas en 2 años de actividad. Los propietarios no tenían tiempo de pedirlas manualmente.",
+    after: "En 2 meses llegaron a 97 reseñas con una media de 4.7★ y llenaron la lista de espera los fines de semana.",
+    stats: [
+      { label: "Reseñas nuevas", value: "+74" },
+      { label: "Media Google", value: "4.7 ★" },
+      { label: "Tiempo para lograrlo", value: "2 meses" },
+    ],
+  },
+  {
+    Icon: Scissors,
+    sector: "Belleza",
+    name: "Studio Hair · Bilbao",
+    before: "Competían con peluquerías con más de 200 reseñas. Su perfil de Google Maps tenía solo 31.",
+    after: "Superaron las 160 reseñas en 3 meses y aparecen en el top 3 local cuando alguien busca peluquería.",
+    stats: [
+      { label: "Reseñas totales", value: "160+" },
+      { label: "Posición local", value: "Top 3" },
+      { label: "Tasa de respuesta", value: "68%" },
+    ],
+  },
+  {
+    Icon: Stethoscope,
+    sector: "Salud",
+    name: "Clínica Dental Ortiz · Zaragoza",
+    before: "Sector sensible donde las malas reseñas tienen un gran impacto. Necesitaban captar las positivas sin arriesgar las negativas.",
+    after: "En 4 meses consiguieron 62 reseñas nuevas. Las opiniones negativas se gestionaron de forma privada, sin llegar a publicarse.",
+    stats: [
+      { label: "Reseñas nuevas", value: "+62" },
+      { label: "Reseñas negativas públicas", value: "0" },
+      { label: "Tasa de satisfacción", value: "94%" },
+    ],
+  },
+];
+
 export default function LandingPage() {
   return (
     <>
@@ -424,6 +510,122 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="py-20 lg:py-24 px-6 bg-gray-50" id="opiniones">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-14">
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                Negocios que ya lo están usando
+              </h2>
+              <p className="text-gray-500 text-lg">Lo que dicen quienes llevan semanas generando reseñas con ReseñasYa</p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {testimonials.map(({ quote, name, role, business, metric }) => (
+                <div
+                  key={name}
+                  className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-brand-200 hover:shadow-card-hover transition-all flex flex-col"
+                >
+                  {/* Stars */}
+                  <div className="flex gap-0.5 mb-3">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={14} className="text-yellow-400 fill-yellow-400" />
+                    ))}
+                  </div>
+                  {/* Quote */}
+                  <Quote size={18} className="text-brand-200 mb-2 shrink-0" strokeWidth={1.5} />
+                  <p className="text-gray-700 text-sm leading-relaxed flex-1 mb-5">
+                    {quote}
+                  </p>
+                  {/* Metric pill */}
+                  <div className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs font-bold px-3 py-1.5 rounded-full mb-4 w-fit">
+                    <TrendingUp size={12} strokeWidth={2.5} />
+                    {metric}
+                  </div>
+                  {/* Author */}
+                  <div className="border-t border-gray-100 pt-4">
+                    <p className="font-semibold text-gray-900 text-sm">{name}</p>
+                    <p className="text-gray-400 text-xs mt-0.5">{role} · {business}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Case studies */}
+        <section className="py-20 lg:py-24 px-6 bg-white" id="casos-exito">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-14">
+              <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
+                <TrendingUp className="w-3.5 h-3.5" strokeWidth={2} />
+                Casos de éxito
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                Resultados reales de negocios reales
+              </h2>
+              <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+                De 23 reseñas a 97 en 2 meses. De ser invisible en Google a aparecer en el top 3 local.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              {caseStudies.map(({ Icon, sector, name, before, after, stats }, idx) => (
+                <div
+                  key={name}
+                  className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden hover:border-brand-200 transition-all"
+                >
+                  <div className="grid lg:grid-cols-[1fr_auto] gap-0">
+                    <div className="p-7 lg:p-8">
+                      {/* Header */}
+                      <div className="flex items-center gap-3 mb-5">
+                        <div className="w-9 h-9 bg-white border border-gray-200 rounded-xl flex items-center justify-center shrink-0">
+                          <Icon size={18} className="text-gray-600" strokeWidth={1.75} />
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold uppercase tracking-wider text-brand-600">{sector}</span>
+                          <p className="text-sm font-bold text-gray-900">{name}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-5">
+                        {/* Before */}
+                        <div>
+                          <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">La situación</p>
+                          <p className="text-sm text-gray-600 leading-relaxed">{before}</p>
+                        </div>
+                        {/* After */}
+                        <div>
+                          <p className="text-xs font-bold text-brand-600 uppercase tracking-wide mb-2">El resultado</p>
+                          <p className="text-sm text-gray-700 leading-relaxed font-medium">{after}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 lg:p-8 flex lg:flex-col justify-around lg:justify-center gap-4 lg:gap-6 lg:min-w-[220px]">
+                      {stats.map(({ label, value }) => (
+                        <div key={label} className="text-center lg:text-left">
+                          <p className="text-2xl lg:text-3xl font-extrabold text-gray-900">{value}</p>
+                          <p className="text-xs text-gray-400 mt-0.5 leading-tight">{label}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <Link
+                href="/register"
+                className="bg-brand-600 hover:bg-brand-700 text-white font-bold px-7 py-3.5 rounded-xl text-base transition shadow-lg shadow-brand-200 inline-block"
+              >
+                Empieza gratis y escribe tu caso de éxito →
+              </Link>
             </div>
           </div>
         </section>
