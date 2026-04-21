@@ -43,6 +43,7 @@ export interface UpdateBusinessParams {
   website_url: string | null;
   google_maps_url: string | null;
   review_links: ReviewPlatformLink[];
+  logo_url: string | null;
   welcome_message: string;
   tone: Business["tone"];
   incentive_enabled: boolean;

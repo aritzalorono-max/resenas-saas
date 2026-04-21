@@ -7,6 +7,7 @@ interface PosterClientProps {
   platformName: string;
   reviewUrl: string;
   qrDataUrl: string;
+  logoUrl: string | null;
   incentiveEnabled: boolean;
   incentiveDescription: string | null;
   whatsappNumber: string;
@@ -17,6 +18,7 @@ export function PosterClient({
   platformName,
   reviewUrl,
   qrDataUrl,
+  logoUrl,
   incentiveEnabled,
   incentiveDescription,
   whatsappNumber,
@@ -50,6 +52,17 @@ export function PosterClient({
       >
         {/* Cabecera verde */}
         <div className="bg-brand-600 px-8 pt-10 pb-8 text-center">
+          {/* Logo del negocio */}
+          {logoUrl && (
+            <div className="flex justify-center mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={logoUrl}
+                alt={`Logo de ${businessName}`}
+                className="h-14 w-auto object-contain bg-white rounded-xl p-2"
+              />
+            </div>
+          )}
           <div className="flex justify-center gap-1 mb-3">
             {[...Array(5)].map((_, i) => (
               <Star key={i} size={22} className="text-yellow-300 fill-yellow-300" />

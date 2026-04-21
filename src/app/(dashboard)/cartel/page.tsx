@@ -58,6 +58,7 @@ export default async function CartelPage() {
       platformName={platformName}
       reviewUrl={reviewUrl}
       qrDataUrl={qrDataUrl}
+      logoUrl={business.logo_url ?? null}
       incentiveEnabled={business.incentive_enabled}
       incentiveDescription={business.incentive_description}
       whatsappNumber={whatsappNumber}

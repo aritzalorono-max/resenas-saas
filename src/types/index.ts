@@ -38,6 +38,8 @@ export interface Business {
   google_maps_url: string | null;
   /** Todas las plataformas de reseñas configuradas */
   review_links: ReviewPlatformLink[];
+  /** URL del logo del negocio (Clearbit o Supabase Storage) */
+  logo_url: string | null;
   welcome_message: string;
   tone: BusinessTone;
   incentive_enabled: boolean;
