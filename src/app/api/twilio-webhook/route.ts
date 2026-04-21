@@ -116,8 +116,8 @@ export async function POST(request: Request): Promise<Response> {
       const { businesses: business } = screenshotRequest;
       const tone = business.tone ?? "tuteo";
       const incentiveDescription = business.incentive_description ?? "";
-      const activePlatformName =
-        business.review_links?.find((l) => l.url === business.google_maps_url)?.name ?? "Google Maps";
+      const screenshotActiveLink = business.review_links?.find((l) => l.url === business.google_maps_url);
+      const activePlatformName = screenshotActiveLink?.name ?? "Google Maps";
 
       let screenshotResult: Awaited<ReturnType<typeof analyzeScreenshot>>;
       try {
@@ -194,8 +194,12 @@ export async function POST(request: Request): Promise<Response> {
 
   logger.info(`Solicitud encontrada: ${reviewRequest.id} (cliente: ${reviewRequest.customer_name})`);
   const { businesses: business } = reviewRequest;
-  const activePlatformName =
-    business.review_links?.find((l) => l.url === business.google_maps_url)?.name ?? "Google Maps";
+  const activeLink = business.review_links?.find((l) => l.url === business.google_maps_url);
+  const activePlatformName = activeLink?.name ?? "Google Maps";
+  const appOrigin = new URL(request.url).origin;
+  const reviewUrl = activeLink?.shortCode
+    ? `${appOrigin}/r/${activeLink.shortCode}`
+    : (business.google_maps_url ?? "");
 
   // ── 4. Analizar sentimiento con Claude ────────────────────────────────────
   let sentiment: Awaited<ReturnType<typeof analyzeSentiment>>;
@@ -233,7 +237,7 @@ export async function POST(request: Request): Promise<Response> {
   const followUpMessage = buildFollowUpMessage({
     customerName: reviewRequest.customer_name,
     businessName: business.name,
-    googleMapsUrl: business.google_maps_url,
+    googleMapsUrl: reviewUrl || null,
     sentiment: sentiment.sentiment,
     tone: business.tone ?? "tuteo",
     platformName: activePlatformName,

@@ -23,6 +23,8 @@ export type BusinessTone = "tuteo" | "usted" | "juvenil";
 export interface ReviewPlatformLink {
   name: string;
   url: string;
+  /** Código del acortador de URLs (6 chars). Undefined hasta que se guarda por primera vez. */
+  shortCode?: string;
 }
 
 /** Negocio registrado en la plataforma (uno por usuario) */

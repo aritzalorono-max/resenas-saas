@@ -38,6 +38,38 @@ const PLATFORMS: { name: string; placeholder: string }[] = [
   { name: "Otra",        placeholder: "https://..." },
 ];
 
+// ---------------------------------------------------------------------------
+// Helpers para el acortador de URLs
+// ---------------------------------------------------------------------------
+
+function generateShortCode(): string {
+  const chars = "abcdefghjkmnpqrstuvwxyz23456789";
+  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+}
+
+async function ensureShortCodes(
+  supabase: ReturnType<typeof createClient>,
+  links: ReviewPlatformLink[],
+  businessId: string
+): Promise<ReviewPlatformLink[]> {
+  const result: ReviewPlatformLink[] = [];
+  for (const link of links) {
+    if (link.shortCode) {
+      await supabase.from("short_links").upsert({ code: link.shortCode, url: link.url, business_id: businessId });
+      result.push(link);
+    } else {
+      let shortCode = "";
+      for (let i = 0; i < 10 && !shortCode; i++) {
+        const code = generateShortCode();
+        const { error } = await supabase.from("short_links").insert({ code, url: link.url, business_id: businessId });
+        if (!error) shortCode = code;
+      }
+      result.push({ ...link, shortCode: shortCode || undefined });
+    }
+  }
+  return result;
+}
+
 export default function ConfiguracionPage() {
   const [business, setBusiness] = useState<Business | null>(null);
   const [form, setForm] = useState({
@@ -46,6 +78,7 @@ export default function ConfiguracionPage() {
     website_url: "",
     // Plataforma activa
     activePlatformName: "Google Maps",
+    activeShortCode: undefined as string | undefined,
     google_maps_url: "",
     // Plataformas adicionales
     otherPlatforms: [] as ReviewPlatformLink[],
@@ -87,6 +120,7 @@ export default function ConfiguracionPage() {
           description: data.description ?? "",
           website_url: data.website_url ?? "",
           activePlatformName: active?.name ?? "Google Maps",
+          activeShortCode: active?.shortCode,
           google_maps_url: data.google_maps_url ?? "",
           otherPlatforms: others,
           welcome_message: data.welcome_message ?? DEFAULT_WELCOME,
@@ -108,10 +142,11 @@ export default function ConfiguracionPage() {
     setForm((p) => ({
       ...p,
       otherPlatforms: [
-        ...(p.google_maps_url ? [{ name: p.activePlatformName, url: p.google_maps_url }] : []),
+        ...(p.google_maps_url ? [{ name: p.activePlatformName, url: p.google_maps_url, shortCode: p.activeShortCode }] : []),
         ...p.otherPlatforms.filter((o) => o.url !== link.url),
       ],
       activePlatformName: link.name,
+      activeShortCode: link.shortCode,
       google_maps_url: link.url,
     }));
   }
@@ -141,13 +176,19 @@ export default function ConfiguracionPage() {
     setSuccess(false);
     setSaving(true);
 
-    const allLinks: ReviewPlatformLink[] = [
-      ...(form.google_maps_url ? [{ name: form.activePlatformName, url: form.google_maps_url }] : []),
+    const rawLinks: ReviewPlatformLink[] = [
+      ...(form.google_maps_url
+        ? [{ name: form.activePlatformName, url: form.google_maps_url, shortCode: form.activeShortCode }]
+        : []),
       ...form.otherPlatforms,
     ];
 
     try {
       const supabase = createClient();
+
+      // Generar o actualizar códigos cortos para todos los enlaces
+      const allLinks = await ensureShortCodes(supabase, rawLinks, business!.id);
+
       const { error: updateError } = await supabase
         .from("businesses")
         .update({
@@ -164,6 +205,15 @@ export default function ConfiguracionPage() {
         .eq("id", business!.id);
 
       if (updateError) { setError("Error al guardar los cambios"); return; }
+
+      // Actualizar el estado local con los nuevos shortCodes
+      const savedActive = allLinks.find((l) => l.url === form.google_maps_url);
+      setForm((p) => ({
+        ...p,
+        activeShortCode: savedActive?.shortCode,
+        otherPlatforms: allLinks.filter((l) => l.url !== p.google_maps_url),
+      }));
+
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch {
@@ -256,17 +306,26 @@ export default function ConfiguracionPage() {
               />
             </div>
             {form.google_maps_url ? (
-              <p className="text-xs text-gray-400 mt-2">
-                Enlace que se enviará a los clientes:{" "}
-                <a
-                  href={form.google_maps_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-brand-600 hover:underline font-medium break-all"
-                >
-                  {form.google_maps_url}
-                </a>
-              </p>
+              <div className="mt-2 space-y-1">
+                {form.activeShortCode ? (
+                  <p className="text-xs text-gray-700">
+                    <span className="text-gray-400">Enlace en WhatsApp: </span>
+                    <span className="font-semibold text-brand-600">
+                      {typeof window !== "undefined" ? window.location.origin : ""}/r/{form.activeShortCode}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-400">
+                    El enlace acortado se generará al guardar.
+                  </p>
+                )}
+                <p className="text-xs text-gray-400">
+                  Destino:{" "}
+                  <a href={form.google_maps_url} target="_blank" rel="noopener noreferrer" className="hover:underline break-all">
+                    {form.google_maps_url}
+                  </a>
+                </p>
+              </div>
             ) : (
               <p className="text-xs text-gray-400 mt-2">
                 Introduce el enlace para que tus clientes puedan dejar su reseña.
