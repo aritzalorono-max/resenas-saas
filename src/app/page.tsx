@@ -511,6 +511,54 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+
+            {/* Incentive flow */}
+            <div className="mt-8">
+              <p className="flex items-center gap-2 text-sm font-semibold text-amber-600 mb-3 uppercase tracking-wide">
+                <Star className="w-4 h-4 shrink-0 fill-amber-400 text-amber-400" strokeWidth={2} />
+                Incentivo activo → reseña 5★ verificada y recompensa enviada
+              </p>
+              <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
+                <div className="grid md:grid-cols-2 gap-x-10 gap-y-3">
+                  {/* Columna izquierda: el cliente responde bien y recibe la oferta */}
+                  <div className="space-y-3">
+                    <div className="flex justify-start">
+                      <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-amber-100">
+                        ¡Hola Sara! Soy el equipo de Barbería Styles. ¿Cómo fue tu visita hoy? 😊
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <div className="bg-brand-500 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-xs text-sm">
+                        ¡Genial! Muy contenta con el corte, quedó perfecto 🥰
+                      </div>
+                    </div>
+                    <div className="flex justify-start">
+                      <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-amber-100">
+                        ¡Nos alegra mucho, Sara! 🌟 Si dejas una reseña de 5★ en Google Maps y nos envías una captura de pantalla al WhatsApp, te regalamos un <strong>20% de descuento</strong> en tu próxima visita. 👉 maps.google.com/...
+                      </div>
+                    </div>
+                  </div>
+                  {/* Columna derecha: la captura y la recompensa */}
+                  <div className="space-y-3 md:pt-0 pt-2 md:border-l-0 border-t md:border-t-0 border-amber-200 md:pt-0 pt-3">
+                    <div className="hidden md:block h-[72px]" /> {/* spacer visual */}
+                    <div className="flex justify-end">
+                      <div className="bg-brand-500 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-xs text-sm flex items-center gap-2">
+                        <span className="text-lg">📸</span>
+                        <span>¡Aquí la captura!</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-start">
+                      <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-amber-100">
+                        ✅ <strong>¡Captura verificada!</strong> Tu 20% de descuento está reservado. Muéstranos este mensaje en tu próxima visita. ¡Hasta pronto, Sara! 🎉
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-amber-600 font-medium mt-4 text-center">
+                  La IA verifica automáticamente que la reseña sea de 5★ antes de enviar la recompensa
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
