@@ -12,29 +12,30 @@ const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; exam
     value: "tuteo",
     label: "Trato de tú",
     sublabel: "Cercano y amigable",
-    example: "¡Qué alegría saber eso, María! ¿Te animarías a dejarnos una reseña...?",
+    example: "¿Te animarías a dejarnos una reseña...?",
   },
   {
     value: "usted",
     label: "Trato de usted",
     sublabel: "Formal y profesional",
-    example: "¡Qué alegría saber eso, María! ¿Se animaría a dejarnos una reseña...?",
+    example: "¿Se animaría a dejarnos una reseña...?",
   },
   {
     value: "juvenil",
     label: "Muy informal",
     sublabel: "Desenfadado y cercano",
-    example: "¡Genial, María! 🔥 ¿Nos echas una mano dejando una reseña...?",
+    example: "¿Nos echas una mano dejando una reseña...?",
   },
 ];
 
-const PREDEFINED_PLATFORMS: { name: string; placeholder: string }[] = [
+const PLATFORMS: { name: string; placeholder: string }[] = [
   { name: "Google Maps",  placeholder: "https://g.page/tu-negocio/review" },
   { name: "Trustpilot",  placeholder: "https://www.trustpilot.com/review/tu-negocio.com" },
-  { name: "TripAdvisor", placeholder: "https://www.tripadvisor.es/Restaurant_Review-..." },
+  { name: "TripAdvisor", placeholder: "https://www.tripadvisor.es/..." },
   { name: "Booking.com", placeholder: "https://www.booking.com/hotel/..." },
   { name: "Yelp",        placeholder: "https://www.yelp.com/biz/tu-negocio" },
   { name: "Facebook",    placeholder: "https://www.facebook.com/tu-negocio/reviews" },
+  { name: "Otra",        placeholder: "https://..." },
 ];
 
 export default function ConfiguracionPage() {
@@ -43,23 +44,26 @@ export default function ConfiguracionPage() {
     name: "",
     description: "",
     website_url: "",
+    // Plataforma activa
+    activePlatformName: "Google Maps",
     google_maps_url: "",
-    review_links: [] as ReviewPlatformLink[],
+    // Plataformas adicionales
+    otherPlatforms: [] as ReviewPlatformLink[],
+    // Mensaje y tono
     welcome_message: "",
     tone: "tuteo" as BusinessTone,
+    // Incentivo
     incentive_enabled: false,
     incentive_description: "",
   });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
-
-  // Add-platform form state
-  const [showAddPlatform, setShowAddPlatform] = useState(false);
+  const [loading, setLoading]   = useState(true);
+  const [saving, setSaving]     = useState(false);
+  const [success, setSuccess]   = useState(false);
+  const [error, setError]       = useState("");
+  const [toneExpanded, setToneExpanded]       = useState(false);
+  const [addingPlatform, setAddingPlatform]   = useState(false);
   const [newPlatformName, setNewPlatformName] = useState("Google Maps");
-  const [customPlatformName, setCustomPlatformName] = useState("");
-  const [newPlatformUrl, setNewPlatformUrl] = useState("");
+  const [newPlatformUrl, setNewPlatformUrl]   = useState("");
 
   useEffect(() => {
     async function load() {
@@ -75,12 +79,16 @@ export default function ConfiguracionPage() {
 
       if (data) {
         setBusiness(data);
+        const links: ReviewPlatformLink[] = data.review_links ?? [];
+        const active = links.find((l) => l.url === data.google_maps_url);
+        const others = links.filter((l) => l.url !== data.google_maps_url);
         setForm({
           name: data.name ?? "",
           description: data.description ?? "",
           website_url: data.website_url ?? "",
+          activePlatformName: active?.name ?? "Google Maps",
           google_maps_url: data.google_maps_url ?? "",
-          review_links: data.review_links ?? [],
+          otherPlatforms: others,
           welcome_message: data.welcome_message ?? DEFAULT_WELCOME,
           tone: data.tone ?? "tuteo",
           incentive_enabled: data.incentive_enabled ?? false,
@@ -92,45 +100,39 @@ export default function ConfiguracionPage() {
     load();
   }, []);
 
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
   }
 
-  function handleAddPlatform() {
-    const name = newPlatformName === "__custom"
-      ? customPlatformName.trim()
-      : newPlatformName;
-    const url = newPlatformUrl.trim();
-    if (!name || !url) return;
-    if (form.review_links.some((l) => l.url === url)) return;
-
-    const newLinks = [...form.review_links, { name, url }];
+  function handleActivatePlatform(link: ReviewPlatformLink) {
     setForm((p) => ({
       ...p,
-      review_links: newLinks,
-      google_maps_url: p.google_maps_url || url,
+      otherPlatforms: [
+        ...(p.google_maps_url ? [{ name: p.activePlatformName, url: p.google_maps_url }] : []),
+        ...p.otherPlatforms.filter((o) => o.url !== link.url),
+      ],
+      activePlatformName: link.name,
+      google_maps_url: link.url,
     }));
-    setShowAddPlatform(false);
-    setNewPlatformUrl("");
-    setNewPlatformName("Google Maps");
-    setCustomPlatformName("");
   }
 
   function handleRemovePlatform(url: string) {
-    const newLinks = form.review_links.filter((l) => l.url !== url);
-    setForm((p) => ({
-      ...p,
-      review_links: newLinks,
-      google_maps_url: p.google_maps_url === url
-        ? (newLinks[0]?.url ?? "")
-        : p.google_maps_url,
-    }));
+    setForm((p) => ({ ...p, otherPlatforms: p.otherPlatforms.filter((o) => o.url !== url) }));
   }
 
-  function handleSetActivePlatform(url: string) {
-    setForm((p) => ({ ...p, google_maps_url: url }));
+  function handleAddPlatform() {
+    const url = newPlatformUrl.trim();
+    if (!url) return;
+    setForm((p) => ({
+      ...p,
+      otherPlatforms: [...p.otherPlatforms, { name: newPlatformName, url }],
+      // If no active URL yet, set this as active
+      activePlatformName: p.google_maps_url ? p.activePlatformName : newPlatformName,
+      google_maps_url: p.google_maps_url || url,
+    }));
+    setAddingPlatform(false);
+    setNewPlatformUrl("");
+    setNewPlatformName("Google Maps");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -138,6 +140,11 @@ export default function ConfiguracionPage() {
     setError("");
     setSuccess(false);
     setSaving(true);
+
+    const allLinks: ReviewPlatformLink[] = [
+      ...(form.google_maps_url ? [{ name: form.activePlatformName, url: form.google_maps_url }] : []),
+      ...form.otherPlatforms,
+    ];
 
     try {
       const supabase = createClient();
@@ -148,7 +155,7 @@ export default function ConfiguracionPage() {
           description: form.description.trim() || null,
           website_url: form.website_url.trim() || null,
           google_maps_url: form.google_maps_url || null,
-          review_links: form.review_links,
+          review_links: allLinks,
           welcome_message: form.welcome_message.trim() || DEFAULT_WELCOME,
           tone: form.tone,
           incentive_enabled: form.incentive_enabled,
@@ -156,11 +163,7 @@ export default function ConfiguracionPage() {
         })
         .eq("id", business!.id);
 
-      if (updateError) {
-        setError("Error al guardar los cambios");
-        return;
-      }
-
+      if (updateError) { setError("Error al guardar los cambios"); return; }
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch {
@@ -171,15 +174,12 @@ export default function ConfiguracionPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64 text-gray-400">
-        Cargando...
-      </div>
-    );
+    return <div className="flex items-center justify-center h-64 text-gray-400">Cargando...</div>;
   }
 
-  const currentPlaceholder =
-    PREDEFINED_PLATFORMS.find((p) => p.name === newPlatformName)?.placeholder ?? "https://...";
+  const currentTone = TONE_OPTIONS.find((o) => o.value === form.tone)!;
+  const activePlaceholder = PLATFORMS.find((p) => p.name === form.activePlatformName)?.placeholder ?? "https://...";
+  const newPlaceholder    = PLATFORMS.find((p) => p.name === newPlatformName)?.placeholder ?? "https://...";
 
   return (
     <div className="max-w-2xl">
@@ -192,22 +192,14 @@ export default function ConfiguracionPage() {
 
         {/* ── Datos del negocio ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-          <div>
-            <h2 className="font-semibold text-gray-900 text-lg">Datos del negocio</h2>
-            <p className="text-sm text-gray-400 mt-0.5">Información básica de tu establecimiento</p>
-          </div>
+          <h2 className="font-semibold text-gray-900 text-lg">Datos del negocio</h2>
 
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">
               Nombre del negocio *
             </label>
             <input
-              id="name"
-              name="name"
-              type="text"
-              value={form.name}
-              onChange={handleChange}
-              required
+              id="name" name="name" type="text" value={form.name} onChange={handleChange} required
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
               placeholder="Ej: Cafetería El Sol"
             />
@@ -218,18 +210,12 @@ export default function ConfiguracionPage() {
               Descripción breve
             </label>
             <textarea
-              id="description"
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              rows={2}
-              maxLength={200}
+              id="description" name="description" value={form.description} onChange={handleChange}
+              rows={2} maxLength={200}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition resize-none"
               placeholder="Ej: Cafetería familiar en el centro, especializada en desayunos y brunch"
             />
-            <p className="text-xs text-gray-400 mt-1">
-              {form.description.length}/200 — aparece en tu perfil interno
-            </p>
+            <p className="text-xs text-gray-400 mt-1">{form.description.length}/200</p>
           </div>
 
           <div>
@@ -237,201 +223,164 @@ export default function ConfiguracionPage() {
               Página web
             </label>
             <input
-              id="website_url"
-              name="website_url"
-              type="url"
-              value={form.website_url}
-              onChange={handleChange}
+              id="website_url" name="website_url" type="url" value={form.website_url} onChange={handleChange}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
               placeholder="https://www.tu-negocio.com"
             />
           </div>
         </div>
 
-        {/* ── Plataformas de reseñas ── */}
+        {/* ── Plataforma de reseñas ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+          <h2 className="font-semibold text-gray-900 text-lg">Plataforma de reseñas</h2>
+
+          {/* Plataforma activa */}
           <div>
-            <h2 className="font-semibold text-gray-900 text-lg">Plataformas de reseñas</h2>
-            <p className="text-sm text-gray-400 mt-0.5">
-              Añade los enlaces donde quieres recibir reseñas. La plataforma{" "}
-              <span className="font-medium text-brand-600">activa</span> es la que se envía a tus clientes.
-            </p>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Enlace activo <span className="text-gray-400 font-normal">(el que recibirán tus clientes)</span>
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={form.activePlatformName}
+                onChange={(e) => setForm((p) => ({ ...p, activePlatformName: e.target.value }))}
+                className="shrink-0 w-36 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+              >
+                {PLATFORMS.map((p) => (
+                  <option key={p.name} value={p.name}>{p.name}</option>
+                ))}
+              </select>
+              <input
+                name="google_maps_url" type="url" value={form.google_maps_url} onChange={handleChange}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm"
+                placeholder={activePlaceholder}
+              />
+            </div>
           </div>
 
-          {/* Lista de plataformas */}
-          {form.review_links.length > 0 ? (
-            <div className="space-y-2">
-              {form.review_links.map((link) => {
-                const isActive = link.url === form.google_maps_url;
-                return (
-                  <div
-                    key={link.url}
-                    className={`flex items-center gap-3 rounded-xl border-2 p-3.5 transition ${
-                      isActive
-                        ? "border-brand-500 bg-brand-50"
-                        : "border-gray-200 bg-white"
-                    }`}
+          {/* Plataformas adicionales */}
+          {form.otherPlatforms.length > 0 && (
+            <div className="space-y-1.5">
+              {form.otherPlatforms.map((link) => (
+                <div key={link.url} className="flex items-center gap-3 py-1.5 px-1">
+                  <span className="text-sm font-medium text-gray-600 w-28 shrink-0">{link.name}</span>
+                  <span className="flex-1 text-xs text-gray-400 truncate">{link.url}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleActivatePlatform(link)}
+                    className="text-xs text-brand-600 font-semibold hover:text-brand-800 shrink-0"
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className={`text-sm font-semibold ${isActive ? "text-brand-700" : "text-gray-800"}`}>
-                          {link.name}
-                        </p>
-                        {isActive && (
-                          <span className="text-xs font-medium bg-brand-500 text-white px-2 py-0.5 rounded-full">
-                            Activa
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-400 truncate mt-0.5">{link.url}</p>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      {!isActive && (
-                        <button
-                          type="button"
-                          onClick={() => handleSetActivePlatform(link.url)}
-                          className="text-xs text-brand-600 font-semibold hover:text-brand-800"
-                        >
-                          Activar
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => handleRemovePlatform(link.url)}
-                        className="text-xs text-gray-400 hover:text-red-500 transition"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                    Activar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePlatform(link.url)}
+                    className="text-xs text-gray-400 hover:text-red-500 shrink-0"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              ))}
             </div>
-          ) : (
-            <p className="text-sm text-gray-400 text-center py-3">
-              No hay ninguna plataforma configurada todavía.
-            </p>
           )}
 
-          {/* Formulario para añadir */}
-          {showAddPlatform ? (
-            <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Plataforma
-                </label>
-                <select
-                  value={newPlatformName}
-                  onChange={(e) => setNewPlatformName(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
-                >
-                  {PREDEFINED_PLATFORMS.map((p) => (
-                    <option key={p.name} value={p.name}>{p.name}</option>
-                  ))}
-                  <option value="__custom">Otra plataforma...</option>
-                </select>
-                {newPlatformName === "__custom" && (
-                  <input
-                    type="text"
-                    value={customPlatformName}
-                    onChange={(e) => setCustomPlatformName(e.target.value)}
-                    className="mt-2 w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
-                    placeholder="Nombre de la plataforma"
-                  />
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  URL de tu perfil en esa plataforma
-                </label>
-                <input
-                  type="url"
-                  value={newPlatformUrl}
-                  onChange={(e) => setNewPlatformUrl(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
-                  placeholder={newPlatformName === "__custom" ? "https://..." : currentPlaceholder}
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleAddPlatform}
-                  disabled={!newPlatformUrl.trim() || (newPlatformName === "__custom" && !customPlatformName.trim())}
-                  className="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
-                >
-                  Añadir
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAddPlatform(false);
-                    setNewPlatformUrl("");
-                    setNewPlatformName("Google Maps");
-                    setCustomPlatformName("");
-                  }}
-                  className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2 rounded-lg border border-gray-200 bg-white transition"
-                >
-                  Cancelar
-                </button>
-              </div>
+          {/* Añadir otra plataforma */}
+          {addingPlatform ? (
+            <div className="flex gap-2 items-start pt-1">
+              <select
+                value={newPlatformName}
+                onChange={(e) => setNewPlatformName(e.target.value)}
+                className="shrink-0 w-36 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+              >
+                {PLATFORMS.map((p) => (
+                  <option key={p.name} value={p.name}>{p.name}</option>
+                ))}
+              </select>
+              <input
+                type="url" value={newPlatformUrl}
+                onChange={(e) => setNewPlatformUrl(e.target.value)}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                placeholder={newPlaceholder}
+                autoFocus
+              />
+              <button
+                type="button" onClick={handleAddPlatform} disabled={!newPlatformUrl.trim()}
+                className="shrink-0 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition"
+              >
+                Añadir
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAddingPlatform(false); setNewPlatformUrl(""); }}
+                className="shrink-0 text-gray-400 hover:text-gray-600 text-sm px-2 py-2.5"
+              >
+                ✕
+              </button>
             </div>
           ) : (
             <button
-              type="button"
-              onClick={() => setShowAddPlatform(true)}
-              className="w-full border-2 border-dashed border-gray-300 hover:border-brand-400 text-gray-500 hover:text-brand-600 text-sm font-medium py-3 rounded-xl transition"
+              type="button" onClick={() => setAddingPlatform(true)}
+              className="text-sm text-brand-600 hover:text-brand-800 font-medium"
             >
-              + Añadir plataforma
+              + Añadir otra plataforma
             </button>
           )}
         </div>
 
         {/* ── Tono de comunicación ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-          <div>
-            <h2 className="font-semibold text-gray-900 text-lg">Tono de comunicación</h2>
-            <p className="text-sm text-gray-400 mt-0.5">
-              Cómo se dirigirá la IA a tus clientes en los mensajes de seguimiento
-            </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="font-semibold text-gray-900 text-lg">Tono de comunicación</h2>
+              {!toneExpanded && (
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {currentTone.label} — {currentTone.sublabel}
+                </p>
+              )}
+            </div>
+            {!toneExpanded && (
+              <button
+                type="button"
+                onClick={() => setToneExpanded(true)}
+                className="shrink-0 text-sm text-brand-600 font-medium hover:text-brand-800 mt-0.5"
+              >
+                Cambiar
+              </button>
+            )}
           </div>
 
-          <div className="grid gap-3">
-            {TONE_OPTIONS.map((opt) => {
-              const selected = form.tone === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setForm((p) => ({ ...p, tone: opt.value }))}
-                  className={`w-full text-left rounded-xl border-2 p-4 transition ${
-                    selected
-                      ? "border-brand-500 bg-brand-50"
-                      : "border-gray-200 hover:border-gray-300 bg-white"
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className={`font-semibold text-sm ${selected ? "text-brand-700" : "text-gray-800"}`}>
-                        {opt.label}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-0.5">{opt.sublabel}</p>
-                      <p className="text-xs text-gray-400 mt-2 italic">&ldquo;{opt.example}&rdquo;</p>
+          {toneExpanded && (
+            <div className="grid gap-2.5">
+              {TONE_OPTIONS.map((opt) => {
+                const selected = form.tone === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => { setForm((p) => ({ ...p, tone: opt.value })); setToneExpanded(false); }}
+                    className={`w-full text-left rounded-xl border-2 px-4 py-3 transition ${
+                      selected ? "border-brand-500 bg-brand-50" : "border-gray-200 hover:border-gray-300 bg-white"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className={`font-semibold text-sm ${selected ? "text-brand-700" : "text-gray-800"}`}>
+                          {opt.label}
+                          <span className={`ml-2 font-normal text-xs ${selected ? "text-brand-500" : "text-gray-400"}`}>
+                            {opt.sublabel}
+                          </span>
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1 italic">&ldquo;{opt.example}&rdquo;</p>
+                      </div>
+                      <span className={`shrink-0 w-4 h-4 rounded-full border-2 ml-3 ${selected ? "border-brand-500 bg-brand-500" : "border-gray-300"}`} />
                     </div>
-                    <span
-                      className={`mt-0.5 shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                        selected ? "border-brand-500 bg-brand-500" : "border-gray-300"
-                      }`}
-                    >
-                      {selected && <span className="w-1.5 h-1.5 rounded-full bg-white block" />}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* ── Mensaje de WhatsApp ── */}
+        {/* ── Mensaje inicial de WhatsApp ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div>
             <h2 className="font-semibold text-gray-900 text-lg">Mensaje inicial de WhatsApp</h2>
@@ -442,11 +391,8 @@ export default function ConfiguracionPage() {
           </div>
 
           <textarea
-            id="welcome_message"
-            name="welcome_message"
-            value={form.welcome_message}
-            onChange={handleChange}
-            rows={4}
+            id="welcome_message" name="welcome_message" value={form.welcome_message}
+            onChange={handleChange} rows={4}
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition resize-none"
           />
 
@@ -467,7 +413,7 @@ export default function ConfiguracionPage() {
           <div>
             <h2 className="font-semibold text-gray-900 text-lg">Incentivo por reseña 5 estrellas</h2>
             <p className="text-sm text-gray-400 mt-0.5">
-              Ofrece un regalo o descuento a los clientes que dejen la máxima puntuación en tu plataforma activa
+              Ofrece un regalo o descuento a los clientes que dejen la máxima puntuación
             </p>
           </div>
 
@@ -475,21 +421,11 @@ export default function ConfiguracionPage() {
             type="button"
             onClick={() => setForm((p) => ({ ...p, incentive_enabled: !p.incentive_enabled }))}
             className={`flex items-center gap-3 w-full text-left rounded-xl border-2 p-4 transition ${
-              form.incentive_enabled
-                ? "border-brand-500 bg-brand-50"
-                : "border-gray-200 hover:border-gray-300 bg-white"
+              form.incentive_enabled ? "border-brand-500 bg-brand-50" : "border-gray-200 hover:border-gray-300"
             }`}
           >
-            <span
-              className={`relative shrink-0 w-10 h-6 rounded-full transition-colors ${
-                form.incentive_enabled ? "bg-brand-500" : "bg-gray-300"
-              }`}
-            >
-              <span
-                className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${
-                  form.incentive_enabled ? "translate-x-5" : "translate-x-1"
-                }`}
-              />
+            <span className={`relative shrink-0 w-10 h-6 rounded-full transition-colors ${form.incentive_enabled ? "bg-brand-500" : "bg-gray-300"}`}>
+              <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${form.incentive_enabled ? "translate-x-5" : "translate-x-1"}`} />
             </span>
             <div>
               <p className={`font-semibold text-sm ${form.incentive_enabled ? "text-brand-700" : "text-gray-700"}`}>
@@ -509,41 +445,28 @@ export default function ConfiguracionPage() {
                 ¿Qué ofreces a cambio? *
               </label>
               <input
-                id="incentive_description"
-                name="incentive_description"
-                type="text"
-                value={form.incentive_description}
-                onChange={handleChange}
-                maxLength={200}
-                required={form.incentive_enabled}
+                id="incentive_description" name="incentive_description" type="text"
+                value={form.incentive_description} onChange={handleChange}
+                maxLength={200} required={form.incentive_enabled}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
                 placeholder="Ej: 25% de descuento en tu próxima visita con el código GRACIAS25"
               />
               <p className="text-xs text-gray-400 mt-1.5">
-                Este texto aparecerá en el mensaje que recibe el cliente. Sé claro y específico.
+                Este texto aparecerá en el mensaje que recibe el cliente.
               </p>
-              {form.incentive_description && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mt-3">
-                  <p className="text-xs font-medium text-gray-500 mb-1">Vista previa del mensaje:</p>
-                  <p className="text-xs text-gray-700 italic">
-                    &ldquo;...¡te regalamos {form.incentive_description}! Cuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla...&rdquo;
-                  </p>
-                </div>
-              )}
             </div>
           )}
 
           {!form.google_maps_url && form.incentive_enabled && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
-              Necesitas configurar al menos una plataforma de reseñas y activarla para que el incentivo funcione.
-            </div>
+            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+              Necesitas añadir el enlace de una plataforma de reseñas para que el incentivo funcione.
+            </p>
           )}
         </div>
 
         {error && (
           <div className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3">{error}</div>
         )}
-
         {success && (
           <div className="bg-green-50 text-green-700 text-sm rounded-lg px-4 py-3">
             ✅ Cambios guardados correctamente
@@ -551,8 +474,7 @@ export default function ConfiguracionPage() {
         )}
 
         <button
-          type="submit"
-          disabled={saving}
+          type="submit" disabled={saving}
           className="bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold px-6 py-2.5 rounded-lg transition"
         >
           {saving ? "Guardando..." : "Guardar cambios"}
