@@ -148,8 +148,8 @@ export default function ConfiguracionPage() {
         body: JSON.stringify({
           name: form.name,
           description: form.description,
+          website_url: form.website_url,
           tone: form.tone,
-          platformName: form.activePlatformName,
         }),
       });
       const data = await res.json();

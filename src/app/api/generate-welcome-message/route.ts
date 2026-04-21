@@ -12,19 +12,23 @@ import { logger } from "@/lib/logger";
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
 const SYSTEM_PROMPT = `Eres un experto en comunicación con clientes para negocios locales.
-Tu tarea es redactar un mensaje de WhatsApp breve y cercano que un negocio envía a sus clientes después de su visita para pedir su opinión.
+Tu tarea es redactar el mensaje de WhatsApp inicial que un negocio envía a un cliente justo después de su visita, cuyo único objetivo es preguntarle cómo le fue.
 
-Reglas estrictas:
-- Usa SIEMPRE {nombre} donde va el nombre del cliente y {negocio} donde va el nombre del negocio
-- El mensaje debe tener entre 1 y 3 frases cortas
-- Debe preguntar por la experiencia del cliente de forma natural
-- Debe adaptarse al tono indicado
-- Solo responde con el texto del mensaje, sin explicaciones ni comillas
+MUY IMPORTANTE — Lo que NUNCA debe aparecer en este mensaje:
+- NO menciones Google Maps, Trustpilot, TripAdvisor ni ninguna plataforma de reseñas
+- NO pidas que dejen una reseña, valoración ni opinión pública
+- NO incluyas ningún enlace ni URL
+Este mensaje es solo para preguntar por la experiencia del cliente. Si responde positivamente, el sistema le enviará automáticamente en otro mensaje el enlace para dejar la reseña.
 
-Tonos disponibles:
-- tuteo: trato informal de tú, cercano y amigable
-- usted: trato formal, profesional y respetuoso
-- juvenil: muy informal, desenfadado, con algún emoji`;
+Reglas del mensaje:
+- Usa SIEMPRE {nombre} para el nombre del cliente y {negocio} para el nombre del negocio
+- Entre 1 y 3 frases cortas y naturales
+- Adapta el lenguaje estrictamente al tono indicado:
+  * tuteo: trato de tú, cercano y amigable
+  * usted: trato formal y profesional
+  * juvenil: muy informal, desenfadado, puede usar algún emoji
+- Usa la descripción del negocio para personalizar el mensaje y hacerlo más específico
+- Solo responde con el texto del mensaje, sin comillas ni explicaciones adicionales`;
 
 export async function POST(request: Request): Promise<Response> {
   const supabase = await createClient();
@@ -34,25 +38,25 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  let body: { name?: string; description?: string; tone?: string; platformName?: string };
+  let body: { name?: string; description?: string; website_url?: string; tone?: string };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: "Body inválido" }, { status: 400 });
   }
 
-  const { name = "", description = "", tone = "tuteo", platformName = "Google Maps" } = body;
+  const { name = "", description = "", website_url = "", tone = "tuteo" } = body;
 
   const userPrompt = [
-    `Negocio: ${name || "un negocio local"}`,
+    `Nombre del negocio: ${name || "un negocio local"}`,
     description ? `Descripción: ${description}` : null,
+    website_url ? `Web: ${website_url}` : null,
     `Tono: ${tone}`,
-    `Plataforma de reseñas: ${platformName}`,
   ]
     .filter(Boolean)
     .join("\n");
 
-  logger.info(`Generando mensaje de bienvenida para negocio "${name}" (tono: ${tone})`);
+  logger.info(`Generando mensaje de bienvenida para "${name}" (tono: ${tone})`);
 
   try {
     const response = await anthropic.messages.create({
