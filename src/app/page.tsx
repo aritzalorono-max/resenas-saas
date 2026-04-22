@@ -453,17 +453,33 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-6">
               <Zap className="w-3.5 h-3.5" strokeWidth={2} />
-              Automatiza tus reseñas de Google Maps
+              Automatiza tus reseñas — en cualquier plataforma
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-              Consigue más reseñas en{" "}
-              <span className="text-brand-600 whitespace-nowrap">Google, App Store</span>
+              Consigue más reseñas de{" "}
+              <span className="text-brand-600">5★</span>
               <br />
-              <span className="text-brand-600">y Play Store</span>{" "}por WhatsApp
+              automáticamente por{" "}
+              <span className="text-brand-600">WhatsApp</span>
             </h1>
+
+            {/* Platform strip */}
+            <div className="flex items-center justify-center gap-2 flex-wrap mb-8">
+              <span className="text-xs text-gray-400 mr-1">En</span>
+              {["Google Maps", "App Store", "Play Store", "Trustpilot"].map((p) => (
+                <span
+                  key={p}
+                  className="text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full border border-gray-200"
+                >
+                  {p}
+                </span>
+              ))}
+              <span className="text-xs text-gray-400 ml-1">y más</span>
+            </div>
+
             <p className="text-lg lg:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
               Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y
-              consigue que los satisfechos dejen reseña en Google Maps, App Store o Play Store — sin esfuerzo.
+              consigue que los satisfechos dejen reseña donde más te importa — sin esfuerzo.
               Para negocios locales, apps móviles y e-commerce.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -534,7 +550,7 @@ export default function LandingPage() {
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 La conversación que consigue reseñas
               </h2>
-              <p className="text-gray-500 text-lg">Completamente automática y personalizada para tu negocio</p>
+              <p className="text-gray-500 text-lg">Completamente automática, personalizada y válida para cualquier plataforma de reseñas</p>
             </div>
             <ConversationTabs />
           </div>
@@ -934,7 +950,7 @@ export default function LandingPage() {
                   <span className="font-bold text-gray-800">ReseñasYa</span>
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed mb-4">
-                  Automatiza la captación de reseñas de Google Maps mediante WhatsApp e inteligencia artificial.
+                  Automatiza tus reseñas en Google Maps, App Store, Play Store y Trustpilot mediante WhatsApp e inteligencia artificial.
                 </p>
                 {/* RRSS */}
                 <div className="flex items-center gap-2">
