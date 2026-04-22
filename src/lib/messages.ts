@@ -115,14 +115,15 @@ export function buildFollowUpMessage(params: {
   platformName?: string;
   incentiveEnabled?: boolean;
   incentiveDescription?: string | null;
+  discountCode?: string | null;
 }): string {
   const {
     customerName, businessName, googleMapsUrl, sentiment, tone,
-    platformName = "Google Maps", incentiveEnabled, incentiveDescription,
+    platformName = "Google Maps", incentiveEnabled, incentiveDescription, discountCode,
   } = params;
 
   if (sentiment === "positive" && googleMapsUrl && incentiveEnabled && incentiveDescription) {
-    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone, platformName);
+    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone, platformName, discountCode);
   }
 
   if (sentiment === "positive" && googleMapsUrl) {
@@ -150,13 +151,17 @@ export function buildIncentiveFollowUp(
   reviewUrl: string,
   incentiveDescription: string,
   tone: BusinessTone = "tuteo",
-  platformName = "Google Maps"
+  platformName = "Google Maps",
+  discountCode?: string | null
 ): string {
+  const incentivo = discountCode
+    ? `${incentiveDescription}\n\n📋 Tu código: *${discountCode}*`
+    : incentiveDescription;
   return applyTemplate(MESSAGE_TEMPLATES[tone].positive_incentive, {
     nombre: customerName,
     negocio: businessName,
     url: reviewUrl,
-    incentivo: incentiveDescription,
+    incentivo,
     plataforma: platformName,
   });
 }
@@ -169,12 +174,16 @@ export function buildScreenshotVerifiedMessage(
   businessName: string,
   incentiveDescription: string,
   tone: BusinessTone = "tuteo",
-  platformName = "Google Maps"
+  platformName = "Google Maps",
+  discountCode?: string | null
 ): string {
+  const incentivo = discountCode
+    ? `${incentiveDescription} — código *${discountCode}*`
+    : incentiveDescription;
   return applyTemplate(MESSAGE_TEMPLATES[tone].screenshot_verified, {
     nombre: customerName,
     negocio: businessName,
-    incentivo: incentiveDescription,
+    incentivo,
     plataforma: platformName,
   });
 }

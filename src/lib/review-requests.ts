@@ -126,7 +126,8 @@ export async function updateToAwaitingScreenshot(
   supabase: SupabaseClient,
   requestId: string,
   customerResponse: string,
-  sentimentScore: number
+  sentimentScore: number,
+  discountCode?: string | null
 ): Promise<void> {
   const { error } = await supabase
     .from("review_requests")
@@ -136,6 +137,7 @@ export async function updateToAwaitingScreenshot(
       sentiment_score: sentimentScore,
       responded_at: new Date().toISOString(),
       follow_up_sent: true,
+      ...(discountCode ? { discount_code: discountCode } : {}),
     })
     .eq("id", requestId);
 

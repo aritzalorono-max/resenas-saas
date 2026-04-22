@@ -15,6 +15,9 @@ export type ReviewStatus =
 /** Tono de comunicación que el negocio quiere usar con sus clientes */
 export type BusinessTone = "tuteo" | "usted" | "juvenil";
 
+/** Tipo de código de descuento: generado aleatoriamente o extraído de un pool */
+export type IncentiveCodeType = "random" | "pool";
+
 // ---------------------------------------------------------------------------
 // Entidades de base de datos
 // ---------------------------------------------------------------------------
@@ -44,6 +47,8 @@ export interface Business {
   tone: BusinessTone;
   incentive_enabled: boolean;
   incentive_description: string | null;
+  incentive_code_enabled: boolean;
+  incentive_code_type: IncentiveCodeType;
   created_at: string;
   updated_at: string;
 }
@@ -59,6 +64,7 @@ export interface ReviewRequest {
   sentiment_score: number | null;
   twilio_message_sid: string | null;
   follow_up_sent: boolean;
+  discount_code: string | null;
   created_at: string;
   responded_at: string | null;
 }
@@ -68,7 +74,19 @@ export interface ReviewRequest {
  * Usado en el webhook para evitar una segunda consulta a la base de datos.
  */
 export interface ReviewRequestWithBusiness extends ReviewRequest {
-  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description">;
+  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type">;
+}
+
+/** Código de descuento generado o subido por el negocio */
+export interface DiscountCode {
+  id: string;
+  business_id: string;
+  code: string;
+  type: IncentiveCodeType;
+  status: "available" | "used" | "expired";
+  review_request_id: string | null;
+  used_at: string | null;
+  created_at: string;
 }
 
 /** Estadísticas agregadas de un negocio (vista business_stats de Supabase) */

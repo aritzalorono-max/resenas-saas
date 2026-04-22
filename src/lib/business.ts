@@ -6,7 +6,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Business, ReviewPlatformLink } from "@/types";
+import type { Business, IncentiveCodeType, ReviewPlatformLink } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Lectura
@@ -48,6 +48,8 @@ export interface UpdateBusinessParams {
   tone: Business["tone"];
   incentive_enabled: boolean;
   incentive_description: string | null;
+  incentive_code_enabled: boolean;
+  incentive_code_type: Business["incentive_code_type"];
 }
 
 /**

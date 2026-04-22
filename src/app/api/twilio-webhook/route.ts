@@ -27,6 +27,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { analyzeSentiment, analyzeScreenshot } from "@/lib/claude";
 import { twilioClient, TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants } from "@/lib/twilio";
+import { assignDiscountCode } from "@/lib/discount-codes";
 import {
   findPendingRequestByPhone,
   findAwaitingScreenshotByPhone,
@@ -144,7 +145,8 @@ export async function POST(request: Request): Promise<Response> {
           business.name,
           incentiveDescription,
           tone,
-          activePlatformName
+          activePlatformName,
+          screenshotRequest.discount_code
         );
 
         try {
@@ -221,9 +223,25 @@ export async function POST(request: Request): Promise<Response> {
     business.incentive_enabled &&
     business.incentive_description;
 
+  let assignedCode: string | null = null;
+
   try {
     if (useIncentive) {
-      await updateToAwaitingScreenshot(supabase, reviewRequest.id, messageBody, sentiment.score);
+      // Assign discount code if the business has codes enabled
+      if (business.incentive_code_enabled) {
+        assignedCode = await assignDiscountCode(
+          supabase,
+          reviewRequest.business_id,
+          business.incentive_code_type ?? "random",
+          reviewRequest.id
+        );
+        if (assignedCode) {
+          logger.info(`Código de descuento asignado: ${assignedCode}`);
+        } else {
+          logger.warn("No se pudo asignar código de descuento (pool vacío o error)");
+        }
+      }
+      await updateToAwaitingScreenshot(supabase, reviewRequest.id, messageBody, sentiment.score, assignedCode);
       logger.info(`Solicitud ${reviewRequest.id} → awaiting_screenshot (incentivo activo)`);
     } else {
       await updateReviewRequestWithSentiment(supabase, reviewRequest.id, messageBody, sentiment);
@@ -243,6 +261,7 @@ export async function POST(request: Request): Promise<Response> {
     platformName: activePlatformName,
     incentiveEnabled: business.incentive_enabled,
     incentiveDescription: business.incentive_description,
+    discountCode: assignedCode,
   });
 
   try {
