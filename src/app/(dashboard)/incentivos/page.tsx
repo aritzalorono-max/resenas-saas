@@ -75,7 +75,7 @@ export default function IncentivosPage() {
     const { count: rewarded } = await supabase
       .from("review_requests")
       .select("id", { count: "exact", head: true })
-      .eq("businesses.user_id", user.id)
+      .eq("business_id", id)
       .not("discount_code", "is", null)
       .eq("status", "rewarded");
 

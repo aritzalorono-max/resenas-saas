@@ -11,7 +11,6 @@ export default function CuentaPage() {
   const [provider, setProvider] = useState<string>("email");
   const [loadingUser, setLoadingUser] = useState(true);
 
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -63,7 +62,6 @@ export default function CuentaPage() {
       setPasswordError(error.message);
     } else {
       setPasswordSuccess("Contraseña actualizada correctamente");
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     }

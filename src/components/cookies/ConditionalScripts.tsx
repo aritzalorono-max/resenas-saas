@@ -3,6 +3,9 @@
 /**
  * Carga scripts de terceros condicionalmente según el consentimiento del usuario.
  *
+ * Se re-ejecuta automáticamente cuando el usuario cambia sus preferencias
+ * durante la sesión (p. ej. acepta cookies desde el banner).
+ *
  * Cómo añadir un nuevo servicio:
  * 1. Incrementa CONSENT_VERSION en /lib/cookie-consent.ts (añade entrada al historial).
  * 2. Actualiza las tablas de la política de cookies en /app/(legal)/cookies/page.tsx.
@@ -10,7 +13,7 @@
  *
  * Servicios pendientes de activar (requieren clave/ID de cada plataforma):
  *   - Google Analytics 4    → consent.analytics
- *   - Vercel Analytics      → consent.analytics (privacy-friendly, opcional)
+ *   - Vercel Analytics      → consent.analytics (privacy-friendly)
  *   - Meta Pixel            → consent.marketing
  *   - LinkedIn Insight Tag  → consent.marketing
  *   - Google Ads            → consent.marketing
@@ -18,24 +21,26 @@
  */
 
 import { useEffect } from "react";
-import { getStoredConsent } from "@/lib/cookie-consent";
+import { useCookieConsent } from "@/hooks/useCookieConsent";
 
 export function ConditionalScripts() {
+  const { consent } = useCookieConsent();
+
   useEffect(() => {
-    const consent = getStoredConsent();
     if (!consent) return;
 
     // ── Analítica ──────────────────────────────────────────────────────────
     if (consent.analytics) {
       // Google Analytics 4
       // const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
-      // if (GA_ID) {
-      //   const s1 = document.createElement("script");
-      //   s1.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
-      //   s1.async = true;
-      //   document.head.appendChild(s1);
-      //   window.dataLayer = window.dataLayer || [];
-      //   function gtag(...args: unknown[]) { window.dataLayer.push(args); }
+      // if (GA_ID && !document.getElementById("ga-script")) {
+      //   const s = document.createElement("script");
+      //   s.id = "ga-script";
+      //   s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+      //   s.async = true;
+      //   document.head.appendChild(s);
+      //   (window as any).dataLayer = (window as any).dataLayer || [];
+      //   function gtag(...args: unknown[]) { (window as any).dataLayer.push(args); }
       //   gtag("js", new Date());
       //   gtag("config", GA_ID, { anonymize_ip: true });
       // }
@@ -44,14 +49,14 @@ export function ConditionalScripts() {
     // ── Marketing y RRSS ───────────────────────────────────────────────────
     if (consent.marketing) {
       // Meta Pixel
-      // const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
-      // if (META_PIXEL_ID) { /* fbq init */ }
+      // const META_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+      // if (META_ID && !document.getElementById("fb-pixel")) { /* fbq init */ }
 
       // LinkedIn Insight Tag
-      // const LI_PARTNER_ID = process.env.NEXT_PUBLIC_LI_PARTNER_ID;
-      // if (LI_PARTNER_ID) { /* _linkedin_partner_id init */ }
+      // const LI_ID = process.env.NEXT_PUBLIC_LI_PARTNER_ID;
+      // if (LI_ID && !document.getElementById("li-script")) { /* _linkedin_partner_id init */ }
     }
-  }, []);
+  }, [consent]);
 
   return null;
 }

@@ -26,6 +26,10 @@ CREATE TABLE IF NOT EXISTS discount_codes (
 CREATE INDEX IF NOT EXISTS idx_discount_codes_business_status
   ON discount_codes(business_id, status);
 
+-- Required for upsert with onConflict: "business_id,code" in uploadPoolCodes()
+ALTER TABLE discount_codes
+  ADD CONSTRAINT unique_business_code UNIQUE(business_id, code);
+
 -- ── 4. Row Level Security ─────────────────────────────────────────────────────
 ALTER TABLE discount_codes ENABLE ROW LEVEL SECURITY;
 
