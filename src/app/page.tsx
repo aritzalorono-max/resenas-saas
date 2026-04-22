@@ -14,7 +14,6 @@ import {
   BedDouble,
   ShoppingBag,
   Dumbbell,
-  Check,
   CheckCircle2,
   Quote,
   TrendingUp,
@@ -238,12 +237,6 @@ const faqs = [
   },
 ];
 
-const trustItems = [
-  "Funciona con WhatsApp Business",
-  "IA de Claude (Anthropic)",
-  "100% RGPD compliant",
-  "Sin tarjeta de crédito",
-];
 
 const testimonials = [
   {
@@ -395,18 +388,6 @@ export default function LandingPage() {
               </Link>
             </div>
             <p className="text-sm text-gray-400 mt-5">Sin tarjeta de crédito · Configuración en 5 minutos</p>
-          </div>
-        </section>
-
-        {/* Social proof / trust bar */}
-        <section className="py-8 px-6 bg-gray-50 border-y border-gray-100">
-          <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500 font-medium">
-            {trustItems.map((item) => (
-              <div key={item} className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-brand-600 shrink-0" strokeWidth={2.5} />
-                {item}
-              </div>
-            ))}
           </div>
         </section>
 
