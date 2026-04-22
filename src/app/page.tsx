@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { ConversationTabs } from "@/components/landing/ConversationTabs";
+import { PricingPlans } from "@/components/landing/PricingPlans";
 import {
   MessageSquare,
   Sparkles,
@@ -436,6 +437,9 @@ export default function LandingPage() {
               <span className="text-base font-bold text-gray-900">ReseñasYa</span>
             </Link>
             <div className="flex items-center gap-4">
+              <a href="#precios" className="text-gray-500 hover:text-gray-900 text-sm font-medium hidden sm:block">
+                Precios
+              </a>
               <Link href="/login" className="text-gray-500 hover:text-gray-900 text-sm font-medium hidden sm:block">
                 Iniciar sesión
               </Link>
@@ -855,8 +859,27 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Pricing */}
+        <section className="py-12 lg:py-24 px-6 bg-white" id="precios">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10 lg:mb-14">
+              <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
+                <Zap className="w-3.5 h-3.5" strokeWidth={2} />
+                Precios
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                Empieza gratis, crece sin límites
+              </h2>
+              <p className="text-gray-500 text-lg max-w-xl mx-auto">
+                Sin permanencia. Cancela cuando quieras. 14 días de prueba gratuita en los planes de pago.
+              </p>
+            </div>
+            <PricingPlans />
+          </div>
+        </section>
+
         {/* Sectors — local SEO */}
-        <section className="py-12 lg:py-24 px-6 bg-white" id="sectores">
+        <section className="py-12 lg:py-24 px-6 bg-gray-50" id="sectores">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-8 lg:mb-14">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -1001,6 +1024,7 @@ export default function LandingPage() {
                 <div>
                   <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">Producto</p>
                   <ul className="space-y-2">
+                    <li><a href="#precios" className="text-sm text-gray-500 hover:text-gray-800 transition">Precios</a></li>
                     <li><a href="#sectores" className="text-sm text-gray-500 hover:text-gray-800 transition">Sectores</a></li>
                     <li><a href="#faq" className="text-sm text-gray-500 hover:text-gray-800 transition">Preguntas frecuentes</a></li>
                     <li><Link href="/register" className="text-sm text-gray-500 hover:text-gray-800 transition">Crear cuenta</Link></li>
