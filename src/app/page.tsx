@@ -24,7 +24,6 @@ import {
   Smartphone,
   Coffee,
   GraduationCap,
-  ChevronDown,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -265,37 +264,6 @@ const sectors = [
     headline: "Reseñas Google para academias y centros de formación",
     desc: "Al terminar el curso o el taller es el momento ideal. Consigue que tus alumnos compartan su experiencia y atraigan a nuevos estudiantes.",
     keywords: ["academia", "autoescuela", "idiomas", "formación"],
-  },
-];
-
-const faqs = [
-  {
-    q: "¿Cómo conseguir más reseñas en Google Maps para un restaurante?",
-    a: "Con ReseñasYa envías un WhatsApp automático a cada cliente tras su visita. Si la experiencia fue positiva, la IA le anima a dejar reseña en Google Maps con el enlace directo. Si fue negativa, responde con empatía sin dirigirle al perfil público.",
-  },
-  {
-    q: "¿Se puede usar para conseguir valoraciones en App Store y Play Store?",
-    a: "Sí. ReseñasYa funciona para cualquier plataforma: Google Maps, App Store (Apple) y Play Store (Google). Solo tienes que configurar el enlace de tu app en lugar del de Google Maps. Es especialmente útil para apps con base de usuarios activos a quienes puedes contactar por WhatsApp.",
-  },
-  {
-    q: "¿Funciona para abogados, gestorías y psicólogos?",
-    a: "Sí. Sectores con alta sensibilidad como despachos de abogados, gestorías o psicólogos lo usan con el tono «usted» para mantener la formalidad. El filtro de sentimiento es especialmente valioso aquí: gestiona los casos delicados en privado, sin exposición pública.",
-  },
-  {
-    q: "¿Qué necesito para empezar?",
-    a: "Solo necesitas una cuenta de Twilio (WhatsApp Business Sandbox gratuita para comenzar), el enlace de Google Maps, App Store o Play Store de tu negocio y registrarte en ReseñasYa. La configuración completa lleva menos de 5 minutos.",
-  },
-  {
-    q: "¿Es legal enviar WhatsApps a clientes para pedir reseñas?",
-    a: "Sí, siempre que el cliente haya dado su consentimiento para recibir comunicaciones. Recomendamos informar al cliente durante la visita o en el proceso de compra, y contar con su número de teléfono proporcionado voluntariamente.",
-  },
-  {
-    q: "¿Puedo personalizar los mensajes de WhatsApp?",
-    a: "Sí. Puedes personalizar el mensaje inicial y elegir entre tres tonos: trato de tú (cercano), usted (formal) o juvenil (desenfadado). Los mensajes de seguimiento se adaptan automáticamente al tono elegido.",
-  },
-  {
-    q: "¿Cómo funciona el análisis de sentimiento con IA?",
-    a: "Cuando el cliente responde al WhatsApp, Claude AI analiza el texto al instante y lo clasifica como positivo, negativo o neutral. En función del resultado, el sistema envía un mensaje diferente: si es positivo, invita a dejar reseña en Google, App Store o Play Store; si es negativo, responde con empatía.",
   },
 ];
 
@@ -862,16 +830,12 @@ export default function LandingPage() {
         {/* Pricing */}
         <section className="py-12 lg:py-24 px-6 bg-white" id="precios">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10 lg:mb-14">
-              <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
-                <Zap className="w-3.5 h-3.5" strokeWidth={2} />
-                Precios
-              </div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Empieza gratis, crece sin límites
+            <div className="text-center mb-8 lg:mb-10">
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+                Simple y sin sorpresas
               </h2>
-              <p className="text-gray-500 text-lg max-w-xl mx-auto">
-                Sin permanencia. Cancela cuando quieras. 14 días de prueba gratuita en los planes de pago.
+              <p className="text-gray-500 text-lg">
+                Sin permanencia · Cancela cuando quieras
               </p>
             </div>
             <PricingPlans />
@@ -916,36 +880,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* FAQ — long-tail SEO */}
-        <section className="py-12 lg:py-24 px-6 bg-gray-50" id="faq">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-8 lg:mb-14">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Preguntas frecuentes
-              </h2>
-              <p className="text-gray-500 text-lg">
-                Todo lo que necesitas saber sobre cómo conseguir más reseñas en Google, App Store y Play Store
-              </p>
-            </div>
-            <dl className="space-y-3">
-              {faqs.map((faq) => (
-                <details
-                  key={faq.q}
-                  className="group bg-white rounded-2xl border border-gray-100 hover:border-brand-200 transition-colors open:border-brand-200 open:shadow-sm"
-                >
-                  <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none">
-                    <span className="font-semibold text-gray-900 text-sm sm:text-base">{faq.q}</span>
-                    <ChevronDown className="w-4 h-4 shrink-0 text-gray-400 transition-transform duration-200 group-open:rotate-180" />
-                  </summary>
-                  <div className="px-5 pb-5">
-                    <p className="text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-4">{faq.a}</p>
-                  </div>
-                </details>
-              ))}
-            </dl>
-          </div>
-        </section>
-
         {/* CTA final */}
         <section className="py-12 lg:py-24 px-6 bg-gradient-to-br from-brand-600 to-brand-700">
           <div className="max-w-3xl mx-auto text-center">
@@ -953,14 +887,14 @@ export default function LandingPage() {
               Empieza a conseguir reseñas hoy
             </h2>
             <p className="text-brand-100 text-lg mb-10 leading-relaxed">
-              Únete a negocios locales que ya automatizan su reputación online con ReseñasYa.
-              Gratis para empezar, sin tarjeta de crédito.
+              Únete a los negocios que ya automatizan su reputación online con ReseñasYa.
+              Sin permanencia, cancela cuando quieras.
             </p>
             <Link
               href="/register"
               className="bg-white text-brand-700 font-bold px-8 py-4 rounded-xl text-lg hover:bg-brand-50 transition inline-block shadow-lg"
             >
-              Crear cuenta gratis →
+              Crear mi cuenta →
             </Link>
           </div>
         </section>
@@ -1026,7 +960,6 @@ export default function LandingPage() {
                   <ul className="space-y-2">
                     <li><a href="#precios" className="text-sm text-gray-500 hover:text-gray-800 transition">Precios</a></li>
                     <li><a href="#sectores" className="text-sm text-gray-500 hover:text-gray-800 transition">Sectores</a></li>
-                    <li><a href="#faq" className="text-sm text-gray-500 hover:text-gray-800 transition">Preguntas frecuentes</a></li>
                     <li><Link href="/register" className="text-sm text-gray-500 hover:text-gray-800 transition">Crear cuenta</Link></li>
                     <li><Link href="/login" className="text-sm text-gray-500 hover:text-gray-800 transition">Iniciar sesión</Link></li>
                   </ul>
