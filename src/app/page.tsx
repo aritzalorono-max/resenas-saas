@@ -23,6 +23,7 @@ import {
   Smartphone,
   Coffee,
   GraduationCap,
+  ChevronDown,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -903,15 +904,20 @@ export default function LandingPage() {
                 Todo lo que necesitas saber sobre cómo conseguir más reseñas en Google, App Store y Play Store
               </p>
             </div>
-            <dl className="space-y-4">
+            <dl className="space-y-3">
               {faqs.map((faq) => (
-                <div
+                <details
                   key={faq.q}
-                  className="bg-gray-50 rounded-2xl p-5 border border-gray-100"
+                  className="group bg-white rounded-2xl border border-gray-100 hover:border-brand-200 transition-colors open:border-brand-200 open:shadow-sm"
                 >
-                  <dt className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{faq.q}</dt>
-                  <dd className="text-gray-600 text-sm leading-relaxed">{faq.a}</dd>
-                </div>
+                  <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none">
+                    <span className="font-semibold text-gray-900 text-sm sm:text-base">{faq.q}</span>
+                    <ChevronDown className="w-4 h-4 shrink-0 text-gray-400 transition-transform duration-200 group-open:rotate-180" />
+                  </summary>
+                  <div className="px-5 pb-5">
+                    <p className="text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-4">{faq.a}</p>
+                  </div>
+                </details>
               ))}
             </dl>
           </div>
