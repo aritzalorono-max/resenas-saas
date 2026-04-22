@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
+import { ConversationTabs } from "@/components/landing/ConversationTabs";
 import {
   MessageSquare,
   Sparkles,
@@ -14,7 +15,6 @@ import {
   BedDouble,
   ShoppingBag,
   Dumbbell,
-  CheckCircle2,
   Quote,
   TrendingUp,
 } from "lucide-react";
@@ -392,7 +392,7 @@ export default function LandingPage() {
         </section>
 
         {/* How it works */}
-        <section className="py-20 lg:py-24 px-6 bg-white">
+        <section className="py-12 lg:py-24 px-6 bg-white">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-14">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">¿Cómo funciona?</h2>
@@ -411,23 +411,23 @@ export default function LandingPage() {
         </section>
 
         {/* Features */}
-        <section className="py-20 lg:py-24 px-6 bg-gray-50">
+        <section className="py-12 lg:py-24 px-6 bg-gray-50">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
+            <div className="text-center mb-10">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Todo lo que necesitas</h2>
               <p className="text-gray-500 text-lg">Una plataforma completa para gestionar tu reputación online</p>
             </div>
-            <div className="grid md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
               {features.map(({ Icon, title, desc }) => (
                 <div
                   key={title}
-                  className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-brand-200 hover:shadow-card-hover transition-all"
+                  className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 hover:border-brand-200 transition-all"
                 >
-                  <div className="w-10 h-10 bg-brand-50 rounded-xl flex items-center justify-center mb-4">
-                    <Icon className="w-5 h-5 text-brand-600" strokeWidth={1.75} />
+                  <div className="w-9 h-9 bg-brand-50 rounded-xl flex items-center justify-center mb-3">
+                    <Icon className="w-4 h-4 text-brand-600" strokeWidth={1.75} />
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-2">{title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+                  <h3 className="font-bold text-gray-900 text-sm sm:text-base mb-1.5">{title}</h3>
+                  <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -435,116 +435,20 @@ export default function LandingPage() {
         </section>
 
         {/* Example conversation */}
-        <section className="py-20 lg:py-24 px-6 bg-white">
+        <section className="py-12 lg:py-24 px-6 bg-white">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 md:mb-12">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 La conversación que consigue reseñas
               </h2>
               <p className="text-gray-500 text-lg">Completamente automática y personalizada para tu negocio</p>
             </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <p className="flex items-center gap-2 text-sm font-semibold text-green-600 mb-3 uppercase tracking-wide">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" strokeWidth={2} />
-                  Cliente satisfecho → reseña en Google Maps
-                </p>
-                <div className="bg-gray-50 rounded-2xl p-5 space-y-3 border border-gray-100">
-                  <div className="flex justify-start">
-                    <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-gray-100">
-                      ¡Hola María! Soy el equipo de Cafetería El Sol. ¿Cómo fue tu experiencia con nosotros hoy? Tu opinión nos ayuda a mejorar 😊
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <div className="bg-brand-500 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-xs text-sm">
-                      ¡Muy buena! El café estaba riquísimo y el personal súper amable 😍
-                    </div>
-                  </div>
-                  <div className="flex justify-start">
-                    <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-gray-100">
-                      ¡Qué alegría saber eso, María! 🙌 ¿Te animarías a dejar tu opinión en Google Maps? 👉 maps.google.com/...
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <p className="flex items-center gap-2 text-sm font-semibold text-red-500 mb-3 uppercase tracking-wide">
-                  <Shield className="w-4 h-4 shrink-0" strokeWidth={2} />
-                  Cliente insatisfecho → respuesta empática, sin enlace
-                </p>
-                <div className="bg-gray-50 rounded-2xl p-5 space-y-3 border border-gray-100">
-                  <div className="flex justify-start">
-                    <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-gray-100">
-                      ¡Hola Carlos! Soy el equipo de Cafetería El Sol. ¿Cómo fue tu experiencia hoy? 😊
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <div className="bg-brand-500 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-xs text-sm">
-                      La verdad no muy bien, tardaron mucho y el pedido llegó frío...
-                    </div>
-                  </div>
-                  <div className="flex justify-start">
-                    <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-gray-100">
-                      Gracias por tu honestidad, Carlos. Lamentamos que tu experiencia no haya sido la esperada 😔 Tu opinión es muy valiosa para mejorar. ¡Esperamos poder verte pronto! 🙏
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Incentive flow */}
-            <div className="mt-8">
-              <p className="flex items-center gap-2 text-sm font-semibold text-amber-600 mb-3 uppercase tracking-wide">
-                <Star className="w-4 h-4 shrink-0 fill-amber-400 text-amber-400" strokeWidth={2} />
-                Incentivo activo → reseña 5★ verificada y recompensa enviada
-              </p>
-              <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
-                <div className="space-y-3 max-w-sm mx-auto md:max-w-none md:grid md:grid-cols-2 md:gap-x-10 md:space-y-0">
-                  {/* Columna izquierda */}
-                  <div className="space-y-3">
-                    <div className="flex justify-start">
-                      <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-amber-100">
-                        ¡Hola Sara! Soy el equipo de Barbería Styles. ¿Cómo fue tu visita hoy? 😊
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <div className="bg-brand-500 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-xs text-sm">
-                        ¡Genial! Muy contenta con el corte, quedó perfecto 🥰
-                      </div>
-                    </div>
-                    <div className="flex justify-start">
-                      <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-amber-100">
-                        ¡Nos alegra mucho, Sara! 🌟 Si dejas una reseña de 5★ en Google Maps y nos envías una captura de pantalla al WhatsApp, te regalamos un <strong>20% de descuento</strong> en tu próxima visita. 👉 maps.google.com/...
-                      </div>
-                    </div>
-                  </div>
-                  {/* Columna derecha */}
-                  <div className="space-y-3 pt-3 border-t border-amber-200 md:pt-0 md:border-t-0">
-                    <div className="flex justify-end">
-                      <div className="bg-brand-500 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-xs text-sm flex items-center gap-2">
-                        <span className="text-lg">📸</span>
-                        <span>¡Aquí la captura!</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-start">
-                      <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 max-w-xs text-sm shadow-sm border border-amber-100">
-                        ✅ <strong>¡Captura verificada!</strong> Tu 20% de descuento está reservado. Muéstranos este mensaje en tu próxima visita. ¡Hasta pronto, Sara! 🎉
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-xs text-amber-600 font-medium mt-4 text-center">
-                  La IA verifica automáticamente que la reseña sea de 5★ antes de enviar la recompensa
-                </p>
-              </div>
-            </div>
+            <ConversationTabs />
           </div>
         </section>
 
         {/* E-commerce inbound screenshot flow */}
-        <section className="py-20 lg:py-24 px-6 bg-gray-50" id="ecommerce">
+        <section className="py-12 lg:py-24 px-6 bg-gray-50" id="ecommerce">
           <div className="max-w-5xl mx-auto">
 
             {/* Header */}
@@ -568,8 +472,8 @@ export default function LandingPage() {
               {/* Left — how to set it up */}
               <div className="space-y-6">
 
-                {/* Sticker mockup */}
-                <div className="bg-white rounded-2xl border-2 border-dashed border-indigo-200 p-6 shadow-sm">
+                {/* Sticker mockup — hidden on mobile */}
+                <div className="hidden sm:block bg-white rounded-2xl border-2 border-dashed border-indigo-200 p-6 shadow-sm">
                   <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-3">
                     Lo que muestra tu tienda / embalaje
                   </p>
@@ -713,19 +617,26 @@ export default function LandingPage() {
         </section>
 
         {/* Testimonials */}
-        <section className="py-20 lg:py-24 px-6 bg-white" id="opiniones">
+        <section className="py-12 lg:py-24 px-6 bg-white" id="opiniones">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-14">
+            <div className="text-center mb-8 lg:mb-14">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 Negocios que ya lo están usando
               </h2>
               <p className="text-gray-500 text-lg">Lo que dicen quienes llevan semanas generando reseñas con ReseñasYa</p>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* Mobile: snap-scroll carousel · Desktop: grid */}
+            <div className="
+              flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-6 px-6
+              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+              sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-5
+              sm:overflow-visible sm:pb-0 sm:mx-0 sm:px-0
+            ">
               {testimonials.map(({ quote, name, role, business, metric }) => (
                 <div
                   key={name}
-                  className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-brand-200 hover:shadow-card-hover transition-all flex flex-col"
+                  className="shrink-0 w-[80vw] snap-center sm:w-auto
+                             bg-white rounded-2xl p-6 border border-gray-100 hover:border-brand-200 transition-all flex flex-col"
                 >
                   {/* Stars */}
                   <div className="flex gap-0.5 mb-3">
@@ -755,9 +666,9 @@ export default function LandingPage() {
         </section>
 
         {/* Case studies */}
-        <section className="py-20 lg:py-24 px-6 bg-gray-50" id="casos-exito">
+        <section className="py-12 lg:py-24 px-6 bg-gray-50" id="casos-exito">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
+            <div className="text-center mb-8 lg:mb-14">
               <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-5">
                 <TrendingUp className="w-3.5 h-3.5" strokeWidth={2} />
                 Casos de éxito
@@ -770,14 +681,20 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="space-y-6">
+            {/* Mobile: snap-scroll carousel · Desktop: stacked */}
+            <div className="
+              flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-6 px-6
+              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+              lg:flex-col lg:gap-6 lg:overflow-visible lg:pb-0 lg:mx-0 lg:px-0
+            ">
               {caseStudies.map(({ Icon, sector, name, before, after, stats }, idx) => (
                 <div
                   key={name}
-                  className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden hover:border-brand-200 transition-all"
+                  className="shrink-0 w-[88vw] snap-center lg:w-auto
+                             bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-brand-200 transition-all"
                 >
                   <div className="grid lg:grid-cols-[1fr_auto] gap-0">
-                    <div className="p-7 lg:p-8">
+                    <div className="p-5 lg:p-8">
                       {/* Header */}
                       <div className="flex items-center gap-3 mb-5">
                         <div className="w-9 h-9 bg-white border border-gray-200 rounded-xl flex items-center justify-center shrink-0">
@@ -804,7 +721,7 @@ export default function LandingPage() {
                     </div>
 
                     {/* Stats */}
-                    <div className="bg-white border-t lg:border-t-0 lg:border-l border-gray-100 p-6 lg:p-8 flex lg:flex-col justify-around lg:justify-center gap-4 lg:gap-6 lg:min-w-[220px]">
+                    <div className="border-t lg:border-t-0 lg:border-l border-gray-100 px-5 py-4 lg:p-8 flex lg:flex-col justify-around lg:justify-center gap-4 lg:gap-6 lg:min-w-[220px]">
                       {stats.map(({ label, value }) => (
                         <div key={label} className="text-center lg:text-left">
                           <p className="text-2xl lg:text-3xl font-extrabold text-gray-900">{value}</p>
@@ -829,9 +746,9 @@ export default function LandingPage() {
         </section>
 
         {/* Sectors — local SEO */}
-        <section className="py-20 lg:py-24 px-6 bg-white" id="sectores">
+        <section className="py-12 lg:py-24 px-6 bg-white" id="sectores">
           <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-14">
+            <div className="text-center mb-8 lg:mb-14">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 Para todo tipo de negocios locales
               </h2>
@@ -839,17 +756,17 @@ export default function LandingPage() {
                 Cualquier negocio que quiera más reseñas positivas en Google Maps puede usar ReseñasYa
               </p>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {sectors.map(({ Icon, name, headline, desc, keywords }) => (
                 <div
                   key={name}
-                  className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-brand-200 hover:shadow-card-hover transition-all"
+                  className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 hover:border-brand-200 hover:shadow-card-hover transition-all"
                 >
-                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mb-3">
-                    <Icon className="w-5 h-5 text-gray-600" strokeWidth={1.75} />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-50 rounded-xl flex items-center justify-center mb-2 sm:mb-3">
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" strokeWidth={1.75} />
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-1">{headline}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed mb-3">{desc}</p>
+                  <h3 className="font-bold text-gray-900 mb-1 text-sm sm:text-base">{headline}</h3>
+                  <p className="text-gray-500 text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3 hidden sm:block">{desc}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {keywords.map((kw) => (
                       <span
@@ -867,9 +784,9 @@ export default function LandingPage() {
         </section>
 
         {/* FAQ — long-tail SEO */}
-        <section className="py-20 lg:py-24 px-6 bg-gray-50" id="faq">
+        <section className="py-12 lg:py-24 px-6 bg-gray-50" id="faq">
           <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-14">
+            <div className="text-center mb-8 lg:mb-14">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 Preguntas frecuentes
               </h2>
@@ -892,7 +809,7 @@ export default function LandingPage() {
         </section>
 
         {/* CTA final */}
-        <section className="py-20 lg:py-24 px-6 bg-gradient-to-br from-brand-600 to-brand-700">
+        <section className="py-12 lg:py-24 px-6 bg-gradient-to-br from-brand-600 to-brand-700">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">
               Empieza a conseguir reseñas hoy
