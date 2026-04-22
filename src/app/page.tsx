@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import {
   MessageSquare,
   Sparkles,
@@ -851,10 +852,11 @@ export default function LandingPage() {
               <p className="text-xs text-gray-400">
                 © {new Date().getFullYear()} ReseñasYa S.L. Todos los derechos reservados.
               </p>
-              <div className="flex gap-4 text-xs text-gray-400">
+              <div className="flex flex-wrap gap-4 text-xs text-gray-400 items-center">
                 <Link href="/privacidad" className="hover:text-gray-600 transition">Privacidad</Link>
                 <Link href="/terminos" className="hover:text-gray-600 transition">Términos</Link>
                 <Link href="/cookies" className="hover:text-gray-600 transition">Cookies</Link>
+                <ManageCookiesButton />
               </div>
             </div>
           </div>

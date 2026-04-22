@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 
 const legalLinks = [
   { href: "/terminos",  label: "Términos y condiciones" },
@@ -44,7 +45,10 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
       <footer className="border-t border-gray-100 py-6 px-6 bg-gray-50">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
           <Link href="/" className="hover:text-gray-600 transition">← Volver a ReseñasYa</Link>
-          <p>© {new Date().getFullYear()} ReseñasYa. Todos los derechos reservados.</p>
+          <div className="flex items-center gap-4">
+            <ManageCookiesButton />
+            <p>© {new Date().getFullYear()} ReseñasYa. Todos los derechos reservados.</p>
+          </div>
         </div>
       </footer>
     </div>

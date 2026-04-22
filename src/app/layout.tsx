@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { CookieBanner } from "@/components/cookies/CookieBanner";
+import { ConditionalScripts } from "@/components/cookies/ConditionalScripts";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -83,7 +85,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <CookieBanner />
+        <ConditionalScripts />
+      </body>
     </html>
   );
 }
