@@ -17,6 +17,12 @@ import {
   Dumbbell,
   Quote,
   TrendingUp,
+  Brain,
+  Scale,
+  Briefcase,
+  Smartphone,
+  Coffee,
+  GraduationCap,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -40,13 +46,13 @@ const schemaOrg = {
         description: "Plan gratuito disponible",
       },
       description:
-        "Plataforma SaaS para negocios locales que automatiza la captación de reseñas de Google Maps mediante WhatsApp e inteligencia artificial.",
+        "Plataforma SaaS que automatiza la captación de reseñas en Google Maps, App Store y Play Store mediante WhatsApp e inteligencia artificial. Para negocios locales, apps móviles y e-commerce.",
       url: process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com",
       screenshot: "/og-image.png",
       featureList: [
         "Envío automático de WhatsApp a clientes",
         "Análisis de sentimiento con IA",
-        "Redirección a Google Maps solo para clientes satisfechos",
+        "Redirección a Google Maps, App Store o Play Store solo para clientes satisfechos",
         "Panel de métricas en tiempo real",
         "Configuración en menos de 5 minutos",
       ],
@@ -99,7 +105,15 @@ const schemaOrg = {
           name: "¿Cómo funciona el análisis de sentimiento?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Cuando el cliente responde al WhatsApp, Claude AI (de Anthropic) analiza el texto al instante y lo clasifica como positivo, negativo o neutral. En función del resultado, el sistema envía un mensaje de seguimiento diferente: si es positivo, le invita a dejar reseña en Google Maps; si es negativo, responde con empatía sin darle el enlace.",
+            text: "Cuando el cliente responde al WhatsApp, Claude AI (de Anthropic) analiza el texto al instante y lo clasifica como positivo, negativo o neutral. En función del resultado, el sistema envía un mensaje de seguimiento diferente: si es positivo, le invita a dejar reseña en Google Maps, App Store o Play Store; si es negativo, responde con empatía sin darle el enlace.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "¿Se puede usar para conseguir reseñas en App Store y Play Store?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Sí. ReseñasYa funciona para cualquier plataforma de reseñas: Google Maps, App Store (Apple) y Play Store (Google). Los desarrolladores de apps lo usan para pedir valoraciones a sus usuarios activos por WhatsApp. Solo tienes que configurar el enlace de tu app en lugar del de Google Maps.",
           },
         },
       ],
@@ -122,8 +136,8 @@ const features = [
   },
   {
     Icon: Star,
-    title: "Más reseñas en Google",
-    desc: "Si el cliente está satisfecho, la IA le anima a dejar reseña con el enlace directo.",
+    title: "Google, App Store y Play Store",
+    desc: "Si el cliente está satisfecho, la IA le anima a dejar reseña con el enlace directo a la plataforma que elijas.",
   },
   {
     Icon: Shield,
@@ -161,52 +175,94 @@ const steps = [
   {
     number: "04",
     title: "Respuesta inteligente",
-    desc: "Si es positiva → enlace a Google Maps. Si es negativa → mensaje empático sin enlace.",
+    desc: "Si es positiva → enlace a Google Maps, App Store o Play Store. Si es negativa → mensaje empático sin enlace.",
   },
 ];
 
 const sectors = [
   {
     Icon: Utensils,
-    name: "Restaurantes y bares",
+    name: "Restaurantes",
     headline: "Más reseñas Google Maps para restaurantes",
-    desc: "Convierte cada visita en una reseña. Envía el WhatsApp justo cuando el cliente pide la cuenta — el momento de mayor satisfacción.",
-    keywords: ["restaurante", "bar", "cafetería", "comida"],
+    desc: "Envía el WhatsApp justo cuando el cliente pide la cuenta — el momento de mayor satisfacción. Funciona para restaurantes, bares, hamburgueserías, sushi, pizzerías y cualquier tipo de cocina.",
+    keywords: ["restaurante", "bar", "fast food", "sushi", "pizzería"],
+  },
+  {
+    Icon: Coffee,
+    name: "Cafeterías y brunch",
+    headline: "Reseñas Google para cafeterías",
+    desc: "Convierte cada café de la mañana en una reseña. El volumen de clientes diarios hace que los resultados se noten desde la primera semana.",
+    keywords: ["cafetería", "brunch", "pastelería", "panadería"],
   },
   {
     Icon: Scissors,
     name: "Peluquerías y estética",
     headline: "Reseñas Google para peluquerías",
-    desc: "El cliente sale con un look espectacular. Aprovecha ese momento para pedirle que comparta su experiencia en Google Maps.",
+    desc: "El cliente sale con un look espectacular. Aprovecha ese momento de satisfacción para pedirle que comparta su experiencia en Google Maps.",
     keywords: ["peluquería", "barbería", "uñas", "estética"],
   },
   {
+    Icon: Brain,
+    name: "Psicólogos y terapeutas",
+    headline: "Reseñas de psicólogos en Google Maps",
+    desc: "La reputación online es clave para que nuevos pacientes te encuentren. Automatiza la captación de valoraciones con máxima discreción y respeto.",
+    keywords: ["psicólogo", "terapeuta", "coach", "bienestar"],
+  },
+  {
     Icon: Stethoscope,
-    name: "Clínicas dentales",
+    name: "Clínicas y salud",
     headline: "Reseñas Google Maps para clínicas",
-    desc: "Construye una reputación online sólida. Cada paciente satisfecho puede convertirse en una reseña positiva que atrae a nuevos pacientes.",
-    keywords: ["dentista", "clínica dental", "ortodoncia"],
+    desc: "Cada paciente satisfecho puede atraer a nuevos. El filtro de sentimiento gestiona los casos delicados en privado, sin exposición pública.",
+    keywords: ["dentista", "clínica", "fisio", "médico"],
+  },
+  {
+    Icon: Scale,
+    name: "Abogados y despachos",
+    headline: "Reseñas Google para abogados",
+    desc: "En un sector donde la confianza lo es todo, las reseñas positivas marcan la diferencia. Automatiza la captación sin que parezca forzado.",
+    keywords: ["abogado", "notaría", "procurador", "legal"],
+  },
+  {
+    Icon: Briefcase,
+    name: "Gestorías y asesorías",
+    headline: "Reseñas para gestorías y asesorías",
+    desc: "Tus clientes te recomiendan en persona, pero pocos lo hacen en Google. Un WhatsApp en el momento justo cambia esa dinámica.",
+    keywords: ["gestoría", "asesoría", "contabilidad", "fiscal"],
   },
   {
     Icon: BedDouble,
     name: "Hoteles y alojamientos",
     headline: "Automatiza reseñas para hoteles",
-    desc: "Contacta con el huésped justo al salir del check-out. Maximiza las reseñas positivas y gestiona las negativas antes de que lleguen a Google.",
+    desc: "Contacta con el huésped justo al salir del check-out. Maximiza las positivas en Google y gestiona las negativas antes de que lleguen a TripAdvisor.",
     keywords: ["hotel", "hostal", "apartamento turístico"],
   },
   {
     Icon: ShoppingBag,
-    name: "Tiendas y comercio",
-    headline: "Google Maps reviews para tiendas",
-    desc: "Cada compra es una oportunidad. Fideliza al cliente y consigue que recomiende tu tienda a otros con solo un WhatsApp.",
-    keywords: ["tienda", "comercio", "retail"],
+    name: "E-commerce",
+    headline: "Reseñas para tiendas online",
+    desc: "Tras cada pedido entregado, envía un WhatsApp automático. Consigue reseñas en Google Maps de tu empresa, en Trustpilot o en tu plataforma favorita.",
+    keywords: ["tienda online", "e-commerce", "envío", "pedidos"],
+  },
+  {
+    Icon: Smartphone,
+    name: "Apps móviles",
+    headline: "Más valoraciones en App Store y Play Store",
+    desc: "Pide la valoración a tus usuarios activos por WhatsApp en el momento de máximo engagement. Consigue más estrellas en App Store y Play Store sin depender de los pop-ups in-app.",
+    keywords: ["App Store", "Play Store", "iOS", "Android"],
   },
   {
     Icon: Dumbbell,
     name: "Gimnasios y deporte",
     headline: "Reseñas Google para gimnasios",
-    desc: "Aumenta tu visibilidad local y atrae más socios. Automatiza las peticiones de reseña tras cada clase o entrenamiento.",
+    desc: "Aumenta tu visibilidad local y atrae más socios. Automatiza las peticiones de reseña tras cada clase o entrenamiento personal.",
     keywords: ["gimnasio", "crossfit", "yoga", "pilates"],
+  },
+  {
+    Icon: GraduationCap,
+    name: "Academias y formación",
+    headline: "Reseñas Google para academias y centros de formación",
+    desc: "Al terminar el curso o el taller es el momento ideal. Consigue que tus alumnos compartan su experiencia y atraigan a nuevos estudiantes.",
+    keywords: ["academia", "autoescuela", "idiomas", "formación"],
   },
 ];
 
@@ -216,16 +272,20 @@ const faqs = [
     a: "Con ReseñasYa envías un WhatsApp automático a cada cliente tras su visita. Si la experiencia fue positiva, la IA le anima a dejar reseña en Google Maps con el enlace directo. Si fue negativa, responde con empatía sin dirigirle al perfil público.",
   },
   {
-    q: "¿Funciona para peluquerías y centros de estética?",
-    a: "Sí. ReseñasYa está diseñado para cualquier negocio local. Muchas peluquerías y centros de estética lo usan para pedir opinión al cliente justo cuando termina el servicio, aprovechando el momento de máxima satisfacción.",
+    q: "¿Se puede usar para conseguir valoraciones en App Store y Play Store?",
+    a: "Sí. ReseñasYa funciona para cualquier plataforma: Google Maps, App Store (Apple) y Play Store (Google). Solo tienes que configurar el enlace de tu app en lugar del de Google Maps. Es especialmente útil para apps con base de usuarios activos a quienes puedes contactar por WhatsApp.",
+  },
+  {
+    q: "¿Funciona para abogados, gestorías y psicólogos?",
+    a: "Sí. Sectores con alta sensibilidad como despachos de abogados, gestorías o psicólogos lo usan con el tono «usted» para mantener la formalidad. El filtro de sentimiento es especialmente valioso aquí: gestiona los casos delicados en privado, sin exposición pública.",
   },
   {
     q: "¿Qué necesito para empezar?",
-    a: "Solo necesitas una cuenta de Twilio (WhatsApp Business Sandbox gratuita para comenzar), el enlace de Google Maps de tu negocio y registrarte en ReseñasYa. La configuración completa lleva menos de 5 minutos.",
+    a: "Solo necesitas una cuenta de Twilio (WhatsApp Business Sandbox gratuita para comenzar), el enlace de Google Maps, App Store o Play Store de tu negocio y registrarte en ReseñasYa. La configuración completa lleva menos de 5 minutos.",
   },
   {
     q: "¿Es legal enviar WhatsApps a clientes para pedir reseñas?",
-    a: "Sí, siempre que el cliente haya dado su consentimiento para recibir comunicaciones. Recomendamos informar al cliente durante la visita y contar con su número de teléfono proporcionado voluntariamente.",
+    a: "Sí, siempre que el cliente haya dado su consentimiento para recibir comunicaciones. Recomendamos informar al cliente durante la visita o en el proceso de compra, y contar con su número de teléfono proporcionado voluntariamente.",
   },
   {
     q: "¿Puedo personalizar los mensajes de WhatsApp?",
@@ -233,7 +293,7 @@ const faqs = [
   },
   {
     q: "¿Cómo funciona el análisis de sentimiento con IA?",
-    a: "Cuando el cliente responde al WhatsApp, Claude AI analiza el texto al instante y lo clasifica como positivo, negativo o neutral. En función del resultado, el sistema envía un mensaje diferente: si es positivo, invita a dejar reseña; si es negativo, responde con empatía.",
+    a: "Cuando el cliente responde al WhatsApp, Claude AI analiza el texto al instante y lo clasifica como positivo, negativo o neutral. En función del resultado, el sistema envía un mensaje diferente: si es positivo, invita a dejar reseña en Google, App Store o Play Store; si es negativo, responde con empatía.",
   },
 ];
 
@@ -247,18 +307,25 @@ const testimonials = [
     metric: "+42 reseñas en 3 semanas",
   },
   {
-    quote: "Lo puse a funcionar en una tarde. Mis clientes responden al WhatsApp y los que están contentos van directos a Google. Ha sido un antes y un después.",
-    name: "Carlos Ruiz",
-    role: "Gerente",
-    business: "Barbería Styles · Barcelona",
-    metric: "4.8★ media en Google",
-  },
-  {
     quote: "Tenía miedo de parecer invasivo, pero el tono es tan natural que los clientes responden encantados. Hemos multiplicado por 3 las reseñas mensuales.",
     name: "Laura Sánchez",
     role: "Directora",
     business: "Clínica Dental Sánchez · Valencia",
     metric: "×3 reseñas al mes",
+  },
+  {
+    quote: "Lo implantamos para nuestros usuarios más activos y en 5 semanas subimos de 3.8 a 4.6 estrellas en App Store. Los ratings son esenciales para el ASO y esto lo cambia todo.",
+    name: "Javier Moreno",
+    role: "CEO",
+    business: "FinTrack App · Barcelona",
+    metric: "3.8→4.6★ App Store",
+  },
+  {
+    quote: "Como psicóloga, necesitaba algo discreto. El tono que usa la IA es tan cálido que los pacientes responden con naturalidad. Ya tengo 38 reseñas nuevas sin pedirlas a mano.",
+    name: "Elena Domínguez",
+    role: "Psicóloga",
+    business: "Centro Psicología Domínguez · Bilbao",
+    metric: "+38 reseñas en 2 meses",
   },
   {
     quote: "El filtro de sentimiento es lo que más me gusta. Si un huésped no está satisfecho, gestionamos el problema internamente. Las malas reseñas han caído un 80%.",
@@ -268,6 +335,20 @@ const testimonials = [
     metric: "−80% reseñas negativas",
   },
   {
+    quote: "Somos una gestoría y nuestros clientes no suelen dejar reseñas espontáneamente. Con ReseñasYa conseguimos 51 reseñas en 3 meses. Ahora somos los más valorados de la zona.",
+    name: "Ramón Vidal",
+    role: "Socio Director",
+    business: "Gestoría Vidal & Asociados · Valencia",
+    metric: "51 reseñas en 3 meses",
+  },
+  {
+    quote: "Nuestros clientes compran online y nunca coincidimos en persona. El WhatsApp post-envío funciona genial: 72% de respuesta y casi todos positivos. Las reseñas en Google se dispararon.",
+    name: "Sofía Reyes",
+    role: "Fundadora",
+    business: "Tienda Naturalia · Murcia",
+    metric: "72% tasa de respuesta",
+  },
+  {
     quote: "Llevaba años con la misma puntuación en Google. En 6 semanas subí de 3.9 a 4.6 estrellas. Ahora aparezco en los primeros resultados cuando buscan barbería en mi zona.",
     name: "Roberto Iglesias",
     role: "Propietario",
@@ -275,11 +356,11 @@ const testimonials = [
     metric: "3.9→4.6★ en 6 semanas",
   },
   {
-    quote: "Mis clientes son mayores y me preguntaba si responderían al WhatsApp. La sorpresa fue que el 70% contesta. Y casi todos están muy contentos, así que las reseñas se disparan.",
-    name: "Carmen López",
-    role: "Gerente",
-    business: "Farmacia López · Zaragoza",
-    metric: "70% tasa de respuesta",
+    quote: "Como despacho de abogados, la reputación digital es fundamental para captar nuevos clientes. Ahora tenemos más de 90 reseñas en Google y el 96% son de 5 estrellas.",
+    name: "Patricia Olmedo",
+    role: "Socia fundadora",
+    business: "Olmedo & Asociados Abogados · Sevilla",
+    metric: "96% reseñas de 5★",
   },
 ];
 
@@ -297,18 +378,6 @@ const caseStudies = [
     ],
   },
   {
-    Icon: Scissors,
-    sector: "Belleza",
-    name: "Studio Hair · Bilbao",
-    before: "Competían con peluquerías con más de 200 reseñas. Su perfil de Google Maps tenía solo 31.",
-    after: "Superaron las 160 reseñas en 3 meses y aparecen en el top 3 local cuando alguien busca peluquería.",
-    stats: [
-      { label: "Reseñas totales", value: "160+" },
-      { label: "Posición local", value: "Top 3" },
-      { label: "Tasa de respuesta", value: "68%" },
-    ],
-  },
-  {
     Icon: Stethoscope,
     sector: "Salud",
     name: "Clínica Dental Ortiz · Zaragoza",
@@ -318,6 +387,30 @@ const caseStudies = [
       { label: "Reseñas nuevas", value: "+62" },
       { label: "Reseñas negativas públicas", value: "0" },
       { label: "Tasa de satisfacción", value: "94%" },
+    ],
+  },
+  {
+    Icon: Smartphone,
+    sector: "App móvil",
+    name: "MiRutaApp · Madrid",
+    before: "App de rutas de senderismo con 4.000 usuarios activos y solo 87 valoraciones en Play Store — insuficientes para aparecer en búsquedas.",
+    after: "En 6 semanas enviaron WhatsApps a su base de usuarios activos. Consiguieron 340 valoraciones nuevas en Play Store y subieron a 4.7★.",
+    stats: [
+      { label: "Valoraciones nuevas", value: "+340" },
+      { label: "Media Play Store", value: "4.7 ★" },
+      { label: "Tasa de conversión", value: "23%" },
+    ],
+  },
+  {
+    Icon: ShoppingBag,
+    sector: "E-commerce",
+    name: "NaturalBox · Barcelona",
+    before: "Tienda online de productos ecológicos con buen NPS interno pero muy pocas reseñas públicas. Sin social proof, la tasa de conversión era baja.",
+    after: "Enviaron WhatsApps al día siguiente de cada entrega. En 3 meses acumularon 198 reseñas verificadas en Google y la conversión subió un 18%.",
+    stats: [
+      { label: "Reseñas en Google", value: "198" },
+      { label: "Conversión web", value: "+18%" },
+      { label: "Media de valoración", value: "4.8 ★" },
     ],
   },
 ];
@@ -363,15 +456,15 @@ export default function LandingPage() {
               Automatiza tus reseñas de Google Maps
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-              Consigue más reseñas{" "}
-              <span className="text-brand-600 whitespace-nowrap">Google Maps</span>
+              Consigue más reseñas en{" "}
+              <span className="text-brand-600 whitespace-nowrap">Google, App Store</span>
               <br />
-              automáticamente por WhatsApp
+              <span className="text-brand-600">y Play Store</span>{" "}por WhatsApp
             </h1>
             <p className="text-lg lg:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
               Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y
-              consigue que los satisfechos dejen reseña en Google Maps — sin esfuerzo.
-              Ideal para restaurantes, peluquerías y cualquier negocio local.
+              consigue que los satisfechos dejen reseña en Google Maps, App Store o Play Store — sin esfuerzo.
+              Para negocios locales, apps móviles y e-commerce.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -750,10 +843,10 @@ export default function LandingPage() {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-8 lg:mb-14">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Para todo tipo de negocios locales
+                Restaurantes, apps, abogados, e-commerce y más
               </h2>
               <p className="text-gray-500 text-lg">
-                Cualquier negocio que quiera más reseñas positivas en Google Maps puede usar ReseñasYa
+                Si tienes clientes y quieres más reseñas en Google, App Store o Play Store, ReseñasYa es para ti
               </p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
@@ -791,7 +884,7 @@ export default function LandingPage() {
                 Preguntas frecuentes
               </h2>
               <p className="text-gray-500 text-lg">
-                Todo lo que necesitas saber sobre cómo conseguir más reseñas de Google Maps
+                Todo lo que necesitas saber sobre cómo conseguir más reseñas en Google, App Store y Play Store
               </p>
             </div>
             <dl className="space-y-4">
