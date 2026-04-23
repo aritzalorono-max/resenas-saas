@@ -24,7 +24,6 @@ import {
   Smartphone,
   Coffee,
   GraduationCap,
-  ChevronDown,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -268,33 +267,6 @@ const sectors = [
   },
 ];
 
-
-const faqs = [
-  {
-    q: "¿Cómo funciona exactamente?",
-    a: "Introduces el nombre y teléfono de tu cliente en el panel. Le llega un WhatsApp personalizado preguntando por su experiencia. Claude AI analiza la respuesta al instante: si es positiva, le anima a dejar reseña con el enlace directo; si es negativa, responde con empatía sin enviarle al perfil público.",
-  },
-  {
-    q: "¿Funciona para Google Maps, App Store y Play Store?",
-    a: "Sí. Solo tienes que configurar el enlace de destino en tu perfil: puede ser tu ficha de Google Maps, tu app en la App Store o en Play Store, o cualquier otra plataforma como Trustpilot. ReseñasYa envía ese enlace a los clientes satisfechos.",
-  },
-  {
-    q: "¿Funciona para abogados, gestorías y psicólogos?",
-    a: "Sí. Sectores sensibles como despachos de abogados, gestorías o psicólogos lo usan con el tono «usted» para mantener la formalidad. El filtro de sentimiento es especialmente valioso aquí: gestiona los casos delicados en privado, sin exposición pública.",
-  },
-  {
-    q: "¿Qué necesito para empezar?",
-    a: "Una cuenta de Twilio (WhatsApp Business Sandbox gratuita para empezar), el enlace de Google Maps, App Store o Play Store de tu negocio, y registrarte en ReseñasYa. La configuración completa lleva menos de 5 minutos.",
-  },
-  {
-    q: "¿Es legal enviar WhatsApps a clientes para pedir reseñas?",
-    a: "Sí, siempre que el cliente haya dado su consentimiento para recibir comunicaciones. Recomendamos informarle durante la visita o en el proceso de compra, y contar con su número facilitado voluntariamente.",
-  },
-  {
-    q: "¿Puedo personalizar los mensajes?",
-    a: "Sí. Puedes personalizar el mensaje inicial y elegir entre tres tonos: trato de tú (cercano), usted (formal) o juvenil (desenfadado). Los mensajes de seguimiento se adaptan automáticamente al tono elegido.",
-  },
-];
 
 const testimonials = [
   {
@@ -963,36 +935,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* FAQ */}
-        <section className="py-12 lg:py-20 px-6 bg-white" id="faq">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
-                Preguntas frecuentes
-              </h2>
-              <p className="text-gray-500 text-lg">
-                Todo lo que necesitas saber antes de empezar
-              </p>
-            </div>
-            <dl className="space-y-3">
-              {faqs.map((faq) => (
-                <details
-                  key={faq.q}
-                  className="group bg-gray-50 rounded-2xl border border-gray-100 hover:border-brand-200 transition-colors open:border-brand-200 open:bg-white open:shadow-sm"
-                >
-                  <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden select-none">
-                    <span className="font-semibold text-gray-900 text-sm sm:text-base">{faq.q}</span>
-                    <ChevronDown className="w-4 h-4 shrink-0 text-gray-400 transition-transform duration-200 group-open:rotate-180" />
-                  </summary>
-                  <div className="px-5 pb-5">
-                    <p className="text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-4">{faq.a}</p>
-                  </div>
-                </details>
-              ))}
-            </dl>
-          </div>
-        </section>
-
         {/* CTA final */}
         <section className="py-12 lg:py-24 px-6 bg-gradient-to-br from-brand-600 to-brand-700">
           <div className="max-w-3xl mx-auto text-center">
@@ -1073,7 +1015,7 @@ export default function LandingPage() {
                   <ul className="space-y-2">
                     <li><a href="#precios" className="text-sm text-gray-500 hover:text-gray-800 transition">Precios</a></li>
                     <li><a href="#sectores" className="text-sm text-gray-500 hover:text-gray-800 transition">Sectores</a></li>
-                    <li><a href="#faq" className="text-sm text-gray-500 hover:text-gray-800 transition">Preguntas frecuentes</a></li>
+                    <li><Link href="/faq" className="text-sm text-gray-500 hover:text-gray-800 transition">Preguntas frecuentes</Link></li>
                     <li><Link href="/register" className="text-sm text-gray-500 hover:text-gray-800 transition">Crear cuenta</Link></li>
                     <li><Link href="/login" className="text-sm text-gray-500 hover:text-gray-800 transition">Iniciar sesión</Link></li>
                   </ul>

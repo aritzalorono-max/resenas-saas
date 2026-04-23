@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 
 const legalLinks = [
+  { href: "/faq",       label: "Preguntas frecuentes" },
   { href: "/terminos",  label: "Términos y condiciones" },
   { href: "/privacidad", label: "Privacidad y aviso legal" },
   { href: "/cookies",   label: "Política de cookies" },
