@@ -298,66 +298,83 @@ const faqs = [
 
 const testimonials = [
   {
-    quote: "En solo 3 semanas pasamos de 47 a 89 reseñas en Google Maps. Lo mejor es que nos avisa si un cliente no está satisfecho antes de que lo publique.",
+    quote: "En solo 3 semanas pasamos de 47 a 89 reseñas en Google Maps. Lo mejor es que nos avisa si un cliente no está satisfecho antes de que lo publique en Google.",
     name: "Ana Martínez",
     role: "Propietaria",
     business: "La Taberna del Sol · Madrid",
+    platform: "Google Maps",
     metric: "+42 reseñas en 3 semanas",
   },
   {
-    quote: "Tenía miedo de parecer invasivo, pero el tono es tan natural que los clientes responden encantados. Hemos multiplicado por 3 las reseñas mensuales.",
-    name: "Laura Sánchez",
-    role: "Directora",
-    business: "Clínica Dental Sánchez · Valencia",
-    metric: "×3 reseñas al mes",
-  },
-  {
-    quote: "Lo implantamos para nuestros usuarios más activos y en 5 semanas subimos de 3.8 a 4.6 estrellas en App Store. Los ratings son esenciales para el ASO y esto lo cambia todo.",
+    quote: "Lo implantamos para nuestros usuarios activos y en 5 semanas subimos de 3.8 a 4.6★ en App Store. Los ratings son esenciales para el ASO y esto lo cambia todo.",
     name: "Javier Moreno",
     role: "CEO",
     business: "FinTrack App · Barcelona",
-    metric: "3.8→4.6★ App Store",
+    platform: "App Store",
+    metric: "3.8→4.6★ en App Store",
   },
   {
-    quote: "Como psicóloga, necesitaba algo discreto. El tono que usa la IA es tan cálido que los pacientes responden con naturalidad. Ya tengo 38 reseñas nuevas sin pedirlas a mano.",
+    quote: "Pusimos el incentivo: reseña de 5★ en Google + captura = 10% de descuento en la próxima cuota. La IA lo verifica sola y manda el código al instante. En un mes, 90 reseñas nuevas.",
+    name: "Diego Herrera",
+    role: "Director",
+    business: "FitLife Gym · Sevilla",
+    platform: "Google Maps + incentivo",
+    metric: "90 reseñas en 1 mes",
+  },
+  {
+    quote: "Como psicóloga necesitaba algo discreto. El tono de la IA es tan cálido que los pacientes responden con naturalidad. Ya tengo 38 reseñas nuevas en Google sin pedirlas yo directamente.",
     name: "Elena Domínguez",
     role: "Psicóloga",
-    business: "Centro Psicología Domínguez · Bilbao",
+    business: "Centro de Psicología Domínguez · Bilbao",
+    platform: "Google Maps",
     metric: "+38 reseñas en 2 meses",
   },
   {
-    quote: "El filtro de sentimiento es lo que más me gusta. Si un huésped no está satisfecho, gestionamos el problema internamente. Las malas reseñas han caído un 80%.",
+    quote: "Teníamos clientes muy contentos pero cero reseñas en Trustpilot — que es donde nos buscan antes de comprar. En 4 meses, 180 valoraciones con 4.7★. La conversión subió un 18%.",
+    name: "Marta Giménez",
+    role: "Fundadora",
+    business: "BabyTrends · E-commerce",
+    platform: "Trustpilot",
+    metric: "180 reseñas en Trustpilot",
+  },
+  {
+    quote: "El filtro de sentimiento es lo que más me gusta. Si un huésped no está contento, gestionamos el problema en privado. Las malas reseñas han caído un 80%.",
     name: "Miguel Fernández",
     role: "Director",
     business: "Hotel Boutique Costa · Málaga",
+    platform: "Google Maps",
     metric: "−80% reseñas negativas",
   },
   {
-    quote: "Somos una gestoría y nuestros clientes no suelen dejar reseñas espontáneamente. Con ReseñasYa conseguimos 51 reseñas en 3 meses. Ahora somos los más valorados de la zona.",
-    name: "Ramón Vidal",
-    role: "Socio Director",
-    business: "Gestoría Vidal & Asociados · Valencia",
-    metric: "51 reseñas en 3 meses",
+    quote: "Nuestra app está en iOS y Android. Configuré dos enlaces: App Store y Play Store. El cliente elige. En 2 meses sumamos más de 500 valoraciones nuevas entre las dos plataformas.",
+    name: "Pablo Torres",
+    role: "Product Manager",
+    business: "RecetApp · Madrid",
+    platform: "App Store + Play Store",
+    metric: "+500 valoraciones",
   },
   {
-    quote: "Nuestros clientes compran online y nunca coincidimos en persona. El WhatsApp post-envío funciona genial: 72% de respuesta y casi todos positivos. Las reseñas en Google se dispararon.",
-    name: "Sofía Reyes",
-    role: "Fundadora",
-    business: "Tienda Naturalia · Murcia",
-    metric: "72% tasa de respuesta",
+    quote: "Activamos el incentivo en la cafetería: captura de 5★ en Google = café de cortesía en la próxima visita, verificado automáticamente. En 3 semanas: de 31 a 97 reseñas.",
+    name: "Lucía Fernández",
+    role: "Propietaria",
+    business: "Bloom Coffee · Zaragoza",
+    platform: "Google Maps + incentivo",
+    metric: "31→97 reseñas en 3 semanas",
   },
   {
-    quote: "Llevaba años con la misma puntuación en Google. En 6 semanas subí de 3.9 a 4.6 estrellas. Ahora aparezco en los primeros resultados cuando buscan barbería en mi zona.",
-    name: "Roberto Iglesias",
-    role: "Propietario",
-    business: "Barbería El Fígaro · Sevilla",
-    metric: "3.9→4.6★ en 6 semanas",
+    quote: "Enviamos WhatsApps a Google Maps y a Trustpilot según el perfil del paciente. Los más jóvenes van a Google, los mayores a Trustpilot. Tenemos presencia en las dos y cada vez más reseñas.",
+    name: "Carlos Bernal",
+    role: "Director médico",
+    business: "Clínica Bernal · Alicante",
+    platform: "Google + Trustpilot",
+    metric: "+110 reseñas en 2 plataformas",
   },
   {
-    quote: "Como despacho de abogados, la reputación digital es fundamental para captar nuevos clientes. Ahora tenemos más de 90 reseñas en Google y el 96% son de 5 estrellas.",
+    quote: "Como despacho de abogados, la reputación digital es fundamental. Ahora tenemos más de 90 reseñas en Google y el 96% son de 5★. Ha cambiado completamente cómo nos encuentran los nuevos clientes.",
     name: "Patricia Olmedo",
     role: "Socia fundadora",
     business: "Olmedo & Asociados Abogados · Sevilla",
+    platform: "Google Maps",
     metric: "96% reseñas de 5★",
   },
 ];
@@ -365,10 +382,10 @@ const testimonials = [
 const caseStudies = [
   {
     Icon: Utensils,
-    sector: "Restauración",
+    sector: "Restauración · Google Maps",
     name: "Pizzería Napoli · Sevilla",
-    before: "23 reseñas en 2 años de actividad. Los propietarios no tenían tiempo de pedirlas manualmente.",
-    after: "En 2 meses llegaron a 97 reseñas con una media de 4.7★ y llenaron la lista de espera los fines de semana.",
+    before: "23 reseñas en 2 años de actividad. Los propietarios no tenían tiempo de pedirlas manualmente y las reseñas se acumulaban solo en momentos de queja.",
+    after: "En 2 meses llegaron a 97 reseñas con una media de 4.7★. Aparecer en el top 3 de búsquedas locales les llenó la lista de espera los fines de semana.",
     stats: [
       { label: "Reseñas nuevas", value: "+74" },
       { label: "Media Google", value: "4.7 ★" },
@@ -376,11 +393,35 @@ const caseStudies = [
     ],
   },
   {
+    Icon: Dumbbell,
+    sector: "Fitness · Google Maps + Incentivo",
+    name: "FitBody Gym · Valencia",
+    before: "58 reseñas en 4 años. Alta satisfacción interna —el NPS era 72— pero los socios no dejaban valoraciones en Google de forma espontánea.",
+    after: "Activaron el incentivo: reseña de 5★ + captura = 10% dto. en la próxima cuota. La IA verifica la foto al instante y envía el código sin intervención humana. Resultado: 134 reseñas en 6 semanas.",
+    stats: [
+      { label: "Reseñas nuevas", value: "+134" },
+      { label: "Media Google", value: "4.9 ★" },
+      { label: "Conversión con incentivo", value: "62%" },
+    ],
+  },
+  {
+    Icon: ShoppingBag,
+    sector: "E-commerce · Trustpilot",
+    name: "ModaTrend · Barcelona",
+    before: "Tienda online de moda con alta satisfacción pero cero presencia en Trustpilot — la plataforma que sus compradores consultaban antes de hacer el primer pedido.",
+    after: "WhatsApp automático 48 h post-entrega, enlace directo a Trustpilot. En 4 meses: 289 valoraciones con 4.7★. La tasa de conversión en primera visita subió un 22%.",
+    stats: [
+      { label: "Reseñas Trustpilot", value: "289" },
+      { label: "Media Trustpilot", value: "4.7 ★" },
+      { label: "Conversión web", value: "+22%" },
+    ],
+  },
+  {
     Icon: Stethoscope,
-    sector: "Salud",
+    sector: "Salud · Google Maps + Trustpilot",
     name: "Clínica Dental Ortiz · Zaragoza",
-    before: "Sector sensible donde las malas reseñas tienen un gran impacto. Necesitaban captar las positivas sin arriesgar las negativas.",
-    after: "En 4 meses consiguieron 62 reseñas nuevas. Las opiniones negativas se gestionaron de forma privada, sin llegar a publicarse.",
+    before: "Sector sensible: las malas reseñas tienen un impacto desproporcionado. Necesitaban captar opiniones positivas sin arriesgar que las negativas llegasen a publicarse.",
+    after: "En 4 meses, 62 reseñas nuevas repartidas entre Google Maps y Trustpilot. Las opiniones negativas se gestionaron en privado — ninguna llegó a publicarse.",
     stats: [
       { label: "Reseñas nuevas", value: "+62" },
       { label: "Reseñas negativas públicas", value: "0" },
@@ -389,26 +430,26 @@ const caseStudies = [
   },
   {
     Icon: Smartphone,
-    sector: "App móvil",
-    name: "MiRutaApp · Madrid",
-    before: "App de rutas de senderismo con 4.000 usuarios activos y solo 87 valoraciones en Play Store — insuficientes para aparecer en búsquedas.",
-    after: "En 6 semanas enviaron WhatsApps a su base de usuarios activos. Consiguieron 340 valoraciones nuevas en Play Store y subieron a 4.7★.",
+    sector: "App móvil · App Store + Play Store",
+    name: "RecetApp · Madrid",
+    before: "App de recetas con 18.000 usuarios activos pero solo 312 valoraciones entre App Store y Play Store — ratio bajísimo que lastraba su posición en los rankings.",
+    after: "WhatsApps segmentados según el dispositivo del usuario: enlace a App Store para iOS, Play Store para Android. En 2 meses: +520 valoraciones en ambas plataformas y posición top 10 en su categoría.",
     stats: [
-      { label: "Valoraciones nuevas", value: "+340" },
-      { label: "Media Play Store", value: "4.7 ★" },
-      { label: "Tasa de conversión", value: "23%" },
+      { label: "Valoraciones nuevas", value: "+520" },
+      { label: "Plataformas cubiertas", value: "2" },
+      { label: "Posición categoría", value: "Top 10" },
     ],
   },
   {
-    Icon: ShoppingBag,
-    sector: "E-commerce",
-    name: "NaturalBox · Barcelona",
-    before: "Tienda online de productos ecológicos con buen NPS interno pero muy pocas reseñas públicas. Sin social proof, la tasa de conversión era baja.",
-    after: "Enviaron WhatsApps al día siguiente de cada entrega. En 3 meses acumularon 198 reseñas verificadas en Google y la conversión subió un 18%.",
+    Icon: Coffee,
+    sector: "Cafetería · Google Maps + Incentivo",
+    name: "Bloom Coffee · Zaragoza",
+    before: "31 reseñas en Google Maps con media de 4.2★. La cafetería de enfrente tenía 180 reseñas y aparecía siempre primera cuando alguien buscaba 'café cerca'.",
+    after: "Activaron el incentivo screenshot: reseña de 5★ + captura = café de cortesía verificado por IA. Sin fricción, sin intervención humana. En 3 semanas: de 31 a 97 reseñas, 4.8★ de media.",
     stats: [
-      { label: "Reseñas en Google", value: "198" },
-      { label: "Conversión web", value: "+18%" },
-      { label: "Media de valoración", value: "4.8 ★" },
+      { label: "Reseñas nuevas", value: "+66" },
+      { label: "Media Google", value: "4.8 ★" },
+      { label: "Tiempo para lograrlo", value: "3 semanas" },
     ],
   },
 ];
@@ -742,23 +783,33 @@ export default function LandingPage() {
               sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-5
               sm:overflow-visible sm:pb-0 sm:mx-0 sm:px-0
             ">
-              {testimonials.map(({ quote, name, role, business, metric }) => (
+              {testimonials.map(({ quote, name, role, business, metric, platform }) => (
                 <div
                   key={name}
                   className="shrink-0 w-[80vw] snap-center sm:w-auto
                              bg-white rounded-2xl p-6 border border-gray-100 hover:border-brand-200 transition-all flex flex-col"
                 >
-                  {/* Stars */}
-                  <div className="flex gap-0.5 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="text-yellow-400 fill-yellow-400" />
-                    ))}
+                  {/* Stars + platform badge */}
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex gap-0.5">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={14} className="text-yellow-400 fill-yellow-400" />
+                      ))}
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${
+                      platform.includes("incentivo") ? "bg-amber-100 text-amber-700" :
+                      platform.includes("+")         ? "bg-indigo-50 text-indigo-600" :
+                      platform === "Trustpilot"      ? "bg-emerald-50 text-emerald-700" :
+                      platform === "App Store"        ? "bg-blue-50 text-blue-600" :
+                      platform === "Play Store"       ? "bg-teal-50 text-teal-600" :
+                                                       "bg-green-50 text-green-700"
+                    }`}>
+                      {platform}
+                    </span>
                   </div>
                   {/* Quote */}
                   <Quote size={18} className="text-brand-200 mb-2 shrink-0" strokeWidth={1.5} />
-                  <p className="text-gray-700 text-sm leading-relaxed flex-1 mb-5">
-                    {quote}
-                  </p>
+                  <p className="text-gray-700 text-sm leading-relaxed flex-1 mb-5">{quote}</p>
                   {/* Metric pill */}
                   <div className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs font-bold px-3 py-1.5 rounded-full mb-4 w-fit">
                     <TrendingUp size={12} strokeWidth={2.5} />
