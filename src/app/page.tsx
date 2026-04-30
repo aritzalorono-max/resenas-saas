@@ -4,11 +4,7 @@ import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { ConversationTabs } from "@/components/landing/ConversationTabs";
 import { PricingPlans } from "@/components/landing/PricingPlans";
 import {
-  MessageSquare,
-  Sparkles,
   Star,
-  Shield,
-  BarChart2,
   Zap,
   Utensils,
   Scissors,
@@ -124,38 +120,6 @@ const schemaOrg = {
 
 // ── Contenido ─────────────────────────────────────────────────────────────────
 
-const features = [
-  {
-    Icon: MessageSquare,
-    title: "WhatsApp automático",
-    desc: "En segundos, tu cliente recibe un mensaje personalizado en WhatsApp pidiendo su opinión.",
-  },
-  {
-    Icon: Sparkles,
-    title: "IA que analiza opiniones",
-    desc: "Claude AI evalúa si la respuesta es positiva, negativa o neutral de forma precisa.",
-  },
-  {
-    Icon: Star,
-    title: "Google, App Store y Play Store",
-    desc: "Si el cliente está satisfecho, la IA le anima a dejar reseña con el enlace directo a la plataforma que elijas.",
-  },
-  {
-    Icon: Shield,
-    title: "Protege tu reputación",
-    desc: "Si la experiencia fue mala, respondemos con empatía sin enviarle al perfil público.",
-  },
-  {
-    Icon: BarChart2,
-    title: "Panel en tiempo real",
-    desc: "Ve todas las solicitudes, respuestas y métricas de satisfacción en un solo lugar.",
-  },
-  {
-    Icon: Zap,
-    title: "Listo en 5 minutos",
-    desc: "Regístrate, conecta tu cuenta de Twilio y empieza a recopilar reseñas hoy mismo.",
-  },
-];
 
 const steps = [
   {
@@ -527,30 +491,6 @@ export default function LandingPage() {
                   <div className="text-4xl font-extrabold text-brand-200 mb-3">{step.number}</div>
                   <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">{step.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Features */}
-        <section className="py-12 lg:py-24 px-6 bg-gray-50">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Todo lo que necesitas</h2>
-              <p className="text-gray-500 text-lg">Una plataforma completa para gestionar tu reputación online</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
-              {features.map(({ Icon, title, desc }) => (
-                <div
-                  key={title}
-                  className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 hover:border-brand-200 transition-all"
-                >
-                  <div className="w-9 h-9 bg-brand-50 rounded-xl flex items-center justify-center mb-3">
-                    <Icon className="w-4 h-4 text-brand-600" strokeWidth={1.75} />
-                  </div>
-                  <h3 className="font-bold text-gray-900 text-sm sm:text-base mb-1.5">{title}</h3>
-                  <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
