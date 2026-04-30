@@ -4,11 +4,11 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { GoogleButton } from "@/components/auth/GoogleButton";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    businessName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -49,14 +49,7 @@ export default function RegisterPage() {
     }
 
     if (data.user) {
-      const { error: bizError } = await supabase.from("businesses").insert({
-        user_id: data.user.id,
-        name: formData.businessName,
-      });
-
-      if (bizError) {
-        console.error("Error creating business:", bizError);
-      }
+      await supabase.from("businesses").insert({ user_id: data.user.id, name: "" });
     }
 
     router.push("/dashboard");
@@ -68,23 +61,18 @@ export default function RegisterPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Crea tu cuenta</h1>
       <p className="text-gray-500 mb-6">Empieza a recopilar reseñas en minutos</p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre de tu negocio
-          </label>
-          <input
-            id="businessName"
-            name="businessName"
-            type="text"
-            value={formData.businessName}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-            placeholder="Ej: Cafetería El Sol"
-          />
-        </div>
+      <GoogleButton label="Registrarse con Google" />
 
+      <div className="relative my-5">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-white px-3 text-sm text-gray-400">o regístrate con email</span>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
             Email

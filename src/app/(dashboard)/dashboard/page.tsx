@@ -2,13 +2,16 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import type { ReviewRequest, BusinessStats } from "@/types";
 import { RingChart } from "@/components/ui/RingChart";
+import { AlertTriangle } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending:     { label: "Pendiente",      color: "bg-amber-100 text-amber-700"  },
-  positive:    { label: "Positiva",       color: "bg-green-100 text-green-700"  },
-  negative:    { label: "Negativa",       color: "bg-red-100 text-red-600"      },
-  neutral:     { label: "Neutral",        color: "bg-gray-100 text-gray-600"    },
-  no_response: { label: "Sin respuesta",  color: "bg-gray-100 text-gray-500"    },
+  pending:              { label: "Pendiente",        color: "bg-amber-100 text-amber-700"   },
+  positive:             { label: "Positiva",         color: "bg-green-100 text-green-700"   },
+  negative:             { label: "Negativa",         color: "bg-red-100 text-red-600"       },
+  neutral:              { label: "Neutral",          color: "bg-gray-100 text-gray-600"     },
+  no_response:          { label: "Sin respuesta",    color: "bg-gray-100 text-gray-500"     },
+  awaiting_screenshot:  { label: "Esp. captura",     color: "bg-purple-100 text-purple-700" },
+  rewarded:             { label: "Recompensado",     color: "bg-brand-100 text-brand-700"   },
 };
 
 export default async function DashboardPage() {
@@ -62,11 +65,11 @@ export default async function DashboardPage() {
       {/* Alerta Google Maps */}
       {!business?.google_maps_url && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-start gap-3 animate-slide-up">
-          <span className="text-amber-500 text-lg shrink-0 mt-0.5">⚠️</span>
+          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" strokeWidth={1.75} />
           <div>
-            <p className="font-semibold text-amber-800 text-sm">Configura tu enlace de Google Maps</p>
+            <p className="font-semibold text-amber-800 text-sm">Configura tu plataforma de reseñas</p>
             <p className="text-sm text-amber-700 mt-0.5">
-              Sin el enlace no podemos redirigir a tus clientes satisfechos a dejar reseña.{" "}
+              Sin un enlace activo no podemos redirigir a tus clientes satisfechos a dejar reseña.{" "}
               <Link href="/configuracion" className="underline font-semibold">
                 Configurar →
               </Link>

@@ -4,8 +4,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <a href="/" className="inline-flex items-center gap-2">
-            <span className="text-3xl">⭐</span>
-            <span className="text-2xl font-bold text-brand-700">ReseñasYa</span>
+            <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center shrink-0">
+              <span className="text-[11px] font-extrabold text-white tracking-tight leading-none select-none">RY</span>
+            </div>
+            <span className="text-xl font-bold text-gray-900">ReseñasYa</span>
           </a>
         </div>
         {children}

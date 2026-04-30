@@ -8,8 +8,16 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
+    const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && user) {
+      const { data: existing } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+      if (!existing) {
+        await supabase.from("businesses").insert({ user_id: user.id, name: "" });
+      }
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
