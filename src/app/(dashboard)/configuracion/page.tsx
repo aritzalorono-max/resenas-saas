@@ -31,6 +31,8 @@ const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; exam
 const PLATFORMS: { name: string; placeholder: string }[] = [
   { name: "Google Maps",  placeholder: "https://g.page/tu-negocio/review" },
   { name: "Trustpilot",  placeholder: "https://www.trustpilot.com/review/tu-negocio.com" },
+  { name: "App Store",   placeholder: "https://apps.apple.com/app/idXXXXXXXXXX" },
+  { name: "Play Store",  placeholder: "https://play.google.com/store/apps/details?id=com.tu.app" },
   { name: "TripAdvisor", placeholder: "https://www.tripadvisor.es/..." },
   { name: "Booking.com", placeholder: "https://www.booking.com/hotel/..." },
   { name: "Yelp",        placeholder: "https://www.yelp.com/biz/tu-negocio" },
@@ -211,8 +213,13 @@ export default function ConfiguracionPage() {
     try {
       const supabase = createClient();
 
-      // Generar o actualizar códigos cortos para todos los enlaces
-      const allLinks = await ensureShortCodes(supabase, rawLinks, business!.id);
+      // Generar o actualizar códigos cortos — si falla, se continúa sin ellos
+      let allLinks = rawLinks;
+      try {
+        allLinks = await ensureShortCodes(supabase, rawLinks, business!.id);
+      } catch (shortCodeErr) {
+        console.error("[ReseñasYa] ensureShortCodes falló, guardando sin código corto:", shortCodeErr);
+      }
 
       const { error: updateError } = await supabase
         .from("businesses")
@@ -229,7 +236,11 @@ export default function ConfiguracionPage() {
         })
         .eq("id", business!.id);
 
-      if (updateError) { setError("Error al guardar los cambios"); return; }
+      if (updateError) {
+        console.error("[ReseñasYa] Error al actualizar negocio:", updateError);
+        setError(`Error al guardar los cambios: ${updateError.message}`);
+        return;
+      }
 
       // Actualizar el estado local con los nuevos shortCodes
       const savedActive = allLinks.find((l) => l.url === form.google_maps_url);
@@ -241,7 +252,8 @@ export default function ConfiguracionPage() {
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch {
+    } catch (err) {
+      console.error("[ReseñasYa] Error inesperado al guardar:", err);
       setError("Error de conexión. Inténtalo de nuevo.");
     } finally {
       setSaving(false);
