@@ -492,9 +492,9 @@ export default function LandingPage() {
             </div>
 
             <p className="text-lg lg:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y
-              consigue que los satisfechos dejen reseña donde más te importa — sin esfuerzo.
-              Para negocios locales, apps móviles y e-commerce.
+              Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue
+              que los satisfechos dejen reseña donde más te importa.
+              Para negocios locales, apps, webs, servicios y e-commerce.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
