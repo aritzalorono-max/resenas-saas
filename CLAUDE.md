@@ -1,5 +1,13 @@
 # ReseñasYa — Documentación técnica
 
+## Flujo de trabajo con Git
+
+- Desarrolla siempre en una rama de feature (`claude/...` o similar).
+- **Crea siempre el PR directamente contra `main`**, nunca contra otras ramas.
+- Haz push de los cambios a la rama y abre el PR una vez completos.
+
+---
+
 SaaS para negocios locales que automatiza la captación de reseñas en Google Maps mediante WhatsApp. El negocio introduce el teléfono del cliente, se envía un WhatsApp preguntando por su experiencia, Claude analiza la respuesta y dirige automáticamente a los clientes satisfechos a dejar reseña en Google.
 
 ---
