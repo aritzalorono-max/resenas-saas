@@ -519,7 +519,7 @@ export default function LandingPage() {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-14">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">¿Cómo funciona?</h2>
-              <p className="text-gray-500 text-lg">4 pasos para conseguir más reseñas de Google Maps</p>
+              <p className="text-gray-500 text-lg">4 pasos para conseguir más reseñas en Google Maps, Trustpilot, App Store y más</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
               {steps.map((step) => (
