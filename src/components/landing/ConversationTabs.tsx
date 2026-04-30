@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2, Shield, Star, ShoppingBag, Sparkles } from "lucide-react";
 
 type Tab = "positive" | "negative" | "incentive" | "ecommerce";
+
+const DURATION = 4500;
 
 const TABS: {
   id: Tab;
@@ -11,66 +13,98 @@ const TABS: {
   sublabel: string;
   activeClass: string;
   inactiveClass: string;
+  barColor: string;
   iconClass: string;
 }[] = [
   {
     id: "positive",
     label: "Satisfecho",
     sublabel: "→ pide reseña",
-    activeClass: "bg-green-100 text-green-700 border-green-200",
-    inactiveClass: "bg-white text-gray-500 border-gray-200 hover:border-gray-300",
+    activeClass: "bg-green-50 text-green-700 border-green-200",
+    inactiveClass: "bg-white text-gray-400 border-gray-200 hover:border-gray-300 hover:text-gray-600",
+    barColor: "bg-green-500",
     iconClass: "text-green-600",
   },
   {
     id: "negative",
     label: "Insatisfecho",
     sublabel: "→ gestión privada",
-    activeClass: "bg-red-100 text-red-600 border-red-200",
-    inactiveClass: "bg-white text-gray-500 border-gray-200 hover:border-gray-300",
+    activeClass: "bg-red-50 text-red-600 border-red-200",
+    inactiveClass: "bg-white text-gray-400 border-gray-200 hover:border-gray-300 hover:text-gray-600",
+    barColor: "bg-red-500",
     iconClass: "text-red-500",
   },
   {
     id: "incentive",
     label: "Incentivo",
     sublabel: "→ código automático",
-    activeClass: "bg-amber-100 text-amber-700 border-amber-200",
-    inactiveClass: "bg-white text-gray-500 border-gray-200 hover:border-gray-300",
+    activeClass: "bg-amber-50 text-amber-700 border-amber-200",
+    inactiveClass: "bg-white text-gray-400 border-gray-200 hover:border-gray-300 hover:text-gray-600",
+    barColor: "bg-amber-500",
     iconClass: "text-amber-500",
   },
   {
     id: "ecommerce",
     label: "E-commerce",
     sublabel: "→ cliente inicia",
-    activeClass: "bg-indigo-100 text-indigo-700 border-indigo-200",
-    inactiveClass: "bg-white text-gray-500 border-gray-200 hover:border-gray-300",
+    activeClass: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    inactiveClass: "bg-white text-gray-400 border-gray-200 hover:border-gray-300 hover:text-gray-600",
+    barColor: "bg-indigo-500",
     iconClass: "text-indigo-500",
   },
 ];
 
 export function ConversationTabs() {
   const [active, setActive] = useState<Tab>("positive");
+  const [progressKey, setProgressKey] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const idx = TABS.findIndex((t) => t.id === active);
+      const next = TABS[(idx + 1) % TABS.length].id;
+      setActive(next);
+      setProgressKey((k) => k + 1);
+    }, DURATION);
+    return () => clearTimeout(timer);
+  }, [active, progressKey]);
+
+  const handleClick = (id: Tab) => {
+    setActive(id);
+    setProgressKey((k) => k + 1);
+  };
 
   return (
     <div className="flex flex-col items-center gap-6">
 
-      {/* Tab pills */}
+      {/* Tab pills with progress bars */}
       <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full sm:w-auto">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActive(tab.id)}
-            className={`flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-1.5
-              px-3 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold border transition
-              ${active === tab.id ? tab.activeClass : tab.inactiveClass}`}
-          >
-            {tab.id === "positive"  && <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${active === tab.id ? tab.iconClass : "text-gray-400"}`} />}
-            {tab.id === "negative"  && <Shield       className={`w-3.5 h-3.5 shrink-0 ${active === tab.id ? tab.iconClass : "text-gray-400"}`} />}
-            {tab.id === "incentive" && <Star         className={`w-3.5 h-3.5 shrink-0 fill-current ${active === tab.id ? tab.iconClass : "text-gray-400"}`} />}
-            {tab.id === "ecommerce" && <ShoppingBag  className={`w-3.5 h-3.5 shrink-0 ${active === tab.id ? tab.iconClass : "text-gray-400"}`} />}
-            <span>{tab.label}</span>
-            <span className={`hidden sm:inline text-[10px] font-normal opacity-70`}>{tab.sublabel}</span>
-          </button>
-        ))}
+        {TABS.map((tab) => {
+          const isActive = active === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleClick(tab.id)}
+              className={`relative flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5
+                px-3 sm:px-4 py-2.5 sm:py-2 rounded-xl text-xs font-bold border transition overflow-hidden
+                ${isActive ? tab.activeClass : tab.inactiveClass}`}
+            >
+              {tab.id === "positive"  && <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${isActive ? tab.iconClass : ""}`} />}
+              {tab.id === "negative"  && <Shield       className={`w-3.5 h-3.5 shrink-0 ${isActive ? tab.iconClass : ""}`} />}
+              {tab.id === "incentive" && <Star         className={`w-3.5 h-3.5 shrink-0 fill-current ${isActive ? tab.iconClass : ""}`} />}
+              {tab.id === "ecommerce" && <ShoppingBag  className={`w-3.5 h-3.5 shrink-0 ${isActive ? tab.iconClass : ""}`} />}
+              <span>{tab.label}</span>
+              <span className="hidden sm:inline text-[10px] font-normal opacity-60">{tab.sublabel}</span>
+
+              {/* Progress bar track */}
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200" />
+
+              {/* Progress bar fill */}
+              {isActive && (
+                <ProgressBar key={progressKey} duration={DURATION} colorClass={tab.barColor} />
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Conversation panel */}
@@ -140,7 +174,30 @@ export function ConversationTabs() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Progress bar ─────────────────────────────────────────────────────────────
+
+function ProgressBar({ duration, colorClass }: { duration: number; colorClass: string }) {
+  return (
+    <span
+      className={`absolute bottom-0 left-0 h-0.5 ${colorClass}`}
+      style={{
+        animation: `progressFill ${duration}ms linear forwards`,
+      }}
+    />
+  );
+}
+
+// Inject the keyframe once via a style tag
+if (typeof document !== "undefined") {
+  if (!document.getElementById("progress-fill-keyframe")) {
+    const style = document.createElement("style");
+    style.id = "progress-fill-keyframe";
+    style.textContent = `@keyframes progressFill { from { width: 0% } to { width: 100% } }`;
+    document.head.appendChild(style);
+  }
+}
+
+// ─── Chat bubble ──────────────────────────────────────────────────────────────
 
 function Bubble({
   side, border, borderAmber, borderIndigo, children,
