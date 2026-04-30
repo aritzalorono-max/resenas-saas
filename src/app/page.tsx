@@ -4,6 +4,7 @@ import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { ConversationTabs } from "@/components/landing/ConversationTabs";
 import { PricingPlans } from "@/components/landing/PricingPlans";
 import { TestimonialsCarousel } from "@/components/landing/TestimonialsCarousel";
+import { CaseStudiesCarousel } from "@/components/landing/CaseStudiesCarousel";
 import {
   Zap,
   Utensils,
@@ -231,80 +232,6 @@ const sectors = [
 ];
 
 
-const caseStudies = [
-  {
-    Icon: Utensils,
-    sector: "Restauración · Google Maps",
-    name: "Pizzería Napoli · Sevilla",
-    before: "23 reseñas en 2 años de actividad. Los propietarios no tenían tiempo de pedirlas manualmente y las reseñas se acumulaban solo en momentos de queja.",
-    after: "En 2 meses llegaron a 97 reseñas con una media de 4.7★. Aparecer en el top 3 de búsquedas locales les llenó la lista de espera los fines de semana.",
-    stats: [
-      { label: "Reseñas nuevas", value: "+74" },
-      { label: "Media Google", value: "4.7 ★" },
-      { label: "Tiempo para lograrlo", value: "2 meses" },
-    ],
-  },
-  {
-    Icon: Dumbbell,
-    sector: "Fitness · Google Maps + Incentivo",
-    name: "FitBody Gym · Valencia",
-    before: "58 reseñas en 4 años. Alta satisfacción interna —el NPS era 72— pero los socios no dejaban valoraciones en Google de forma espontánea.",
-    after: "Activaron el incentivo: reseña de 5★ + captura = 10% dto. en la próxima cuota. La IA verifica la foto al instante y envía el código sin intervención humana. Resultado: 134 reseñas en 6 semanas.",
-    stats: [
-      { label: "Reseñas nuevas", value: "+134" },
-      { label: "Media Google", value: "4.9 ★" },
-      { label: "Conversión con incentivo", value: "62%" },
-    ],
-  },
-  {
-    Icon: ShoppingBag,
-    sector: "E-commerce · Trustpilot",
-    name: "ModaTrend · Barcelona",
-    before: "Tienda online de moda con alta satisfacción pero cero presencia en Trustpilot — la plataforma que sus compradores consultaban antes de hacer el primer pedido.",
-    after: "WhatsApp automático 48 h post-entrega, enlace directo a Trustpilot. En 4 meses: 289 valoraciones con 4.7★. La tasa de conversión en primera visita subió un 22%.",
-    stats: [
-      { label: "Reseñas Trustpilot", value: "289" },
-      { label: "Media Trustpilot", value: "4.7 ★" },
-      { label: "Conversión web", value: "+22%" },
-    ],
-  },
-  {
-    Icon: Stethoscope,
-    sector: "Salud · Google Maps + Trustpilot",
-    name: "Clínica Dental Ortiz · Zaragoza",
-    before: "Sector sensible: las malas reseñas tienen un impacto desproporcionado. Necesitaban captar opiniones positivas sin arriesgar que las negativas llegasen a publicarse.",
-    after: "En 4 meses, 62 reseñas nuevas repartidas entre Google Maps y Trustpilot. Las opiniones negativas se gestionaron en privado — ninguna llegó a publicarse.",
-    stats: [
-      { label: "Reseñas nuevas", value: "+62" },
-      { label: "Reseñas negativas públicas", value: "0" },
-      { label: "Tasa de satisfacción", value: "94%" },
-    ],
-  },
-  {
-    Icon: Smartphone,
-    sector: "App móvil · App Store + Play Store",
-    name: "RecetApp · Madrid",
-    before: "App de recetas con 18.000 usuarios activos pero solo 312 valoraciones entre App Store y Play Store — ratio bajísimo que lastraba su posición en los rankings.",
-    after: "WhatsApps segmentados según el dispositivo del usuario: enlace a App Store para iOS, Play Store para Android. En 2 meses: +520 valoraciones en ambas plataformas y posición top 10 en su categoría.",
-    stats: [
-      { label: "Valoraciones nuevas", value: "+520" },
-      { label: "Plataformas cubiertas", value: "2" },
-      { label: "Posición categoría", value: "Top 10" },
-    ],
-  },
-  {
-    Icon: Coffee,
-    sector: "Cafetería · Google Maps + Incentivo",
-    name: "Bloom Coffee · Zaragoza",
-    before: "31 reseñas en Google Maps con media de 4.2★. La cafetería de enfrente tenía 180 reseñas y aparecía siempre primera cuando alguien buscaba 'café cerca'.",
-    after: "Activaron el incentivo screenshot: reseña de 5★ + captura = café de cortesía verificado por IA. Sin fricción, sin intervención humana. En 3 semanas: de 31 a 97 reseñas, 4.8★ de media.",
-    stats: [
-      { label: "Reseñas nuevas", value: "+66" },
-      { label: "Media Google", value: "4.8 ★" },
-      { label: "Tiempo para lograrlo", value: "3 semanas" },
-    ],
-  },
-];
 
 export default function LandingPage() {
   return (
@@ -455,60 +382,9 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Mobile: snap-scroll carousel · Desktop: stacked */}
-            <div className="
-              flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-6 px-6
-              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-              lg:flex-col lg:gap-6 lg:overflow-visible lg:pb-0 lg:mx-0 lg:px-0
-            ">
-              {caseStudies.map(({ Icon, sector, name, before, after, stats }, idx) => (
-                <div
-                  key={name}
-                  className="shrink-0 w-[88vw] snap-center lg:w-auto
-                             bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-brand-200 transition-all"
-                >
-                  <div className="grid lg:grid-cols-[1fr_auto] gap-0">
-                    <div className="p-5 lg:p-8">
-                      {/* Header */}
-                      <div className="flex items-center gap-3 mb-5">
-                        <div className="w-9 h-9 bg-white border border-gray-200 rounded-xl flex items-center justify-center shrink-0">
-                          <Icon size={18} className="text-gray-600" strokeWidth={1.75} />
-                        </div>
-                        <div>
-                          <span className="text-xs font-bold uppercase tracking-wider text-brand-600">{sector}</span>
-                          <p className="text-sm font-bold text-gray-900">{name}</p>
-                        </div>
-                      </div>
+            <CaseStudiesCarousel />
 
-                      <div className="grid sm:grid-cols-2 gap-5">
-                        {/* Before */}
-                        <div>
-                          <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">La situación</p>
-                          <p className="text-sm text-gray-600 leading-relaxed">{before}</p>
-                        </div>
-                        {/* After */}
-                        <div>
-                          <p className="text-xs font-bold text-brand-600 uppercase tracking-wide mb-2">El resultado</p>
-                          <p className="text-sm text-gray-700 leading-relaxed font-medium">{after}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="border-t lg:border-t-0 lg:border-l border-gray-100 px-5 py-4 lg:p-8 flex lg:flex-col justify-around lg:justify-center gap-4 lg:gap-6 lg:min-w-[220px]">
-                      {stats.map(({ label, value }) => (
-                        <div key={label} className="text-center lg:text-left">
-                          <p className="text-2xl lg:text-3xl font-extrabold text-gray-900">{value}</p>
-                          <p className="text-xs text-gray-400 mt-0.5 leading-tight">{label}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center mt-12">
+            <div className="text-center mt-8">
               <Link
                 href="/register"
                 className="bg-brand-600 hover:bg-brand-700 text-white font-bold px-7 py-3.5 rounded-xl text-base transition shadow-lg shadow-brand-200 inline-block"
@@ -545,31 +421,19 @@ export default function LandingPage() {
                 Si tienes clientes y quieres más reseñas en Google, App Store o Play Store, ReseñasYa es para ti
               </p>
             </div>
-            {/* Mobile: snap-scroll carousel · sm+: grid */}
-            <div className="
-              flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-6 px-6
-              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-              sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4 lg:gap-5
-              sm:overflow-visible sm:pb-0 sm:mx-0 sm:px-0
-            ">
-              {sectors.map(({ Icon, name, headline, desc, keywords }) => (
+            <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-6 px-6
+                            [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {sectors.map(({ Icon, name, headline }) => (
                 <div
                   key={name}
-                  className="shrink-0 w-[44vw] snap-center sm:w-auto
-                             bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 hover:border-brand-200 transition-all"
+                  className="shrink-0 snap-center w-[38vw] sm:w-[22vw] lg:w-[14vw]
+                             bg-white rounded-2xl p-4 border border-gray-100 hover:border-brand-200
+                             transition-all flex flex-col items-center text-center gap-2"
                 >
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-50 rounded-xl flex items-center justify-center mb-2 sm:mb-3">
-                    <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" strokeWidth={1.75} />
+                  <div className="w-9 h-9 bg-brand-50 rounded-xl flex items-center justify-center">
+                    <Icon className="w-4 h-4 text-brand-600" strokeWidth={1.75} />
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-1 text-xs sm:text-base leading-snug">{headline}</h3>
-                  <p className="text-gray-500 text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3 hidden sm:block">{desc}</p>
-                  <div className="hidden sm:flex flex-wrap gap-1.5">
-                    {keywords.map((kw) => (
-                      <span key={kw} className="text-xs bg-brand-50 text-brand-700 px-2 py-0.5 rounded-full">
-                        {kw}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="font-semibold text-gray-900 text-xs leading-snug">{name}</p>
                 </div>
               ))}
             </div>
