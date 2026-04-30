@@ -201,13 +201,19 @@ export default function ConfiguracionPage() {
     e.preventDefault();
     setError("");
     setSuccess(false);
+
+    if (!business) {
+      setError("No se pudo cargar el negocio. Recarga la página.");
+      return;
+    }
+
     setSaving(true);
 
     const rawLinks: ReviewPlatformLink[] = [
       ...(form.google_maps_url
         ? [{ name: form.activePlatformName, url: form.google_maps_url, shortCode: form.activeShortCode }]
         : []),
-      ...form.otherPlatforms,
+      ...(Array.isArray(form.otherPlatforms) ? form.otherPlatforms : []),
     ];
 
     try {
@@ -216,7 +222,7 @@ export default function ConfiguracionPage() {
       // Generar o actualizar códigos cortos — si falla, se continúa sin ellos
       let allLinks = rawLinks;
       try {
-        allLinks = await ensureShortCodes(supabase, rawLinks, business!.id);
+        allLinks = await ensureShortCodes(supabase, rawLinks, business.id);
       } catch (shortCodeErr) {
         console.error("[ReseñasYa] ensureShortCodes falló, guardando sin código corto:", shortCodeErr);
       }
@@ -232,9 +238,9 @@ export default function ConfiguracionPage() {
           welcome_message: form.welcome_message.trim() || DEFAULT_WELCOME,
           tone: form.tone,
           incentive_enabled: form.incentive_enabled,
-          incentive_description: form.incentive_description.trim() || null,
+          incentive_description: (form.incentive_description ?? "").trim() || null,
         })
-        .eq("id", business!.id);
+        .eq("id", business.id);
 
       if (updateError) {
         console.error("[ReseñasYa] Error al actualizar negocio:", updateError);
@@ -254,7 +260,8 @@ export default function ConfiguracionPage() {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error("[ReseñasYa] Error inesperado al guardar:", err);
-      setError("Error de conexión. Inténtalo de nuevo.");
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(`Error de conexión: ${msg}`);
     } finally {
       setSaving(false);
     }
