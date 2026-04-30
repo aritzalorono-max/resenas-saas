@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { ConversationTabs } from "@/components/landing/ConversationTabs";
 import { PricingPlans } from "@/components/landing/PricingPlans";
+import { TestimonialsCarousel } from "@/components/landing/TestimonialsCarousel";
 import {
-  Star,
   Zap,
   Utensils,
   Scissors,
@@ -12,7 +12,6 @@ import {
   BedDouble,
   ShoppingBag,
   Dumbbell,
-  Quote,
   TrendingUp,
   Brain,
   Scale,
@@ -232,89 +231,6 @@ const sectors = [
 ];
 
 
-const testimonials = [
-  {
-    quote: "En solo 3 semanas pasamos de 47 a 89 reseñas en Google Maps. Lo mejor es que nos avisa si un cliente no está satisfecho antes de que lo publique en Google.",
-    name: "Ana Martínez",
-    role: "Propietaria",
-    business: "La Taberna del Sol · Madrid",
-    platform: "Google Maps",
-    metric: "+42 reseñas en 3 semanas",
-  },
-  {
-    quote: "Lo implantamos para nuestros usuarios activos y en 5 semanas subimos de 3.8 a 4.6★ en App Store. Los ratings son esenciales para el ASO y esto lo cambia todo.",
-    name: "Javier Moreno",
-    role: "CEO",
-    business: "FinTrack App · Barcelona",
-    platform: "App Store",
-    metric: "3.8→4.6★ en App Store",
-  },
-  {
-    quote: "Pusimos el incentivo: reseña de 5★ en Google + captura = 10% de descuento en la próxima cuota. La IA lo verifica sola y manda el código al instante. En un mes, 90 reseñas nuevas.",
-    name: "Diego Herrera",
-    role: "Director",
-    business: "FitLife Gym · Sevilla",
-    platform: "Google Maps + incentivo",
-    metric: "90 reseñas en 1 mes",
-  },
-  {
-    quote: "Como psicóloga necesitaba algo discreto. El tono de la IA es tan cálido que los pacientes responden con naturalidad. Ya tengo 38 reseñas nuevas en Google sin pedirlas yo directamente.",
-    name: "Elena Domínguez",
-    role: "Psicóloga",
-    business: "Centro de Psicología Domínguez · Bilbao",
-    platform: "Google Maps",
-    metric: "+38 reseñas en 2 meses",
-  },
-  {
-    quote: "Teníamos clientes muy contentos pero cero reseñas en Trustpilot — que es donde nos buscan antes de comprar. En 4 meses, 180 valoraciones con 4.7★. La conversión subió un 18%.",
-    name: "Marta Giménez",
-    role: "Fundadora",
-    business: "BabyTrends · E-commerce",
-    platform: "Trustpilot",
-    metric: "180 reseñas en Trustpilot",
-  },
-  {
-    quote: "El filtro de sentimiento es lo que más me gusta. Si un huésped no está contento, gestionamos el problema en privado. Las malas reseñas han caído un 80%.",
-    name: "Miguel Fernández",
-    role: "Director",
-    business: "Hotel Boutique Costa · Málaga",
-    platform: "Google Maps",
-    metric: "−80% reseñas negativas",
-  },
-  {
-    quote: "Nuestra app está en iOS y Android. Configuré dos enlaces: App Store y Play Store. El cliente elige. En 2 meses sumamos más de 500 valoraciones nuevas entre las dos plataformas.",
-    name: "Pablo Torres",
-    role: "Product Manager",
-    business: "RecetApp · Madrid",
-    platform: "App Store + Play Store",
-    metric: "+500 valoraciones",
-  },
-  {
-    quote: "Activamos el incentivo en la cafetería: captura de 5★ en Google = café de cortesía en la próxima visita, verificado automáticamente. En 3 semanas: de 31 a 97 reseñas.",
-    name: "Lucía Fernández",
-    role: "Propietaria",
-    business: "Bloom Coffee · Zaragoza",
-    platform: "Google Maps + incentivo",
-    metric: "31→97 reseñas en 3 semanas",
-  },
-  {
-    quote: "Enviamos WhatsApps a Google Maps y a Trustpilot según el perfil del paciente. Los más jóvenes van a Google, los mayores a Trustpilot. Tenemos presencia en las dos y cada vez más reseñas.",
-    name: "Carlos Bernal",
-    role: "Director médico",
-    business: "Clínica Bernal · Alicante",
-    platform: "Google + Trustpilot",
-    metric: "+110 reseñas en 2 plataformas",
-  },
-  {
-    quote: "Como despacho de abogados, la reputación digital es fundamental. Ahora tenemos más de 90 reseñas en Google y el 96% son de 5★. Ha cambiado completamente cómo nos encuentran los nuevos clientes.",
-    name: "Patricia Olmedo",
-    role: "Socia fundadora",
-    business: "Olmedo & Asociados Abogados · Sevilla",
-    platform: "Google Maps",
-    metric: "96% reseñas de 5★",
-  },
-];
-
 const caseStudies = [
   {
     Icon: Utensils,
@@ -513,59 +429,13 @@ export default function LandingPage() {
         {/* Testimonials */}
         <section className="py-12 lg:py-24 px-6 bg-white" id="opiniones">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8 lg:mb-14">
+            <div className="text-center mb-8 lg:mb-10">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 Negocios que ya lo están usando
               </h2>
               <p className="text-gray-500 text-lg">Lo que dicen quienes llevan semanas generando reseñas con ReseñasYa</p>
             </div>
-            {/* Mobile: snap-scroll carousel · Desktop: grid */}
-            <div className="
-              flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-6 px-6
-              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-              sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-5
-              sm:overflow-visible sm:pb-0 sm:mx-0 sm:px-0
-            ">
-              {testimonials.map(({ quote, name, role, business, metric, platform }) => (
-                <div
-                  key={name}
-                  className="shrink-0 w-[80vw] snap-center sm:w-auto
-                             bg-white rounded-2xl p-6 border border-gray-100 hover:border-brand-200 transition-all flex flex-col"
-                >
-                  {/* Stars + platform badge */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={14} className="text-yellow-400 fill-yellow-400" />
-                      ))}
-                    </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${
-                      platform.includes("incentivo") ? "bg-amber-100 text-amber-700" :
-                      platform.includes("+")         ? "bg-indigo-50 text-indigo-600" :
-                      platform === "Trustpilot"      ? "bg-emerald-50 text-emerald-700" :
-                      platform === "App Store"        ? "bg-blue-50 text-blue-600" :
-                      platform === "Play Store"       ? "bg-teal-50 text-teal-600" :
-                                                       "bg-green-50 text-green-700"
-                    }`}>
-                      {platform}
-                    </span>
-                  </div>
-                  {/* Quote */}
-                  <Quote size={18} className="text-brand-200 mb-2 shrink-0" strokeWidth={1.5} />
-                  <p className="text-gray-700 text-sm leading-relaxed flex-1 mb-5">{quote}</p>
-                  {/* Metric pill */}
-                  <div className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs font-bold px-3 py-1.5 rounded-full mb-4 w-fit">
-                    <TrendingUp size={12} strokeWidth={2.5} />
-                    {metric}
-                  </div>
-                  {/* Author */}
-                  <div className="border-t border-gray-100 pt-4">
-                    <p className="font-semibold text-gray-900 text-sm">{name}</p>
-                    <p className="text-gray-400 text-xs mt-0.5">{role} · {business}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TestimonialsCarousel />
           </div>
         </section>
 
