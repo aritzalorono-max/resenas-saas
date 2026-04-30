@@ -31,6 +31,8 @@ const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; exam
 const PLATFORMS: { name: string; placeholder: string }[] = [
   { name: "Google Maps",  placeholder: "https://g.page/tu-negocio/review" },
   { name: "Trustpilot",  placeholder: "https://www.trustpilot.com/review/tu-negocio.com" },
+  { name: "App Store",   placeholder: "https://apps.apple.com/app/idXXXXXXXXXX" },
+  { name: "Play Store",  placeholder: "https://play.google.com/store/apps/details?id=com.tu.app" },
   { name: "TripAdvisor", placeholder: "https://www.tripadvisor.es/..." },
   { name: "Booking.com", placeholder: "https://www.booking.com/hotel/..." },
   { name: "Yelp",        placeholder: "https://www.yelp.com/biz/tu-negocio" },
