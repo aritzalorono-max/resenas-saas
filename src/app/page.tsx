@@ -473,7 +473,7 @@ export default function LandingPage() {
                   <span className="font-bold text-gray-800">ReseñasYa</span>
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed mb-4">
-                  Automatiza tus reseñas en Google Maps, App Store, Play Store y Trustpilot mediante WhatsApp e inteligencia artificial.
+                  Consigue más reseñas en Google Maps, App Store, Play Store, Trustpilot o cualquier otra plataforma mediante WhatsApp e inteligencia artificial.
                 </p>
                 {/* RRSS */}
                 <div className="flex items-center gap-2">
