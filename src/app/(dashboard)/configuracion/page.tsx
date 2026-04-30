@@ -173,6 +173,12 @@ export default function ConfiguracionPage() {
     e.preventDefault();
     setError("");
     setSuccess(false);
+
+    if (!business) {
+      setError("No se pudo cargar el negocio. Recarga la página.");
+      return;
+    }
+
     setSaving(true);
 
     const review_links: ReviewPlatformLink[] = [
