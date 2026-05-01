@@ -53,44 +53,41 @@ export async function POST(request: NextRequest) {
       incentive_description,
     } = body;
 
-    // Obtener el negocio del usuario
-    const { data: business, error: bizError } = await supabase
-      .from("businesses")
-      .select("id")
-      .eq("user_id", user.id)
-      .single();
-
-    if (bizError || !business) {
-      return NextResponse.json({ error: "Negocio no encontrado" }, { status: 404 });
-    }
-
-    // Generar códigos cortos (fallo silencioso si la tabla no existe)
     const rawLinks: ReviewPlatformLink[] = Array.isArray(review_links) ? review_links : [];
-    let allLinks = rawLinks;
-    try {
-      allLinks = await ensureShortCodes(supabase, rawLinks, business.id);
-    } catch {
-      // short_links table might not exist yet — proceed without short codes
-    }
 
-    const { error: updateError } = await supabase
+    // Actualizar directamente filtrando por user_id — RLS + eq garantizan seguridad
+    const { data: updated, error: updateError } = await supabase
       .from("businesses")
       .update({
         name: String(name ?? "").trim(),
         description: String(description ?? "").trim() || null,
         website_url: String(website_url ?? "").trim() || null,
         google_maps_url: google_maps_url || null,
-        review_links: allLinks,
+        review_links: rawLinks,
         welcome_message: String(welcome_message ?? "").trim() || DEFAULT_WELCOME_MESSAGE,
         tone: tone ?? "tuteo",
         incentive_enabled: Boolean(incentive_enabled),
         incentive_description: String(incentive_description ?? "").trim() || null,
       })
-      .eq("id", business.id);
+      .eq("user_id", user.id)
+      .select("id")
+      .single();
 
     if (updateError) {
       console.error("[ReseñasYa] Error al guardar configuración:", updateError);
       return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+
+    // Generar códigos cortos en segundo plano (fallo silencioso)
+    let allLinks = rawLinks;
+    try {
+      allLinks = await ensureShortCodes(supabase, rawLinks, updated.id);
+      await supabase
+        .from("businesses")
+        .update({ review_links: allLinks })
+        .eq("id", updated.id);
+    } catch {
+      // short_links table might not exist yet
     }
 
     return NextResponse.json({ success: true, review_links: allLinks });
