@@ -55,13 +55,14 @@ export async function POST(request: NextRequest) {
 
     const rawLinks: ReviewPlatformLink[] = Array.isArray(review_links) ? review_links : [];
 
-    // Use service role to bypass PostgREST schema cache issues; still filter by verified user_id
+    // Use service role to bypass PostgREST schema cache issues; user identity verified above
     const supabase = await createServiceClient();
 
     const { data: updated, error: updateError } = await supabase
       .from("businesses")
-      .update({
-        name: String(name ?? "").trim(),
+      .upsert({
+        user_id: user.id,
+        name: String(name ?? "").trim() || "Mi negocio",
         description: String(description ?? "").trim() || null,
         website_url: String(website_url ?? "").trim() || null,
         google_maps_url: google_maps_url || null,
@@ -70,8 +71,7 @@ export async function POST(request: NextRequest) {
         tone: tone ?? "tuteo",
         incentive_enabled: Boolean(incentive_enabled),
         incentive_description: String(incentive_description ?? "").trim() || null,
-      })
-      .eq("user_id", user.id)
+      }, { onConflict: "user_id" })
       .select("id")
       .single();
 
