@@ -85,9 +85,16 @@ export async function POST(
   logger.info(`Negocio: ${business.name} | Envíos recientes: ${rateLimit.count}`);
 
   // ── 5. Enviar WhatsApp ────────────────────────────────────────────────────
-  const messageText = business.welcome_message
+  const activeLink = business.review_links?.find((l) => l.url === business.google_maps_url);
+  const platformName = activeLink?.name ?? "Google Maps";
+
+  let messageText = business.welcome_message
     .replace("{nombre}", customerName)
     .replace("{negocio}", business.name);
+
+  if (business.incentive_enabled && business.incentive_description) {
+    messageText += `\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, te enviaremos automáticamente ${business.incentive_description}.`;
+  }
 
   let messageSid: string;
   try {
