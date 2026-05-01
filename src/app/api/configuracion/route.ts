@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 import type { ReviewPlatformLink } from "@/types";
 
@@ -33,9 +33,9 @@ async function ensureShortCodes(
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const authClient = await createClient();
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
@@ -55,7 +55,9 @@ export async function POST(request: NextRequest) {
 
     const rawLinks: ReviewPlatformLink[] = Array.isArray(review_links) ? review_links : [];
 
-    // Actualizar directamente filtrando por user_id — RLS + eq garantizan seguridad
+    // Use service role to bypass PostgREST schema cache issues; still filter by verified user_id
+    const supabase = await createServiceClient();
+
     const { data: updated, error: updateError } = await supabase
       .from("businesses")
       .update({
