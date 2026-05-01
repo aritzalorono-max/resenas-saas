@@ -5,8 +5,6 @@ import { createClient } from "@/lib/supabase/client";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 import type { Business, BusinessTone, ReviewPlatformLink } from "@/types";
 
-const DEFAULT_WELCOME = DEFAULT_WELCOME_MESSAGE;
-
 const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; example: string }[] = [
   {
     value: "tuteo",
@@ -40,37 +38,6 @@ const PLATFORMS: { name: string; placeholder: string }[] = [
   { name: "Otra",        placeholder: "https://..." },
 ];
 
-// ---------------------------------------------------------------------------
-// Helpers para el acortador de URLs
-// ---------------------------------------------------------------------------
-
-function generateShortCode(): string {
-  const chars = "abcdefghjkmnpqrstuvwxyz23456789";
-  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-}
-
-async function ensureShortCodes(
-  supabase: ReturnType<typeof createClient>,
-  links: ReviewPlatformLink[],
-  businessId: string
-): Promise<ReviewPlatformLink[]> {
-  const result: ReviewPlatformLink[] = [];
-  for (const link of links) {
-    if (link.shortCode) {
-      await supabase.from("short_links").upsert({ code: link.shortCode, url: link.url, business_id: businessId });
-      result.push(link);
-    } else {
-      let shortCode = "";
-      for (let i = 0; i < 10 && !shortCode; i++) {
-        const code = generateShortCode();
-        const { error } = await supabase.from("short_links").insert({ code, url: link.url, business_id: businessId });
-        if (!error) shortCode = code;
-      }
-      result.push({ ...link, shortCode: shortCode || undefined });
-    }
-  }
-  return result;
-}
 
 export default function ConfiguracionPage() {
   const [business, setBusiness] = useState<Business | null>(null);
@@ -126,7 +93,7 @@ export default function ConfiguracionPage() {
           activeShortCode: active?.shortCode,
           google_maps_url: data.google_maps_url ?? "",
           otherPlatforms: others,
-          welcome_message: data.welcome_message ?? DEFAULT_WELCOME,
+          welcome_message: data.welcome_message ?? DEFAULT_WELCOME_MESSAGE,
           tone: data.tone ?? "tuteo",
           incentive_enabled: data.incentive_enabled ?? false,
           incentive_description: data.incentive_description ?? "",
@@ -203,58 +170,51 @@ export default function ConfiguracionPage() {
     setSuccess(false);
     setSaving(true);
 
-    const rawLinks: ReviewPlatformLink[] = [
+    const review_links: ReviewPlatformLink[] = [
       ...(form.google_maps_url
         ? [{ name: form.activePlatformName, url: form.google_maps_url, shortCode: form.activeShortCode }]
         : []),
-      ...form.otherPlatforms,
+      ...(Array.isArray(form.otherPlatforms) ? form.otherPlatforms : []),
     ];
 
     try {
-      const supabase = createClient();
-
-      // Generar o actualizar códigos cortos — si falla, se continúa sin ellos
-      let allLinks = rawLinks;
-      try {
-        allLinks = await ensureShortCodes(supabase, rawLinks, business!.id);
-      } catch (shortCodeErr) {
-        console.error("[ReseñasYa] ensureShortCodes falló, guardando sin código corto:", shortCodeErr);
-      }
-
-      const { error: updateError } = await supabase
-        .from("businesses")
-        .update({
-          name: form.name.trim(),
-          description: form.description.trim() || null,
-          website_url: form.website_url.trim() || null,
-          google_maps_url: form.google_maps_url || null,
-          review_links: allLinks,
-          welcome_message: form.welcome_message.trim() || DEFAULT_WELCOME,
+      const res = await fetch("/api/configuracion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          description: form.description,
+          website_url: form.website_url,
+          google_maps_url: form.google_maps_url,
+          review_links,
+          welcome_message: form.welcome_message,
           tone: form.tone,
           incentive_enabled: form.incentive_enabled,
-          incentive_description: form.incentive_description.trim() || null,
-        })
-        .eq("id", business!.id);
+          incentive_description: form.incentive_description,
+        }),
+      });
 
-      if (updateError) {
-        console.error("[ReseñasYa] Error al actualizar negocio:", updateError);
-        setError(`Error al guardar los cambios: ${updateError.message}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? "Error al guardar los cambios");
         return;
       }
 
-      // Actualizar el estado local con los nuevos shortCodes
-      const savedActive = allLinks.find((l) => l.url === form.google_maps_url);
+      // Actualizar estado local con los shortCodes generados por el servidor
+      const savedLinks: ReviewPlatformLink[] = data.review_links ?? review_links;
+      const savedActive = savedLinks.find((l) => l.url === form.google_maps_url);
       setForm((p) => ({
         ...p,
         activeShortCode: savedActive?.shortCode,
-        otherPlatforms: allLinks.filter((l) => l.url !== p.google_maps_url),
+        otherPlatforms: savedLinks.filter((l) => l.url !== p.google_maps_url),
       }));
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.error("[ReseñasYa] Error inesperado al guardar:", err);
-      setError("Error de conexión. Inténtalo de nuevo.");
+      console.error("[ReseñasYa] Error de red al guardar:", err);
+      setError("Error de red. Comprueba tu conexión e inténtalo de nuevo.");
     } finally {
       setSaving(false);
     }
