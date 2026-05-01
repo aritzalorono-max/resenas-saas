@@ -9,7 +9,7 @@ function generateShortCode(): string {
 }
 
 async function ensureShortCodes(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: Awaited<ReturnType<typeof createServiceClient>>,
   links: ReviewPlatformLink[],
   businessId: string
 ): Promise<ReviewPlatformLink[]> {
@@ -55,37 +55,60 @@ export async function POST(request: NextRequest) {
 
     const rawLinks: ReviewPlatformLink[] = Array.isArray(review_links) ? review_links : [];
 
-    // Use service role to bypass PostgREST schema cache issues; user identity verified above
     const supabase = await createServiceClient();
 
-    const { data: upserted, error: updateError } = await supabase
-      .from("businesses")
-      .upsert({
-        user_id: user.id,
-        name: String(name ?? "").trim() || "Mi negocio",
-        description: String(description ?? "").trim() || null,
-        website_url: String(website_url ?? "").trim() || null,
-        google_maps_url: google_maps_url || null,
-        review_links: rawLinks,
-        welcome_message: String(welcome_message ?? "").trim() || DEFAULT_WELCOME_MESSAGE,
-        tone: tone ?? "tuteo",
-        incentive_enabled: Boolean(incentive_enabled),
-        incentive_description: String(incentive_description ?? "").trim() || null,
-      }, { onConflict: "user_id" })
-      .select("id");
+    const payload = {
+      user_id: user.id,
+      name: String(name ?? "").trim() || "Mi negocio",
+      description: String(description ?? "").trim() || null,
+      website_url: String(website_url ?? "").trim() || null,
+      google_maps_url: google_maps_url || null,
+      review_links: rawLinks,
+      welcome_message: String(welcome_message ?? "").trim() || DEFAULT_WELCOME_MESSAGE,
+      tone: tone ?? "tuteo",
+      incentive_enabled: Boolean(incentive_enabled),
+      incentive_description: String(incentive_description ?? "").trim() || null,
+    };
 
-    if (updateError) {
-      console.error("[ReseñasYa] Error al guardar configuración:", updateError);
-      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    // Check whether the row already exists
+    const { data: existing } = await supabase
+      .from("businesses")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    let businessId: string | undefined;
+
+    if (existing?.id) {
+      // UPDATE existing row
+      const { error } = await supabase
+        .from("businesses")
+        .update(payload)
+        .eq("user_id", user.id);
+      if (error) {
+        console.error("[ReseñasYa] Error al actualizar configuración:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      businessId = existing.id;
+    } else {
+      // INSERT new row
+      const { data: inserted, error } = await supabase
+        .from("businesses")
+        .insert(payload)
+        .select("id")
+        .maybeSingle();
+      if (error) {
+        console.error("[ReseñasYa] Error al crear negocio:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      businessId = inserted?.id;
     }
 
-    const businessId = Array.isArray(upserted) ? upserted[0]?.id : (upserted as { id: string } | null)?.id;
-
-    // Generar códigos cortos en segundo plano (fallo silencioso)
+    // Generate short codes silently
     let allLinks = rawLinks;
     try {
-      if (businessId) allLinks = await ensureShortCodes(supabase, rawLinks, businessId);
       if (businessId) {
+        allLinks = await ensureShortCodes(supabase, rawLinks, businessId);
         await supabase
           .from("businesses")
           .update({ review_links: allLinks })
