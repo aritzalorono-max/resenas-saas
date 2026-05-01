@@ -30,34 +30,34 @@ export default async function CartelPage() {
     ? `${appUrl}/r/${activeLink.shortCode}`
     : (business.google_maps_url ?? appUrl);
 
-  if (!reviewUrl) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <p className="text-gray-500 text-sm">
-          Añade el enlace de tu plataforma de reseñas en la{" "}
-          <a href="/configuracion" className="underline text-brand-600">configuración</a>{" "}
-          para generar el cartel.
-        </p>
-      </div>
-    );
-  }
-
-  const qrDataUrl = await QRCode.toDataURL(reviewUrl, {
-    width: 400,
-    margin: 1,
-    color: { dark: "#111827", light: "#ffffff" },
-    errorCorrectionLevel: "M",
-  });
-
   const rawTwilioNumber = process.env.TWILIO_WHATSAPP_NUMBER ?? "";
   const whatsappNumber = rawTwilioNumber.replace(/^whatsapp:/i, "");
+  const whatsappNumberClean = whatsappNumber.replace(/\D/g, "");
+
+  const [reviewQrDataUrl, whatsappQrDataUrl] = await Promise.all([
+    reviewUrl
+      ? QRCode.toDataURL(reviewUrl, {
+          width: 400, margin: 1,
+          color: { dark: "#111827", light: "#ffffff" },
+          errorCorrectionLevel: "M",
+        })
+      : Promise.resolve(""),
+    whatsappNumberClean
+      ? QRCode.toDataURL(`https://wa.me/${whatsappNumberClean}`, {
+          width: 400, margin: 1,
+          color: { dark: "#111827", light: "#ffffff" },
+          errorCorrectionLevel: "M",
+        })
+      : Promise.resolve(""),
+  ]);
 
   return (
     <PosterClient
       businessName={business.name}
       platformName={platformName}
       reviewUrl={reviewUrl}
-      qrDataUrl={qrDataUrl}
+      reviewQrDataUrl={reviewQrDataUrl}
+      whatsappQrDataUrl={whatsappQrDataUrl}
       logoUrl={business.logo_url ?? null}
       incentiveEnabled={business.incentive_enabled}
       incentiveDescription={business.incentive_description}
