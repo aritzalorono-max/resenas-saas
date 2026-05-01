@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     // Use service role to bypass PostgREST schema cache issues; user identity verified above
     const supabase = await createServiceClient();
 
-    const { data: updated, error: updateError } = await supabase
+    const { data: upserted, error: updateError } = await supabase
       .from("businesses")
       .upsert({
         user_id: user.id,
@@ -72,22 +72,25 @@ export async function POST(request: NextRequest) {
         incentive_enabled: Boolean(incentive_enabled),
         incentive_description: String(incentive_description ?? "").trim() || null,
       }, { onConflict: "user_id" })
-      .select("id")
-      .single();
+      .select("id");
 
     if (updateError) {
       console.error("[ReseñasYa] Error al guardar configuración:", updateError);
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
+    const businessId = Array.isArray(upserted) ? upserted[0]?.id : (upserted as { id: string } | null)?.id;
+
     // Generar códigos cortos en segundo plano (fallo silencioso)
     let allLinks = rawLinks;
     try {
-      allLinks = await ensureShortCodes(supabase, rawLinks, updated.id);
-      await supabase
-        .from("businesses")
-        .update({ review_links: allLinks })
-        .eq("id", updated.id);
+      if (businessId) allLinks = await ensureShortCodes(supabase, rawLinks, businessId);
+      if (businessId) {
+        await supabase
+          .from("businesses")
+          .update({ review_links: allLinks })
+          .eq("id", businessId);
+      }
     } catch {
       // short_links table might not exist yet
     }
