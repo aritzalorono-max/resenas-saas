@@ -49,14 +49,13 @@ export async function POST(request: NextRequest) {
       review_links,
       welcome_message,
       tone,
-      incentive_enabled,
-      incentive_description,
     } = body;
 
     const rawLinks: ReviewPlatformLink[] = Array.isArray(review_links) ? review_links : [];
 
     const supabase = await createServiceClient();
 
+    // Incentive fields are managed by the /incentivos page — don't touch them here
     const payload = {
       user_id: user.id,
       name: String(name ?? "").trim() || "Mi negocio",
@@ -66,8 +65,6 @@ export async function POST(request: NextRequest) {
       review_links: rawLinks,
       welcome_message: String(welcome_message ?? "").trim() || DEFAULT_WELCOME_MESSAGE,
       tone: tone ?? "tuteo",
-      incentive_enabled: Boolean(incentive_enabled),
-      incentive_description: String(incentive_description ?? "").trim() || null,
     };
 
     // Check whether the row already exists
