@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const EMAIL_SOPORTE = "hola@resenasya.com";
+const EMAIL_SOPORTE = "prueba@gmail.com";
 const EMAIL_LEGAL   = "legal@resenasya.com";
 const TWITTER_URL   = "https://twitter.com/resenasya";
 const LINKEDIN_URL  = "https://linkedin.com/company/resenasya";
