@@ -774,7 +774,7 @@ export default function ClientesPage() {
         <ol className="text-sm text-blue-800 space-y-1.5 list-decimal list-inside">
           <li>Introduces el nombre y teléfono del cliente</li>
           <li>Le llega un WhatsApp pidiendo su opinión</li>
-          <li>Si es positiva, la IA le anima a dejar reseña en Google Maps</li>
+          <li>Si es positiva, la IA le anima a dejar reseña en tu plataforma de reseñas</li>
           <li>Si es negativa, le responde con empatía sin enviarle al enlace</li>
         </ol>
       </div>
