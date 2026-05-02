@@ -530,8 +530,8 @@ export default function LandingPage() {
                   <ul className="space-y-2">
                     <li><Link href="/contacto" className="text-sm text-gray-500 hover:text-gray-800 transition">Contacto</Link></li>
                     <li>
-                      <a href="mailto:prueba@gmail.com" className="text-sm text-gray-500 hover:text-gray-800 transition">
-                        prueba@gmail.com
+                      <a href="mailto:contacto.resenasya@gmail.com" className="text-sm text-gray-500 hover:text-gray-800 transition">
+                        contacto.resenasya@gmail.com
                       </a>
                     </li>
                   </ul>
