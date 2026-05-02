@@ -2,7 +2,18 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, FileSpreadsheet, Download, X, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Upload, FileSpreadsheet, Download, X, CheckCircle2, AlertCircle, Loader2, MapPin, Gift, Clock, Tag } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+
+interface BusinessSummary {
+  platformName: string;
+  platformUrl: string | null;
+  incentiveEnabled: boolean;
+  incentiveDescription: string | null;
+  incentiveTiming: "initial" | "after_positive";
+  codeType: "fixed" | "random" | "pool";
+  fixedCode: string | null;
+}
 
 interface Country {
   code: string;
@@ -164,6 +175,32 @@ async function parseFileToRows(file: File, dialCode: string): Promise<BulkRow[]>
 
 export default function ClientesPage() {
   const router = useRouter();
+
+  // Business summary
+  const [bizSummary, setBizSummary] = useState<BusinessSummary | null>(null);
+
+  useEffect(() => {
+    async function loadBiz() {
+      const supabase = createClient();
+      const { data: biz } = await supabase
+        .from("businesses")
+        .select("google_maps_url, review_links, incentive_enabled, incentive_description, incentive_timing, incentive_code_type, incentive_fixed_code")
+        .single();
+      if (!biz) return;
+      const links: { name: string; url: string }[] = biz.review_links ?? [];
+      const active = links.find((l) => l.url === biz.google_maps_url);
+      setBizSummary({
+        platformName: active?.name ?? (biz.google_maps_url ? "Plataforma configurada" : "Sin configurar"),
+        platformUrl: biz.google_maps_url,
+        incentiveEnabled: biz.incentive_enabled ?? false,
+        incentiveDescription: biz.incentive_description ?? null,
+        incentiveTiming: (biz.incentive_timing as "initial" | "after_positive") ?? "initial",
+        codeType: (biz.incentive_code_type as "fixed" | "random" | "pool") ?? "fixed",
+        fixedCode: biz.incentive_fixed_code ?? null,
+      });
+    }
+    loadBiz();
+  }, []);
 
   // Shared
   const [mode, setMode] = useState<"manual" | "bulk">("manual");
@@ -765,6 +802,69 @@ export default function ClientesPage() {
               )}
             </button>
           )}
+        </div>
+      )}
+
+      {/* Active config summary */}
+      {bizSummary && (
+        <div className="mt-5 bg-white border border-gray-200 rounded-2xl p-4 space-y-2.5">
+          <h3 className="font-semibold text-gray-800 text-sm">Configuración activa</h3>
+          <div className="space-y-2">
+
+            {/* Platform */}
+            <div className="flex items-start gap-2.5">
+              <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" strokeWidth={1.75} />
+              <div className="text-sm">
+                <span className="text-gray-500">Plataforma: </span>
+                {bizSummary.platformUrl
+                  ? <span className="font-medium text-gray-900">{bizSummary.platformName}</span>
+                  : <span className="text-amber-600 font-medium">Sin configurar — ve a Configuración</span>}
+              </div>
+            </div>
+
+            {/* Incentive */}
+            <div className="flex items-start gap-2.5">
+              <Gift className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" strokeWidth={1.75} />
+              <div className="text-sm">
+                <span className="text-gray-500">Incentivo: </span>
+                {bizSummary.incentiveEnabled && bizSummary.incentiveDescription
+                  ? <span className="font-medium text-gray-900">{bizSummary.incentiveDescription}</span>
+                  : <span className="text-gray-400">Desactivado</span>}
+              </div>
+            </div>
+
+            {/* Timing — only if incentive active */}
+            {bizSummary.incentiveEnabled && bizSummary.incentiveDescription && (
+              <div className="flex items-start gap-2.5">
+                <Clock className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" strokeWidth={1.75} />
+                <div className="text-sm">
+                  <span className="text-gray-500">Se anuncia: </span>
+                  <span className="font-medium text-gray-900">
+                    {bizSummary.incentiveTiming === "initial"
+                      ? "En el primer mensaje"
+                      : "Tras respuesta positiva"}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Code — only if incentive active */}
+            {bizSummary.incentiveEnabled && bizSummary.incentiveDescription && (
+              <div className="flex items-start gap-2.5">
+                <Tag className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" strokeWidth={1.75} />
+                <div className="text-sm">
+                  <span className="text-gray-500">Código: </span>
+                  {bizSummary.codeType === "fixed" && bizSummary.fixedCode
+                    ? <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-1.5 py-0.5 rounded">{bizSummary.fixedCode}</span>
+                    : bizSummary.codeType === "fixed"
+                    ? <span className="text-gray-400">Sin código</span>
+                    : bizSummary.codeType === "random"
+                    ? <span className="font-medium text-gray-900">Aleatorio por cliente</span>
+                    : <span className="font-medium text-gray-900">Pool de códigos</span>}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
