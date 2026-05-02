@@ -233,7 +233,8 @@ export async function POST(request: Request): Promise<Response> {
           supabase,
           reviewRequest.business_id,
           business.incentive_code_type ?? "random",
-          reviewRequest.id
+          reviewRequest.id,
+          business.incentive_fixed_code
         );
         if (assignedCode) {
           logger.info(`Código de descuento asignado: ${assignedCode}`);

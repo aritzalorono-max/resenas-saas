@@ -15,8 +15,8 @@ export type ReviewStatus =
 /** Tono de comunicación que el negocio quiere usar con sus clientes */
 export type BusinessTone = "tuteo" | "usted" | "juvenil";
 
-/** Tipo de código de descuento: generado aleatoriamente o extraído de un pool */
-export type IncentiveCodeType = "random" | "pool";
+/** Tipo de código de descuento: generado aleatoriamente, extraído de un pool, o fijo siempre igual */
+export type IncentiveCodeType = "random" | "pool" | "fixed";
 
 // ---------------------------------------------------------------------------
 // Entidades de base de datos
@@ -49,6 +49,7 @@ export interface Business {
   incentive_description: string | null;
   incentive_code_enabled: boolean;
   incentive_code_type: IncentiveCodeType;
+  incentive_fixed_code: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -74,7 +75,7 @@ export interface ReviewRequest {
  * Usado en el webhook para evitar una segunda consulta a la base de datos.
  */
 export interface ReviewRequestWithBusiness extends ReviewRequest {
-  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type">;
+  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type" | "incentive_fixed_code">;
 }
 
 /** Código de descuento generado o subido por el negocio */
