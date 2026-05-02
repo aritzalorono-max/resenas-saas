@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   Gift, ToggleLeft, ToggleRight, Upload, RefreshCw,
-  CheckCircle, Clock, XCircle, Shuffle, ListOrdered,
-  ChevronDown, Ticket,
+  CheckCircle, Clock, Shuffle, ListOrdered,
+  ChevronDown, Ticket, Tag,
 } from "lucide-react";
 import type { DiscountCode, IncentiveCodeType } from "@/types";
 
@@ -32,6 +32,7 @@ export default function IncentivosPage() {
   const [incentiveDescription, setIncentiveDescription] = useState("");
   const [codeEnabled, setCodeEnabled]         = useState(false);
   const [codeType, setCodeType]               = useState<IncentiveCodeType>("random");
+  const [fixedCode, setFixedCode]             = useState("");
   const [codes, setCodes]                     = useState<DiscountCode[]>([]);
   const [stats, setStats]                     = useState<Stats>({ total: 0, available: 0, used: 0, rewarded: 0 });
   const [filter, setFilter]                   = useState<FilterStatus>("all");
@@ -50,7 +51,7 @@ export default function IncentivosPage() {
 
     const { data: biz } = await supabase
       .from("businesses")
-      .select("id, name, google_maps_url, review_links, incentive_enabled, incentive_description, incentive_code_enabled, incentive_code_type")
+      .select("id, name, google_maps_url, review_links, incentive_enabled, incentive_description, incentive_code_enabled, incentive_code_type, incentive_fixed_code")
       .eq("user_id", user.id)
       .single();
 
@@ -62,6 +63,7 @@ export default function IncentivosPage() {
     setIncentiveDescription(biz.incentive_description ?? "");
     setCodeEnabled(biz.incentive_code_enabled ?? false);
     setCodeType(biz.incentive_code_type ?? "random");
+    setFixedCode(biz.incentive_fixed_code ?? "");
 
     // Determine active platform name
     const links: { name: string; url: string }[] = biz.review_links ?? [];
@@ -109,6 +111,7 @@ export default function IncentivosPage() {
         incentive_description: incentiveDescription.trim() || null,
         incentive_code_enabled: codeEnabled,
         incentive_code_type: codeType,
+        incentive_fixed_code: codeType === "fixed" ? fixedCode.trim() || null : null,
       })
       .eq("id", businessId);
     setSavingSettings(false);
@@ -304,19 +307,25 @@ export default function IncentivosPage() {
         {/* Code type selector */}
         <div className="pt-5 space-y-3">
           <p className="text-sm font-medium text-gray-700">Tipo de código</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               {
                 value: "random" as IncentiveCodeType,
                 icon: Shuffle,
                 title: "Aleatorio",
-                desc: "Se genera un código único por cada cliente. Letras mayúsculas y números.",
+                desc: "Se genera un código único por cada cliente.",
               },
               {
                 value: "pool" as IncentiveCodeType,
                 icon: ListOrdered,
                 title: "Pool de códigos",
-                desc: "Usa una lista de códigos que tú introduces. Cada código se usa una sola vez.",
+                desc: "Lista de códigos que introduces tú. Cada uno se usa una sola vez.",
+              },
+              {
+                value: "fixed" as IncentiveCodeType,
+                icon: Tag,
+                title: "Código fijo",
+                desc: "Siempre el mismo código para todos los clientes.",
               },
             ].map(({ value, icon: Icon, title, desc }) => (
               <button
@@ -340,10 +349,29 @@ export default function IncentivosPage() {
           </div>
         </div>
 
+        {codeType === "fixed" && (
+          <div className="pt-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Código fijo *
+            </label>
+            <input
+              type="text"
+              value={fixedCode}
+              onChange={(e) => setFixedCode(e.target.value.toUpperCase())}
+              maxLength={50}
+              className="w-full max-w-xs px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition font-mono tracking-widest uppercase"
+              placeholder="Ej: BIENVENIDA26"
+            />
+            <p className="text-xs text-gray-400 mt-1.5">
+              Este código se enviará a todos los clientes que dejen una reseña de 5 estrellas.
+            </p>
+          </div>
+        )}
+
         <div className="mt-5 flex items-center gap-3">
           <button
             onClick={saveSettings}
-            disabled={savingSettings}
+            disabled={savingSettings || (codeType === "fixed" && codeEnabled && !fixedCode.trim())}
             className="bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-lg transition text-sm"
           >
             {savingSettings ? "Guardando..." : "Guardar configuración"}
