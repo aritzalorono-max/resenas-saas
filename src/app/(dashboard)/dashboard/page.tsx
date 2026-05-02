@@ -89,14 +89,14 @@ export default async function DashboardPage() {
         {/* Total */}
         <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-card">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Total</p>
-          <p className="text-3xl font-bold text-gray-900 leading-none">{total}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{total}</p>
           <p className="text-xs text-gray-400 mt-1.5">solicitudes enviadas</p>
         </div>
 
         {/* Positivas */}
         <div className="bg-white border border-green-100 rounded-2xl p-4 shadow-card">
           <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-2">Positivas</p>
-          <p className="text-3xl font-bold text-gray-900 leading-none">{positives}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{positives}</p>
           <div className="mt-2 h-1.5 rounded-full bg-green-100 overflow-hidden">
             <div
               className="h-full rounded-full bg-green-500 transition-all duration-700"
@@ -108,7 +108,7 @@ export default async function DashboardPage() {
         {/* Negativas */}
         <div className="bg-white border border-red-50 rounded-2xl p-4 shadow-card">
           <p className="text-xs font-medium text-red-500 uppercase tracking-wide mb-2">Negativas</p>
-          <p className="text-3xl font-bold text-gray-900 leading-none">{negatives}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{negatives}</p>
           <div className="mt-2 h-1.5 rounded-full bg-red-100 overflow-hidden">
             <div
               className="h-full rounded-full bg-red-400 transition-all duration-700"
@@ -129,7 +129,7 @@ export default async function DashboardPage() {
               const pct = total > 0 ? Math.round((bar.count / total) * 100) : 0;
               return (
                 <div key={bar.label} className="flex items-center gap-3">
-                  <span className="text-xs text-gray-500 w-20 shrink-0">{bar.label}</span>
+                  <span className="text-xs text-gray-500 w-16 shrink-0">{bar.label}</span>
                   <div className={`flex-1 h-2 rounded-full ${bar.bg} overflow-hidden`}>
                     <div
                       className={`h-full rounded-full ${bar.color}`}

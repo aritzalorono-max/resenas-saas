@@ -83,7 +83,7 @@ export default async function DashboardLayout({
       </aside>
 
       {/* ── Contenido principal ────────────────────────────────────────────── */}
-      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
+      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen overflow-x-hidden">
         {/* Header móvil */}
         <header className="lg:hidden flex items-center justify-between px-4 py-3
                            bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">
