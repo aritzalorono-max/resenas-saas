@@ -7,7 +7,7 @@ import {
   CheckCircle, Clock, Shuffle, ListOrdered,
   ChevronDown, Ticket,
 } from "lucide-react";
-import type { DiscountCode, IncentiveCodeType } from "@/types";
+import type { DiscountCode, IncentiveCodeType, IncentiveTiming } from "@/types";
 
 type FilterStatus = "all" | "available" | "used" | "expired";
 
@@ -30,6 +30,7 @@ export default function IncentivosPage() {
   const [platformName, setPlatformName]       = useState("Google Maps");
   const [incentiveEnabled, setIncentiveEnabled] = useState(false);
   const [incentiveDescription, setIncentiveDescription] = useState("");
+  const [timing, setTiming]                   = useState<IncentiveTiming>("initial");
   const [codeType, setCodeType]               = useState<IncentiveCodeType>("fixed");
   const [fixedCode, setFixedCode]             = useState("");
   const [advancedOpen, setAdvancedOpen]       = useState(false);
@@ -51,7 +52,7 @@ export default function IncentivosPage() {
 
     const { data: biz } = await supabase
       .from("businesses")
-      .select("id, name, google_maps_url, review_links, incentive_enabled, incentive_description, incentive_code_enabled, incentive_code_type, incentive_fixed_code")
+      .select("id, name, google_maps_url, review_links, incentive_enabled, incentive_description, incentive_code_enabled, incentive_code_type, incentive_fixed_code, incentive_timing")
       .eq("user_id", user.id)
       .single();
 
@@ -61,6 +62,7 @@ export default function IncentivosPage() {
     setBusinessName(biz.name ?? "");
     setIncentiveEnabled(biz.incentive_enabled ?? false);
     setIncentiveDescription(biz.incentive_description ?? "");
+    setTiming((biz.incentive_timing as IncentiveTiming) ?? "initial");
     setCodeType(biz.incentive_code_type ?? "fixed");
     setFixedCode(biz.incentive_fixed_code ?? "");
     // Always start collapsed regardless of saved type
@@ -109,6 +111,7 @@ export default function IncentivosPage() {
       .update({
         incentive_enabled: incentiveEnabled,
         incentive_description: incentiveDescription.trim() || null,
+        incentive_timing: timing,
         incentive_code_enabled: codeType === "fixed" ? fixedCode.trim() !== "" : true,
         incentive_code_type: codeType,
         incentive_fixed_code: codeType === "fixed" ? fixedCode.trim() || null : null,
@@ -218,6 +221,37 @@ export default function IncentivosPage() {
 
         {incentiveEnabled && (
           <div className="space-y-4">
+            {/* Cuándo avisar */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                ¿Cuándo avisar del incentivo?
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {([
+                  {
+                    value: "initial" as IncentiveTiming,
+                    title: "En el primer mensaje",
+                    desc: "El cliente ve la oferta desde el principio, antes de responder.",
+                  },
+                  {
+                    value: "after_positive" as IncentiveTiming,
+                    title: "Tras respuesta positiva",
+                    desc: "Solo se ofrece si el cliente ya ha expresado una opinión buena.",
+                  },
+                ] as { value: IncentiveTiming; title: string; desc: string }[]).map(({ value, title, desc }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTiming(value)}
+                    className={`text-left p-3 rounded-xl border-2 transition ${timing === value ? "border-brand-500 bg-brand-50" : "border-gray-200 bg-white hover:border-gray-300"}`}
+                  >
+                    <p className={`font-semibold text-sm mb-0.5 ${timing === value ? "text-brand-700" : "text-gray-700"}`}>{title}</p>
+                    <p className="text-xs text-gray-500 leading-snug">{desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Qué ofreces */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -352,7 +386,9 @@ export default function IncentivosPage() {
               <p className="text-xs text-gray-400 ml-1">1. Mensaje inicial (lo envías tú)</p>
               <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                 <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-                  {`Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, te enviaremos automáticamente ${incentiveDescription}.`}
+                  {timing === "initial"
+                    ? `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, te enviaremos automáticamente ${incentiveDescription}.`
+                    : `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?`}
                 </p>
               </div>
             </div>
@@ -370,7 +406,9 @@ export default function IncentivosPage() {
               <p className="text-xs text-gray-400 ml-1">3. Respuesta automática (opinión positiva)</p>
               <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                 <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-                  {`¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}? Es muy sencillo:\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo... ¡te regalamos ${incentiveDescription}! 🎁\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`}
+                  {timing === "initial"
+                    ? `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\nCuando la publiques, mándanos una captura de pantalla y te enviamos ${incentiveDescription}. ¡Muchas gracias! 💚`
+                    : `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}? Es muy sencillo:\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo... ¡te regalamos ${incentiveDescription}! 🎁\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`}
                 </p>
               </div>
             </div>
