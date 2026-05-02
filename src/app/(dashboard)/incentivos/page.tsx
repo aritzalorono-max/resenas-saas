@@ -61,10 +61,9 @@ export default function IncentivosPage() {
     setBusinessName(biz.name ?? "");
     setIncentiveEnabled(biz.incentive_enabled ?? false);
     setIncentiveDescription(biz.incentive_description ?? "");
-    const savedType: IncentiveCodeType = biz.incentive_code_type ?? "fixed";
-    setCodeType(savedType);
+    setCodeType(biz.incentive_code_type ?? "fixed");
     setFixedCode(biz.incentive_fixed_code ?? "");
-    setAdvancedOpen(savedType === "random" || savedType === "pool");
+    // Always start collapsed regardless of saved type
 
     // Determine active platform name
     const links: { name: string; url: string }[] = biz.review_links ?? [];
