@@ -387,7 +387,7 @@ export default function IncentivosPage() {
               <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                 <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
                   {timing === "initial"
-                    ? `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, te enviaremos automáticamente ${incentiveDescription}.`
+                    ? `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, te enviaremos ${incentiveDescription} para agradecértelo.`
                     : `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?`}
                 </p>
               </div>
