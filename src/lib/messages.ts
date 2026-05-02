@@ -123,7 +123,7 @@ export function buildFollowUpMessage(params: {
   } = params;
 
   if (sentiment === "positive" && googleMapsUrl && incentiveEnabled && incentiveDescription) {
-    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone, platformName, discountCode);
+    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone, platformName);
   }
 
   if (sentiment === "positive" && googleMapsUrl) {
@@ -152,16 +152,12 @@ export function buildIncentiveFollowUp(
   incentiveDescription: string,
   tone: BusinessTone = "tuteo",
   platformName = "Google Maps",
-  discountCode?: string | null
 ): string {
-  const incentivo = discountCode
-    ? `${incentiveDescription}\n\n📋 Tu código: *${discountCode}*`
-    : incentiveDescription;
   return applyTemplate(MESSAGE_TEMPLATES[tone].positive_incentive, {
     nombre: customerName,
     negocio: businessName,
     url: reviewUrl,
-    incentivo,
+    incentivo: incentiveDescription,
     plataforma: platformName,
   });
 }
