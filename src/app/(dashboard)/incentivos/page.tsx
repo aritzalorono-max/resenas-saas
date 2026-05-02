@@ -387,7 +387,7 @@ export default function IncentivosPage() {
               <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                 <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
                   {timing === "initial"
-                    ? `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, te enviaremos ${incentiveDescription} para agradecértelo.`
+                    ? `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, recibirás de regalo: ${incentiveDescription}.`
                     : `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?`}
                 </p>
               </div>
@@ -407,8 +407,8 @@ export default function IncentivosPage() {
               <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                 <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
                   {timing === "initial"
-                    ? `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\nCuando la publiques, mándanos una captura de pantalla y te enviamos ${incentiveDescription}. ¡Muchas gracias! 💚`
-                    : `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}? Es muy sencillo:\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo... ¡te regalamos ${incentiveDescription}! 🎁\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`}
+                    ? `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo, tu regalo: *${incentiveDescription}* 🎁\n\nCuando la publiques, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`
+                    : `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}? Es muy sencillo:\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo, tu regalo: *${incentiveDescription}* 🎁\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`}
                 </p>
               </div>
             </div>
@@ -418,7 +418,7 @@ export default function IncentivosPage() {
               <p className="text-xs text-gray-400 ml-1">4. Cliente envía captura → confirmación automática</p>
               <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                 <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-                  {`¡Muchísimas gracias, María! 🎉 Hemos comprobado tu reseña de 5 ⭐ en ${platformName}.\n\nComo prometimos, aquí tienes tu regalo: ${incentiveDescription} 🎁\n\n¡Gracias por confiar en ${businessName || "tu negocio"}! 💚`}
+                  {`¡Muchísimas gracias, María! 🎉 Hemos comprobado tu reseña de 5 ⭐ en ${platformName}.\n\nComo prometimos, aquí tienes tu regalo: *${incentiveDescription}* 🎁\n\n¡Gracias por confiar en ${businessName || "tu negocio"}! 💚`}
                 </p>
               </div>
             </div>

@@ -70,7 +70,7 @@ Si quieres compartir tu experiencia en {plataforma}, nos ayudaría mucho:
 
 👉 {url}
 
-Y como agradecimiento por tu tiempo... ¡te regalamos {incentivo}! 🎁
+Y como agradecimiento por tu tiempo, tu regalo: *{incentivo}* 🎁
 
 Cuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`,
 
@@ -120,7 +120,7 @@ Si quiere compartir su experiencia en {plataforma}, nos ayudaría mucho:
 
 👉 {url}
 
-Y como agradecimiento por su tiempo... ¡le regalamos {incentivo}! 🎁
+Y como agradecimiento por su tiempo, su regalo: *{incentivo}* 🎁
 
 Cuando publique su reseña de 5 estrellas, envíenos una captura de pantalla y se lo hacemos llegar enseguida. ¡Muchas gracias! 💚`,
 
@@ -170,7 +170,7 @@ Si te apetece, puedes dejarnos tu opinión en {plataforma}, ¡nos ayuda un mont�
 
 👉 {url}
 
-Y de parte nuestra... ¡te llevas {incentivo}! 🎁🙌
+Y de parte nuestra, tu regalo: *{incentivo}* 🎁🙌
 
 Cuando pongas la reseña, mándanos una captura y te lo mandamos al momento. ¡Eres lo mejor! 💚`,
 
