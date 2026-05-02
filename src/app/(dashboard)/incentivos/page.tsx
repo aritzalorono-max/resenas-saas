@@ -232,13 +232,48 @@ export default function IncentivosPage() {
           </div>
         )}
 
-        {/* Vista previa del mensaje con incentivo */}
+        {/* Vista previa: flujo completo de conversación */}
         {incentiveEnabled && incentiveDescription && (
-          <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Vista previa del mensaje inicial</p>
-            <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-              {`Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, te enviaremos automáticamente ${incentiveDescription}.`}
-            </p>
+          <div className="space-y-3">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Ejemplo de conversación</p>
+
+            {/* Mensaje 1: inicial del negocio */}
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400 ml-1">1. Mensaje inicial (lo envías tú)</p>
+              <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
+                <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+                  {`Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, te enviaremos automáticamente ${incentiveDescription}.`}
+                </p>
+              </div>
+            </div>
+
+            {/* Respuesta cliente */}
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400 ml-1">2. El cliente responde</p>
+              <div className="bg-white border border-gray-200 rounded-2xl rounded-tr-sm px-4 py-3 max-w-xs">
+                <p className="text-sm text-gray-700 italic">Muy bien, todo perfecto 😊</p>
+              </div>
+            </div>
+
+            {/* Mensaje 2: seguimiento automático */}
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400 ml-1">3. Respuesta automática (opinión positiva)</p>
+              <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
+                <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+                  {`¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}? Es muy sencillo:\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo... ¡te regalamos ${incentiveDescription}! 🎁\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`}
+                </p>
+              </div>
+            </div>
+
+            {/* Mensaje 3: tras recibir captura */}
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-400 ml-1">4. Cliente envía captura → confirmación automática</p>
+              <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
+                <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+                  {`¡Muchísimas gracias, María! 🎉 Hemos comprobado tu reseña de 5 ⭐ en ${platformName}.\n\nComo prometimos, aquí tienes tu regalo: ${incentiveDescription} 🎁\n\n¡Gracias por confiar en ${businessName || "tu negocio"}! 💚`}
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>
