@@ -421,7 +421,6 @@ export default function IncentivosPage() {
                     {intro}{"Y como agradecimiento por tu tiempo, tu regalo: "}
                     <strong>{incentiveDescription}</strong>
                     {" 🎁"}
-                    {previewCode && <>{"\n\n"}{"📋 Tu código: "}<strong className="bg-white/60 px-1 rounded">{previewCode}</strong></>}
                     {timing === "initial"
                       ? "\n\nCuando la publiques, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚"
                       : "\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚"}
