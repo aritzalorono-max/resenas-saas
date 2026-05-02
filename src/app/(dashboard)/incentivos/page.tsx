@@ -382,12 +382,13 @@ export default function IncentivosPage() {
             codeType === "fixed" ? (fixedCode.trim() || null) :
             codeType === "random" ? "A3K8Z2QP" :
             "TU-CÓDIGO";
-          const incentivoPaso3 = previewCode
-            ? `${incentiveDescription}\n\n📋 Tu código: *${previewCode}*`
-            : incentiveDescription;
-          const incentivoPaso4 = previewCode
-            ? `${incentiveDescription} — código *${previewCode}*`
-            : incentiveDescription;
+
+          const msgClass = "text-sm text-gray-800 leading-relaxed";
+          const biz = businessName || "tu negocio";
+          const intro = timing === "initial"
+            ? `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${biz}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\n`
+            : `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${biz}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}? Es muy sencillo:\n\n👉 [enlace a ${platformName}]\n\n`;
+
           return (
             <div className="space-y-3">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Ejemplo de conversación</p>
@@ -396,10 +397,10 @@ export default function IncentivosPage() {
               <div className="flex flex-col gap-1">
                 <p className="text-xs text-gray-400 ml-1">1. Mensaje inicial (lo envías tú)</p>
                 <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
-                  <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+                  <p className={`${msgClass} whitespace-pre-wrap`}>
                     {timing === "initial"
-                      ? `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, recibirás de regalo: ${incentiveDescription}.`
-                      : `Hola María, ¿cómo fue tu experiencia en ${businessName || "tu negocio"}?`}
+                      ? `Hola María, ¿cómo fue tu experiencia en ${biz}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, recibirás de regalo: ${incentiveDescription}.`
+                      : `Hola María, ¿cómo fue tu experiencia en ${biz}?`}
                   </p>
                 </div>
               </div>
@@ -416,10 +417,14 @@ export default function IncentivosPage() {
               <div className="flex flex-col gap-1">
                 <p className="text-xs text-gray-400 ml-1">3. Respuesta automática (opinión positiva)</p>
                 <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
-                  <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+                  <p className={`${msgClass} whitespace-pre-wrap`}>
+                    {intro}{"Y como agradecimiento por tu tiempo, tu regalo: "}
+                    <strong>{incentiveDescription}</strong>
+                    {" 🎁"}
+                    {previewCode && <>{"\n\n"}{"📋 Tu código: "}<strong className="bg-white/60 px-1 rounded">{previewCode}</strong></>}
                     {timing === "initial"
-                      ? `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo, tu regalo: *${incentivoPaso3}* 🎁\n\nCuando la publiques, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`
-                      : `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${businessName || "tu negocio"}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}? Es muy sencillo:\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo, tu regalo: *${incentivoPaso3}* 🎁\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`}
+                      ? "\n\nCuando la publiques, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚"
+                      : "\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚"}
                   </p>
                 </div>
               </div>
@@ -428,8 +433,11 @@ export default function IncentivosPage() {
               <div className="flex flex-col gap-1">
                 <p className="text-xs text-gray-400 ml-1">4. Cliente envía captura → confirmación automática</p>
                 <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
-                  <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-                    {`¡Muchísimas gracias, María! 🎉 Hemos comprobado tu reseña de 5 ⭐ en ${platformName}.\n\nComo prometimos, aquí tienes tu regalo: *${incentivoPaso4}* 🎁\n\n¡Gracias por confiar en ${businessName || "tu negocio"}! 💚`}
+                  <p className={`${msgClass} whitespace-pre-wrap`}>
+                    {`¡Muchísimas gracias, María! 🎉 Hemos comprobado tu reseña de 5 ⭐ en ${platformName}.\n\nComo prometimos, aquí tienes tu regalo: `}
+                    <strong>{incentiveDescription}</strong>
+                    {previewCode && <>{" — código "}<strong className="bg-white/60 px-1 rounded">{previewCode}</strong></>}
+                    {` 🎁\n\n¡Gracias por confiar en ${biz}! 💚`}
                   </p>
                 </div>
               </div>
