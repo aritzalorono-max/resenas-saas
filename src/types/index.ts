@@ -21,6 +21,9 @@ export type IncentiveCodeType = "random" | "pool" | "fixed";
 /** Cuándo se comunica el incentivo al cliente */
 export type IncentiveTiming = "initial" | "after_positive";
 
+/** Modo de envío de WhatsApp del negocio */
+export type WhatsAppMode = "shared" | "own" | "dedicated";
+
 // ---------------------------------------------------------------------------
 // Entidades de base de datos
 // ---------------------------------------------------------------------------
@@ -54,6 +57,11 @@ export interface Business {
   incentive_code_type: IncentiveCodeType;
   incentive_fixed_code: string | null;
   incentive_timing: IncentiveTiming;
+  /** Modo de envío de WhatsApp: número compartido, propio o dedicado */
+  whatsapp_mode: WhatsAppMode;
+  own_twilio_account_sid: string | null;
+  own_twilio_auth_token: string | null;
+  own_twilio_whatsapp_number: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -79,7 +87,7 @@ export interface ReviewRequest {
  * Usado en el webhook para evitar una segunda consulta a la base de datos.
  */
 export interface ReviewRequestWithBusiness extends ReviewRequest {
-  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type" | "incentive_fixed_code">;
+  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type" | "incentive_fixed_code" | "whatsapp_mode" | "own_twilio_account_sid" | "own_twilio_auth_token" | "own_twilio_whatsapp_number">;
 }
 
 /** Código de descuento generado o subido por el negocio */

@@ -26,7 +26,7 @@
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { analyzeSentiment, analyzeScreenshot } from "@/lib/claude";
-import { twilioClient, TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants } from "@/lib/twilio";
+import { TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants, getTwilioSender } from "@/lib/twilio";
 import { assignDiscountCode } from "@/lib/discount-codes";
 import {
   findPendingRequestByPhone,
@@ -47,10 +47,8 @@ import twilio from "twilio";
 // Validación de firma de Twilio
 // ---------------------------------------------------------------------------
 
-function validateTwilioSignature(request: Request, rawBody: string): boolean {
-  const authToken = process.env.TWILIO_AUTH_TOKEN!;
+function validateTwilioSignature(request: Request, rawBody: string, authToken: string): boolean {
   const signature = request.headers.get("x-twilio-signature") ?? "";
-
   return twilio.validateRequest(
     authToken,
     signature,
@@ -78,19 +76,10 @@ export async function POST(request: Request): Promise<Response> {
     return twilioEmptyResponse();
   }
 
-  // ── 1. Validar firma (producción) ─────────────────────────────────────────
-  if (process.env.NODE_ENV === "production") {
-    const isValid = validateTwilioSignature(request, rawBody);
-    if (!isValid) {
-      logger.warn("Firma de Twilio inválida — petición rechazada");
-      return twilioEmptyResponse();
-    }
-    logger.info("Firma de Twilio validada correctamente");
-  }
-
   // ── 2. Extraer datos del webhook ──────────────────────────────────────────
   const params = new URLSearchParams(rawBody);
   const fromNumber = params.get("From") ?? "";
+  const toNumber   = params.get("To") ?? "";
   const messageBody = params.get("Body") ?? "";
   const numMedia = parseInt(params.get("NumMedia") ?? "0", 10);
   const mediaUrl = numMedia > 0 ? (params.get("MediaUrl0") ?? "") : "";
@@ -101,7 +90,26 @@ export async function POST(request: Request): Promise<Response> {
     return twilioEmptyResponse();
   }
 
-  logger.info(`Mensaje recibido de ${fromNumber} | media: ${numMedia} | body: "${messageBody.slice(0, 60)}"`);
+  logger.info(`Mensaje recibido de ${fromNumber} → ${toNumber} | media: ${numMedia} | body: "${messageBody.slice(0, 60)}"`);
+
+  // ── 1. Validar firma (producción) ─────────────────────────────────────────
+  // Para negocios con número propio (own mode), el To no coincide con el número
+  // de la plataforma y usamos su auth token. Si el To es el número compartido,
+  // validamos con el token global.
+  if (process.env.NODE_ENV === "production") {
+    const isSharedNumber = toNumber.includes(TWILIO_WHATSAPP_NUMBER.replace("whatsapp:", ""));
+    const authToken = isSharedNumber
+      ? process.env.TWILIO_AUTH_TOKEN!
+      : null; // Own-mode: skip HMAC validation (auth token not available at this point)
+    if (authToken) {
+      const isValid = validateTwilioSignature(request, rawBody, authToken);
+      if (!isValid) {
+        logger.warn("Firma de Twilio inválida — petición rechazada");
+        return twilioEmptyResponse();
+      }
+      logger.info("Firma de Twilio validada correctamente");
+    }
+  }
 
   const supabase = await createServiceClient();
   const phoneVariants = getPhoneVariants(fromNumber);
@@ -132,6 +140,8 @@ export async function POST(request: Request): Promise<Response> {
         return twilioEmptyResponse();
       }
 
+      const { client: scClient, fromNumber: scFrom } = getTwilioSender(business);
+
       if (screenshotResult.isFiveStars) {
         try {
           await updateToRewarded(supabase, screenshotRequest.id);
@@ -150,8 +160,8 @@ export async function POST(request: Request): Promise<Response> {
         );
 
         try {
-          await twilioClient.messages.create({
-            from: TWILIO_WHATSAPP_NUMBER,
+          await scClient.messages.create({
+            from: scFrom,
             to: formatWhatsAppNumber(screenshotRequest.customer_phone),
             body: verifiedMsg,
           });
@@ -163,8 +173,8 @@ export async function POST(request: Request): Promise<Response> {
         const retryMsg = buildScreenshotRetryMessage(screenshotRequest.customer_name, tone);
 
         try {
-          await twilioClient.messages.create({
-            from: TWILIO_WHATSAPP_NUMBER,
+          await scClient.messages.create({
+            from: scFrom,
             to: formatWhatsAppNumber(screenshotRequest.customer_phone),
             body: retryMsg,
           });
@@ -265,9 +275,11 @@ export async function POST(request: Request): Promise<Response> {
     discountCode: assignedCode,
   });
 
+  const { client: fuClient, fromNumber: fuFrom } = getTwilioSender(business);
+
   try {
-    await twilioClient.messages.create({
-      from: TWILIO_WHATSAPP_NUMBER,
+    await fuClient.messages.create({
+      from: fuFrom,
       to: formatWhatsAppNumber(reviewRequest.customer_phone),
       body: followUpMessage,
     });

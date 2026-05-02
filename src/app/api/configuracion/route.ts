@@ -49,6 +49,10 @@ export async function POST(request: NextRequest) {
       review_links,
       welcome_message,
       tone,
+      whatsapp_mode,
+      own_twilio_account_sid,
+      own_twilio_auth_token,
+      own_twilio_whatsapp_number,
     } = body;
 
     const rawLinks: ReviewPlatformLink[] = Array.isArray(review_links) ? review_links : [];
@@ -65,6 +69,10 @@ export async function POST(request: NextRequest) {
       review_links: rawLinks,
       welcome_message: String(welcome_message ?? "").trim() || DEFAULT_WELCOME_MESSAGE,
       tone: tone ?? "tuteo",
+      whatsapp_mode: whatsapp_mode ?? "shared",
+      own_twilio_account_sid: whatsapp_mode === "own" ? (String(own_twilio_account_sid ?? "").trim() || null) : null,
+      own_twilio_auth_token:  whatsapp_mode === "own" ? (String(own_twilio_auth_token ?? "").trim() || null) : null,
+      own_twilio_whatsapp_number: whatsapp_mode === "own" ? (String(own_twilio_whatsapp_number ?? "").trim() || null) : null,
     };
 
     // Check whether the row already exists

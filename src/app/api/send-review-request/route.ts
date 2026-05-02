@@ -14,7 +14,7 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
-import { sendWhatsAppMessage } from "@/lib/twilio";
+import { getTwilioSender, sendWhatsAppMessageWith } from "@/lib/twilio";
 import { getBusinessByUserId } from "@/lib/business";
 import { createReviewRequest } from "@/lib/review-requests";
 import { validateCustomerName, validatePhone } from "@/lib/validation";
@@ -97,10 +97,12 @@ export async function POST(
     messageText += `\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, recibirás de regalo: ${business.incentive_description}.`;
   }
 
+  const { client: bizClient, fromNumber: bizFrom } = getTwilioSender(business);
+
   let messageSid: string;
   try {
-    messageSid = await sendWhatsAppMessage(customerPhone, messageText);
-    logger.info(`WhatsApp enviado. SID: ${messageSid}`);
+    messageSid = await sendWhatsAppMessageWith(bizClient, bizFrom, customerPhone, messageText);
+    logger.info(`WhatsApp enviado desde ${bizFrom}. SID: ${messageSid}`);
   } catch (twilioError) {
     logger.error("Error al enviar el WhatsApp via Twilio", twilioError);
     return NextResponse.json(
