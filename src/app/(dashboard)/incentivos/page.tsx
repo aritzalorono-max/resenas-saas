@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
-  Gift, ToggleLeft, ToggleRight, Upload, RefreshCw,
+  Gift, Upload, RefreshCw,
   CheckCircle, Clock, Shuffle, ListOrdered,
-  ChevronDown, Ticket, Tag,
+  ChevronDown, Ticket,
 } from "lucide-react";
 import type { DiscountCode, IncentiveCodeType } from "@/types";
 
@@ -30,9 +30,9 @@ export default function IncentivosPage() {
   const [platformName, setPlatformName]       = useState("Google Maps");
   const [incentiveEnabled, setIncentiveEnabled] = useState(false);
   const [incentiveDescription, setIncentiveDescription] = useState("");
-  const [codeEnabled, setCodeEnabled]         = useState(false);
-  const [codeType, setCodeType]               = useState<IncentiveCodeType>("random");
+  const [codeType, setCodeType]               = useState<IncentiveCodeType>("fixed");
   const [fixedCode, setFixedCode]             = useState("");
+  const [advancedOpen, setAdvancedOpen]       = useState(false);
   const [codes, setCodes]                     = useState<DiscountCode[]>([]);
   const [stats, setStats]                     = useState<Stats>({ total: 0, available: 0, used: 0, rewarded: 0 });
   const [filter, setFilter]                   = useState<FilterStatus>("all");
@@ -61,9 +61,10 @@ export default function IncentivosPage() {
     setBusinessName(biz.name ?? "");
     setIncentiveEnabled(biz.incentive_enabled ?? false);
     setIncentiveDescription(biz.incentive_description ?? "");
-    setCodeEnabled(biz.incentive_code_enabled ?? false);
-    setCodeType(biz.incentive_code_type ?? "random");
+    const savedType: IncentiveCodeType = biz.incentive_code_type ?? "fixed";
+    setCodeType(savedType);
     setFixedCode(biz.incentive_fixed_code ?? "");
+    setAdvancedOpen(savedType === "random" || savedType === "pool");
 
     // Determine active platform name
     const links: { name: string; url: string }[] = biz.review_links ?? [];
@@ -109,7 +110,7 @@ export default function IncentivosPage() {
       .update({
         incentive_enabled: incentiveEnabled,
         incentive_description: incentiveDescription.trim() || null,
-        incentive_code_enabled: codeEnabled,
+        incentive_code_enabled: codeType === "fixed" ? fixedCode.trim() !== "" : true,
         incentive_code_type: codeType,
         incentive_fixed_code: codeType === "fixed" ? fixedCode.trim() || null : null,
       })
@@ -217,23 +218,130 @@ export default function IncentivosPage() {
         </button>
 
         {incentiveEnabled && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              ¿Qué ofreces a cambio? *
-            </label>
-            <input
-              type="text"
-              value={incentiveDescription}
-              onChange={(e) => setIncentiveDescription(e.target.value)}
-              maxLength={200}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-              placeholder="Ej: un código descuento del 25%"
-            />
-            <p className="text-xs text-gray-400 mt-1.5">
-              Este texto se añade automáticamente al final del primer mensaje de WhatsApp.
-            </p>
+          <div className="space-y-4">
+            {/* Qué ofreces */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                ¿Qué ofreces a cambio? *
+              </label>
+              <input
+                type="text"
+                value={incentiveDescription}
+                onChange={(e) => setIncentiveDescription(e.target.value)}
+                maxLength={200}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+                placeholder="Ej: un código descuento del 25%"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Este texto se añade automáticamente al final del primer mensaje de WhatsApp.
+              </p>
+            </div>
+
+            {/* Código fijo + botón opciones avanzadas */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Código de descuento
+              </label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  value={fixedCode}
+                  onChange={(e) => setFixedCode(e.target.value.toUpperCase())}
+                  disabled={codeType !== "fixed"}
+                  maxLength={50}
+                  className="flex-1 max-w-xs px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition font-mono tracking-widest uppercase disabled:bg-gray-50 disabled:text-gray-400"
+                  placeholder="Ej: BIENVENIDA26"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !advancedOpen;
+                    setAdvancedOpen(next);
+                    if (!next) setCodeType("fixed");
+                  }}
+                  className="flex items-center gap-1.5 text-sm text-brand-600 hover:text-brand-800 font-medium whitespace-nowrap"
+                >
+                  <ChevronDown className={`w-4 h-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+                  {advancedOpen ? "Ocultar opciones" : "Más opciones"}
+                </button>
+              </div>
+              {codeType === "fixed" && (
+                <p className="text-xs text-gray-400 mt-1">
+                  Se enviará el mismo código a todos los clientes. Déjalo vacío para no enviar código.
+                </p>
+              )}
+            </div>
+
+            {/* Opciones avanzadas */}
+            {advancedOpen && (
+              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Opciones avanzadas</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { value: "random" as IncentiveCodeType, icon: Shuffle, title: "Aleatorio", desc: "Código único por cliente, generado automáticamente." },
+                    { value: "pool"   as IncentiveCodeType, icon: ListOrdered, title: "Pool de códigos", desc: "Lista propia de códigos. Cada uno se usa una sola vez." },
+                  ].map(({ value, icon: Icon, title, desc }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setCodeType(value)}
+                      className={`text-left p-3 rounded-xl border-2 transition ${codeType === value ? "border-brand-500 bg-brand-50" : "border-gray-200 bg-white hover:border-gray-300"}`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <Icon className={`w-4 h-4 ${codeType === value ? "text-brand-600" : "text-gray-400"}`} />
+                        <span className={`font-semibold text-sm ${codeType === value ? "text-brand-700" : "text-gray-700"}`}>{title}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 leading-snug">{desc}</p>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Upload para pool */}
+                {codeType === "pool" && (
+                  <div className="pt-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm text-gray-600">Sube un Excel (.xlsx) o CSV con un código por fila</p>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="flex items-center gap-2 bg-white border border-gray-300 hover:border-gray-400 text-gray-700 font-medium px-3 py-2 rounded-lg transition text-sm disabled:opacity-60"
+                      >
+                        {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        {uploading ? "Subiendo..." : "Subir archivo"}
+                      </button>
+                      <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleFileUpload} />
+                    </div>
+                    {uploadResult && (
+                      <div className="bg-green-50 text-green-700 text-sm rounded-lg px-3 py-2 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 shrink-0" />{uploadResult}
+                      </div>
+                    )}
+                    {uploadError && (
+                      <div className="bg-red-50 text-red-700 text-sm rounded-lg px-3 py-2">{uploadError}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
+
+        {/* Botón guardar */}
+        <div className="flex items-center gap-3 pt-1">
+          <button
+            onClick={saveSettings}
+            disabled={savingSettings}
+            className="bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-lg transition text-sm"
+          >
+            {savingSettings ? "Guardando..." : "Guardar cambios"}
+          </button>
+          {settingsSuccess && (
+            <span className="text-sm text-green-600 font-medium flex items-center gap-1.5">
+              <CheckCircle className="w-4 h-4" /> Guardado
+            </span>
+          )}
+        </div>
 
         {/* Vista previa: flujo completo de conversación */}
         {incentiveEnabled && incentiveDescription && (
@@ -280,150 +388,6 @@ export default function IncentivosPage() {
           </div>
         )}
       </div>
-
-      {/* Settings */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h2 className="font-semibold text-gray-900 mb-5">Configuración de códigos de descuento</h2>
-
-        {/* Enable/disable toggle */}
-        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-          <div>
-            <p className="font-medium text-gray-800">Activar códigos de descuento</p>
-            <p className="text-sm text-gray-400">
-              Se incluirá un código en el mensaje de incentivo cuando detectemos una valoración positiva
-            </p>
-          </div>
-          <button
-            onClick={() => setCodeEnabled((v) => !v)}
-            className="shrink-0 ml-4"
-            aria-label="Toggle códigos"
-          >
-            {codeEnabled
-              ? <ToggleRight className="w-10 h-10 text-brand-600" />
-              : <ToggleLeft  className="w-10 h-10 text-gray-300"  />}
-          </button>
-        </div>
-
-        {/* Code type selector */}
-        <div className="pt-5 space-y-3">
-          <p className="text-sm font-medium text-gray-700">Tipo de código</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {[
-              {
-                value: "random" as IncentiveCodeType,
-                icon: Shuffle,
-                title: "Aleatorio",
-                desc: "Se genera un código único por cada cliente.",
-              },
-              {
-                value: "pool" as IncentiveCodeType,
-                icon: ListOrdered,
-                title: "Pool de códigos",
-                desc: "Lista de códigos que introduces tú. Cada uno se usa una sola vez.",
-              },
-              {
-                value: "fixed" as IncentiveCodeType,
-                icon: Tag,
-                title: "Código fijo",
-                desc: "Siempre el mismo código para todos los clientes.",
-              },
-            ].map(({ value, icon: Icon, title, desc }) => (
-              <button
-                key={value}
-                onClick={() => setCodeType(value)}
-                className={`text-left p-4 rounded-xl border-2 transition ${
-                  codeType === value
-                    ? "border-brand-500 bg-brand-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Icon className={`w-4 h-4 ${codeType === value ? "text-brand-600" : "text-gray-400"}`} />
-                  <span className={`font-semibold text-sm ${codeType === value ? "text-brand-700" : "text-gray-700"}`}>
-                    {title}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 leading-snug">{desc}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {codeType === "fixed" && (
-          <div className="pt-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Código fijo *
-            </label>
-            <input
-              type="text"
-              value={fixedCode}
-              onChange={(e) => setFixedCode(e.target.value.toUpperCase())}
-              maxLength={50}
-              className="w-full max-w-xs px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition font-mono tracking-widest uppercase"
-              placeholder="Ej: BIENVENIDA26"
-            />
-            <p className="text-xs text-gray-400 mt-1.5">
-              Este código se enviará a todos los clientes que dejen una reseña de 5 estrellas.
-            </p>
-          </div>
-        )}
-
-        <div className="mt-5 flex items-center gap-3">
-          <button
-            onClick={saveSettings}
-            disabled={savingSettings || (codeType === "fixed" && codeEnabled && !fixedCode.trim())}
-            className="bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-lg transition text-sm"
-          >
-            {savingSettings ? "Guardando..." : "Guardar configuración"}
-          </button>
-          {settingsSuccess && (
-            <span className="text-sm text-green-600 font-medium flex items-center gap-1.5">
-              <CheckCircle className="w-4 h-4" /> Guardado
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Pool upload section */}
-      {codeType === "pool" && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="font-semibold text-gray-900">Subir códigos</h2>
-              <p className="text-sm text-gray-400 mt-0.5">
-                Sube un archivo Excel (.xlsx) o CSV con un código por fila en la primera columna
-              </p>
-            </div>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="flex items-center gap-2 bg-brand-50 hover:bg-brand-100 text-brand-700 font-medium px-4 py-2.5 rounded-lg transition text-sm disabled:opacity-60"
-            >
-              {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-              {uploading ? "Subiendo..." : "Subir archivo"}
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".xlsx,.xls,.csv"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-          </div>
-
-          {uploadResult && (
-            <div className="bg-green-50 text-green-700 text-sm rounded-lg px-4 py-3 flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 shrink-0" />
-              {uploadResult}
-            </div>
-          )}
-          {uploadError && (
-            <div className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3">
-              {uploadError}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Codes table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
