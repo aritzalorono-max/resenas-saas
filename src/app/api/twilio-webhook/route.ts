@@ -206,6 +206,7 @@ export async function POST(request: Request): Promise<Response> {
 
   logger.info(`Solicitud encontrada: ${reviewRequest.id} (cliente: ${reviewRequest.customer_name})`);
   const { businesses: business } = reviewRequest;
+  logger.info(`Datos negocio — incentive_enabled: ${business.incentive_enabled}, incentive_description: "${business.incentive_description}", google_maps_url: ${!!business.google_maps_url}`);
   const activeLink = business.review_links?.find((l) => l.url === business.google_maps_url);
   const activePlatformName = activeLink?.name ?? "Google Maps";
   const appOrigin = new URL(request.url).origin;
