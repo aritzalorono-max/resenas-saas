@@ -18,6 +18,9 @@ export type BusinessTone = "tuteo" | "usted" | "juvenil";
 /** Tipo de código de descuento: generado aleatoriamente, extraído de un pool, o fijo siempre igual */
 export type IncentiveCodeType = "random" | "pool" | "fixed";
 
+/** Cuándo se comunica el incentivo al cliente */
+export type IncentiveTiming = "initial" | "after_positive";
+
 // ---------------------------------------------------------------------------
 // Entidades de base de datos
 // ---------------------------------------------------------------------------
@@ -50,6 +53,7 @@ export interface Business {
   incentive_code_enabled: boolean;
   incentive_code_type: IncentiveCodeType;
   incentive_fixed_code: string | null;
+  incentive_timing: IncentiveTiming;
   created_at: string;
   updated_at: string;
 }

@@ -92,7 +92,8 @@ export async function POST(
     .replace("{nombre}", customerName)
     .replace("{negocio}", business.name);
 
-  if (business.incentive_enabled && business.incentive_description) {
+  const incentiveTiming = business.incentive_timing ?? "initial";
+  if (business.incentive_enabled && business.incentive_description && incentiveTiming === "initial") {
     messageText += `\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, te enviaremos automáticamente ${business.incentive_description}.`;
   }
 
