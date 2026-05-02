@@ -119,7 +119,8 @@ export async function analyzeScreenshot(mediaUrl: string): Promise<ScreenshotRes
 
   const rawText =
     response.content[0].type === "text" ? response.content[0].text : "";
-  return JSON.parse(rawText) as ScreenshotResult;
+  const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  return JSON.parse(cleaned) as ScreenshotResult;
 }
 
 export async function analyzeSentiment(
@@ -140,8 +141,7 @@ export async function analyzeSentiment(
   const rawText =
     response.content[0].type === "text" ? response.content[0].text : "";
 
-  // El modelo siempre devuelve JSON según el system prompt,
-  // pero hacemos el cast explícito por seguridad de tipos.
-  const result = JSON.parse(rawText) as SentimentResult;
+  const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  const result = JSON.parse(cleaned) as SentimentResult;
   return result;
 }
