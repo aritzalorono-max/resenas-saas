@@ -55,7 +55,15 @@ export async function fetchGoogleMapsSnapshot(): Promise<{ ok: boolean; error?: 
 
   // Fetch rating
   const { rating, review_count } = await getPlaceRating(placeId);
-  if (rating === null) return { ok: false, error: "No se obtuvo puntuación de Google Maps" };
+  if (rating === null) {
+    // Debug: call directly to get the raw API status
+    const key = process.env.GOOGLE_PLACES_API_KEY ?? "";
+    const params = new URLSearchParams({ place_id: placeId, fields: "rating,user_ratings_total,name", key });
+    const debugRes = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?${params}`);
+    const debugData = await debugRes.json() as { status: string; result?: { name?: string } };
+    logger.warn(`Place details API status: ${debugData.status}, place: ${debugData.result?.name}, placeId: ${placeId}`);
+    return { ok: false, error: `Sin puntuación (API: ${debugData.status}, lugar: ${debugData.result?.name ?? "?"})` };
+  }
 
   // Save snapshot using service client (bypasses RLS for INSERT)
   const service = await createServiceClient();
