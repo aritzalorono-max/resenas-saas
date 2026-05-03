@@ -195,3 +195,17 @@ export function buildScreenshotRetryMessage(
     nombre: customerName,
   });
 }
+
+/**
+ * Mensaje de cierre cuando se alcanza el límite de 7 mensajes en una conversación multi-turno.
+ */
+export function buildConversationClosingMessage(
+  customerName: string,
+  businessName: string,
+  tone: BusinessTone = "tuteo"
+): string {
+  return applyTemplate(MESSAGE_TEMPLATES[tone].conversation_closing, {
+    nombre: customerName,
+    negocio: businessName,
+  });
+}

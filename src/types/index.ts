@@ -78,6 +78,7 @@ export interface ReviewRequest {
   twilio_message_sid: string | null;
   follow_up_sent: boolean;
   discount_code: string | null;
+  message_count: number;
   created_at: string;
   responded_at: string | null;
 }

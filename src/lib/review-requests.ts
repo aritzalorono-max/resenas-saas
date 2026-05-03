@@ -147,6 +147,42 @@ export async function updateToAwaitingScreenshot(
 }
 
 /**
+ * Busca la solicitud más reciente con estado positivo/negativo/neutral para un número.
+ * Se usa para continuar conversaciones multi-turno después del primer intercambio.
+ */
+export async function findActiveRequestByPhone(
+  supabase: SupabaseClient,
+  phoneVariants: string[]
+): Promise<ReviewRequestWithBusiness | null> {
+  const { data } = await supabase
+    .from("review_requests")
+    .select("*, businesses(*)")
+    .in("customer_phone", phoneVariants)
+    .in("status", ["positive", "negative", "neutral"])
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  return (data as ReviewRequestWithBusiness) ?? null;
+}
+
+/**
+ * Incrementa el contador de mensajes de una solicitud y devuelve el nuevo valor.
+ */
+export async function incrementMessageCount(
+  supabase: SupabaseClient,
+  requestId: string,
+  currentCount: number
+): Promise<number> {
+  const newCount = currentCount + 1;
+  await supabase
+    .from("review_requests")
+    .update({ message_count: newCount })
+    .eq("id", requestId);
+  return newCount;
+}
+
+/**
  * Cambia el estado de una solicitud awaiting_screenshot a rewarded.
  * Se llama cuando Claude verifica las 5 estrellas en la captura.
  */
