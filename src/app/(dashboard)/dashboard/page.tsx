@@ -38,7 +38,7 @@ export default async function DashboardPage() {
     .limit(10) as { data: ReviewRequest[] | null };
 
   const total      = stats?.total_requests  ?? 0;
-  const positives  = stats?.positive_count  ?? 0;
+  const positives  = stats?.positive_count  ?? 0;  // ya incluye rewarded + awaiting_screenshot
   const negatives  = stats?.negative_count  ?? 0;
   const neutrals   = stats?.neutral_count   ?? 0;
   const pending    = stats?.pending_count   ?? 0;
