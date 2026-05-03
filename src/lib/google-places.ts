@@ -35,9 +35,13 @@ export async function extractPlaceIdFromUrl(url: string): Promise<string | null>
     resolved = await resolveShortUrl(url);
   }
 
-  // Formato más común: ...!1sChIJxxxxxxxx...
+  // Formato ChIJ: ...!1sChIJxxxxxxxx...
   const m1 = resolved.match(/!1s(ChIJ[A-Za-z0-9_-]+)/);
   if (m1) return m1[1];
+
+  // Formato hex: ...!1s0xHEX:0xHEX... (URLs de google.es/maps)
+  const m3 = resolved.match(/!1s(0x[0-9a-f]+:0x[0-9a-f]+)/i);
+  if (m3) return m3[1];
 
   // Formato con query param explícito
   const m2 = resolved.match(/[?&]placeid=(ChIJ[A-Za-z0-9_-]+)/i);
