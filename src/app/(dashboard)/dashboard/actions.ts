@@ -73,7 +73,7 @@ export async function fetchGoogleMapsSnapshot(): Promise<{ ok: boolean; error?: 
 
   if (error) {
     logger.error("Error al guardar snapshot manual", error);
-    return { ok: false, error: "Error al guardar el dato" };
+    return { ok: false, error: `Error al guardar: ${error.message} (${error.code})` };
   }
 
   logger.info(`Snapshot manual guardado: "${biz.name}" → ${rating}★ (${review_count})`);
