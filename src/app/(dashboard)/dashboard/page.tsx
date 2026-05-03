@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import type { ReviewRequest, BusinessStats } from "@/types";
+import type { ReviewRequest, BusinessStats, GoogleMapsSnapshot } from "@/types";
 import { RingChart } from "@/components/ui/RingChart";
+import { GoogleMapsRatingSection } from "@/components/ui/RatingChart";
 import { AlertTriangle } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -36,6 +37,20 @@ export default async function DashboardPage() {
     .eq("business_id", business?.id ?? "")
     .order("created_at", { ascending: false })
     .limit(10) as { data: ReviewRequest[] | null };
+
+  // Google Maps rating snapshots (last 60 days)
+  const { data: snapshots } = await supabase
+    .from("google_maps_snapshots")
+    .select("rating, review_count, fetched_at")
+    .eq("business_id", business?.id ?? "")
+    .order("fetched_at", { ascending: true })
+    .limit(60) as { data: Pick<GoogleMapsSnapshot, "rating" | "review_count" | "fetched_at">[] | null };
+
+  const chartData = (snapshots ?? [])
+    .filter(s => s.rating != null)
+    .map(s => ({ date: s.fetched_at, rating: s.rating!, review_count: s.review_count }));
+
+  const hasApiKey = !!process.env.GOOGLE_PLACES_API_KEY;
 
   const total      = stats?.total_requests  ?? 0;
   const positives  = stats?.positive_count  ?? 0;  // ya incluye rewarded + awaiting_screenshot
@@ -143,6 +158,11 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Google Maps rating evolution */}
+      <div className="mb-6">
+        <GoogleMapsRatingSection data={chartData} hasApiKey={hasApiKey} />
+      </div>
 
       {/* CTA principal */}
       <Link
