@@ -23,7 +23,14 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
+  title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
+  description: "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
   alternates: { canonical: "/" },
+  openGraph: {
+    url: "/",
+    title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
+    description: "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
+  },
 };
 
 // ── Datos estructurados Schema.org ────────────────────────────────────────────
