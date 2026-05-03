@@ -18,7 +18,9 @@ export async function GET(request: Request) {
       if (!existing) {
         await supabase.from("businesses").insert({ user_id: user.id, name: "" });
       }
-      return NextResponse.redirect(`${origin}${next}`);
+      // Only allow relative paths to prevent open redirect attacks
+      const safePath = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+      return NextResponse.redirect(`${origin}${safePath}`);
     }
   }
 

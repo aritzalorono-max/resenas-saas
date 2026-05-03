@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
-import type { ReviewPlatformLink } from "@/types";
+import { validateUrl } from "@/lib/validation";
+import { logger } from "@/lib/logger";
+import type { ReviewPlatformLink, BusinessTone, WhatsAppMode } from "@/types";
+
+const VALID_TONES: BusinessTone[] = ["tuteo", "usted", "juvenil"];
+const VALID_WHATSAPP_MODES: WhatsAppMode[] = ["shared", "own", "dedicated"];
+const WELCOME_MESSAGE_MAX = 1000;
 
 function generateShortCode(): string {
   const chars = "abcdefghjkmnpqrstuvwxyz23456789";
@@ -55,24 +61,44 @@ export async function POST(request: NextRequest) {
       own_twilio_whatsapp_number,
     } = body;
 
-    const rawLinks: ReviewPlatformLink[] = Array.isArray(review_links) ? review_links : [];
+    // Validate tone
+    const safeTone: BusinessTone = VALID_TONES.includes(tone) ? tone : "tuteo";
+
+    // Validate whatsapp_mode
+    const safeMode: WhatsAppMode = VALID_WHATSAPP_MODES.includes(whatsapp_mode) ? whatsapp_mode : "shared";
+
+    // Validate welcome_message length
+    const safeWelcome = String(welcome_message ?? "").trim().slice(0, WELCOME_MESSAGE_MAX) || DEFAULT_WELCOME_MESSAGE;
+
+    // Validate review_links URLs
+    const rawLinks: ReviewPlatformLink[] = [];
+    if (Array.isArray(review_links)) {
+      for (const link of review_links) {
+        if (typeof link !== "object" || !link) continue;
+        const urlResult = validateUrl(link.url);
+        if (!urlResult.valid) {
+          return NextResponse.json({ error: `URL inválida en plataforma "${link.name}": ${urlResult.error}` }, { status: 400 });
+        }
+        rawLinks.push({ ...link, url: urlResult.sanitized ?? link.url });
+      }
+    }
 
     const supabase = await createServiceClient();
 
     // Incentive fields are managed by the /incentivos page — don't touch them here
     const payload = {
       user_id: user.id,
-      name: String(name ?? "").trim() || "Mi negocio",
-      description: String(description ?? "").trim() || null,
+      name: String(name ?? "").trim().slice(0, 200) || "Mi negocio",
+      description: String(description ?? "").trim().slice(0, 500) || null,
       website_url: String(website_url ?? "").trim() || null,
       google_maps_url: google_maps_url || null,
       review_links: rawLinks,
-      welcome_message: String(welcome_message ?? "").trim() || DEFAULT_WELCOME_MESSAGE,
-      tone: tone ?? "tuteo",
-      whatsapp_mode: whatsapp_mode ?? "shared",
-      own_twilio_account_sid: whatsapp_mode === "own" ? (String(own_twilio_account_sid ?? "").trim() || null) : null,
-      own_twilio_auth_token:  whatsapp_mode === "own" ? (String(own_twilio_auth_token ?? "").trim() || null) : null,
-      own_twilio_whatsapp_number: whatsapp_mode === "own" ? (String(own_twilio_whatsapp_number ?? "").trim() || null) : null,
+      welcome_message: safeWelcome,
+      tone: safeTone,
+      whatsapp_mode: safeMode,
+      own_twilio_account_sid: safeMode === "own" ? (String(own_twilio_account_sid ?? "").trim() || null) : null,
+      own_twilio_auth_token:  safeMode === "own" ? (String(own_twilio_auth_token ?? "").trim() || null) : null,
+      own_twilio_whatsapp_number: safeMode === "own" ? (String(own_twilio_whatsapp_number ?? "").trim() || null) : null,
     };
 
     // Check whether the row already exists
@@ -91,8 +117,8 @@ export async function POST(request: NextRequest) {
         .update(payload)
         .eq("user_id", user.id);
       if (error) {
-        console.error("[ReseñasYa] Error al actualizar configuración:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        logger.error("Error al actualizar configuración", error);
+        return NextResponse.json({ error: "Error al guardar los cambios" }, { status: 500 });
       }
       businessId = existing.id;
     } else {
@@ -103,8 +129,8 @@ export async function POST(request: NextRequest) {
         .select("id")
         .maybeSingle();
       if (error) {
-        console.error("[ReseñasYa] Error al crear negocio:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        logger.error("Error al crear negocio", error);
+        return NextResponse.json({ error: "Error al guardar los cambios" }, { status: 500 });
       }
       businessId = inserted?.id;
     }
@@ -125,7 +151,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, review_links: allLinks });
   } catch (err) {
-    console.error("[ReseñasYa] Error inesperado en /api/configuracion:", err);
+    logger.error("Error inesperado en /api/configuracion", err);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
