@@ -15,10 +15,14 @@ const STATUS_CONFIG = {
 
 const PAGE_SIZE = 20;
 
+function buildMonthBounds(year: number, month: number) {
+  const start = new Date(Date.UTC(year, month - 1, 1)).toISOString();
+  const end   = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1)).toISOString();
+  return { start, end };
+}
+
 function monthLabel(year: number, month: number) {
-  return new Date(year, month - 1, 1).toLocaleDateString("es-ES", {
-    month: "long", year: "numeric",
-  });
+  return new Date(year, month - 1, 1).toLocaleDateString("es-ES", { month: "long", year: "numeric" });
 }
 
 export default async function ResenasPage({
@@ -26,52 +30,42 @@ export default async function ResenasPage({
 }: {
   searchParams: Promise<{ status?: string; page?: string; month?: string; incentive?: string }>;
 }) {
-  const params = await searchParams;
-  const filterStatus  = params.status;
-  const monthParam    = params.month;
-  const incentiveParam = params.incentive;
-  const page          = Math.max(1, parseInt(params.page ?? "1", 10));
+  const sp             = await searchParams;
+  const filterStatus   = sp.status    ?? "all";
+  const incentiveFilter = sp.incentive ?? "all";
+  const page           = Math.max(1, parseInt(sp.page ?? "1", 10));
+  const offset         = (page - 1) * PAGE_SIZE;
 
-  // ── Month range ──────────────────────────────────────────────────────────
+  // ── Month ────────────────────────────────────────────────────────────────
   const now = new Date();
   const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const selectedMonth   = monthParam ?? currentMonthStr;
+  const selectedMonth   = sp.month ?? currentMonthStr;
   const [yearStr, monthStr] = selectedMonth.split("-");
   const year  = parseInt(yearStr,  10);
   const month = parseInt(monthStr, 10);
 
-  const monthStart  = new Date(Date.UTC(year, month - 1, 1)).toISOString();
-  const monthEnd    = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1)).toISOString();
+  const { start: monthStart, end: monthEnd } = buildMonthBounds(year, month);
 
-  const prevDate      = new Date(Date.UTC(year, month - 2, 1));
-  const nextDate      = new Date(Date.UTC(year, month, 1));
-  const prevMonthStr  = `${prevDate.getUTCFullYear()}-${String(prevDate.getUTCMonth() + 1).padStart(2, "0")}`;
-  const nextMonthStr  = `${nextDate.getUTCFullYear()}-${String(nextDate.getUTCMonth() + 1).padStart(2, "0")}`;
+  const prevD         = new Date(Date.UTC(year, month - 2, 1));
+  const nextD         = new Date(Date.UTC(year, month,     1));
+  const prevMonthStr  = `${prevD.getUTCFullYear()}-${String(prevD.getUTCMonth() + 1).padStart(2, "0")}`;
+  const nextMonthStr  = `${nextD.getUTCFullYear()}-${String(nextD.getUTCMonth() + 1).padStart(2, "0")}`;
   const isCurrentMonth = selectedMonth === currentMonthStr;
-
-  const active         = filterStatus   ?? "all";
-  const incentiveFilter = incentiveParam ?? "all";
-  const offset         = (page - 1) * PAGE_SIZE;
 
   // ── Supabase ─────────────────────────────────────────────────────────────
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-
   const { data: business } = await supabase
-    .from("businesses")
-    .select("id")
-    .eq("user_id", user!.id)
-    .single();
-
+    .from("businesses").select("id").eq("user_id", user!.id).single();
   const businessId = business?.id ?? "";
 
-  // Monthly aggregate stats (all statuses, no status filter)
+  // Monthly aggregate (no status/incentive filter — always full month)
   const { data: monthlyRaw } = await supabase
     .from("review_requests")
-    .select("status, sentiment_score")
+    .select("status")
     .eq("business_id", businessId)
     .gte("created_at", monthStart)
-    .lt("created_at", monthEnd);
+    .lt("created_at",  monthEnd);
 
   const ms = {
     total:    monthlyRaw?.length ?? 0,
@@ -84,103 +78,99 @@ export default async function ResenasPage({
   const responded    = ms.positive + ms.negative + ms.neutral;
   const positiveRate = responded > 0 ? Math.round((ms.positive / responded) * 100) : 0;
 
-  // Filtered count
-  function applyFilters<Q extends ReturnType<typeof supabase.from>>(q: Q) {
-    let r = (q as unknown as ReturnType<typeof supabase.from>)
-      .gte("created_at", monthStart)
-      .lt("created_at",  monthEnd);
-    if (active !== "all")          r = r.eq("status", active);
-    if (incentiveFilter === "yes") r = r.not("discount_code", "is", null);
-    if (incentiveFilter === "no")  r = r.is("discount_code",  null);
-    return r;
-  }
-
-  const countBase = supabase
+  // ── Count query ──────────────────────────────────────────────────────────
+  let cq = supabase
     .from("review_requests")
     .select("id", { count: "exact", head: true })
-    .eq("business_id", businessId);
-  const { count: total } = await applyFilters(countBase as unknown as ReturnType<typeof supabase.from>) as unknown as { count: number | null };
+    .eq("business_id", businessId)
+    .gte("created_at", monthStart)
+    .lt("created_at",  monthEnd);
+  if (filterStatus !== "all")       cq = cq.eq("status", filterStatus);
+  if (incentiveFilter === "yes")    cq = cq.not("discount_code", "is", null);
+  if (incentiveFilter === "no")     cq = cq.is("discount_code",  null);
+  const { count: total } = await cq;
 
-  const dataBase = supabase
+  // ── Data query ───────────────────────────────────────────────────────────
+  let dq = supabase
     .from("review_requests")
     .select("*")
     .eq("business_id", businessId)
+    .gte("created_at", monthStart)
+    .lt("created_at",  monthEnd)
     .order("created_at", { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1);
-  const { data: requests } = await applyFilters(dataBase as unknown as ReturnType<typeof supabase.from>) as unknown as { data: ReviewRequest[] | null };
+  if (filterStatus !== "all")       dq = dq.eq("status", filterStatus);
+  if (incentiveFilter === "yes")    dq = dq.not("discount_code", "is", null);
+  if (incentiveFilter === "no")     dq = dq.is("discount_code",  null);
+  const { data: requests } = await dq as { data: ReviewRequest[] | null };
 
   const totalPages = Math.ceil((total ?? 0) / PAGE_SIZE);
-  const hasNext    = page < totalPages;
-  const hasPrev    = page > 1;
 
   // ── URL builder ───────────────────────────────────────────────────────────
-  function buildHref(opts: { page?: number; status?: string; month?: string; incentive?: string }) {
-    const p = new URLSearchParams();
-    const s  = opts.status    ?? active;
+  function href(opts: { page?: number; status?: string; month?: string; incentive?: string }) {
+    const p  = new URLSearchParams();
+    const s  = opts.status    ?? filterStatus;
     const m  = opts.month     ?? selectedMonth;
     const i  = opts.incentive ?? incentiveFilter;
     const pg = opts.page      ?? 1;
-    if (s  !== "all")            p.set("status",    s);
-    if (m  !== currentMonthStr)  p.set("month",     m);
-    if (i  !== "all")            p.set("incentive", i);
-    if (pg > 1)                  p.set("page",      String(pg));
+    if (s  !== "all")           p.set("status",    s);
+    if (m  !== currentMonthStr) p.set("month",     m);
+    if (i  !== "all")           p.set("incentive", i);
+    if (pg > 1)                 p.set("page",      String(pg));
     const qs = p.toString();
     return `/resenas${qs ? `?${qs}` : ""}`;
   }
 
-  const filterTabs = [
+  const statusTabs = [
     { value: "all",                label: "Todas"         },
     { value: "positive",           label: "Positivas"     },
     { value: "negative",           label: "Negativas"     },
     { value: "neutral",            label: "Neutrales"     },
     { value: "pending",            label: "Pendientes"    },
     { value: "no_response",        label: "Sin resp."     },
+    { value: "awaiting_screenshot",label: "Captura"       },
     { value: "rewarded",           label: "Recompensadas" },
   ];
 
   return (
     <div className="animate-fade-in">
-      <div className="mb-5">
-        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Reseñas y respuestas</h1>
-      </div>
+      <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-5">Reseñas y respuestas</h1>
 
-      {/* ── Navegación de mes ──────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-4">
+      {/* ── Navegación de mes ─────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between mb-4 bg-white border border-gray-200 rounded-2xl px-4 py-2.5 shadow-card">
         <Link
-          href={buildHref({ month: prevMonthStr, page: 1 })}
-          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition px-2 py-1.5 rounded-lg hover:bg-gray-100"
+          href={href({ month: prevMonthStr, page: 1 })}
+          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition px-2 py-1 rounded-lg hover:bg-gray-50"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span className="hidden sm:inline capitalize">
-            {monthLabel(prevDate.getUTCFullYear(), prevDate.getUTCMonth() + 1)}
+          <span className="hidden sm:inline capitalize text-xs">
+            {monthLabel(prevD.getUTCFullYear(), prevD.getUTCMonth() + 1)}
           </span>
         </Link>
 
-        <h2 className="text-sm font-semibold text-gray-900 capitalize">
+        <p className="text-sm font-semibold text-gray-900 capitalize">
           {monthLabel(year, month)}
-        </h2>
+        </p>
 
         <Link
-          href={isCurrentMonth ? "#" : buildHref({ month: nextMonthStr, page: 1 })}
+          href={isCurrentMonth ? "#" : href({ month: nextMonthStr, page: 1 })}
           aria-disabled={isCurrentMonth}
-          className={`flex items-center gap-1 text-sm transition px-2 py-1.5 rounded-lg ${
+          className={`flex items-center gap-1 text-sm transition px-2 py-1 rounded-lg ${
             isCurrentMonth
               ? "text-gray-300 pointer-events-none"
-              : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+              : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
           }`}
         >
-          <span className="hidden sm:inline capitalize">
-            {monthLabel(nextDate.getUTCFullYear(), nextDate.getUTCMonth() + 1)}
+          <span className="hidden sm:inline capitalize text-xs">
+            {monthLabel(nextD.getUTCFullYear(), nextD.getUTCMonth() + 1)}
           </span>
           <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
 
-      {/* ── Informe mensual ────────────────────────────────────────────────── */}
+      {/* ── Informe del mes ───────────────────────────────────────────────── */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-5 shadow-card">
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-          Resumen del mes
-        </h3>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Resumen del mes</p>
         {ms.total === 0 ? (
           <p className="text-sm text-gray-400 italic">Sin solicitudes en este periodo</p>
         ) : (
@@ -206,7 +196,7 @@ export default async function ResenasPage({
             {responded > 0 && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-gray-500">Tasa positiva (sobre respondidas)</span>
+                  <span className="text-xs text-gray-500">Tasa positiva (respondidas)</span>
                   <span className="text-xs font-semibold text-green-600">{positiveRate}%</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
@@ -215,27 +205,11 @@ export default async function ResenasPage({
                     style={{ width: `${positiveRate}%` }}
                   />
                 </div>
-                <div className="mt-3 flex gap-3 flex-wrap">
-                  {ms.positive > 0 && (
-                    <span className="text-xs text-green-600">
-                      {ms.positive} positiva{ms.positive !== 1 ? "s" : ""}
-                    </span>
-                  )}
-                  {ms.neutral > 0 && (
-                    <span className="text-xs text-gray-500">
-                      {ms.neutral} neutral{ms.neutral !== 1 ? "es" : ""}
-                    </span>
-                  )}
-                  {ms.negative > 0 && (
-                    <span className="text-xs text-red-500">
-                      {ms.negative} negativa{ms.negative !== 1 ? "s" : ""}
-                    </span>
-                  )}
-                  {ms.pending > 0 && (
-                    <span className="text-xs text-amber-500">
-                      {ms.pending} pendiente{ms.pending !== 1 ? "s" : ""}
-                    </span>
-                  )}
+                <div className="mt-2.5 flex gap-3 flex-wrap text-xs">
+                  {ms.positive > 0 && <span className="text-green-600">{ms.positive} positiva{ms.positive !== 1 ? "s" : ""}</span>}
+                  {ms.neutral  > 0 && <span className="text-gray-500">{ms.neutral}  neutral{ms.neutral  !== 1 ? "es" : ""}</span>}
+                  {ms.negative > 0 && <span className="text-red-500"> {ms.negative} negativa{ms.negative !== 1 ? "s" : ""}</span>}
+                  {ms.pending  > 0 && <span className="text-amber-500">{ms.pending} pendiente{ms.pending !== 1 ? "s" : ""}</span>}
                 </div>
               </div>
             )}
@@ -243,56 +217,50 @@ export default async function ResenasPage({
         )}
       </div>
 
-      {/* ── Filtro por estado ──────────────────────────────────────────────── */}
+      {/* ── Filtro por estado ─────────────────────────────────────────────── */}
       <div className="flex gap-2 mb-3 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {filterTabs.map((tab) => {
-          const isActive = active === tab.value;
-          return (
-            <Link
-              key={tab.value}
-              href={buildHref({ status: tab.value, page: 1 })}
-              className={`shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
-                isActive
-                  ? "bg-brand-600 text-white shadow-sm"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700"
-              }`}
-            >
-              {tab.label}
-            </Link>
-          );
-        })}
+        {statusTabs.map((tab) => (
+          <Link
+            key={tab.value}
+            href={href({ status: tab.value, page: 1 })}
+            className={`shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+              filterStatus === tab.value
+                ? "bg-brand-600 text-white shadow-sm"
+                : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700"
+            }`}
+          >
+            {tab.label}
+          </Link>
+        ))}
       </div>
 
-      {/* ── Filtro por incentivo ───────────────────────────────────────────── */}
+      {/* ── Filtro por incentivo ──────────────────────────────────────────── */}
       <div className="flex items-center gap-2 mb-5 flex-wrap">
         <span className="text-xs text-gray-400">Incentivo:</span>
         {[
-          { value: "all", label: "Todos" },
+          { value: "all", label: "Todos"         },
           { value: "yes", label: "Con incentivo" },
           { value: "no",  label: "Sin incentivo" },
-        ].map((opt) => {
-          const isActive = incentiveFilter === opt.value;
-          return (
-            <Link
-              key={opt.value}
-              href={buildHref({ incentive: opt.value, page: 1 })}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                isActive
-                  ? "bg-brand-600 text-white"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700"
-              }`}
-            >
-              {opt.label}
-            </Link>
-          );
-        })}
+        ].map((opt) => (
+          <Link
+            key={opt.value}
+            href={href({ incentive: opt.value, page: 1 })}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+              incentiveFilter === opt.value
+                ? "bg-brand-600 text-white"
+                : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700"
+            }`}
+          >
+            {opt.label}
+          </Link>
+        ))}
       </div>
 
-      {/* ── Lista ─────────────────────────────────────────────────────────── */}
+      {/* ── Lista ────────────────────────────────────────────────────────── */}
       {total != null && (
         <p className="text-xs text-gray-400 mb-4">
           {total} solicitud{total !== 1 ? "es" : ""}
-          {active !== "all" ? ` · filtro: ${filterTabs.find(t => t.value === active)?.label}` : ""}
+          {filterStatus !== "all" ? ` · ${statusTabs.find(t => t.value === filterStatus)?.label}` : ""}
         </p>
       )}
 
@@ -311,10 +279,9 @@ export default async function ResenasPage({
               });
 
               return (
-                <Link
+                <div
                   key={req.id}
-                  href={`/resenas/${req.id}`}
-                  className="block bg-white rounded-2xl border border-gray-200 p-4 shadow-card hover:border-brand-300 hover:shadow-md transition-all"
+                  className="bg-white rounded-2xl border border-gray-200 p-4 shadow-card"
                 >
                   {/* Fila 1: nombre + badge */}
                   <div className="flex items-start justify-between gap-2 mb-1">
@@ -353,7 +320,7 @@ export default async function ResenasPage({
 
                   {/* Pie de tarjeta */}
                   <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-gray-50">
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-3">
                       {req.responded_at && (
                         <span className="text-xs text-green-600 flex items-center gap-1">
                           <Check className="w-3 h-3" strokeWidth={2.5} />
@@ -366,12 +333,15 @@ export default async function ResenasPage({
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-brand-600 font-medium flex items-center gap-1">
-                      <MessageSquare className="w-3 h-3" />
-                      Ver detalle
-                    </span>
+                    <Link
+                      href={`/resenas/${req.id}`}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      Ver conversación
+                    </Link>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>
@@ -380,24 +350,23 @@ export default async function ResenasPage({
           {totalPages > 1 && (
             <div className="mt-6 flex flex-col sm:flex-row items-center gap-3 sm:justify-between">
               <p className="text-sm text-gray-500 order-2 sm:order-1">
-                Pág. {page}/{totalPages}
-                <span className="text-gray-400"> · {total} solicitudes</span>
+                Pág. {page}/{totalPages} · {total} solicitudes
               </p>
               <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
                 <Link
-                  href={hasPrev ? buildHref({ page: page - 1 }) : "#"}
-                  aria-disabled={!hasPrev}
+                  href={page > 1 ? href({ page: page - 1 }) : "#"}
+                  aria-disabled={page <= 1}
                   className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition
-                    ${hasPrev ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
+                    ${page > 1 ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Anterior
                 </Link>
                 <Link
-                  href={hasNext ? buildHref({ page: page + 1 }) : "#"}
-                  aria-disabled={!hasNext}
+                  href={page < totalPages ? href({ page: page + 1 }) : "#"}
+                  aria-disabled={page >= totalPages}
                   className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition
-                    ${hasNext ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
+                    ${page < totalPages ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
                 >
                   Siguiente
                   <ChevronRight className="w-4 h-4" />
