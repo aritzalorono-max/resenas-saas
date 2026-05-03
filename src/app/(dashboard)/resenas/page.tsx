@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ReviewRequest } from "@/types";
 import { Check, ChevronLeft, ChevronRight, MessageSquare, Gift } from "lucide-react";
 
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
   pending:             { label: "Pendiente",      badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-400"   },
   positive:            { label: "Positiva",       badge: "bg-green-100 text-green-700",   dot: "bg-green-500"   },
   negative:            { label: "Negativa",       badge: "bg-red-100 text-red-600",       dot: "bg-red-400"     },
@@ -11,18 +11,25 @@ const STATUS_CONFIG = {
   no_response:         { label: "Sin respuesta",  badge: "bg-gray-100 text-gray-500",     dot: "bg-gray-300"    },
   awaiting_screenshot: { label: "Esp. captura",   badge: "bg-purple-100 text-purple-700", dot: "bg-purple-400"  },
   rewarded:            { label: "Recompensado",   badge: "bg-brand-100 text-brand-700",   dot: "bg-brand-500"   },
-} as const;
+};
 
 const PAGE_SIZE = 20;
 
-function buildMonthBounds(year: number, month: number) {
-  const start = new Date(Date.UTC(year, month - 1, 1)).toISOString();
-  const end   = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1)).toISOString();
-  return { start, end };
-}
+const STATUS_TABS = [
+  { value: "all",                label: "Todas"         },
+  { value: "positive",           label: "Positivas"     },
+  { value: "negative",           label: "Negativas"     },
+  { value: "neutral",            label: "Neutrales"     },
+  { value: "pending",            label: "Pendientes"    },
+  { value: "no_response",        label: "Sin resp."     },
+  { value: "awaiting_screenshot",label: "Captura"       },
+  { value: "rewarded",           label: "Recompensadas" },
+];
 
-function monthLabel(year: number, month: number) {
-  return new Date(year, month - 1, 1).toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+function monthLabel(year: number, month: number): string {
+  return new Date(year, month - 1, 1).toLocaleDateString("es-ES", {
+    month: "long", year: "numeric",
+  });
 }
 
 export default async function ResenasPage({
@@ -34,22 +41,22 @@ export default async function ResenasPage({
   const filterStatus   = sp.status    ?? "all";
   const incentiveFilter = sp.incentive ?? "all";
   const page           = Math.max(1, parseInt(sp.page ?? "1", 10));
-  const offset         = (page - 1) * PAGE_SIZE;
 
   // ── Month ────────────────────────────────────────────────────────────────
-  const now = new Date();
+  const now             = new Date();
   const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const selectedMonth   = sp.month ?? currentMonthStr;
-  const [yearStr, monthStr] = selectedMonth.split("-");
-  const year  = parseInt(yearStr,  10);
-  const month = parseInt(monthStr, 10);
+  const [ys, ms2]       = selectedMonth.split("-");
+  const year            = parseInt(ys,  10);
+  const month           = parseInt(ms2, 10);
 
-  const { start: monthStart, end: monthEnd } = buildMonthBounds(year, month);
+  const monthStart = new Date(Date.UTC(year, month - 1, 1)).toISOString();
+  const monthEnd   = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1)).toISOString();
 
-  const prevD         = new Date(Date.UTC(year, month - 2, 1));
-  const nextD         = new Date(Date.UTC(year, month,     1));
-  const prevMonthStr  = `${prevD.getUTCFullYear()}-${String(prevD.getUTCMonth() + 1).padStart(2, "0")}`;
-  const nextMonthStr  = `${nextD.getUTCFullYear()}-${String(nextD.getUTCMonth() + 1).padStart(2, "0")}`;
+  const prevD        = new Date(Date.UTC(year, month - 2, 1));
+  const nextD        = new Date(Date.UTC(year, month,     1));
+  const prevMStr     = `${prevD.getUTCFullYear()}-${String(prevD.getUTCMonth() + 1).padStart(2, "0")}`;
+  const nextMStr     = `${nextD.getUTCFullYear()}-${String(nextD.getUTCMonth() + 1).padStart(2, "0")}`;
   const isCurrentMonth = selectedMonth === currentMonthStr;
 
   // ── Supabase ─────────────────────────────────────────────────────────────
@@ -59,55 +66,41 @@ export default async function ResenasPage({
     .from("businesses").select("id").eq("user_id", user!.id).single();
   const businessId = business?.id ?? "";
 
-  // Monthly aggregate (no status/incentive filter — always full month)
-  const { data: monthlyRaw } = await supabase
-    .from("review_requests")
-    .select("status")
-    .eq("business_id", businessId)
-    .gte("created_at", monthStart)
-    .lt("created_at",  monthEnd);
-
-  const ms = {
-    total:    monthlyRaw?.length ?? 0,
-    positive: monthlyRaw?.filter(r => ["positive", "awaiting_screenshot", "rewarded"].includes(r.status)).length ?? 0,
-    negative: monthlyRaw?.filter(r => r.status === "negative").length ?? 0,
-    neutral:  monthlyRaw?.filter(r => r.status === "neutral").length ?? 0,
-    rewarded: monthlyRaw?.filter(r => r.status === "rewarded").length ?? 0,
-    pending:  monthlyRaw?.filter(r => r.status === "pending").length ?? 0,
-  };
-  const responded    = ms.positive + ms.negative + ms.neutral;
-  const positiveRate = responded > 0 ? Math.round((ms.positive / responded) * 100) : 0;
-
-  // ── Count query ──────────────────────────────────────────────────────────
-  let cq = supabase
-    .from("review_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("business_id", businessId)
-    .gte("created_at", monthStart)
-    .lt("created_at",  monthEnd);
-  if (filterStatus !== "all")       cq = cq.eq("status", filterStatus);
-  if (incentiveFilter === "yes")    cq = cq.not("discount_code", "is", null);
-  if (incentiveFilter === "no")     cq = cq.is("discount_code",  null);
-  const { count: total } = await cq;
-
-  // ── Data query ───────────────────────────────────────────────────────────
-  let dq = supabase
+  // Fetch all requests for the selected month in one query
+  const { data: allRaw } = await supabase
     .from("review_requests")
     .select("*")
     .eq("business_id", businessId)
     .gte("created_at", monthStart)
     .lt("created_at",  monthEnd)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1);
-  if (filterStatus !== "all")       dq = dq.eq("status", filterStatus);
-  if (incentiveFilter === "yes")    dq = dq.not("discount_code", "is", null);
-  if (incentiveFilter === "no")     dq = dq.is("discount_code",  null);
-  const { data: requests } = await dq as { data: ReviewRequest[] | null };
+    .order("created_at", { ascending: false }) as { data: ReviewRequest[] | null };
 
-  const totalPages = Math.ceil((total ?? 0) / PAGE_SIZE);
+  const all = allRaw ?? [];
+
+  // ── Monthly summary stats ─────────────────────────────────────────────────
+  const ms = {
+    total:    all.length,
+    positive: all.filter(r => ["positive", "awaiting_screenshot", "rewarded"].includes(r.status)).length,
+    negative: all.filter(r => r.status === "negative").length,
+    neutral:  all.filter(r => r.status === "neutral").length,
+    rewarded: all.filter(r => r.status === "rewarded").length,
+    pending:  all.filter(r => r.status === "pending").length,
+  };
+  const responded    = ms.positive + ms.negative + ms.neutral;
+  const positiveRate = responded > 0 ? Math.round((ms.positive / responded) * 100) : 0;
+
+  // ── Apply filters in JS ───────────────────────────────────────────────────
+  let filtered = all;
+  if (filterStatus !== "all")       filtered = filtered.filter(r => r.status === filterStatus);
+  if (incentiveFilter === "yes")    filtered = filtered.filter(r => r.discount_code != null);
+  if (incentiveFilter === "no")     filtered = filtered.filter(r => r.discount_code == null);
+
+  const total      = filtered.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const requests   = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   // ── URL builder ───────────────────────────────────────────────────────────
-  function href(opts: { page?: number; status?: string; month?: string; incentive?: string }) {
+  function href(opts: { page?: number; status?: string; month?: string; incentive?: string }): string {
     const p  = new URLSearchParams();
     const s  = opts.status    ?? filterStatus;
     const m  = opts.month     ?? selectedMonth;
@@ -121,26 +114,15 @@ export default async function ResenasPage({
     return `/resenas${qs ? `?${qs}` : ""}`;
   }
 
-  const statusTabs = [
-    { value: "all",                label: "Todas"         },
-    { value: "positive",           label: "Positivas"     },
-    { value: "negative",           label: "Negativas"     },
-    { value: "neutral",            label: "Neutrales"     },
-    { value: "pending",            label: "Pendientes"    },
-    { value: "no_response",        label: "Sin resp."     },
-    { value: "awaiting_screenshot",label: "Captura"       },
-    { value: "rewarded",           label: "Recompensadas" },
-  ];
-
   return (
     <div className="animate-fade-in">
       <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-5">Reseñas y respuestas</h1>
 
       {/* ── Navegación de mes ─────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-4 bg-white border border-gray-200 rounded-2xl px-4 py-2.5 shadow-card">
+      <div className="flex items-center justify-between mb-4 bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-card">
         <Link
-          href={href({ month: prevMonthStr, page: 1 })}
-          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition px-2 py-1 rounded-lg hover:bg-gray-50"
+          href={href({ month: prevMStr, page: 1 })}
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition px-2 py-1 rounded-lg hover:bg-gray-50"
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="hidden sm:inline capitalize text-xs">
@@ -148,14 +130,14 @@ export default async function ResenasPage({
           </span>
         </Link>
 
-        <p className="text-sm font-semibold text-gray-900 capitalize">
+        <span className="text-sm font-semibold text-gray-900 capitalize">
           {monthLabel(year, month)}
-        </p>
+        </span>
 
         <Link
-          href={isCurrentMonth ? "#" : href({ month: nextMonthStr, page: 1 })}
+          href={isCurrentMonth ? "#" : href({ month: nextMStr, page: 1 })}
           aria-disabled={isCurrentMonth}
-          className={`flex items-center gap-1 text-sm transition px-2 py-1 rounded-lg ${
+          className={`flex items-center gap-1.5 text-sm transition px-2 py-1 rounded-lg ${
             isCurrentMonth
               ? "text-gray-300 pointer-events-none"
               : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
@@ -168,9 +150,11 @@ export default async function ResenasPage({
         </Link>
       </div>
 
-      {/* ── Informe del mes ───────────────────────────────────────────────── */}
+      {/* ── Resumen del mes ───────────────────────────────────────────────── */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-5 shadow-card">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Resumen del mes</p>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+          Resumen del mes
+        </p>
         {ms.total === 0 ? (
           <p className="text-sm text-gray-400 italic">Sin solicitudes en este periodo</p>
         ) : (
@@ -201,14 +185,14 @@ export default async function ResenasPage({
                 </div>
                 <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-green-500 transition-all duration-700"
+                    className="h-full rounded-full bg-green-500"
                     style={{ width: `${positiveRate}%` }}
                   />
                 </div>
                 <div className="mt-2.5 flex gap-3 flex-wrap text-xs">
                   {ms.positive > 0 && <span className="text-green-600">{ms.positive} positiva{ms.positive !== 1 ? "s" : ""}</span>}
-                  {ms.neutral  > 0 && <span className="text-gray-500">{ms.neutral}  neutral{ms.neutral  !== 1 ? "es" : ""}</span>}
-                  {ms.negative > 0 && <span className="text-red-500"> {ms.negative} negativa{ms.negative !== 1 ? "s" : ""}</span>}
+                  {ms.neutral  > 0 && <span className="text-gray-500">{ms.neutral} neutral{ms.neutral !== 1 ? "es" : ""}</span>}
+                  {ms.negative > 0 && <span className="text-red-500">{ms.negative} negativa{ms.negative !== 1 ? "s" : ""}</span>}
                   {ms.pending  > 0 && <span className="text-amber-500">{ms.pending} pendiente{ms.pending !== 1 ? "s" : ""}</span>}
                 </div>
               </div>
@@ -217,9 +201,9 @@ export default async function ResenasPage({
         )}
       </div>
 
-      {/* ── Filtro por estado ─────────────────────────────────────────────── */}
+      {/* ── Filtros ───────────────────────────────────────────────────────── */}
       <div className="flex gap-2 mb-3 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {statusTabs.map((tab) => (
+        {STATUS_TABS.map((tab) => (
           <Link
             key={tab.value}
             href={href({ status: tab.value, page: 1 })}
@@ -234,7 +218,6 @@ export default async function ResenasPage({
         ))}
       </div>
 
-      {/* ── Filtro por incentivo ──────────────────────────────────────────── */}
       <div className="flex items-center gap-2 mb-5 flex-wrap">
         <span className="text-xs text-gray-400">Incentivo:</span>
         {[
@@ -256,15 +239,13 @@ export default async function ResenasPage({
         ))}
       </div>
 
-      {/* ── Lista ────────────────────────────────────────────────────────── */}
-      {total != null && (
-        <p className="text-xs text-gray-400 mb-4">
-          {total} solicitud{total !== 1 ? "es" : ""}
-          {filterStatus !== "all" ? ` · ${statusTabs.find(t => t.value === filterStatus)?.label}` : ""}
-        </p>
-      )}
+      {/* ── Lista ─────────────────────────────────────────────────────────── */}
+      <p className="text-xs text-gray-400 mb-4">
+        {total} solicitud{total !== 1 ? "es" : ""}
+        {filterStatus !== "all" ? ` · ${STATUS_TABS.find(t => t.value === filterStatus)?.label ?? ""}` : ""}
+      </p>
 
-      {!requests?.length ? (
+      {requests.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-200 px-6 py-16 flex flex-col items-center text-center">
           <p className="font-semibold text-gray-700">No hay solicitudes</p>
           <p className="text-xs text-gray-400 mt-1">Prueba a cambiar los filtros o navega a otro mes</p>
@@ -273,17 +254,14 @@ export default async function ResenasPage({
         <>
           <div className="space-y-3">
             {requests.map((req) => {
-              const config = STATUS_CONFIG[req.status as keyof typeof STATUS_CONFIG] ?? STATUS_CONFIG.pending;
+              const config = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.pending;
               const sentDate = new Date(req.created_at).toLocaleDateString("es-ES", {
                 day: "numeric", month: "short",
               });
 
               return (
-                <div
-                  key={req.id}
-                  className="bg-white rounded-2xl border border-gray-200 p-4 shadow-card"
-                >
-                  {/* Fila 1: nombre + badge */}
+                <div key={req.id} className="bg-white rounded-2xl border border-gray-200 p-4 shadow-card">
+                  {/* Nombre + badge */}
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-900 text-sm truncate leading-snug">
@@ -318,7 +296,7 @@ export default async function ResenasPage({
                     <p className="text-gray-300 text-xs italic mt-2">Sin respuesta todavía</p>
                   )}
 
-                  {/* Pie de tarjeta */}
+                  {/* Pie */}
                   <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-gray-50">
                     <div className="flex items-center gap-3">
                       {req.responded_at && (
@@ -356,8 +334,9 @@ export default async function ResenasPage({
                 <Link
                   href={page > 1 ? href({ page: page - 1 }) : "#"}
                   aria-disabled={page <= 1}
-                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition
-                    ${page > 1 ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
+                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition ${
+                    page > 1 ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"
+                  }`}
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Anterior
@@ -365,8 +344,9 @@ export default async function ResenasPage({
                 <Link
                   href={page < totalPages ? href({ page: page + 1 }) : "#"}
                   aria-disabled={page >= totalPages}
-                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition
-                    ${page < totalPages ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
+                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition ${
+                    page < totalPages ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"
+                  }`}
                 >
                   Siguiente
                   <ChevronRight className="w-4 h-4" />
