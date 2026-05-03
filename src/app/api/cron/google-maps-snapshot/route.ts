@@ -50,7 +50,7 @@ export async function GET(request: Request): Promise<Response> {
       let placeId: string | null = biz.google_place_id ?? null;
 
       if (!placeId && biz.google_maps_url) {
-        placeId = extractPlaceIdFromUrl(biz.google_maps_url);
+        placeId = await extractPlaceIdFromUrl(biz.google_maps_url);
       }
 
       if (!placeId && biz.name) {

@@ -10,16 +10,37 @@ function apiKey(): string {
 }
 
 /**
+ * Resuelve una URL acortada de Google Maps (maps.app.goo.gl) siguiendo la redirección
+ * para obtener la URL completa con el Place ID embebido.
+ */
+export async function resolveShortUrl(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, { redirect: "follow", method: "HEAD" });
+    return res.url || url;
+  } catch {
+    return url;
+  }
+}
+
+/**
  * Intenta extraer el Place ID directamente de una URL de Google Maps.
  * Funciona con URLs largas que contienen el ID embebido en los datos del path.
+ * Si recibe una URL acortada (maps.app.goo.gl), la resuelve primero.
  */
-export function extractPlaceIdFromUrl(url: string): string | null {
+export async function extractPlaceIdFromUrl(url: string): Promise<string | null> {
+  let resolved = url;
+
+  // Resolve short URLs (maps.app.goo.gl, goo.gl, etc.)
+  if (/goo\.gl|maps\.app/i.test(url)) {
+    resolved = await resolveShortUrl(url);
+  }
+
   // Formato más común: ...!1sChIJxxxxxxxx...
-  const m1 = url.match(/!1s(ChIJ[A-Za-z0-9_-]+)/);
+  const m1 = resolved.match(/!1s(ChIJ[A-Za-z0-9_-]+)/);
   if (m1) return m1[1];
 
   // Formato con query param explícito
-  const m2 = url.match(/[?&]placeid=(ChIJ[A-Za-z0-9_-]+)/i);
+  const m2 = resolved.match(/[?&]placeid=(ChIJ[A-Za-z0-9_-]+)/i);
   if (m2) return m2[1];
 
   return null;

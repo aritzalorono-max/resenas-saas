@@ -24,7 +24,7 @@ export async function fetchGoogleMapsSnapshot(): Promise<{ ok: boolean; error?: 
 
   // Resolve Place ID
   let placeId: string | null = biz.google_place_id ?? null;
-  if (!placeId && biz.google_maps_url) placeId = extractPlaceIdFromUrl(biz.google_maps_url);
+  if (!placeId && biz.google_maps_url) placeId = await extractPlaceIdFromUrl(biz.google_maps_url);
   if (!placeId && biz.name)            placeId = await findPlaceIdByName(biz.name);
 
   if (!placeId) return { ok: false, error: "No se pudo encontrar el negocio en Google Maps" };
