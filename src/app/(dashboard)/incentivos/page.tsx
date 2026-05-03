@@ -105,18 +105,18 @@ export default function IncentivosPage() {
     if (!businessId) return;
     setSavingSettings(true);
     setSettingsSuccess(false);
-    const supabase = createClient();
-    await supabase
-      .from("businesses")
-      .update({
+    await fetch("/api/incentivos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         incentive_enabled: incentiveEnabled,
         incentive_description: incentiveDescription.trim() || null,
         incentive_timing: timing,
         incentive_code_enabled: codeType === "fixed" ? fixedCode.trim() !== "" : true,
         incentive_code_type: codeType,
         incentive_fixed_code: codeType === "fixed" ? fixedCode.trim() || null : null,
-      })
-      .eq("id", businessId);
+      }),
+    });
     setSavingSettings(false);
     setSettingsSuccess(true);
     setTimeout(() => setSettingsSuccess(false), 2500);

@@ -101,22 +101,34 @@ export async function POST(request: Request): Promise<Response> {
   logger.info(`Mensaje recibido de ${maskPhone(fromNumber)} → ${toNumber} | media: ${numMedia} | len: ${messageBody.length}`);
 
   // ── 1. Validar firma (producción) ─────────────────────────────────────────
-  // Para negocios con número propio (own mode), el To no coincide con el número
-  // de la plataforma y usamos su auth token. Si el To es el número compartido,
-  // validamos con el token global.
   if (process.env.NODE_ENV === "production") {
     const isSharedNumber = toNumber.includes(TWILIO_WHATSAPP_NUMBER.replace("whatsapp:", ""));
-    const authToken = isSharedNumber
-      ? process.env.TWILIO_AUTH_TOKEN!
-      : null; // Own-mode: skip HMAC validation (auth token not available at this point)
-    if (authToken) {
-      const isValid = validateTwilioSignature(request, rawBody, authToken);
-      if (!isValid) {
-        logger.warn("Firma de Twilio inválida — petición rechazada");
-        return twilioEmptyResponse();
-      }
-      logger.info("Firma de Twilio validada correctamente");
+    let authToken: string | null = null;
+
+    if (isSharedNumber) {
+      authToken = process.env.TWILIO_AUTH_TOKEN ?? null;
+    } else {
+      // Own-mode: look up the business by its Twilio number to get the auth token
+      const supabaseEarly = await createServiceClient();
+      const { data: bizForAuth } = await supabaseEarly
+        .from("businesses")
+        .select("own_twilio_auth_token")
+        .eq("own_twilio_whatsapp_number", toNumber)
+        .maybeSingle();
+      authToken = bizForAuth?.own_twilio_auth_token ?? null;
     }
+
+    if (!authToken) {
+      logger.warn("No se pudo obtener auth token para validar firma — petición rechazada");
+      return twilioEmptyResponse();
+    }
+
+    const isValid = validateTwilioSignature(request, rawBody, authToken);
+    if (!isValid) {
+      logger.warn("Firma de Twilio inválida — petición rechazada");
+      return twilioEmptyResponse();
+    }
+    logger.info("Firma de Twilio validada correctamente");
   }
 
   const supabase = await createServiceClient();
