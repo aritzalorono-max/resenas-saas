@@ -9,20 +9,6 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { extractPlaceIdFromUrl, findPlaceIdByName, getPlaceRating } from "@/lib/google-places";
 import { logger } from "@/lib/logger";
 
-// Diagnostic: log Places API response for debugging
-async function debugPlacesApi(name: string): Promise<string> {
-  const key = process.env.GOOGLE_PLACES_API_KEY ?? "";
-  if (!key) return "Sin API key";
-  const params = new URLSearchParams({ input: name, inputtype: "textquery", fields: "place_id", key });
-  try {
-    const res = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?${params}`);
-    const data = await res.json() as { status: string };
-    return data.status;
-  } catch (e) {
-    return String(e);
-  }
-}
-
 export async function fetchGoogleMapsSnapshot(): Promise<{ ok: boolean; error?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -41,11 +27,7 @@ export async function fetchGoogleMapsSnapshot(): Promise<{ ok: boolean; error?: 
   if (!placeId && biz.google_maps_url) placeId = await extractPlaceIdFromUrl(biz.google_maps_url);
   if (!placeId && biz.name)            placeId = await findPlaceIdByName(biz.name);
 
-  if (!placeId) {
-    const apiStatus = await debugPlacesApi(biz.name ?? "");
-    logger.warn(`Place ID no resuelto. API status: ${apiStatus}. URL: ${biz.google_maps_url}`);
-    return { ok: false, error: `No se pudo encontrar el negocio (API: ${apiStatus})` };
-  }
+  if (!placeId) return { ok: false, error: "No se pudo encontrar el negocio en Google Maps" };
 
   // Save Place ID if newly resolved
   if (!biz.google_place_id) {
@@ -55,15 +37,7 @@ export async function fetchGoogleMapsSnapshot(): Promise<{ ok: boolean; error?: 
 
   // Fetch rating
   const { rating, review_count } = await getPlaceRating(placeId);
-  if (rating === null) {
-    // Debug: call directly to get the raw API status
-    const key = process.env.GOOGLE_PLACES_API_KEY ?? "";
-    const params = new URLSearchParams({ place_id: placeId, fields: "rating,user_ratings_total,name", key });
-    const debugRes = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?${params}`);
-    const debugData = await debugRes.json() as { status: string; result?: { name?: string } };
-    logger.warn(`Place details API status: ${debugData.status}, place: ${debugData.result?.name}, placeId: ${placeId}`);
-    return { ok: false, error: `Sin puntuación (API: ${debugData.status}, lugar: ${debugData.result?.name ?? "?"})` };
-  }
+  if (rating === null) return { ok: false, error: "No se obtuvo puntuación de Google Maps" };
 
   // Save snapshot using service client (bypasses RLS for INSERT)
   const service = await createServiceClient();
@@ -73,7 +47,7 @@ export async function fetchGoogleMapsSnapshot(): Promise<{ ok: boolean; error?: 
 
   if (error) {
     logger.error("Error al guardar snapshot manual", error);
-    return { ok: false, error: `Error al guardar: ${error.message} (${error.code})` };
+    return { ok: false, error: "Error al guardar el dato" };
   }
 
   logger.info(`Snapshot manual guardado: "${biz.name}" → ${rating}★ (${review_count})`);
