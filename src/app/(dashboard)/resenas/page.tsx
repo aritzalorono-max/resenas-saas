@@ -46,9 +46,9 @@ export default async function ResenasPage({
   const now             = new Date();
   const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const selectedMonth   = sp.month ?? currentMonthStr;
-  const [ys, ms2]       = selectedMonth.split("-");
-  const year            = parseInt(ys,  10);
-  const month           = parseInt(ms2, 10);
+  const [yearStr, monthStr] = selectedMonth.split("-");
+  const year                = parseInt(yearStr,  10);
+  const month               = parseInt(monthStr, 10);
 
   const monthStart = new Date(Date.UTC(year, month - 1, 1)).toISOString();
   const monthEnd   = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1)).toISOString();

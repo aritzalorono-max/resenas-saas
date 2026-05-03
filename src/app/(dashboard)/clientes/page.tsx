@@ -118,13 +118,14 @@ function validateBulkRow(name: string, phone: string) {
   return { nameError, phoneError };
 }
 
-// Normalize diacritics for header matching
-function norm(s: string) {
+// Remove diacritics and lowercase for locale-insensitive header matching
+// (e.g. "Teléfono" → "telefono", "Nombre" → "nombre")
+function stripDiacritics(s: string): string {
   return s.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").trim();
 }
 
 function findCol(headers: string[], keywords: string[]): number {
-  return headers.findIndex((h) => keywords.includes(norm(h)));
+  return headers.findIndex((h) => keywords.includes(stripDiacritics(h)));
 }
 
 async function parseFileToRows(file: File, dialCode: string): Promise<BulkRow[]> {
@@ -316,7 +317,7 @@ export default function ClientesPage() {
     } catch (err) {
       setBulkParseError("No se pudo leer el archivo. Comprueba que sea un Excel (.xlsx) o CSV (.csv) válido.");
       setBulkRows([]);
-      console.error(err);
+      console.error("Error al leer el archivo de carga masiva:", err);
     }
   }
 

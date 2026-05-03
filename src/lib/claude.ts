@@ -12,11 +12,10 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
-/**
- * Prompt del sistema para el análisis de sentimiento.
- * Instruye a Claude a devolver siempre un JSON estructurado
- * para facilitar el parsing de la respuesta.
- */
+// Positive-bias rule: when a response is ambiguous between "positive" and "neutral"
+// (e.g. "ok", "bien"), we classify it as positive with a lower score. This increases
+// the number of customers who receive the review link, at the cost of slightly inflating
+// positive metrics. The lower score (0.55–0.70) signals low confidence to the dashboard.
 const SENTIMENT_SYSTEM_PROMPT = `Eres un analizador de opiniones de clientes para negocios locales.
 Tu tarea es analizar el texto de la respuesta de un cliente y determinar si es positiva, negativa o neutral.
 
@@ -34,16 +33,6 @@ Criterios de clasificación:
 
 En caso de duda entre "positive" y "neutral", clasifica como "positive" con score bajo.`;
 
-/**
- * Analiza el texto de respuesta de un cliente y devuelve el sentimiento detectado.
- *
- * Usa el modelo claude-sonnet-4-6 con temperatura baja implícita para
- * maximizar la coherencia del JSON de salida.
- *
- * @param customerResponse - Texto libre que el cliente ha enviado por WhatsApp
- * @returns Objeto con sentimiento, puntuación numérica y resumen textual
- * @throws Si la respuesta de Claude no es un JSON válido con la estructura esperada
- */
 const SCREENSHOT_SYSTEM_PROMPT = `Eres un verificador de reseñas de plataformas como Google Maps, Trustpilot, TripAdvisor, Yelp, Booking.com, Facebook y otras.
 Tu tarea es analizar una imagen que debería ser una captura de pantalla de una reseña publicada y determinar si muestra la puntuación máxima posible en esa plataforma.
 
@@ -166,6 +155,12 @@ export async function generateConversationalResponse(
   return response.content[0].type === "text" ? response.content[0].text.trim() : "";
 }
 
+/**
+ * Analiza el texto de respuesta de un cliente y devuelve el sentimiento detectado.
+ * Usa claude-sonnet-4-6; el JSON estructurado fuerza salida determinista.
+ *
+ * @throws Si la respuesta de Claude no es un JSON válido con la estructura esperada
+ */
 export async function analyzeSentiment(
   customerResponse: string
 ): Promise<SentimentResult> {

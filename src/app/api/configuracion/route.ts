@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 import type { ReviewPlatformLink } from "@/types";
 
 function generateShortCode(): string {
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
         .update(payload)
         .eq("user_id", user.id);
       if (error) {
-        console.error("[ReseñasYa] Error al actualizar configuración:", error);
+        logger.error("Error al actualizar configuración", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
       businessId = existing.id;
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
         .select("id")
         .maybeSingle();
       if (error) {
-        console.error("[ReseñasYa] Error al crear negocio:", error);
+        logger.error("Error al crear negocio", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
       businessId = inserted?.id;
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, review_links: allLinks });
   } catch (err) {
-    console.error("[ReseñasYa] Error inesperado en /api/configuracion:", err);
+    logger.error("Error inesperado en /api/configuracion", err);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

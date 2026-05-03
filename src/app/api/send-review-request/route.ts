@@ -19,6 +19,7 @@ import { getBusinessByUserId } from "@/lib/business";
 import { createReviewRequest } from "@/lib/review-requests";
 import { validateCustomerName, validatePhone } from "@/lib/validation";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { applyTemplate } from "@/lib/messages";
 import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
 
@@ -88,9 +89,10 @@ export async function POST(
   const activeLink = business.review_links?.find((l) => l.url === business.google_maps_url);
   const platformName = activeLink?.name ?? "Google Maps";
 
-  let messageText = business.welcome_message
-    .replace("{nombre}", customerName)
-    .replace("{negocio}", business.name);
+  let messageText = applyTemplate(business.welcome_message, {
+    nombre: customerName,
+    negocio: business.name,
+  });
 
   const incentiveTiming = business.incentive_timing ?? "initial";
   if (business.incentive_enabled && business.incentive_description && incentiveTiming === "initial") {

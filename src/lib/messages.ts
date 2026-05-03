@@ -21,7 +21,7 @@ interface TemplateVars {
   plataforma?: string;
 }
 
-function applyTemplate(template: string, vars: TemplateVars): string {
+export function applyTemplate(template: string, vars: TemplateVars): string {
   return template
     .replace(/{nombre}/g, vars.nombre ?? "")
     .replace(/{negocio}/g, vars.negocio ?? "")
