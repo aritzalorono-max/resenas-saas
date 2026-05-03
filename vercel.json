@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/google-maps-snapshot",
+      "schedule": "0 8 * * *"
+    }
+  ]
+}

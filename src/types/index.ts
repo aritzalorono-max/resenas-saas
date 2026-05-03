@@ -62,8 +62,20 @@ export interface Business {
   own_twilio_account_sid: string | null;
   own_twilio_auth_token: string | null;
   own_twilio_whatsapp_number: string | null;
+  /** Google Places ID para seguimiento automático de puntuación */
+  google_place_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Snapshot diario de la puntuación de un negocio en Google Maps */
+export interface GoogleMapsSnapshot {
+  id: string;
+  business_id: string;
+  place_id: string;
+  rating: number | null;
+  review_count: number | null;
+  fetched_at: string;
 }
 
 /** Solicitud de reseña enviada a un cliente */
