@@ -25,20 +25,23 @@
  */
 
 import { createServiceClient } from "@/lib/supabase/server";
-import { analyzeSentiment, analyzeScreenshot } from "@/lib/claude";
+import { analyzeSentiment, analyzeScreenshot, generateConversationalResponse } from "@/lib/claude";
 import { TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants, getTwilioSender } from "@/lib/twilio";
 import { assignDiscountCode } from "@/lib/discount-codes";
 import {
   findPendingRequestByPhone,
   findAwaitingScreenshotByPhone,
+  findActiveRequestByPhone,
   updateReviewRequestWithSentiment,
   updateToAwaitingScreenshot,
   updateToRewarded,
+  incrementMessageCount,
 } from "@/lib/review-requests";
 import {
   buildFollowUpMessage,
   buildScreenshotVerifiedMessage,
   buildScreenshotRetryMessage,
+  buildConversationClosingMessage,
 } from "@/lib/messages";
 import { logger } from "@/lib/logger";
 import twilio from "twilio";
@@ -200,7 +203,61 @@ export async function POST(request: Request): Promise<Response> {
   const reviewRequest = await findPendingRequestByPhone(supabase, phoneVariants);
 
   if (!reviewRequest) {
-    logger.warn(`No se encontró solicitud pendiente para ${fromNumber}`);
+    // ── 3c. Flujo multi-turno: cliente responde después del primer intercambio ─
+    logger.info("Sin solicitud pendiente — buscando solicitud activa para conversación multi-turno");
+    const activeRequest = await findActiveRequestByPhone(supabase, phoneVariants);
+
+    if (!activeRequest) {
+      logger.warn(`No se encontró solicitud activa para ${fromNumber}`);
+      return twilioEmptyResponse();
+    }
+
+    logger.info(`Solicitud activa encontrada: ${activeRequest.id} (message_count: ${activeRequest.message_count})`);
+    const { businesses: activeBusiness } = activeRequest;
+
+    const newCount = await incrementMessageCount(supabase, activeRequest.id, activeRequest.message_count);
+
+    if (newCount > 7) {
+      logger.info(`Límite de mensajes superado para ${activeRequest.id} — sin respuesta`);
+      return twilioEmptyResponse();
+    }
+
+    const { client: convClient, fromNumber: convFrom } = getTwilioSender(activeBusiness);
+
+    let convResponse: string;
+
+    if (newCount === 7) {
+      convResponse = buildConversationClosingMessage(
+        activeRequest.customer_name,
+        activeBusiness.name,
+        activeBusiness.tone ?? "tuteo"
+      );
+      logger.info(`Enviando mensaje de cierre (mensaje 7/7) a ${activeRequest.customer_phone}`);
+    } else {
+      try {
+        convResponse = await generateConversationalResponse(
+          messageBody,
+          activeBusiness.name,
+          activeBusiness.tone ?? "tuteo"
+        );
+        logger.info(`Respuesta conversacional generada (mensaje ${newCount}/7)`);
+      } catch (aiError) {
+        logger.error("Error al generar respuesta conversacional con Claude", aiError);
+        return twilioEmptyResponse();
+      }
+    }
+
+    try {
+      await convClient.messages.create({
+        from: convFrom,
+        to: formatWhatsAppNumber(activeRequest.customer_phone),
+        body: convResponse,
+      });
+      logger.info(`Respuesta conversacional enviada a ${activeRequest.customer_phone}`);
+    } catch (twilioError) {
+      logger.error("Error al enviar respuesta conversacional", twilioError);
+    }
+
     return twilioEmptyResponse();
   }
 

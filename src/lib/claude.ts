@@ -123,6 +123,49 @@ export async function analyzeScreenshot(mediaUrl: string): Promise<ScreenshotRes
   return JSON.parse(cleaned) as ScreenshotResult;
 }
 
+const CONVERSATIONAL_SYSTEM_PROMPT = `Eres el Asistente de ReseñasYa, una IA diseñada para recoger feedback de clientes de negocios locales.
+
+Reglas que debes seguir siempre:
+1. Si alguien te pregunta qué eres, identifícate como "Asistente de ReseñasYa, una IA para recoger feedback de clientes".
+2. Nunca uses palabras malsonantes ni lenguaje inapropiado.
+3. Mantente centrado en recoger feedback sobre la experiencia del cliente con {negocio}.
+4. Sé amable, breve y directo. Máximo 2-3 frases por respuesta.
+5. Si el cliente hace preguntas sobre el negocio que no puedes responder (horarios, precios, reservas, etc.), dile que lo mejor es contactar directamente con {negocio}.
+6. No inventes información sobre el negocio.
+
+Responde solo con el texto del mensaje de WhatsApp, sin JSON ni formatos especiales.`;
+
+/**
+ * Genera una respuesta conversacional para mensajes posteriores al primer intercambio.
+ * Aplica las reglas del asistente: identificación, sin lenguaje inapropiado,
+ * enfoque en feedback y redirección a negocio para preguntas específicas.
+ */
+export async function generateConversationalResponse(
+  customerMessage: string,
+  businessName: string,
+  tone: string
+): Promise<string> {
+  const toneInstruction =
+    tone === "usted"
+      ? "Usa siempre el tratamiento de 'usted' (formal)."
+      : tone === "juvenil"
+      ? "Usa un tono muy informal y desenfadado (tuteo juvenil)."
+      : "Usa el tuteo (tono informal amigable).";
+
+  const systemPrompt =
+    CONVERSATIONAL_SYSTEM_PROMPT.replace(/{negocio}/g, businessName) +
+    `\n\nTono: ${toneInstruction}`;
+
+  const response = await anthropic.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 200,
+    system: systemPrompt,
+    messages: [{ role: "user", content: customerMessage }],
+  });
+
+  return response.content[0].type === "text" ? response.content[0].text.trim() : "";
+}
+
 export async function analyzeSentiment(
   customerResponse: string
 ): Promise<SentimentResult> {

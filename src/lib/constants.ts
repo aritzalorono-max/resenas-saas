@@ -33,6 +33,8 @@ export interface ToneTemplates {
   screenshot_verified: string;
   /** Se envía cuando la captura no muestra claramente 5 estrellas */
   screenshot_retry: string;
+  /** Mensaje de cierre cuando se alcanza el límite de 7 mensajes en conversación multi-turno */
+  conversation_closing: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -83,6 +85,8 @@ Como prometimos, aquí tienes tu regalo: *{incentivo}* 🎁
   screenshot_retry: `¡Hola, {nombre}! 😊 Hemos recibido tu foto, pero no hemos podido ver claramente las estrellas.
 
 ¿Podrías enviarnos una captura un poco más nítida donde se vea la reseña completa? En cuanto lo confirmemos, te enviamos tu regalo 🎁`,
+
+  conversation_closing: `¡Muchas gracias por tu tiempo, {nombre}! 😊 Ha sido un placer hablar contigo. Si necesitas algo más, no dudes en contactar directamente con {negocio}. ¡Hasta pronto! 💚`,
 };
 
 // ---------------------------------------------------------------------------
@@ -133,6 +137,8 @@ Como prometimos, aquí tiene su regalo: *{incentivo}* 🎁
   screenshot_retry: `¡Hola, {nombre}! 😊 Hemos recibido su foto, pero no hemos podido ver claramente las estrellas.
 
 ¿Podría enviarnos una captura un poco más nítida donde se vea la reseña completa? En cuanto lo confirmemos, le enviamos su regalo 🎁`,
+
+  conversation_closing: `¡Muchas gracias por su tiempo, {nombre}! 😊 Ha sido un placer hablar con usted. Si necesita algo más, no dude en contactar directamente con {negocio}. ¡Hasta pronto! 💚`,
 };
 
 // ---------------------------------------------------------------------------
@@ -183,6 +189,8 @@ Como te dijimos, aquí va tu regalo: *{incentivo}* 🎁
   screenshot_retry: `¡Ey, {nombre}! 😊 Hemos visto tu foto pero no se ven del todo bien las estrellitas.
 
 ¿Puedes mandarnos otra captura más clarita con la reseña? En cuanto lo veamos te enviamos tu regalo 🎁`,
+
+  conversation_closing: `¡Muchas gracias por el ratillo, {nombre}! 😊 Ha sido genial hablar contigo. Si necesitas algo, no te olvides de contactar con {negocio}. ¡Cuídate! 💚`,
 };
 
 // ---------------------------------------------------------------------------
