@@ -28,11 +28,11 @@ Responde SIEMPRE con un JSON válido con esta estructura exacta:
 }
 
 Criterios de clasificación:
-- "positive": el cliente está satisfecho, recomienda el servicio, usa palabras claramente positivas
-- "negative": el cliente está insatisfecho, tiene quejas, usa palabras negativas
-- "neutral": la opinión es ambigua, poco clara, o usa expresiones como "bien", "ok", "normal"
+- "positive": el cliente expresa satisfacción, aunque sea leve. Incluye respuestas como "bien", "todo bien", "ok", "correcto", "me gustó", "muy bien", "genial", "perfecto", "contento/a", "satisfecho/a", o cualquier expresión que no sea negativa ni ambivalente. El score refleja el grado: 0.55–0.70 para respuestas positivas simples ("bien", "ok"), 0.75–0.90 para claramente positivas ("muy bien", "genial"), 0.90–1.0 para muy entusiastas.
+- "negative": el cliente expresa insatisfacción, tiene quejas concretas o usa palabras negativas ("mal", "fatal", "decepcionante", "no volvería", etc.).
+- "neutral": la opinión es genuinamente ambivalente o mixta (mezcla aspectos positivos y negativos), o el mensaje no expresa ninguna opinión sobre la experiencia (preguntas, mensajes fuera de contexto, respuestas sin sentido).
 
-Sé estricto: solo clasifica como "positive" cuando haya satisfacción evidente.`;
+En caso de duda entre "positive" y "neutral", clasifica como "positive" con score bajo.`;
 
 /**
  * Analiza el texto de respuesta de un cliente y devuelve el sentimiento detectado.
