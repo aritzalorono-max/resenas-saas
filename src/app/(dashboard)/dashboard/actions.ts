@@ -9,6 +9,20 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { extractPlaceIdFromUrl, findPlaceIdByName, getPlaceRating } from "@/lib/google-places";
 import { logger } from "@/lib/logger";
 
+// Diagnostic: log Places API response for debugging
+async function debugPlacesApi(name: string): Promise<string> {
+  const key = process.env.GOOGLE_PLACES_API_KEY ?? "";
+  if (!key) return "Sin API key";
+  const params = new URLSearchParams({ input: name, inputtype: "textquery", fields: "place_id", key });
+  try {
+    const res = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?${params}`);
+    const data = await res.json() as { status: string };
+    return data.status;
+  } catch (e) {
+    return String(e);
+  }
+}
+
 export async function fetchGoogleMapsSnapshot(): Promise<{ ok: boolean; error?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -27,7 +41,11 @@ export async function fetchGoogleMapsSnapshot(): Promise<{ ok: boolean; error?: 
   if (!placeId && biz.google_maps_url) placeId = await extractPlaceIdFromUrl(biz.google_maps_url);
   if (!placeId && biz.name)            placeId = await findPlaceIdByName(biz.name);
 
-  if (!placeId) return { ok: false, error: "No se pudo encontrar el negocio en Google Maps" };
+  if (!placeId) {
+    const apiStatus = await debugPlacesApi(biz.name ?? "");
+    logger.warn(`Place ID no resuelto. API status: ${apiStatus}. URL: ${biz.google_maps_url}`);
+    return { ok: false, error: `No se pudo encontrar el negocio (API: ${apiStatus})` };
+  }
 
   // Save Place ID if newly resolved
   if (!biz.google_place_id) {
