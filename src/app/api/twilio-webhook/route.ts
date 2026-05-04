@@ -111,20 +111,32 @@ export async function POST(request: Request): Promise<Response> {
   // ── 1. Validar firma (producción) ─────────────────────────────────────────
   if (process.env.NODE_ENV === "production") {
     const isSharedNumber = toNumber.includes(TWILIO_WHATSAPP_NUMBER.replace("whatsapp:", ""));
+    let authToken: string | null = null;
 
-    // Own-mode businesses use their own Twilio account and auth token.
-    // We only validate the HMAC for the shared number where we know the token.
-    // Own-mode requests are still protected by Twilio's account-level access controls.
-    const authToken = isSharedNumber ? (process.env.TWILIO_AUTH_TOKEN ?? null) : null;
-
-    if (authToken) {
-      const isValid = validateTwilioSignature(request, rawBody, authToken);
-      if (!isValid) {
-        logger.warn("Firma de Twilio inválida — petición rechazada");
-        return twilioEmptyResponse();
-      }
-      logger.info("Firma de Twilio validada correctamente");
+    if (isSharedNumber) {
+      authToken = process.env.TWILIO_AUTH_TOKEN ?? null;
+    } else {
+      // Own-mode: look up the business by its Twilio number to get the auth token
+      const supabaseEarly = await createServiceClient();
+      const { data: bizForAuth } = await supabaseEarly
+        .from("businesses")
+        .select("own_twilio_auth_token")
+        .eq("own_twilio_whatsapp_number", toNumber)
+        .maybeSingle();
+      authToken = bizForAuth?.own_twilio_auth_token ?? null;
     }
+
+    if (!authToken) {
+      logger.warn("No se pudo obtener auth token para validar firma — petición rechazada");
+      return twilioEmptyResponse();
+    }
+
+    const isValid = validateTwilioSignature(request, rawBody, authToken);
+    if (!isValid) {
+      logger.warn("Firma de Twilio inválida — petición rechazada");
+      return twilioEmptyResponse();
+    }
+    logger.info("Firma de Twilio validada correctamente");
   }
 
   const supabase = await createServiceClient();
