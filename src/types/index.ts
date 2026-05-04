@@ -148,3 +148,66 @@ export interface ScreenshotResult {
   confidence: number;
   reason: string;
 }
+
+// ---------------------------------------------------------------------------
+// Informes de análisis de reseñas
+// ---------------------------------------------------------------------------
+
+export interface ReportSentimentSummary {
+  total_analyzed: number;
+  positive_count: number;
+  negative_count: number;
+  neutral_count:  number;
+  avg_score:      number;
+}
+
+export interface ReportTheme {
+  theme:    string;
+  count:    number;
+  examples: string[];
+}
+
+export interface ReportImprovementIdea {
+  title:            string;
+  description:      string;
+  based_on_count:   number;
+  example_comments: string[];
+}
+
+export interface ReportPlatformComparison {
+  whatsapp_positive_rate: number;
+  platform_rating:        number | null;
+  platform_review_count:  number | null;
+  gap_description:        string;
+}
+
+export interface ReportStarsCalculator {
+  current_rating:             number | null;
+  current_review_count:       number | null;
+  five_stars_needed_for_next: number | null;
+  next_target_rating:         number | null;
+}
+
+export interface ReportFrequencyRecommendation {
+  current_monthly_avg_requests: number;
+  conversion_rate:              number;
+  recommended_monthly_target:   number;
+  recommended_weekly_target:    number;
+  reasoning:                    string;
+}
+
+export interface BusinessReport {
+  id:                       string;
+  business_id:              string;
+  generated_at:             string;
+  period_start:             string;
+  period_end:               string;
+  total_analyzed:           number;
+  sentiment_summary:        ReportSentimentSummary;
+  positive_themes:          ReportTheme[];
+  negative_themes:          ReportTheme[];
+  improvement_ideas:        ReportImprovementIdea[];
+  platform_comparison:      ReportPlatformComparison;
+  stars_calculator:         ReportStarsCalculator;
+  frequency_recommendation: ReportFrequencyRecommendation;
+}
