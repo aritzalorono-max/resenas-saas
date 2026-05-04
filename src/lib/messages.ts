@@ -21,7 +21,7 @@ interface TemplateVars {
   plataforma?: string;
 }
 
-function applyTemplate(template: string, vars: TemplateVars): string {
+export function applyTemplate(template: string, vars: TemplateVars): string {
   return template
     .replace(/{nombre}/g, vars.nombre ?? "")
     .replace(/{negocio}/g, vars.negocio ?? "")
@@ -123,7 +123,7 @@ export function buildFollowUpMessage(params: {
   } = params;
 
   if (sentiment === "positive" && googleMapsUrl && incentiveEnabled && incentiveDescription) {
-    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone, platformName, discountCode);
+    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone, platformName);
   }
 
   if (sentiment === "positive" && googleMapsUrl) {
@@ -152,16 +152,12 @@ export function buildIncentiveFollowUp(
   incentiveDescription: string,
   tone: BusinessTone = "tuteo",
   platformName = "Google Maps",
-  discountCode?: string | null
 ): string {
-  const incentivo = discountCode
-    ? `${incentiveDescription}\n\n📋 Tu código: *${discountCode}*`
-    : incentiveDescription;
   return applyTemplate(MESSAGE_TEMPLATES[tone].positive_incentive, {
     nombre: customerName,
     negocio: businessName,
     url: reviewUrl,
-    incentivo,
+    incentivo: incentiveDescription,
     plataforma: platformName,
   });
 }
@@ -197,5 +193,19 @@ export function buildScreenshotRetryMessage(
 ): string {
   return applyTemplate(MESSAGE_TEMPLATES[tone].screenshot_retry, {
     nombre: customerName,
+  });
+}
+
+/**
+ * Mensaje de cierre cuando se alcanza el límite de 7 mensajes en una conversación multi-turno.
+ */
+export function buildConversationClosingMessage(
+  customerName: string,
+  businessName: string,
+  tone: BusinessTone = "tuteo"
+): string {
+  return applyTemplate(MESSAGE_TEMPLATES[tone].conversation_closing, {
+    nombre: customerName,
+    negocio: businessName,
   });
 }

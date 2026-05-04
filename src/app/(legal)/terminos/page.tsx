@@ -87,7 +87,7 @@ export default function TerminosPage() {
         </ul>
       </Section>
 
-      <Section title="5. Consentimiento de los clientes finales">
+      <Section title="5. Consentimiento de los clientes finales y cumplimiento con plataformas de reseñas">
         <p>
           El usuario de ReseñasYa (el negocio) es exclusivamente responsable de obtener el consentimiento previo,
           informado y libre de sus clientes antes de enviarles mensajes de WhatsApp a través de la Plataforma.
@@ -103,6 +103,25 @@ export default function TerminosPage() {
           prestado su consentimiento. El incumplimiento de esta obligación puede suponer la suspensión inmediata de
           la cuenta del usuario.
         </p>
+        <p>
+          Adicionalmente, la Plataforma ofrece funcionalidades como la <strong>solicitud selectiva de reseñas</strong>{" "}
+          (dirigir el enlace de la plataforma de reseñas únicamente a clientes con experiencias positivas) y el{" "}
+          <strong>sistema de incentivos</strong> (ofrecer recompensas a cambio de una reseña). El usuario reconoce y
+          acepta expresamente que:
+        </p>
+        <ul>
+          <li>Estas funcionalidades pueden estar sujetas a las políticas de contenido y uso aceptable de las plataformas
+              de reseñas donde el negocio esté presente (incluyendo, sin carácter limitativo, Google Maps / Google Business
+              Profile, Trustpilot, App Store, Google Play y Yelp).</li>
+          <li>Es <strong>su exclusiva responsabilidad</strong> conocer, revisar y cumplir con las políticas vigentes de
+              cada plataforma de reseñas antes de activar y hacer uso de dichas funcionalidades.</li>
+          <li><strong>{COMPANY} no garantiza ni declara</strong> que el uso de estas funcionalidades sea conforme con
+              las políticas de ninguna plataforma de reseñas de terceros, y <strong>no asume ninguna responsabilidad</strong>{" "}
+              por sanciones, eliminación de reseñas, penalizaciones en el posicionamiento, suspensión de perfiles de
+              negocio u otras consecuencias derivadas del uso de estas funcionalidades por parte del usuario.</li>
+          <li>El usuario mantendrá indemne a {COMPANY} frente a cualquier reclamación, sanción o daño derivado del
+              uso que el usuario haga de la solicitud selectiva de reseñas o del sistema de incentivos.</li>
+        </ul>
       </Section>
 
       <Section title="6. Servicios de terceros">
@@ -167,7 +186,18 @@ export default function TerminosPage() {
           <li>Las reseñas publicadas por los clientes en Google Maps u otras plataformas.</li>
           <li>Las acciones u omisiones de los clientes finales del usuario.</li>
           <li>El incumplimiento por parte del usuario de sus obligaciones legales en materia de protección de datos.</li>
+          <li>Sanciones, penalizaciones, eliminación de reseñas, suspensión de perfiles de negocio o cualquier otra
+              medida adoptada por plataformas de reseñas de terceros (Google Maps, Trustpilot, App Store, Google Play,
+              Yelp u otras) como consecuencia del uso por parte del usuario de la funcionalidad de solicitud selectiva
+              de reseñas, del sistema de incentivos o de cualquier otra funcionalidad de la Plataforma.</li>
+          <li>El incumplimiento por parte del usuario de las políticas de contenido o uso aceptable de cualquier
+              plataforma de reseñas de terceros.</li>
         </ul>
+        <p>
+          La responsabilidad máxima de {COMPANY} frente al usuario, por cualquier concepto y en conjunto, no superará
+          el importe total abonado por el usuario a {COMPANY} durante los tres (3) meses anteriores al evento que
+          origine la reclamación.
+        </p>
       </Section>
 
       <Section title="10. Precios, facturación y cancelación">
@@ -200,7 +230,32 @@ export default function TerminosPage() {
         </p>
       </Section>
 
-      <Section title="12. Modificación de las Condiciones">
+      <Section title="12. Tratamiento de datos por cuenta del usuario (Art. 28 RGPD)">
+        <p>
+          En el marco de la prestación del servicio, {COMPANY} actúa como <strong>encargado del tratamiento</strong>{" "}
+          por cuenta del usuario (negocio), que actúa como <strong>responsable del tratamiento</strong>, respecto a
+          los datos personales de los clientes finales (nombre y número de teléfono) introducidos en la Plataforma
+          para el envío de solicitudes de reseña.
+        </p>
+        <p>
+          En virtud de lo dispuesto en el artículo 28 del Reglamento (UE) 2016/679 (RGPD), {COMPANY} se compromete a:
+        </p>
+        <ul>
+          <li>Tratar los datos personales de los clientes finales únicamente siguiendo las instrucciones documentadas del responsable del tratamiento (el usuario).</li>
+          <li>Garantizar que las personas autorizadas para tratar los datos personales se hayan comprometido a respetar la confidencialidad.</li>
+          <li>Aplicar todas las medidas de seguridad técnicas y organizativas apropiadas conforme al artículo 32 RGPD.</li>
+          <li>No recurrir a otro encargado del tratamiento sin autorización previa del responsable, salvo los subencargados necesarios para la prestación del servicio (Twilio, Anthropic, Supabase, Vercel), cuya utilización el usuario acepta mediante el uso de la Plataforma.</li>
+          <li>Asistir al responsable del tratamiento en la atención de solicitudes de ejercicio de derechos de los interesados.</li>
+          <li>Suprimir o devolver todos los datos personales al responsable del tratamiento una vez finalizada la prestación del servicio, salvo que el derecho de la Unión o de los Estados miembros exija la conservación de los datos personales.</li>
+          <li>Poner a disposición del responsable del tratamiento toda la información necesaria para demostrar el cumplimiento de las obligaciones establecidas en el artículo 28 RGPD.</li>
+        </ul>
+        <p>
+          El usuario, como responsable del tratamiento, garantiza que cuenta con base jurídica suficiente para tratar
+          los datos de sus clientes y para encargar dicho tratamiento a {COMPANY}.
+        </p>
+      </Section>
+
+      <Section title="13. Modificación de las Condiciones">
         <p>
           {COMPANY} se reserva el derecho de modificar estas Condiciones en cualquier momento. Las modificaciones
           serán comunicadas al usuario mediante correo electrónico o aviso en la Plataforma con un mínimo de 15 días
@@ -209,7 +264,7 @@ export default function TerminosPage() {
         </p>
       </Section>
 
-      <Section title="13. Legislación aplicable y jurisdicción">
+      <Section title="14. Legislación aplicable y jurisdicción">
         <p>
           Estas Condiciones se rigen por la legislación española. Para la resolución de cualquier controversia
           derivada de la interpretación o el cumplimiento de estas Condiciones, las partes se someten, con renuncia
@@ -224,7 +279,7 @@ export default function TerminosPage() {
         </p>
       </Section>
 
-      <Section title="14. Contacto">
+      <Section title="15. Contacto">
         <p>
           Para cualquier consulta relacionada con estas Condiciones, puedes contactarnos en:{" "}
           <a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> o a través de{" "}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 import type { ReviewPlatformLink } from "@/types";
 
 function generateShortCode(): string {
@@ -9,7 +10,7 @@ function generateShortCode(): string {
 }
 
 async function ensureShortCodes(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: Awaited<ReturnType<typeof createServiceClient>>,
   links: ReviewPlatformLink[],
   businessId: string
 ): Promise<ReviewPlatformLink[]> {
@@ -33,9 +34,9 @@ async function ensureShortCodes(
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const authClient = await createClient();
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
@@ -49,53 +50,83 @@ export async function POST(request: NextRequest) {
       review_links,
       welcome_message,
       tone,
-      incentive_enabled,
-      incentive_description,
+      whatsapp_mode,
+      own_twilio_account_sid,
+      own_twilio_auth_token,
+      own_twilio_whatsapp_number,
     } = body;
 
-    // Obtener el negocio del usuario
-    const { data: business, error: bizError } = await supabase
+    const rawLinks: ReviewPlatformLink[] = Array.isArray(review_links) ? review_links : [];
+
+    const supabase = await createServiceClient();
+
+    // Incentive fields are managed by the /incentivos page — don't touch them here
+    const payload = {
+      user_id: user.id,
+      name: String(name ?? "").trim() || "Mi negocio",
+      description: String(description ?? "").trim() || null,
+      website_url: String(website_url ?? "").trim() || null,
+      google_maps_url: google_maps_url || null,
+      review_links: rawLinks,
+      welcome_message: String(welcome_message ?? "").trim() || DEFAULT_WELCOME_MESSAGE,
+      tone: tone ?? "tuteo",
+      whatsapp_mode: whatsapp_mode ?? "shared",
+      own_twilio_account_sid: whatsapp_mode === "own" ? (String(own_twilio_account_sid ?? "").trim() || null) : null,
+      own_twilio_auth_token:  whatsapp_mode === "own" ? (String(own_twilio_auth_token ?? "").trim() || null) : null,
+      own_twilio_whatsapp_number: whatsapp_mode === "own" ? (String(own_twilio_whatsapp_number ?? "").trim() || null) : null,
+    };
+
+    // Check whether the row already exists
+    const { data: existing } = await supabase
       .from("businesses")
       .select("id")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
-    if (bizError || !business) {
-      return NextResponse.json({ error: "Negocio no encontrado" }, { status: 404 });
+    let businessId: string | undefined;
+
+    if (existing?.id) {
+      // UPDATE existing row
+      const { error } = await supabase
+        .from("businesses")
+        .update(payload)
+        .eq("user_id", user.id);
+      if (error) {
+        logger.error("Error al actualizar configuración", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      businessId = existing.id;
+    } else {
+      // INSERT new row
+      const { data: inserted, error } = await supabase
+        .from("businesses")
+        .insert(payload)
+        .select("id")
+        .maybeSingle();
+      if (error) {
+        logger.error("Error al crear negocio", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      businessId = inserted?.id;
     }
 
-    // Generar códigos cortos (fallo silencioso si la tabla no existe)
-    const rawLinks: ReviewPlatformLink[] = Array.isArray(review_links) ? review_links : [];
+    // Generate short codes silently
     let allLinks = rawLinks;
     try {
-      allLinks = await ensureShortCodes(supabase, rawLinks, business.id);
+      if (businessId) {
+        allLinks = await ensureShortCodes(supabase, rawLinks, businessId);
+        await supabase
+          .from("businesses")
+          .update({ review_links: allLinks })
+          .eq("id", businessId);
+      }
     } catch {
-      // short_links table might not exist yet — proceed without short codes
-    }
-
-    const { error: updateError } = await supabase
-      .from("businesses")
-      .update({
-        name: String(name ?? "").trim(),
-        description: String(description ?? "").trim() || null,
-        website_url: String(website_url ?? "").trim() || null,
-        google_maps_url: google_maps_url || null,
-        review_links: allLinks,
-        welcome_message: String(welcome_message ?? "").trim() || DEFAULT_WELCOME_MESSAGE,
-        tone: tone ?? "tuteo",
-        incentive_enabled: Boolean(incentive_enabled),
-        incentive_description: String(incentive_description ?? "").trim() || null,
-      })
-      .eq("id", business.id);
-
-    if (updateError) {
-      console.error("[ReseñasYa] Error al guardar configuración:", updateError);
-      return NextResponse.json({ error: updateError.message }, { status: 500 });
+      // short_links table might not exist yet
     }
 
     return NextResponse.json({ success: true, review_links: allLinks });
   } catch (err) {
-    console.error("[ReseñasYa] Error inesperado en /api/configuracion:", err);
+    logger.error("Error inesperado en /api/configuracion", err);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

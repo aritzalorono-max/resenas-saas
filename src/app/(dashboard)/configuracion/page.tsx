@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
-import type { Business, BusinessTone, ReviewPlatformLink } from "@/types";
+import type { Business, BusinessTone, ReviewPlatformLink, WhatsAppMode } from "@/types";
 
 const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; example: string }[] = [
   {
@@ -54,10 +54,13 @@ export default function ConfiguracionPage() {
     // Mensaje y tono
     welcome_message: "",
     tone: "tuteo" as BusinessTone,
-    // Incentivo
-    incentive_enabled: false,
-    incentive_description: "",
   });
+  const [whatsappMode, setWhatsappMode]         = useState<WhatsAppMode>("shared");
+  const [ownAccountSid, setOwnAccountSid]       = useState("");
+  const [ownAuthToken, setOwnAuthToken]         = useState("");
+  const [ownWhatsappNumber, setOwnWhatsappNumber] = useState("");
+  const [showOwnToken, setShowOwnToken]         = useState(false);
+
   const [loading, setLoading]       = useState(true);
   const [saving, setSaving]         = useState(false);
   const [success, setSuccess]       = useState(false);
@@ -82,6 +85,10 @@ export default function ConfiguracionPage() {
 
       if (data) {
         setBusiness(data);
+        setWhatsappMode((data.whatsapp_mode as WhatsAppMode) ?? "shared");
+        setOwnAccountSid(data.own_twilio_account_sid ?? "");
+        setOwnAuthToken(data.own_twilio_auth_token ?? "");
+        setOwnWhatsappNumber(data.own_twilio_whatsapp_number ?? "");
         const links: ReviewPlatformLink[] = data.review_links ?? [];
         const active = links.find((l) => l.url === data.google_maps_url);
         const others = links.filter((l) => l.url !== data.google_maps_url);
@@ -95,8 +102,6 @@ export default function ConfiguracionPage() {
           otherPlatforms: others,
           welcome_message: data.welcome_message ?? DEFAULT_WELCOME_MESSAGE,
           tone: data.tone ?? "tuteo",
-          incentive_enabled: data.incentive_enabled ?? false,
-          incentive_description: data.incentive_description ?? "",
         });
       }
       setLoading(false);
@@ -189,8 +194,10 @@ export default function ConfiguracionPage() {
           review_links,
           welcome_message: form.welcome_message,
           tone: form.tone,
-          incentive_enabled: form.incentive_enabled,
-          incentive_description: form.incentive_description,
+          whatsapp_mode: whatsappMode,
+          own_twilio_account_sid: ownAccountSid,
+          own_twilio_auth_token: ownAuthToken,
+          own_twilio_whatsapp_number: ownWhatsappNumber,
         }),
       });
 
@@ -514,60 +521,137 @@ export default function ConfiguracionPage() {
           )}
         </div>
 
-        {/* ── Incentivo 5★ ── */}
+        {/* ── Número de WhatsApp ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div>
-            <h2 className="font-semibold text-gray-900 text-lg">Incentivo por reseña 5 estrellas</h2>
-            <p className="text-sm text-gray-400 mt-0.5">
-              Ofrece un regalo o descuento a los clientes que dejen la máxima puntuación
-            </p>
+            <h2 className="font-semibold text-gray-900 text-lg">Número de WhatsApp para envíos</h2>
+            <p className="text-sm text-gray-400 mt-0.5">Elige desde qué número saldrán los mensajes a tus clientes</p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setForm((p) => ({ ...p, incentive_enabled: !p.incentive_enabled }))}
-            className={`flex items-center gap-3 w-full text-left rounded-xl border-2 p-4 transition ${
-              form.incentive_enabled ? "border-brand-500 bg-brand-50" : "border-gray-200 hover:border-gray-300"
-            }`}
-          >
-            <span className={`relative shrink-0 w-10 h-6 rounded-full transition-colors ${form.incentive_enabled ? "bg-brand-500" : "bg-gray-300"}`}>
-              <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${form.incentive_enabled ? "translate-x-5" : "translate-x-1"}`} />
-            </span>
-            <div>
-              <p className={`font-semibold text-sm ${form.incentive_enabled ? "text-brand-700" : "text-gray-700"}`}>
-                {form.incentive_enabled ? "Incentivo activado" : "Incentivo desactivado"}
-              </p>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {form.incentive_enabled
-                  ? "Los clientes satisfechos recibirán la oferta automáticamente"
-                  : "Actívalo para fomentar reseñas de máxima puntuación"}
-              </p>
-            </div>
-          </button>
+          <div className="space-y-3">
 
-          {form.incentive_enabled && (
-            <div>
-              <label htmlFor="incentive_description" className="block text-sm font-medium text-gray-700 mb-1.5">
-                ¿Qué ofreces a cambio? *
-              </label>
-              <input
-                id="incentive_description" name="incentive_description" type="text"
-                value={form.incentive_description} onChange={handleChange}
-                maxLength={200} required={form.incentive_enabled}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-                placeholder="Ej: 25% de descuento en tu próxima visita con el código GRACIAS25"
-              />
-              <p className="text-xs text-gray-400 mt-1.5">
-                Este texto aparecerá en el mensaje que recibe el cliente.
-              </p>
-            </div>
-          )}
+            {/* Opción 1: Compartido */}
+            <button
+              type="button"
+              onClick={() => setWhatsappMode("shared")}
+              className={`w-full text-left rounded-xl border-2 p-4 transition ${whatsappMode === "shared" ? "border-brand-500 bg-brand-50" : "border-gray-200 hover:border-gray-300"}`}
+            >
+              <div className="flex items-start gap-3">
+                <span className={`mt-0.5 w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${whatsappMode === "shared" ? "border-brand-500" : "border-gray-300"}`}>
+                  {whatsappMode === "shared" && <span className="w-2 h-2 rounded-full bg-brand-500" />}
+                </span>
+                <div>
+                  <p className="font-semibold text-sm text-gray-900">Número compartido de ReseñasYa</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Los mensajes salen del número de la plataforma. Sin configuración, funciona desde el primer momento.</p>
+                  <p className="text-xs font-mono text-gray-400 mt-1">+1 415 523 8886 (sandbox Twilio)</p>
+                </div>
+              </div>
+            </button>
 
-          {!form.google_maps_url && form.incentive_enabled && (
-            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-              Necesitas añadir el enlace de una plataforma de reseñas para que el incentivo funcione.
-            </p>
-          )}
+            {/* Opción 2: Propio */}
+            <div className={`rounded-xl border-2 transition ${whatsappMode === "own" ? "border-brand-500 bg-brand-50" : "border-gray-200"}`}>
+              <button
+                type="button"
+                onClick={() => setWhatsappMode("own")}
+                className="w-full text-left p-4"
+              >
+                <div className="flex items-start gap-3">
+                  <span className={`mt-0.5 w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${whatsappMode === "own" ? "border-brand-500" : "border-gray-300"}`}>
+                    {whatsappMode === "own" && <span className="w-2 h-2 rounded-full bg-brand-500" />}
+                  </span>
+                  <div>
+                    <p className="font-semibold text-sm text-gray-900">Tu propio número de WhatsApp Business</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Los mensajes salen desde tu número de empresa. Los clientes ven tu marca, no ReseñasYa.</p>
+                  </div>
+                </div>
+              </button>
+
+              {whatsappMode === "own" && (
+                <div className="px-4 pb-4 space-y-4">
+                  {/* Credenciales */}
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Account SID de Twilio</label>
+                      <input
+                        type="text"
+                        value={ownAccountSid}
+                        onChange={(e) => setOwnAccountSid(e.target.value)}
+                        placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Auth Token de Twilio</label>
+                      <div className="relative">
+                        <input
+                          type={showOwnToken ? "text" : "password"}
+                          value={ownAuthToken}
+                          onChange={(e) => setOwnAuthToken(e.target.value)}
+                          placeholder="••••••••••••••••••••••••••••••••"
+                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                        />
+                        <button type="button" onClick={() => setShowOwnToken((v) => !v)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
+                          {showOwnToken ? "Ocultar" : "Ver"}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Tu número de WhatsApp</label>
+                      <input
+                        type="text"
+                        value={ownWhatsappNumber}
+                        onChange={(e) => setOwnWhatsappNumber(e.target.value)}
+                        placeholder="+34612345678"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Guía paso a paso */}
+                  <details className="bg-amber-50 border border-amber-100 rounded-lg">
+                    <summary className="px-4 py-3 text-sm font-semibold text-amber-800 cursor-pointer select-none">
+                      📋 Cómo conectar tu número — guía paso a paso
+                    </summary>
+                    <ol className="px-4 pb-4 mt-1 space-y-3 text-xs text-amber-900 list-decimal list-inside leading-relaxed">
+                      <li><strong>Crea una cuenta en Twilio</strong> — <span className="font-mono">twilio.com</span> (es gratuito para empezar).</li>
+                      <li><strong>Activa WhatsApp Business</strong> — en Twilio Console ve a <em>Messaging → Senders → WhatsApp Senders</em> y pulsa <em>"Add Sender"</em>.</li>
+                      <li><strong>Conecta tu número</strong> — Twilio te guiará por el proceso de verificación de Meta (WhatsApp). Necesitarás una cuenta de Meta Business. El proceso tarda 1-3 días hábiles.</li>
+                      <li><strong>Copia tus credenciales</strong> — desde la pantalla de inicio de Twilio Console copia el <em>Account SID</em> y el <em>Auth Token</em> e introdúcelos arriba.</li>
+                      <li><strong>Configura el webhook</strong> — en Twilio Console ve a tu número de WhatsApp y en <em>"When a message comes in"</em> introduce esta URL:</li>
+                    </ol>
+                    <div className="mx-4 mb-4 bg-white border border-amber-200 rounded px-3 py-2 font-mono text-xs text-gray-700 break-all">
+                      {typeof window !== "undefined" ? window.location.origin : "https://tu-dominio.com"}/api/twilio-webhook
+                    </div>
+                  </details>
+                </div>
+              )}
+            </div>
+
+            {/* Opción 3: Dedicado */}
+            <button
+              type="button"
+              onClick={() => setWhatsappMode("dedicated")}
+              className={`w-full text-left rounded-xl border-2 p-4 transition ${whatsappMode === "dedicated" ? "border-brand-500 bg-brand-50" : "border-gray-200 hover:border-gray-300"}`}
+            >
+              <div className="flex items-start gap-3">
+                <span className={`mt-0.5 w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${whatsappMode === "dedicated" ? "border-brand-500" : "border-gray-300"}`}>
+                  {whatsappMode === "dedicated" && <span className="w-2 h-2 rounded-full bg-brand-500" />}
+                </span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-sm text-gray-900">Número dedicado gestionado por ReseñasYa</p>
+                    <span className="text-[10px] font-semibold bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">Próximamente</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">Te asignamos un número exclusivo para tu negocio. Nosotros nos encargamos de todo: configuración, mantenimiento y soporte con Meta.</p>
+                  {whatsappMode === "dedicated" && (
+                    <p className="text-xs text-brand-700 font-medium mt-2">
+                      Nos pondremos en contacto contigo en cuanto esta opción esté disponible. Escríbenos a <span className="font-mono">prueba@gmail.com</span>.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -587,18 +671,12 @@ export default function ConfiguracionPage() {
         </button>
       </form>
 
-      {/* ── Webhook info ── */}
-      <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-5">
-        <h3 className="font-semibold text-blue-900 mb-3">Configurar Twilio webhook</h3>
-        <p className="text-sm text-blue-800 mb-2">
-          Para recibir las respuestas de los clientes, configura este webhook en tu cuenta de Twilio:
-        </p>
-        <code className="block bg-blue-100 text-blue-900 text-sm px-3 py-2 rounded-lg font-mono break-all">
+      {/* ── Webhook URL (siempre visible como referencia) ── */}
+      <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-4">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">URL del webhook (para Twilio)</p>
+        <code className="block bg-white border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg font-mono break-all">
           {typeof window !== "undefined" ? window.location.origin : "https://tu-dominio.com"}/api/twilio-webhook
         </code>
-        <p className="text-xs text-blue-700 mt-2">
-          Twilio Console → Messaging → Sandbox for WhatsApp → When a message comes in
-        </p>
       </div>
     </div>
   );

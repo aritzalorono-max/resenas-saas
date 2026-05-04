@@ -39,7 +39,11 @@ export async function updateSession(request: NextRequest) {
     url.pathname.startsWith("/dashboard") ||
     url.pathname.startsWith("/clientes") ||
     url.pathname.startsWith("/resenas") ||
-    url.pathname.startsWith("/configuracion");
+    url.pathname.startsWith("/configuracion") ||
+    url.pathname.startsWith("/cuenta") ||
+    url.pathname.startsWith("/cartel") ||
+    url.pathname.startsWith("/incentivos") ||
+    url.pathname.startsWith("/admin");
 
   if (!user && isDashboardRoute) {
     url.pathname = "/login";

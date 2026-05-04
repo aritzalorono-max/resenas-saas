@@ -71,16 +71,45 @@ export function getPhoneVariants(fromField: string): string[] {
 }
 
 // ---------------------------------------------------------------------------
+// Selección de cliente según el modo del negocio
+// ---------------------------------------------------------------------------
+
+interface BusinessWhatsAppConfig {
+  whatsapp_mode?: string | null;
+  own_twilio_account_sid?: string | null;
+  own_twilio_auth_token?: string | null;
+  own_twilio_whatsapp_number?: string | null;
+}
+
+/**
+ * Devuelve el cliente Twilio y el número de origen correctos para un negocio.
+ * - shared / dedicated: usa las credenciales globales de la plataforma.
+ * - own: usa las credenciales propias del negocio si están completas.
+ */
+export function getTwilioSender(business: BusinessWhatsAppConfig): {
+  client: ReturnType<typeof twilio>;
+  fromNumber: string;
+} {
+  if (
+    business.whatsapp_mode === "own" &&
+    business.own_twilio_account_sid &&
+    business.own_twilio_auth_token &&
+    business.own_twilio_whatsapp_number
+  ) {
+    return {
+      client: twilio(business.own_twilio_account_sid, business.own_twilio_auth_token),
+      fromNumber: formatWhatsAppNumber(business.own_twilio_whatsapp_number),
+    };
+  }
+  return { client: twilioClient, fromNumber: TWILIO_WHATSAPP_NUMBER };
+}
+
+// ---------------------------------------------------------------------------
 // Envío de mensajes
 // ---------------------------------------------------------------------------
 
 /**
- * Envía un mensaje de texto por WhatsApp usando Twilio.
- *
- * @param to   - Número de teléfono del destinatario (con o sin prefijo internacional)
- * @param body - Texto del mensaje a enviar
- * @returns SID del mensaje creado en Twilio (útil para trazabilidad)
- * @throws Si Twilio rechaza el mensaje (número inválido, sandbox no configurado, etc.)
+ * Envía un WhatsApp usando el cliente compartido de la plataforma (modo shared).
  */
 export async function sendWhatsAppMessage(to: string, body: string): Promise<string> {
   const message = await twilioClient.messages.create({
@@ -88,6 +117,23 @@ export async function sendWhatsAppMessage(to: string, body: string): Promise<str
     to: formatWhatsAppNumber(to),
     body,
   });
+  return message.sid;
+}
 
+/**
+ * Envía un WhatsApp usando un cliente y número de origen explícitos.
+ * Usado cuando el negocio tiene su propio número de Twilio.
+ */
+export async function sendWhatsAppMessageWith(
+  client: ReturnType<typeof twilio>,
+  fromNumber: string,
+  to: string,
+  body: string
+): Promise<string> {
+  const message = await client.messages.create({
+    from: fromNumber,
+    to: formatWhatsAppNumber(to),
+    body,
+  });
   return message.sid;
 }

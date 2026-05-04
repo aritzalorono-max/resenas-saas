@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import type { ReviewRequest, BusinessStats } from "@/types";
+import type { ReviewRequest, BusinessStats, GoogleMapsSnapshot } from "@/types";
 import { RingChart } from "@/components/ui/RingChart";
+import { GoogleMapsRatingSection } from "@/components/ui/RatingChart";
 import { AlertTriangle } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -18,27 +19,50 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: business } = await supabase
-    .from("businesses")
-    .select("*")
-    .eq("user_id", user!.id)
-    .single();
+  // business + stats share the same user_id filter → run in parallel.
+  // recent + snapshots need business.id, so they run in a second parallel batch.
+  const [{ data: business }, statsResult] = await Promise.all([
+    supabase
+      .from("businesses")
+      .select("id, name, google_maps_url")
+      .eq("user_id", user!.id)
+      .single(),
+    supabase
+      .from("business_stats")
+      .select("*")
+      .eq("user_id", user!.id)
+      .single(),
+  ]);
+  const stats = (statsResult.data ?? null) as BusinessStats | null;
 
-  const { data: stats } = await supabase
-    .from("business_stats")
-    .select("*")
-    .eq("user_id", user!.id)
-    .single() as { data: BusinessStats | null };
+  const businessId = business?.id ?? "";
 
-  const { data: recent } = await supabase
-    .from("review_requests")
-    .select("*")
-    .eq("business_id", business?.id ?? "")
-    .order("created_at", { ascending: false })
-    .limit(10) as { data: ReviewRequest[] | null };
+  const [recentResult, snapshotsResult] = await Promise.all([
+    supabase
+      .from("review_requests")
+      .select("id, customer_name, customer_phone, status, customer_response, created_at")
+      .eq("business_id", businessId)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    supabase
+      .from("google_maps_snapshots")
+      .select("rating, review_count, fetched_at")
+      .eq("business_id", businessId)
+      .order("fetched_at", { ascending: true })
+      .limit(60),
+  ]);
+  const recent    = (recentResult.data    ?? null) as ReviewRequest[] | null;
+  const snapshots = (snapshotsResult.data ?? null) as Pick<GoogleMapsSnapshot, "rating" | "review_count" | "fetched_at">[] | null;
+
+  const chartData = (snapshots ?? [])
+    .filter(s => s.rating != null)
+    .map(s => ({ date: s.fetched_at, rating: s.rating!, review_count: s.review_count }));
+
+  const hasApiKey = !!process.env.GOOGLE_PLACES_API_KEY;
+
 
   const total      = stats?.total_requests  ?? 0;
-  const positives  = stats?.positive_count  ?? 0;
+  const positives  = stats?.positive_count  ?? 0;  // ya incluye rewarded + awaiting_screenshot
   const negatives  = stats?.negative_count  ?? 0;
   const neutrals   = stats?.neutral_count   ?? 0;
   const pending    = stats?.pending_count   ?? 0;
@@ -89,14 +113,14 @@ export default async function DashboardPage() {
         {/* Total */}
         <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-card">
           <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Total</p>
-          <p className="text-3xl font-bold text-gray-900 leading-none">{total}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{total}</p>
           <p className="text-xs text-gray-400 mt-1.5">solicitudes enviadas</p>
         </div>
 
         {/* Positivas */}
         <div className="bg-white border border-green-100 rounded-2xl p-4 shadow-card">
           <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-2">Positivas</p>
-          <p className="text-3xl font-bold text-gray-900 leading-none">{positives}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{positives}</p>
           <div className="mt-2 h-1.5 rounded-full bg-green-100 overflow-hidden">
             <div
               className="h-full rounded-full bg-green-500 transition-all duration-700"
@@ -108,7 +132,7 @@ export default async function DashboardPage() {
         {/* Negativas */}
         <div className="bg-white border border-red-50 rounded-2xl p-4 shadow-card">
           <p className="text-xs font-medium text-red-500 uppercase tracking-wide mb-2">Negativas</p>
-          <p className="text-3xl font-bold text-gray-900 leading-none">{negatives}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{negatives}</p>
           <div className="mt-2 h-1.5 rounded-full bg-red-100 overflow-hidden">
             <div
               className="h-full rounded-full bg-red-400 transition-all duration-700"
@@ -129,7 +153,7 @@ export default async function DashboardPage() {
               const pct = total > 0 ? Math.round((bar.count / total) * 100) : 0;
               return (
                 <div key={bar.label} className="flex items-center gap-3">
-                  <span className="text-xs text-gray-500 w-20 shrink-0">{bar.label}</span>
+                  <span className="text-xs text-gray-500 w-16 shrink-0">{bar.label}</span>
                   <div className={`flex-1 h-2 rounded-full ${bar.bg} overflow-hidden`}>
                     <div
                       className={`h-full rounded-full ${bar.color}`}
@@ -143,6 +167,11 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Google Maps rating evolution */}
+      <div className="mb-6">
+        <GoogleMapsRatingSection data={chartData} hasApiKey={hasApiKey} />
+      </div>
 
       {/* CTA principal */}
       <Link

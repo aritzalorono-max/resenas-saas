@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { ChevronDown } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Preguntas frecuentes",
+  title: "Preguntas frecuentes — ReseñasYa",
   description:
     "Resuelve tus dudas sobre ReseñasYa: cómo funciona, qué plataformas soporta, si es legal y cómo personalizar los mensajes de WhatsApp.",
+  alternates: { canonical: "/faq" },
+  robots: { index: true, follow: true },
 };
 
 const faqs = [

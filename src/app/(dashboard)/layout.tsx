@@ -3,15 +3,16 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { Home, Send, Star, Settings, Printer, UserCircle, Gift } from "lucide-react";
+import { Home, Send, Star, Settings, Printer, UserCircle, Gift, BarChart2 } from "lucide-react";
 
 const navItems = [
-  { href: "/dashboard",     label: "Inicio",           Icon: Home     },
-  { href: "/clientes",      label: "Enviar solicitud",  Icon: Send     },
-  { href: "/resenas",       label: "Reseñas",           Icon: Star     },
-  { href: "/incentivos",    label: "Incentivos",        Icon: Gift     },
-  { href: "/configuracion", label: "Configuración",     Icon: Settings },
-  { href: "/cartel",        label: "Cartel QR",         Icon: Printer  },
+  { href: "/dashboard",     label: "Inicio",           Icon: Home      },
+  { href: "/clientes",      label: "Enviar solicitud",  Icon: Send      },
+  { href: "/resenas",       label: "Reseñas",           Icon: Star      },
+  { href: "/informes",      label: "Informes",          Icon: BarChart2 },
+  { href: "/incentivos",    label: "Incentivos",        Icon: Gift      },
+  { href: "/configuracion", label: "Configuración",     Icon: Settings  },
+  { href: "/cartel",        label: "Cartel QR",         Icon: Printer   },
 ];
 
 function Logo() {
@@ -83,7 +84,7 @@ export default async function DashboardLayout({
       </aside>
 
       {/* ── Contenido principal ────────────────────────────────────────────── */}
-      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
+      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen overflow-x-hidden">
         {/* Header móvil */}
         <header className="lg:hidden flex items-center justify-between px-4 py-3
                            bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">

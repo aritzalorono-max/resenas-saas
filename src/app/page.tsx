@@ -22,8 +22,19 @@ import {
   GraduationCap,
 } from "lucide-react";
 
+// Landing page is fully static content — regenerate at most once per hour
+// so CDN edge nodes serve cached HTML globally without hitting the origin.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
+  title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
+  description: "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
   alternates: { canonical: "/" },
+  openGraph: {
+    url: "/",
+    title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
+    description: "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
+  },
 };
 
 // ── Datos estructurados Schema.org ────────────────────────────────────────────
@@ -242,7 +253,7 @@ export default function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
       />
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white overflow-x-hidden">
         {/* Navbar */}
         <nav className="border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur z-50">
           <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -276,11 +287,10 @@ export default function LandingPage() {
               <Zap className="w-3.5 h-3.5" strokeWidth={2} />
               Automatiza tus reseñas — en cualquier plataforma
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
+            <h1 className="text-3xl xs:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
               Consigue más reseñas de{" "}
               <span className="text-brand-600">5★</span>
-              <br />
-              automáticamente por{" "}
+              {" "}automáticamente por{" "}
               <span className="text-brand-600">WhatsApp</span>
             </h1>
 

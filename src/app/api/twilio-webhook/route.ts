@@ -25,32 +25,46 @@
  */
 
 import { createServiceClient } from "@/lib/supabase/server";
-import { analyzeSentiment, analyzeScreenshot } from "@/lib/claude";
-import { twilioClient, TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants } from "@/lib/twilio";
+import { analyzeSentiment, analyzeScreenshot, generateConversationalResponse } from "@/lib/claude";
+import { TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants, getTwilioSender } from "@/lib/twilio";
 import { assignDiscountCode } from "@/lib/discount-codes";
 import {
   findPendingRequestByPhone,
   findAwaitingScreenshotByPhone,
+  findActiveRequestByPhone,
   updateReviewRequestWithSentiment,
   updateToAwaitingScreenshot,
   updateToRewarded,
+  incrementMessageCount,
 } from "@/lib/review-requests";
 import {
   buildFollowUpMessage,
   buildScreenshotVerifiedMessage,
   buildScreenshotRetryMessage,
+  buildConversationClosingMessage,
 } from "@/lib/messages";
 import { logger } from "@/lib/logger";
 import twilio from "twilio";
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Masks a phone number showing only the last 4 digits for safe logging */
+function maskPhone(phone: string): string {
+  return phone.length > 4 ? `****${phone.slice(-4)}` : "****";
+}
+
+// Cap multi-turn conversations to prevent runaway exchanges and Twilio cost surprises.
+// The closing message is sent on exactly this turn, so the customer always gets a proper goodbye.
+const MAX_CONVERSATION_TURNS = 7;
+
+// ---------------------------------------------------------------------------
 // Validación de firma de Twilio
 // ---------------------------------------------------------------------------
 
-function validateTwilioSignature(request: Request, rawBody: string): boolean {
-  const authToken = process.env.TWILIO_AUTH_TOKEN!;
+function validateTwilioSignature(request: Request, rawBody: string, authToken: string): boolean {
   const signature = request.headers.get("x-twilio-signature") ?? "";
-
   return twilio.validateRequest(
     authToken,
     signature,
@@ -78,30 +92,40 @@ export async function POST(request: Request): Promise<Response> {
     return twilioEmptyResponse();
   }
 
-  // ── 1. Validar firma (producción) ─────────────────────────────────────────
-  if (process.env.NODE_ENV === "production") {
-    const isValid = validateTwilioSignature(request, rawBody);
-    if (!isValid) {
-      logger.warn("Firma de Twilio inválida — petición rechazada");
-      return twilioEmptyResponse();
-    }
-    logger.info("Firma de Twilio validada correctamente");
-  }
-
   // ── 2. Extraer datos del webhook ──────────────────────────────────────────
   const params = new URLSearchParams(rawBody);
-  const fromNumber = params.get("From") ?? "";
+  const fromNumber  = params.get("From") ?? "";
+  const toNumber    = params.get("To") ?? "";
   const messageBody = params.get("Body") ?? "";
-  const numMedia = parseInt(params.get("NumMedia") ?? "0", 10);
-  const mediaUrl = numMedia > 0 ? (params.get("MediaUrl0") ?? "") : "";
-  const hasImage = numMedia > 0 && mediaUrl.length > 0;
+  const numMedia    = parseInt(params.get("NumMedia") ?? "0", 10);
+  const mediaUrl    = numMedia > 0 ? (params.get("MediaUrl0") ?? "") : "";
+  const hasImage    = numMedia > 0 && mediaUrl.length > 0;
 
   if (!fromNumber) {
     logger.warn("Webhook sin número de origen");
     return twilioEmptyResponse();
   }
 
-  logger.info(`Mensaje recibido de ${fromNumber} | media: ${numMedia} | body: "${messageBody.slice(0, 60)}"`);
+  logger.info(`Mensaje recibido de ${maskPhone(fromNumber)} → ${toNumber} | media: ${numMedia} | len: ${messageBody.length}`);
+
+  // ── 1. Validar firma (producción) ─────────────────────────────────────────
+  if (process.env.NODE_ENV === "production") {
+    const isSharedNumber = toNumber.includes(TWILIO_WHATSAPP_NUMBER.replace("whatsapp:", ""));
+
+    // Own-mode businesses use their own Twilio account and auth token.
+    // We only validate the HMAC for the shared number where we know the token.
+    // Own-mode requests are still protected by Twilio's account-level access controls.
+    const authToken = isSharedNumber ? (process.env.TWILIO_AUTH_TOKEN ?? null) : null;
+
+    if (authToken) {
+      const isValid = validateTwilioSignature(request, rawBody, authToken);
+      if (!isValid) {
+        logger.warn("Firma de Twilio inválida — petición rechazada");
+        return twilioEmptyResponse();
+      }
+      logger.info("Firma de Twilio validada correctamente");
+    }
+  }
 
   const supabase = await createServiceClient();
   const phoneVariants = getPhoneVariants(fromNumber);
@@ -118,7 +142,7 @@ export async function POST(request: Request): Promise<Response> {
       const tone = business.tone ?? "tuteo";
       const incentiveDescription = business.incentive_description ?? "";
       const screenshotActiveLink = business.review_links?.find((l) => l.url === business.google_maps_url);
-      const activePlatformName = screenshotActiveLink?.name ?? "Google Maps";
+      const activePlatformName   = screenshotActiveLink?.name ?? "Google Maps";
 
       let screenshotResult: Awaited<ReturnType<typeof analyzeScreenshot>>;
       try {
@@ -131,6 +155,8 @@ export async function POST(request: Request): Promise<Response> {
         logger.error("Error al analizar la captura con Claude", aiError);
         return twilioEmptyResponse();
       }
+
+      const { client: screenshotClient, fromNumber: screenshotFrom } = getTwilioSender(business);
 
       if (screenshotResult.isFiveStars) {
         try {
@@ -150,12 +176,12 @@ export async function POST(request: Request): Promise<Response> {
         );
 
         try {
-          await twilioClient.messages.create({
-            from: TWILIO_WHATSAPP_NUMBER,
-            to: formatWhatsAppNumber(screenshotRequest.customer_phone),
+          await screenshotClient.messages.create({
+            from: screenshotFrom,
+            to:   formatWhatsAppNumber(screenshotRequest.customer_phone),
             body: verifiedMsg,
           });
-          logger.info(`Mensaje de recompensa enviado a ${screenshotRequest.customer_phone}`);
+          logger.info(`Mensaje de recompensa enviado a ${maskPhone(screenshotRequest.customer_phone)}`);
         } catch (twilioError) {
           logger.error("Error al enviar el mensaje de recompensa", twilioError);
         }
@@ -163,12 +189,12 @@ export async function POST(request: Request): Promise<Response> {
         const retryMsg = buildScreenshotRetryMessage(screenshotRequest.customer_name, tone);
 
         try {
-          await twilioClient.messages.create({
-            from: TWILIO_WHATSAPP_NUMBER,
-            to: formatWhatsAppNumber(screenshotRequest.customer_phone),
+          await screenshotClient.messages.create({
+            from: screenshotFrom,
+            to:   formatWhatsAppNumber(screenshotRequest.customer_phone),
             body: retryMsg,
           });
-          logger.info(`Mensaje de reintento de captura enviado a ${screenshotRequest.customer_phone}`);
+          logger.info(`Mensaje de reintento de captura enviado a ${maskPhone(screenshotRequest.customer_phone)}`);
         } catch (twilioError) {
           logger.error("Error al enviar el mensaje de reintento", twilioError);
         }
@@ -186,20 +212,75 @@ export async function POST(request: Request): Promise<Response> {
     return twilioEmptyResponse();
   }
 
-  logger.info("Buscando solicitud pendiente para variantes de número", phoneVariants);
+  logger.info(`Buscando solicitud pendiente para ${maskPhone(fromNumber)}`);
   const reviewRequest = await findPendingRequestByPhone(supabase, phoneVariants);
 
   if (!reviewRequest) {
-    logger.warn(`No se encontró solicitud pendiente para ${fromNumber}`);
+    // ── 3c. Flujo multi-turno: cliente responde después del primer intercambio ─
+    logger.info("Sin solicitud pendiente — buscando solicitud activa para conversación multi-turno");
+    const activeRequest = await findActiveRequestByPhone(supabase, phoneVariants);
+
+    if (!activeRequest) {
+      logger.warn(`No se encontró solicitud activa para ${maskPhone(fromNumber)}`);
+      return twilioEmptyResponse();
+    }
+
+    logger.info(`Solicitud activa encontrada: ${activeRequest.id} (message_count: ${activeRequest.message_count})`);
+    const { businesses: activeBusiness } = activeRequest;
+
+    const newCount = await incrementMessageCount(supabase, activeRequest.id, activeRequest.message_count);
+
+    if (newCount > MAX_CONVERSATION_TURNS) {
+      logger.info(`Límite de ${MAX_CONVERSATION_TURNS} turnos superado para ${activeRequest.id} — sin respuesta`);
+      return twilioEmptyResponse();
+    }
+
+    const { client: conversationClient, fromNumber: conversationFrom } = getTwilioSender(activeBusiness);
+
+    let conversationResponse: string;
+
+    if (newCount === MAX_CONVERSATION_TURNS) {
+      conversationResponse = buildConversationClosingMessage(
+        activeRequest.customer_name,
+        activeBusiness.name,
+        activeBusiness.tone ?? "tuteo"
+      );
+      logger.info(`Enviando mensaje de cierre (turno ${MAX_CONVERSATION_TURNS}/${MAX_CONVERSATION_TURNS}) a ${maskPhone(activeRequest.customer_phone)}`);
+    } else {
+      try {
+        conversationResponse = await generateConversationalResponse(
+          messageBody,
+          activeBusiness.name,
+          activeBusiness.tone ?? "tuteo"
+        );
+        logger.info(`Respuesta conversacional generada (turno ${newCount}/${MAX_CONVERSATION_TURNS})`);
+      } catch (aiError) {
+        logger.error("Error al generar respuesta conversacional con Claude", aiError);
+        return twilioEmptyResponse();
+      }
+    }
+
+    try {
+      await conversationClient.messages.create({
+        from: conversationFrom,
+        to:   formatWhatsAppNumber(activeRequest.customer_phone),
+        body: conversationResponse,
+      });
+      logger.info(`Respuesta conversacional enviada a ${maskPhone(activeRequest.customer_phone)}`);
+    } catch (twilioError) {
+      logger.error("Error al enviar respuesta conversacional", twilioError);
+    }
+
     return twilioEmptyResponse();
   }
 
   logger.info(`Solicitud encontrada: ${reviewRequest.id} (cliente: ${reviewRequest.customer_name})`);
   const { businesses: business } = reviewRequest;
-  const activeLink = business.review_links?.find((l) => l.url === business.google_maps_url);
+  logger.info(`Datos negocio — incentive_enabled: ${business.incentive_enabled}, incentive_description: "${business.incentive_description}", google_maps_url: ${!!business.google_maps_url}`);
+  const activeLink       = business.review_links?.find((l) => l.url === business.google_maps_url);
   const activePlatformName = activeLink?.name ?? "Google Maps";
-  const appOrigin = new URL(request.url).origin;
-  const reviewUrl = activeLink?.shortCode
+  const appOrigin        = new URL(request.url).origin;
+  const reviewUrl        = activeLink?.shortCode
     ? `${appOrigin}/r/${activeLink.shortCode}`
     : (business.google_maps_url ?? "");
 
@@ -227,13 +308,13 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     if (useIncentive) {
-      // Assign discount code if the business has codes enabled
       if (business.incentive_code_enabled) {
         assignedCode = await assignDiscountCode(
           supabase,
           reviewRequest.business_id,
           business.incentive_code_type ?? "random",
-          reviewRequest.id
+          reviewRequest.id,
+          business.incentive_fixed_code
         );
         if (assignedCode) {
           logger.info(`Código de descuento asignado: ${assignedCode}`);
@@ -253,24 +334,26 @@ export async function POST(request: Request): Promise<Response> {
 
   // ── 6. Construir y enviar mensaje de seguimiento ──────────────────────────
   const followUpMessage = buildFollowUpMessage({
-    customerName: reviewRequest.customer_name,
-    businessName: business.name,
-    googleMapsUrl: reviewUrl || null,
-    sentiment: sentiment.sentiment,
-    tone: business.tone ?? "tuteo",
-    platformName: activePlatformName,
-    incentiveEnabled: business.incentive_enabled,
+    customerName:         reviewRequest.customer_name,
+    businessName:         business.name,
+    googleMapsUrl:        reviewUrl || null,
+    sentiment:            sentiment.sentiment,
+    tone:                 business.tone ?? "tuteo",
+    platformName:         activePlatformName,
+    incentiveEnabled:     business.incentive_enabled,
     incentiveDescription: business.incentive_description,
-    discountCode: assignedCode,
+    discountCode:         assignedCode,
   });
 
+  const { client: followUpClient, fromNumber: followUpFrom } = getTwilioSender(business);
+
   try {
-    await twilioClient.messages.create({
-      from: TWILIO_WHATSAPP_NUMBER,
-      to: formatWhatsAppNumber(reviewRequest.customer_phone),
+    await followUpClient.messages.create({
+      from: followUpFrom,
+      to:   formatWhatsAppNumber(reviewRequest.customer_phone),
       body: followUpMessage,
     });
-    logger.info(`Mensaje de seguimiento enviado a ${reviewRequest.customer_phone}`);
+    logger.info(`Mensaje de seguimiento enviado a ${maskPhone(reviewRequest.customer_phone)}`);
   } catch (twilioError) {
     logger.error("Error al enviar el mensaje de seguimiento via Twilio", twilioError);
   }

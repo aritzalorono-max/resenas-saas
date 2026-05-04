@@ -15,8 +15,14 @@ export type ReviewStatus =
 /** Tono de comunicación que el negocio quiere usar con sus clientes */
 export type BusinessTone = "tuteo" | "usted" | "juvenil";
 
-/** Tipo de código de descuento: generado aleatoriamente o extraído de un pool */
-export type IncentiveCodeType = "random" | "pool";
+/** Tipo de código de descuento: generado aleatoriamente, extraído de un pool, o fijo siempre igual */
+export type IncentiveCodeType = "random" | "pool" | "fixed";
+
+/** Cuándo se comunica el incentivo al cliente */
+export type IncentiveTiming = "initial" | "after_positive";
+
+/** Modo de envío de WhatsApp del negocio */
+export type WhatsAppMode = "shared" | "own" | "dedicated";
 
 // ---------------------------------------------------------------------------
 // Entidades de base de datos
@@ -49,8 +55,27 @@ export interface Business {
   incentive_description: string | null;
   incentive_code_enabled: boolean;
   incentive_code_type: IncentiveCodeType;
+  incentive_fixed_code: string | null;
+  incentive_timing: IncentiveTiming;
+  /** Modo de envío de WhatsApp: número compartido, propio o dedicado */
+  whatsapp_mode: WhatsAppMode;
+  own_twilio_account_sid: string | null;
+  own_twilio_auth_token: string | null;
+  own_twilio_whatsapp_number: string | null;
+  /** Google Places ID para seguimiento automático de puntuación */
+  google_place_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Snapshot diario de la puntuación de un negocio en Google Maps */
+export interface GoogleMapsSnapshot {
+  id: string;
+  business_id: string;
+  place_id: string;
+  rating: number | null;
+  review_count: number | null;
+  fetched_at: string;
 }
 
 /** Solicitud de reseña enviada a un cliente */
@@ -65,6 +90,7 @@ export interface ReviewRequest {
   twilio_message_sid: string | null;
   follow_up_sent: boolean;
   discount_code: string | null;
+  message_count: number;
   created_at: string;
   responded_at: string | null;
 }
@@ -74,7 +100,7 @@ export interface ReviewRequest {
  * Usado en el webhook para evitar una segunda consulta a la base de datos.
  */
 export interface ReviewRequestWithBusiness extends ReviewRequest {
-  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type">;
+  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type" | "incentive_fixed_code" | "whatsapp_mode" | "own_twilio_account_sid" | "own_twilio_auth_token" | "own_twilio_whatsapp_number">;
 }
 
 /** Código de descuento generado o subido por el negocio */
@@ -121,4 +147,67 @@ export interface ScreenshotResult {
   isFiveStars: boolean;
   confidence: number;
   reason: string;
+}
+
+// ---------------------------------------------------------------------------
+// Informes de análisis de reseñas
+// ---------------------------------------------------------------------------
+
+export interface ReportSentimentSummary {
+  total_analyzed: number;
+  positive_count: number;
+  negative_count: number;
+  neutral_count:  number;
+  avg_score:      number;
+}
+
+export interface ReportTheme {
+  theme:    string;
+  count:    number;
+  examples: string[];
+}
+
+export interface ReportImprovementIdea {
+  title:            string;
+  description:      string;
+  based_on_count:   number;
+  example_comments: string[];
+}
+
+export interface ReportPlatformComparison {
+  whatsapp_positive_rate: number;
+  platform_rating:        number | null;
+  platform_review_count:  number | null;
+  gap_description:        string;
+}
+
+export interface ReportStarsCalculator {
+  current_rating:             number | null;
+  current_review_count:       number | null;
+  five_stars_needed_for_next: number | null;
+  next_target_rating:         number | null;
+}
+
+export interface ReportFrequencyRecommendation {
+  current_monthly_avg_requests: number;
+  conversion_rate:              number;
+  recommended_monthly_target:   number;
+  recommended_weekly_target:    number;
+  reasoning:                    string;
+}
+
+export interface BusinessReport {
+  id:                       string;
+  business_id:              string;
+  generated_at:             string;
+  period_start:             string;
+  period_end:               string;
+  total_analyzed:           number;
+  sentiment_summary:        ReportSentimentSummary;
+  positive_themes:          ReportTheme[];
+  negative_themes:          ReportTheme[];
+  improvement_ideas:        ReportImprovementIdea[];
+  platform_comparison:      ReportPlatformComparison;
+  stars_calculator:         ReportStarsCalculator;
+  frequency_recommendation: ReportFrequencyRecommendation;
 }

@@ -13,17 +13,23 @@ export function generateRandomCode(length = 8): string {
 
 /**
  * Asigna un código de descuento a una solicitud de reseña.
+ * - fixed: devuelve siempre el mismo código configurado por el negocio
  * - random: genera un código nuevo y lo inserta como "used"
  * - pool: selecciona el primer código "available" y lo marca como "used"
- * Devuelve el código o null si no hay disponibles (pool vacío o error).
+ * Devuelve el código o null si no hay disponibles.
  */
 export async function assignDiscountCode(
   supabase: SupabaseClient,
   businessId: string,
   codeType: IncentiveCodeType,
-  reviewRequestId: string
+  reviewRequestId: string,
+  fixedCode?: string | null
 ): Promise<string | null> {
   const usedAt = new Date().toISOString();
+
+  if (codeType === "fixed") {
+    return fixedCode?.trim() || null;
+  }
 
   if (codeType === "random") {
     const code = generateRandomCode();

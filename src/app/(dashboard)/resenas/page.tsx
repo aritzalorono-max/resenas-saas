@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import type { ReviewRequest } from "@/types";
-import { Check } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, MessageSquare, Gift } from "lucide-react";
 
 const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
   pending:             { label: "Pendiente",      badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-400"   },
@@ -15,115 +15,258 @@ const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string 
 
 const PAGE_SIZE = 20;
 
+const STATUS_TABS = [
+  { value: "all",                label: "Todas"         },
+  { value: "positive",           label: "Positivas"     },
+  { value: "negative",           label: "Negativas"     },
+  { value: "neutral",            label: "Neutrales"     },
+  { value: "pending",            label: "Pendientes"    },
+  { value: "no_response",        label: "Sin resp."     },
+  { value: "awaiting_screenshot",label: "Captura"       },
+  { value: "rewarded",           label: "Recompensadas" },
+];
+
+function monthLabel(year: number, month: number): string {
+  return new Date(year, month - 1, 1).toLocaleDateString("es-ES", {
+    month: "long", year: "numeric",
+  });
+}
+
 export default async function ResenasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; page?: string; month?: string; incentive?: string }>;
 }) {
-  const { status: filterStatus, page: pageParam } = await searchParams;
-  const page    = Math.max(1, parseInt(pageParam ?? "1", 10));
-  const offset  = (page - 1) * PAGE_SIZE;
-  const active  = filterStatus ?? "all";
+  const sp              = await searchParams;
+  const filterStatus    = sp.status    ?? "all";
+  const incentiveFilter = sp.incentive ?? "all";
+  const page            = Math.max(1, parseInt(sp.page ?? "1", 10));
 
+  // ── Month ────────────────────────────────────────────────────────────────
+  const now             = new Date();
+  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const selectedMonth   = sp.month ?? currentMonthStr;
+  const [yearStr, monthStr] = selectedMonth.split("-");
+  const year                = parseInt(yearStr,  10);
+  const month               = parseInt(monthStr, 10);
+
+  const monthStart = new Date(Date.UTC(year, month - 1, 1)).toISOString();
+  const monthEnd   = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1)).toISOString();
+
+  const prevD        = new Date(Date.UTC(year, month - 2, 1));
+  const nextD        = new Date(Date.UTC(year, month,     1));
+  const prevMStr     = `${prevD.getUTCFullYear()}-${String(prevD.getUTCMonth() + 1).padStart(2, "0")}`;
+  const nextMStr     = `${nextD.getUTCFullYear()}-${String(nextD.getUTCMonth() + 1).padStart(2, "0")}`;
+  const isCurrentMonth = selectedMonth === currentMonthStr;
+
+  // ── Supabase ─────────────────────────────────────────────────────────────
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-
   const { data: business } = await supabase
-    .from("businesses")
-    .select("id")
-    .eq("user_id", user!.id)
-    .single();
-
+    .from("businesses").select("id").eq("user_id", user!.id).single();
   const businessId = business?.id ?? "";
 
-  // Total count for pagination
-  let countQuery = supabase
-    .from("review_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("business_id", businessId);
-  if (active !== "all") countQuery = countQuery.eq("status", active);
-  const { count: total } = await countQuery;
+  const offset = (page - 1) * PAGE_SIZE;
 
-  // Paginated rows
-  let dataQuery = supabase
+  // Build the paginated query conditionally before running it.
+  // Filters are applied in SQL so only 20 rows are transferred regardless of month size.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let pageQuery: any = supabase
     .from("review_requests")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("business_id", businessId)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + PAGE_SIZE - 1);
-  if (active !== "all") dataQuery = dataQuery.eq("status", active);
-  const { data: requests } = await dataQuery as { data: ReviewRequest[] | null };
+    .gte("created_at", monthStart)
+    .lt("created_at",  monthEnd)
+    .order("created_at", { ascending: false });
 
-  const totalPages  = Math.ceil((total ?? 0) / PAGE_SIZE);
-  const hasNext     = page < totalPages;
-  const hasPrev     = page > 1;
+  if (filterStatus !== "all")    pageQuery = pageQuery.eq("status", filterStatus);
+  if (incentiveFilter === "yes") pageQuery = pageQuery.not("discount_code", "is", null);
+  if (incentiveFilter === "no")  pageQuery = pageQuery.is("discount_code", null);
 
-  const filterTabs = [
-    { value: "all",                label: "Todas"        },
-    { value: "positive",           label: "Positivas"    },
-    { value: "negative",           label: "Negativas"    },
-    { value: "neutral",            label: "Neutrales"    },
-    { value: "pending",            label: "Pendientes"   },
-    { value: "no_response",        label: "Sin resp."    },
-    { value: "awaiting_screenshot", label: "Captura"     },
-    { value: "rewarded",           label: "Recompensados"},
-  ];
+  pageQuery = pageQuery.range(offset, offset + PAGE_SIZE - 1);
 
-  function buildHref(newPage: number, newStatus?: string) {
-    const s = newStatus ?? active;
-    const params = new URLSearchParams();
-    if (s !== "all") params.set("status", s);
-    if (newPage > 1) params.set("page", String(newPage));
-    const qs = params.toString();
+  // Run both queries in parallel:
+  //   statsQuery — fetches only (status, discount_code) for the full month to compute
+  //                the summary bar. Lightweight even for large months.
+  //   pageQuery  — fetches full rows but only PAGE_SIZE of them via SQL LIMIT/OFFSET.
+  const [statsResult, pageResult] = await Promise.all([
+    supabase
+      .from("review_requests")
+      .select("status, discount_code")
+      .eq("business_id", businessId)
+      .gte("created_at", monthStart)
+      .lt("created_at",  monthEnd),
+    pageQuery,
+  ]);
+
+  // ── Monthly summary stats (computed from lightweight stats query) ─────────
+  const allStats = (statsResult.data ?? []) as { status: string; discount_code: string | null }[];
+  const ms = {
+    total:    allStats.length,
+    positive: allStats.filter(r => ["positive", "awaiting_screenshot", "rewarded"].includes(r.status)).length,
+    negative: allStats.filter(r => r.status === "negative").length,
+    neutral:  allStats.filter(r => r.status === "neutral").length,
+    rewarded: allStats.filter(r => r.status === "rewarded").length,
+    pending:  allStats.filter(r => r.status === "pending").length,
+  };
+  const responded    = ms.positive + ms.negative + ms.neutral;
+  const positiveRate = responded > 0 ? Math.round((ms.positive / responded) * 100) : 0;
+
+  // ── Paginated rows from SQL ───────────────────────────────────────────────
+  const requests   = (pageResult.data ?? []) as ReviewRequest[];
+  const total      = (pageResult.count ?? 0) as number;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+
+  // ── URL builder ───────────────────────────────────────────────────────────
+  function href(opts: { page?: number; status?: string; month?: string; incentive?: string }): string {
+    const p  = new URLSearchParams();
+    const s  = opts.status    ?? filterStatus;
+    const m  = opts.month     ?? selectedMonth;
+    const i  = opts.incentive ?? incentiveFilter;
+    const pg = opts.page      ?? 1;
+    if (s  !== "all")           p.set("status",    s);
+    if (m  !== currentMonthStr) p.set("month",     m);
+    if (i  !== "all")           p.set("incentive", i);
+    if (pg > 1)                 p.set("page",      String(pg));
+    const qs = p.toString();
     return `/resenas${qs ? `?${qs}` : ""}`;
   }
 
   return (
     <div className="animate-fade-in">
-      <div className="mb-6">
-        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Reseñas y respuestas</h1>
-        <p className="text-gray-400 text-sm mt-1">
-          {total != null ? `${total} solicitud${total !== 1 ? "es" : ""} en total` : "Historial de todas las solicitudes"}
+      <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-5">Reseñas y respuestas</h1>
+
+      {/* ── Navegación de mes ─────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between mb-4 bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-card">
+        <Link
+          href={href({ month: prevMStr, page: 1 })}
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition px-2 py-1 rounded-lg hover:bg-gray-50"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span className="hidden sm:inline capitalize text-xs">
+            {monthLabel(prevD.getUTCFullYear(), prevD.getUTCMonth() + 1)}
+          </span>
+        </Link>
+
+        <span className="text-sm font-semibold text-gray-900 capitalize">
+          {monthLabel(year, month)}
+        </span>
+
+        <Link
+          href={isCurrentMonth ? "#" : href({ month: nextMStr, page: 1 })}
+          aria-disabled={isCurrentMonth}
+          className={`flex items-center gap-1.5 text-sm transition px-2 py-1 rounded-lg ${
+            isCurrentMonth
+              ? "text-gray-300 pointer-events-none"
+              : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+          }`}
+        >
+          <span className="hidden sm:inline capitalize text-xs">
+            {monthLabel(nextD.getUTCFullYear(), nextD.getUTCMonth() + 1)}
+          </span>
+          <ChevronRight className="w-4 h-4" />
+        </Link>
+      </div>
+
+      {/* ── Resumen del mes ───────────────────────────────────────────────── */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-5 shadow-card">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+          Resumen del mes
         </p>
+        {ms.total === 0 ? (
+          <p className="text-sm text-gray-400 italic">Sin solicitudes en este periodo</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{ms.total}</p>
+                <p className="text-xs text-gray-400 mt-0.5">Solicitudes</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-green-600">{ms.positive}</p>
+                <p className="text-xs text-gray-400 mt-0.5">Positivas</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-red-500">{ms.negative}</p>
+                <p className="text-xs text-gray-400 mt-0.5">Negativas</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-brand-600">{ms.rewarded}</p>
+                <p className="text-xs text-gray-400 mt-0.5">Recompensadas</p>
+              </div>
+            </div>
+            {responded > 0 && (
+              <div className="mt-4 pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs text-gray-500">Tasa positiva (respondidas)</span>
+                  <span className="text-xs font-semibold text-green-600">{positiveRate}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-green-500"
+                    style={{ width: `${positiveRate}%` }}
+                  />
+                </div>
+                <div className="mt-2.5 flex gap-3 flex-wrap text-xs">
+                  {ms.positive > 0 && <span className="text-green-600">{ms.positive} positiva{ms.positive !== 1 ? "s" : ""}</span>}
+                  {ms.neutral  > 0 && <span className="text-gray-500">{ms.neutral} neutral{ms.neutral !== 1 ? "es" : ""}</span>}
+                  {ms.negative > 0 && <span className="text-red-500">{ms.negative} negativa{ms.negative !== 1 ? "s" : ""}</span>}
+                  {ms.pending  > 0 && <span className="text-amber-500">{ms.pending} pendiente{ms.pending !== 1 ? "s" : ""}</span>}
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
-      {/* Filter tabs — horizontal scroll en móvil */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {filterTabs.map((tab) => {
-          const isActive = active === tab.value;
-          return (
-            <Link
-              key={tab.value}
-              href={buildHref(1, tab.value)}
-              className={`shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
-                isActive
-                  ? "bg-brand-600 text-white shadow-sm"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700"
-              }`}
-            >
-              {tab.label}
-            </Link>
-          );
-        })}
+      {/* ── Filtros ───────────────────────────────────────────────────────── */}
+      <div className="flex gap-2 mb-3 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {STATUS_TABS.map((tab) => (
+          <Link
+            key={tab.value}
+            href={href({ status: tab.value, page: 1 })}
+            className={`shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
+              filterStatus === tab.value
+                ? "bg-brand-600 text-white shadow-sm"
+                : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700"
+            }`}
+          >
+            {tab.label}
+          </Link>
+        ))}
       </div>
 
-      {!requests?.length ? (
+      <div className="flex items-center gap-2 mb-5 flex-wrap">
+        <span className="text-xs text-gray-400">Incentivo:</span>
+        {[
+          { value: "all", label: "Todos"         },
+          { value: "yes", label: "Con incentivo" },
+          { value: "no",  label: "Sin incentivo" },
+        ].map((opt) => (
+          <Link
+            key={opt.value}
+            href={href({ incentive: opt.value, page: 1 })}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+              incentiveFilter === opt.value
+                ? "bg-brand-600 text-white"
+                : "bg-white border border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700"
+            }`}
+          >
+            {opt.label}
+          </Link>
+        ))}
+      </div>
+
+      {/* ── Lista ─────────────────────────────────────────────────────────── */}
+      <p className="text-xs text-gray-400 mb-4">
+        {total} solicitud{total !== 1 ? "es" : ""}
+        {filterStatus !== "all" ? ` · ${STATUS_TABS.find(t => t.value === filterStatus)?.label ?? ""}` : ""}
+      </p>
+
+      {requests.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-200 px-6 py-16 flex flex-col items-center text-center">
-          <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-            </svg>
-          </div>
-          <p className="font-semibold text-gray-700">
-            {active === "all"
-              ? "Aún no hay solicitudes"
-              : `No hay solicitudes en "${filterTabs.find(t => t.value === active)?.label}"`}
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            {active === "all"
-              ? "Las solicitudes que envíes aparecerán aquí"
-              : "Prueba a cambiar el filtro"}
-          </p>
+          <p className="font-semibold text-gray-700">No hay solicitudes</p>
+          <p className="text-xs text-gray-400 mt-1">Prueba a cambiar los filtros o navega a otro mes</p>
         </div>
       ) : (
         <>
@@ -131,70 +274,69 @@ export default async function ResenasPage({
             {requests.map((req) => {
               const config = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.pending;
               const sentDate = new Date(req.created_at).toLocaleDateString("es-ES", {
-                day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+                day: "numeric", month: "short",
               });
-              const respDate = req.responded_at
-                ? new Date(req.responded_at).toLocaleDateString("es-ES", {
-                    day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
-                  })
-                : null;
 
               return (
-                <div
-                  key={req.id}
-                  className="bg-white rounded-2xl border border-gray-200 p-4 shadow-card"
-                >
-                  {/* Fila 1: nombre + badge */}
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <p className="font-semibold text-gray-900 text-sm truncate leading-snug">
-                      {req.customer_name}
-                    </p>
-                    <span className={`shrink-0 flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${config.badge}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${config.dot}`} />
-                      {config.label}
-                    </span>
+                <div key={req.id} className="bg-white rounded-2xl border border-gray-200 p-4 shadow-card">
+                  {/* Nombre + badge */}
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm truncate leading-snug">
+                        {req.customer_name}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {req.customer_phone}
+                        <span className="mx-1.5 text-gray-200">·</span>
+                        {sentDate}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <span className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${config.badge}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+                        {config.label}
+                      </span>
+                      {req.discount_code && (
+                        <span className="text-xs text-brand-600 flex items-center gap-1">
+                          <Gift className="w-3 h-3" />
+                          {req.discount_code}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Fila 2: teléfono · fecha */}
-                  <p className="text-xs text-gray-400 mb-3">
-                    {req.customer_phone}
-                    <span className="mx-1.5 text-gray-200">·</span>
-                    {sentDate}
-                  </p>
-
-                  {/* Respuesta del cliente */}
+                  {/* Respuesta */}
                   {req.customer_response ? (
-                    <p className="text-gray-700 text-sm bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 italic line-clamp-3 mb-3">
+                    <p className="text-gray-600 text-sm bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 italic line-clamp-2 mt-2">
                       &ldquo;{req.customer_response}&rdquo;
                     </p>
                   ) : (
-                    <p className="text-gray-300 text-xs italic mb-3">Sin respuesta todavía</p>
+                    <p className="text-gray-300 text-xs italic mt-2">Sin respuesta todavía</p>
                   )}
 
-                  {/* Fila inferior: respondió + follow-up + score */}
-                  {(respDate || req.follow_up_sent || req.sentiment_score != null) && (
-                    <div className="flex items-center gap-3 flex-wrap pt-2.5 border-t border-gray-50">
-                      {respDate && (
+                  {/* Pie */}
+                  <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-gray-50">
+                    <div className="flex items-center gap-3">
+                      {req.responded_at && (
                         <span className="text-xs text-green-600 flex items-center gap-1">
-                          <Check className="w-3 h-3 shrink-0" strokeWidth={2.5} />
-                          Respondió {respDate}
-                        </span>
-                      )}
-                      {req.follow_up_sent && (
-                        <span className="text-xs text-gray-400 flex items-center gap-1">
-                          <svg className="w-3 h-3 text-brand-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                          </svg>
-                          Follow-up enviado
+                          <Check className="w-3 h-3" strokeWidth={2.5} />
+                          Respondió
                         </span>
                       )}
                       {req.sentiment_score != null && (
-                        <span className="text-xs text-gray-400 tabular-nums hidden sm:inline">
+                        <span className="text-xs text-gray-400 tabular-nums">
                           Score {(req.sentiment_score * 100).toFixed(0)}%
                         </span>
                       )}
                     </div>
-                  )}
+                    <Link
+                      href={`/resenas/${req.id}`}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      Ver conversación
+                    </Link>
+                  </div>
                 </div>
               );
             })}
@@ -204,31 +346,28 @@ export default async function ResenasPage({
           {totalPages > 1 && (
             <div className="mt-6 flex flex-col sm:flex-row items-center gap-3 sm:justify-between">
               <p className="text-sm text-gray-500 order-2 sm:order-1">
-                Pág. {page}/{totalPages}
-                <span className="text-gray-400"> · {total} solicitudes</span>
+                Pág. {page}/{totalPages} · {total} solicitudes
               </p>
               <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
                 <Link
-                  href={hasPrev ? buildHref(page - 1) : "#"}
-                  aria-disabled={!hasPrev}
-                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition
-                    ${hasPrev ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
+                  href={page > 1 ? href({ page: page - 1 }) : "#"}
+                  aria-disabled={page <= 1}
+                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition ${
+                    page > 1 ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"
+                  }`}
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                  </svg>
+                  <ChevronLeft className="w-4 h-4" />
                   Anterior
                 </Link>
                 <Link
-                  href={hasNext ? buildHref(page + 1) : "#"}
-                  aria-disabled={!hasNext}
-                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition
-                    ${hasNext ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"}`}
+                  href={page < totalPages ? href({ page: page + 1 }) : "#"}
+                  aria-disabled={page >= totalPages}
+                  className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium transition ${
+                    page < totalPages ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"
+                  }`}
                 >
                   Siguiente
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                  </svg>
+                  <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
             </div>

@@ -12,11 +12,10 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
-/**
- * Prompt del sistema para el análisis de sentimiento.
- * Instruye a Claude a devolver siempre un JSON estructurado
- * para facilitar el parsing de la respuesta.
- */
+// Positive-bias rule: when a response is ambiguous between "positive" and "neutral"
+// (e.g. "ok", "bien"), we classify it as positive with a lower score. This increases
+// the number of customers who receive the review link, at the cost of slightly inflating
+// positive metrics. The lower score (0.55–0.70) signals low confidence to the dashboard.
 const SENTIMENT_SYSTEM_PROMPT = `Eres un analizador de opiniones de clientes para negocios locales.
 Tu tarea es analizar el texto de la respuesta de un cliente y determinar si es positiva, negativa o neutral.
 
@@ -28,22 +27,12 @@ Responde SIEMPRE con un JSON válido con esta estructura exacta:
 }
 
 Criterios de clasificación:
-- "positive": el cliente está satisfecho, recomienda el servicio, usa palabras claramente positivas
-- "negative": el cliente está insatisfecho, tiene quejas, usa palabras negativas
-- "neutral": la opinión es ambigua, poco clara, o usa expresiones como "bien", "ok", "normal"
+- "positive": el cliente expresa satisfacción, aunque sea leve. Incluye respuestas como "bien", "todo bien", "ok", "correcto", "me gustó", "muy bien", "genial", "perfecto", "contento/a", "satisfecho/a", o cualquier expresión que no sea negativa ni ambivalente. El score refleja el grado: 0.55–0.70 para respuestas positivas simples ("bien", "ok"), 0.75–0.90 para claramente positivas ("muy bien", "genial"), 0.90–1.0 para muy entusiastas.
+- "negative": el cliente expresa insatisfacción, tiene quejas concretas o usa palabras negativas ("mal", "fatal", "decepcionante", "no volvería", etc.).
+- "neutral": la opinión es genuinamente ambivalente o mixta (mezcla aspectos positivos y negativos), o el mensaje no expresa ninguna opinión sobre la experiencia (preguntas, mensajes fuera de contexto, respuestas sin sentido).
 
-Sé estricto: solo clasifica como "positive" cuando haya satisfacción evidente.`;
+En caso de duda entre "positive" y "neutral", clasifica como "positive" con score bajo.`;
 
-/**
- * Analiza el texto de respuesta de un cliente y devuelve el sentimiento detectado.
- *
- * Usa el modelo claude-sonnet-4-6 con temperatura baja implícita para
- * maximizar la coherencia del JSON de salida.
- *
- * @param customerResponse - Texto libre que el cliente ha enviado por WhatsApp
- * @returns Objeto con sentimiento, puntuación numérica y resumen textual
- * @throws Si la respuesta de Claude no es un JSON válido con la estructura esperada
- */
 const SCREENSHOT_SYSTEM_PROMPT = `Eres un verificador de reseñas de plataformas como Google Maps, Trustpilot, TripAdvisor, Yelp, Booking.com, Facebook y otras.
 Tu tarea es analizar una imagen que debería ser una captura de pantalla de una reseña publicada y determinar si muestra la puntuación máxima posible en esa plataforma.
 
@@ -119,9 +108,59 @@ export async function analyzeScreenshot(mediaUrl: string): Promise<ScreenshotRes
 
   const rawText =
     response.content[0].type === "text" ? response.content[0].text : "";
-  return JSON.parse(rawText) as ScreenshotResult;
+  const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  return JSON.parse(cleaned) as ScreenshotResult;
 }
 
+const CONVERSATIONAL_SYSTEM_PROMPT = `Eres el Asistente de ReseñasYa, una IA diseñada para recoger feedback de clientes de negocios locales.
+
+Reglas que debes seguir siempre:
+1. Si alguien te pregunta qué eres, identifícate como "Asistente de ReseñasYa, una IA para recoger feedback de clientes".
+2. Nunca uses palabras malsonantes ni lenguaje inapropiado.
+3. Mantente centrado en recoger feedback sobre la experiencia del cliente con {negocio}.
+4. Sé amable, breve y directo. Máximo 2-3 frases por respuesta.
+5. Si el cliente hace preguntas sobre el negocio que no puedes responder (horarios, precios, reservas, etc.), dile que lo mejor es contactar directamente con {negocio}.
+6. No inventes información sobre el negocio.
+
+Responde solo con el texto del mensaje de WhatsApp, sin JSON ni formatos especiales.`;
+
+/**
+ * Genera una respuesta conversacional para mensajes posteriores al primer intercambio.
+ * Aplica las reglas del asistente: identificación, sin lenguaje inapropiado,
+ * enfoque en feedback y redirección a negocio para preguntas específicas.
+ */
+export async function generateConversationalResponse(
+  customerMessage: string,
+  businessName: string,
+  tone: string
+): Promise<string> {
+  const toneInstruction =
+    tone === "usted"
+      ? "Usa siempre el tratamiento de 'usted' (formal)."
+      : tone === "juvenil"
+      ? "Usa un tono muy informal y desenfadado (tuteo juvenil)."
+      : "Usa el tuteo (tono informal amigable).";
+
+  const systemPrompt =
+    CONVERSATIONAL_SYSTEM_PROMPT.replace(/{negocio}/g, businessName) +
+    `\n\nTono: ${toneInstruction}`;
+
+  const response = await anthropic.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 200,
+    system: systemPrompt,
+    messages: [{ role: "user", content: customerMessage }],
+  });
+
+  return response.content[0].type === "text" ? response.content[0].text.trim() : "";
+}
+
+/**
+ * Analiza el texto de respuesta de un cliente y devuelve el sentimiento detectado.
+ * Usa claude-sonnet-4-6; el JSON estructurado fuerza salida determinista.
+ *
+ * @throws Si la respuesta de Claude no es un JSON válido con la estructura esperada
+ */
 export async function analyzeSentiment(
   customerResponse: string
 ): Promise<SentimentResult> {
@@ -140,8 +179,7 @@ export async function analyzeSentiment(
   const rawText =
     response.content[0].type === "text" ? response.content[0].text : "";
 
-  // El modelo siempre devuelve JSON según el system prompt,
-  // pero hacemos el cast explícito por seguridad de tipos.
-  const result = JSON.parse(rawText) as SentimentResult;
+  const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  const result = JSON.parse(cleaned) as SentimentResult;
   return result;
 }
