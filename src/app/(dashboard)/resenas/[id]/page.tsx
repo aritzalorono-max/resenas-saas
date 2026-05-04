@@ -60,20 +60,22 @@ export default async function ResenasDetailPage({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: business } = await supabase
+  const businessResult = await supabase
     .from("businesses")
     .select("*")
     .eq("user_id", user!.id)
-    .single() as { data: Business | null };
+    .single();
+  const business = (businessResult.data ?? null) as Business | null;
 
   if (!business) notFound();
 
-  const { data: req } = await supabase
+  const reqResult = await supabase
     .from("review_requests")
     .select("*")
     .eq("id", id)
     .eq("business_id", business.id)
-    .single() as { data: ReviewRequest | null };
+    .single();
+  const req = (reqResult.data ?? null) as ReviewRequest | null;
 
   if (!req) notFound();
 
