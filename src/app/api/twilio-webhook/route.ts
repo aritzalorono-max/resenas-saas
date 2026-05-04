@@ -25,6 +25,7 @@
  */
 
 import { createServiceClient } from "@/lib/supabase/server";
+import { checkGeneralRateLimit, getClientIp } from "@/lib/rate-limit";
 import { analyzeSentiment, analyzeScreenshot, generateConversationalResponse } from "@/lib/claude";
 import { TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants, getTwilioSender } from "@/lib/twilio";
 import { assignDiscountCode } from "@/lib/discount-codes";
@@ -84,6 +85,22 @@ function twilioEmptyResponse(): Response {
 export async function POST(request: Request): Promise<Response> {
   logger.info("Webhook de Twilio recibido");
 
+  // ── 0. Rate limiting por IP ───────────────────────────────────────────────
+  // Protege contra scraping masivo y ataques de fuerza bruta al endpoint.
+  // Límite generoso para no bloquear a Twilio en caso de reintentos legítimos.
+  const rateLimitSupabase = await createServiceClient();
+  const clientIp = getClientIp(request);
+  const ipRateLimit = await checkGeneralRateLimit(
+    rateLimitSupabase,
+    `webhook:ip:${clientIp}`,
+    5,   // ventana: 5 minutos
+    120  // max 120 requests/5min por IP (~2 req/s)
+  );
+  if (!ipRateLimit.allowed) {
+    logger.warn(`Rate limit por IP alcanzado: ${clientIp}`);
+    return new Response("Too Many Requests", { status: 429 });
+  }
+
   let rawBody: string;
   try {
     rawBody = await request.text();
@@ -106,25 +123,49 @@ export async function POST(request: Request): Promise<Response> {
     return twilioEmptyResponse();
   }
 
+  // Rate limiting por número de teléfono: máx 20 mensajes por hora desde el mismo número
+  const phoneRateLimit = await checkGeneralRateLimit(
+    rateLimitSupabase,
+    `webhook:phone:${fromNumber}`,
+    60,  // ventana: 60 minutos
+    20   // max 20 mensajes/hora por número
+  );
+  if (!phoneRateLimit.allowed) {
+    logger.warn(`Rate limit por teléfono alcanzado: ${maskPhone(fromNumber)}`);
+    return twilioEmptyResponse(); // Respuesta vacía (no error) para no alertar al abusador
+  }
+
   logger.info(`Mensaje recibido de ${maskPhone(fromNumber)} → ${toNumber} | media: ${numMedia} | len: ${messageBody.length}`);
 
   // ── 1. Validar firma (producción) ─────────────────────────────────────────
   if (process.env.NODE_ENV === "production") {
     const isSharedNumber = toNumber.includes(TWILIO_WHATSAPP_NUMBER.replace("whatsapp:", ""));
+    let authToken: string | null = null;
 
-    // Own-mode businesses use their own Twilio account and auth token.
-    // We only validate the HMAC for the shared number where we know the token.
-    // Own-mode requests are still protected by Twilio's account-level access controls.
-    const authToken = isSharedNumber ? (process.env.TWILIO_AUTH_TOKEN ?? null) : null;
-
-    if (authToken) {
-      const isValid = validateTwilioSignature(request, rawBody, authToken);
-      if (!isValid) {
-        logger.warn("Firma de Twilio inválida — petición rechazada");
-        return twilioEmptyResponse();
-      }
-      logger.info("Firma de Twilio validada correctamente");
+    if (isSharedNumber) {
+      authToken = process.env.TWILIO_AUTH_TOKEN ?? null;
+    } else {
+      // Own-mode: look up the business by its Twilio number to get the auth token
+      const supabaseEarly = await createServiceClient();
+      const { data: bizForAuth } = await supabaseEarly
+        .from("businesses")
+        .select("own_twilio_auth_token")
+        .eq("own_twilio_whatsapp_number", toNumber)
+        .maybeSingle();
+      authToken = bizForAuth?.own_twilio_auth_token ?? null;
     }
+
+    if (!authToken) {
+      logger.warn("No se pudo obtener auth token para validar firma — petición rechazada");
+      return twilioEmptyResponse();
+    }
+
+    const isValid = validateTwilioSignature(request, rawBody, authToken);
+    if (!isValid) {
+      logger.warn("Firma de Twilio inválida — petición rechazada");
+      return twilioEmptyResponse();
+    }
+    logger.info("Firma de Twilio validada correctamente");
   }
 
   const supabase = await createServiceClient();
@@ -245,6 +286,7 @@ export async function POST(request: Request): Promise<Response> {
         activeBusiness.name,
         activeBusiness.tone ?? "tuteo"
       );
+<<<<<<< HEAD
       logger.info(`Enviando mensaje de cierre (turno ${MAX_CONVERSATION_TURNS}/${MAX_CONVERSATION_TURNS}) a ${maskPhone(activeRequest.customer_phone)}`);
     } else {
       try {
