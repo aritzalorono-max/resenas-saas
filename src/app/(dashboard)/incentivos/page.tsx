@@ -187,12 +187,24 @@ export default function IncentivosPage() {
         ))}
       </div>
 
-      {/* ── Incentivo 5★ ── */}
+      {/* ── Incentivo ── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
         <div>
-          <h2 className="font-semibold text-gray-900">Incentivo por reseña 5 estrellas</h2>
+          <h2 className="font-semibold text-gray-900">Incentivo por reseña</h2>
           <p className="text-sm text-gray-400 mt-0.5">
-            Cuando esté activo, el mensaje inicial de WhatsApp incluirá automáticamente la oferta
+            Cuando esté activo, el mensaje de WhatsApp incluirá automáticamente la oferta de recompensa
+          </p>
+        </div>
+
+        {/* Legal disclaimer */}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-800 leading-relaxed">
+          <p className="font-semibold mb-1">Aviso de responsabilidad</p>
+          <p>
+            Algunas plataformas de reseñas (como Google Maps) tienen políticas propias sobre incentivos y solicitudes
+            selectivas. <strong>Eres el único responsable</strong> de asegurarte de que el uso de esta función cumple
+            con dichas políticas. ReseñasYa no asume ninguna responsabilidad por sanciones, eliminaciones de reseñas
+            u otras consecuencias derivadas de su uso. Consulta los Términos de Servicio de cada plataforma antes
+            de activarlo.
           </p>
         </div>
 
@@ -212,8 +224,8 @@ export default function IncentivosPage() {
             </p>
             <p className="text-xs text-gray-500 mt-0.5">
               {incentiveEnabled
-                ? "El mensaje inicial ya incluye la oferta de 5 estrellas"
-                : "Actívalo para que el primer mensaje anime a dejar 5 estrellas"}
+                ? "El cliente recibirá la oferta de recompensa si deja una reseña"
+                : "Actívalo para ofrecer una recompensa a cambio de una reseña"}
             </p>
           </div>
         </button>
