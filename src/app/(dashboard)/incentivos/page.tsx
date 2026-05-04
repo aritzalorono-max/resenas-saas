@@ -72,28 +72,27 @@ export default function IncentivosPage() {
     const active = links.find((l) => l.url === biz.google_maps_url);
     setPlatformName(active?.name ?? "Google Maps");
 
-    // Load codes
-    const { data: codesData } = await supabase
-      .from("discount_codes")
-      .select("*")
-      .eq("business_id", id)
-      .order("created_at", { ascending: false })
-      .limit(500);
+    // Codes list and rewarded count are independent — run in parallel
+    const [{ data: codesData }, { count: rewarded }] = await Promise.all([
+      supabase
+        .from("discount_codes")
+        .select("*")
+        .eq("business_id", id)
+        .order("created_at", { ascending: false })
+        .limit(500),
+      supabase
+        .from("review_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("business_id", id)
+        .not("discount_code", "is", null)
+        .eq("status", "rewarded"),
+    ]);
 
     const allCodes = (codesData ?? []) as DiscountCode[];
     setCodes(allCodes);
 
-    // Stats
     const available = allCodes.filter((c) => c.status === "available").length;
     const used      = allCodes.filter((c) => c.status === "used").length;
-
-    // Count rewarded review_requests that have a discount code
-    const { count: rewarded } = await supabase
-      .from("review_requests")
-      .select("id", { count: "exact", head: true })
-      .eq("business_id", id)
-      .not("discount_code", "is", null)
-      .eq("status", "rewarded");
 
     setStats({ total: allCodes.length, available, used, rewarded: rewarded ?? 0 });
     setLoading(false);
@@ -102,7 +101,7 @@ export default function IncentivosPage() {
   useEffect(() => { load(); }, []);
 
   async function saveSettings() {
-    if (!businessId) return;
+    if (!businessId || savingSettings) return;
     setSavingSettings(true);
     setSettingsSuccess(false);
     const supabase = createClient();

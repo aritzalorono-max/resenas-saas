@@ -19,38 +19,44 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: business } = await supabase
-    .from("businesses")
-    .select("*")
-    .eq("user_id", user!.id)
-    .single();
+  // business + stats share the same user_id filter → run in parallel.
+  // recent + snapshots need business.id, so they run in a second parallel batch.
+  const [{ data: business }, { data: stats }] = await Promise.all([
+    supabase
+      .from("businesses")
+      .select("id, name, google_maps_url")
+      .eq("user_id", user!.id)
+      .single(),
+    supabase
+      .from("business_stats")
+      .select("*")
+      .eq("user_id", user!.id)
+      .single() as Promise<{ data: BusinessStats | null }>,
+  ]);
 
-  const { data: stats } = await supabase
-    .from("business_stats")
-    .select("*")
-    .eq("user_id", user!.id)
-    .single() as { data: BusinessStats | null };
+  const businessId = business?.id ?? "";
 
-  const { data: recent } = await supabase
-    .from("review_requests")
-    .select("*")
-    .eq("business_id", business?.id ?? "")
-    .order("created_at", { ascending: false })
-    .limit(10) as { data: ReviewRequest[] | null };
-
-  // Google Maps rating snapshots (last 60 days)
-  const { data: snapshots } = await supabase
-    .from("google_maps_snapshots")
-    .select("rating, review_count, fetched_at")
-    .eq("business_id", business?.id ?? "")
-    .order("fetched_at", { ascending: true })
-    .limit(60) as { data: Pick<GoogleMapsSnapshot, "rating" | "review_count" | "fetched_at">[] | null };
+  const [{ data: recent }, { data: snapshots }] = await Promise.all([
+    supabase
+      .from("review_requests")
+      .select("id, customer_name, customer_phone, status, customer_response, created_at")
+      .eq("business_id", businessId)
+      .order("created_at", { ascending: false })
+      .limit(10) as Promise<{ data: ReviewRequest[] | null }>,
+    supabase
+      .from("google_maps_snapshots")
+      .select("rating, review_count, fetched_at")
+      .eq("business_id", businessId)
+      .order("fetched_at", { ascending: true })
+      .limit(60) as Promise<{ data: Pick<GoogleMapsSnapshot, "rating" | "review_count" | "fetched_at">[] | null }>,
+  ]);
 
   const chartData = (snapshots ?? [])
     .filter(s => s.rating != null)
     .map(s => ({ date: s.fetched_at, rating: s.rating!, review_count: s.review_count }));
 
   const hasApiKey = !!process.env.GOOGLE_PLACES_API_KEY;
+
 
   const total      = stats?.total_requests  ?? 0;
   const positives  = stats?.positive_count  ?? 0;  // ya incluye rewarded + awaiting_screenshot

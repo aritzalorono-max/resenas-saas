@@ -5,8 +5,18 @@
 
 const BASE = "https://maps.googleapis.com/maps/api/place";
 
+// Abort Google Places requests that hang. The API is usually fast (<1 s)
+// but without a timeout a hung request would block the cron for its full slot.
+const FETCH_TIMEOUT_MS = 8000;
+
 function apiKey(): string {
   return process.env.GOOGLE_PLACES_API_KEY ?? "";
+}
+
+function fetchWithTimeout(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
 }
 
 /**
@@ -41,13 +51,13 @@ export async function findPlaceIdByName(name: string): Promise<string | null> {
   });
 
   try {
-    const res  = await fetch(`${BASE}/findplacefromtext/json?${params}`);
+    const res  = await fetchWithTimeout(`${BASE}/findplacefromtext/json?${params}`);
     const data = await res.json() as { status: string; candidates?: { place_id: string }[] };
     if (data.status === "OK" && data.candidates?.[0]?.place_id) {
       return data.candidates[0].place_id;
     }
   } catch {
-    // network error — handled by caller
+    // network error or timeout — handled by caller
   }
   return null;
 }
@@ -71,7 +81,7 @@ export async function getPlaceRating(placeId: string): Promise<PlaceRating> {
   });
 
   try {
-    const res  = await fetch(`${BASE}/details/json?${params}`);
+    const res  = await fetchWithTimeout(`${BASE}/details/json?${params}`);
     const data = await res.json() as {
       status: string;
       result?: { rating?: number; user_ratings_total?: number };
@@ -83,7 +93,7 @@ export async function getPlaceRating(placeId: string): Promise<PlaceRating> {
       };
     }
   } catch {
-    // network error — handled by caller
+    // network error or timeout — handled by caller
   }
   return { rating: null, review_count: null };
 }
