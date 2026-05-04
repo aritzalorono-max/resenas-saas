@@ -37,10 +37,10 @@ export default async function ResenasPage({
 }: {
   searchParams: Promise<{ status?: string; page?: string; month?: string; incentive?: string }>;
 }) {
-  const sp             = await searchParams;
-  const filterStatus   = sp.status    ?? "all";
+  const sp              = await searchParams;
+  const filterStatus    = sp.status    ?? "all";
   const incentiveFilter = sp.incentive ?? "all";
-  const page           = Math.max(1, parseInt(sp.page ?? "1", 10));
+  const page            = Math.max(1, parseInt(sp.page ?? "1", 10));
 
   // ── Month ────────────────────────────────────────────────────────────────
   const now             = new Date();
@@ -66,38 +66,56 @@ export default async function ResenasPage({
     .from("businesses").select("id").eq("user_id", user!.id).single();
   const businessId = business?.id ?? "";
 
-  // Fetch all requests for the selected month in one query
-  const { data: allRaw } = await supabase
+  const offset = (page - 1) * PAGE_SIZE;
+
+  // Build the paginated query conditionally before running it.
+  // Filters are applied in SQL so only 20 rows are transferred regardless of month size.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let pageQuery: any = supabase
     .from("review_requests")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("business_id", businessId)
     .gte("created_at", monthStart)
     .lt("created_at",  monthEnd)
-    .order("created_at", { ascending: false }) as { data: ReviewRequest[] | null };
+    .order("created_at", { ascending: false });
 
-  const all = allRaw ?? [];
+  if (filterStatus !== "all")    pageQuery = pageQuery.eq("status", filterStatus);
+  if (incentiveFilter === "yes") pageQuery = pageQuery.not("discount_code", "is", null);
+  if (incentiveFilter === "no")  pageQuery = pageQuery.is("discount_code", null);
 
-  // ── Monthly summary stats ─────────────────────────────────────────────────
+  pageQuery = pageQuery.range(offset, offset + PAGE_SIZE - 1);
+
+  // Run both queries in parallel:
+  //   statsQuery — fetches only (status, discount_code) for the full month to compute
+  //                the summary bar. Lightweight even for large months.
+  //   pageQuery  — fetches full rows but only PAGE_SIZE of them via SQL LIMIT/OFFSET.
+  const [statsResult, pageResult] = await Promise.all([
+    supabase
+      .from("review_requests")
+      .select("status, discount_code")
+      .eq("business_id", businessId)
+      .gte("created_at", monthStart)
+      .lt("created_at",  monthEnd),
+    pageQuery,
+  ]);
+
+  // ── Monthly summary stats (computed from lightweight stats query) ─────────
+  const allStats = (statsResult.data ?? []) as { status: string; discount_code: string | null }[];
   const ms = {
-    total:    all.length,
-    positive: all.filter(r => ["positive", "awaiting_screenshot", "rewarded"].includes(r.status)).length,
-    negative: all.filter(r => r.status === "negative").length,
-    neutral:  all.filter(r => r.status === "neutral").length,
-    rewarded: all.filter(r => r.status === "rewarded").length,
-    pending:  all.filter(r => r.status === "pending").length,
+    total:    allStats.length,
+    positive: allStats.filter(r => ["positive", "awaiting_screenshot", "rewarded"].includes(r.status)).length,
+    negative: allStats.filter(r => r.status === "negative").length,
+    neutral:  allStats.filter(r => r.status === "neutral").length,
+    rewarded: allStats.filter(r => r.status === "rewarded").length,
+    pending:  allStats.filter(r => r.status === "pending").length,
   };
   const responded    = ms.positive + ms.negative + ms.neutral;
   const positiveRate = responded > 0 ? Math.round((ms.positive / responded) * 100) : 0;
 
-  // ── Apply filters in JS ───────────────────────────────────────────────────
-  let filtered = all;
-  if (filterStatus !== "all")       filtered = filtered.filter(r => r.status === filterStatus);
-  if (incentiveFilter === "yes")    filtered = filtered.filter(r => r.discount_code != null);
-  if (incentiveFilter === "no")     filtered = filtered.filter(r => r.discount_code == null);
-
-  const total      = filtered.length;
+  // ── Paginated rows from SQL ───────────────────────────────────────────────
+  const requests   = (pageResult.data ?? []) as ReviewRequest[];
+  const total      = (pageResult.count ?? 0) as number;
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const requests   = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   // ── URL builder ───────────────────────────────────────────────────────────
   function href(opts: { page?: number; status?: string; month?: string; incentive?: string }): string {

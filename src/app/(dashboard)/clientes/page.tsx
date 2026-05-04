@@ -56,6 +56,10 @@ const MAX_RETRIES     = 2;
 const RETRY_DELAY_MS  = 1500;
 const SEND_DELAY_MS   = 400;
 
+// Safeguards for bulk import
+const MAX_FILE_SIZE_MB = 10;
+const MAX_BULK_ROWS    = 500;
+
 function loadCountry(): Country {
   if (typeof window === "undefined") return DEFAULT_COUNTRY;
   try {
@@ -306,10 +310,21 @@ export default function ClientesPage() {
     setSendStatus("idle");
     setSendProgress(0);
     setBulkFileName(file.name);
+
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setBulkParseError(`El archivo es demasiado grande. El tamaño máximo es ${MAX_FILE_SIZE_MB} MB.`);
+      return;
+    }
+
     try {
       const rows = await parseFileToRows(file, country.dial);
       if (!rows.length) {
         setBulkParseError("No se encontraron filas con datos en el archivo.");
+        setBulkRows([]);
+        return;
+      }
+      if (rows.length > MAX_BULK_ROWS) {
+        setBulkParseError(`El archivo contiene ${rows.length} filas. El máximo por importación es ${MAX_BULK_ROWS}. Divide el archivo en partes más pequeñas.`);
         setBulkRows([]);
         return;
       }

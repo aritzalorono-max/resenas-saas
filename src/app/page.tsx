@@ -22,6 +22,10 @@ import {
   GraduationCap,
 } from "lucide-react";
 
+// Landing page is fully static content — regenerate at most once per hour
+// so CDN edge nodes serve cached HTML globally without hitting the origin.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
   description: "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
