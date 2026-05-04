@@ -21,7 +21,7 @@ export default async function DashboardPage() {
 
   // business + stats share the same user_id filter → run in parallel.
   // recent + snapshots need business.id, so they run in a second parallel batch.
-  const [{ data: business }, { data: stats }] = await Promise.all([
+  const [{ data: business }, statsResult] = await Promise.all([
     supabase
       .from("businesses")
       .select("id, name, google_maps_url")
@@ -31,25 +31,28 @@ export default async function DashboardPage() {
       .from("business_stats")
       .select("*")
       .eq("user_id", user!.id)
-      .single() as Promise<{ data: BusinessStats | null }>,
+      .single(),
   ]);
+  const stats = (statsResult.data ?? null) as BusinessStats | null;
 
   const businessId = business?.id ?? "";
 
-  const [{ data: recent }, { data: snapshots }] = await Promise.all([
+  const [recentResult, snapshotsResult] = await Promise.all([
     supabase
       .from("review_requests")
       .select("id, customer_name, customer_phone, status, customer_response, created_at")
       .eq("business_id", businessId)
       .order("created_at", { ascending: false })
-      .limit(10) as Promise<{ data: ReviewRequest[] | null }>,
+      .limit(10),
     supabase
       .from("google_maps_snapshots")
       .select("rating, review_count, fetched_at")
       .eq("business_id", businessId)
       .order("fetched_at", { ascending: true })
-      .limit(60) as Promise<{ data: Pick<GoogleMapsSnapshot, "rating" | "review_count" | "fetched_at">[] | null }>,
+      .limit(60),
   ]);
+  const recent    = (recentResult.data    ?? null) as ReviewRequest[] | null;
+  const snapshots = (snapshotsResult.data ?? null) as Pick<GoogleMapsSnapshot, "rating" | "review_count" | "fetched_at">[] | null;
 
   const chartData = (snapshots ?? [])
     .filter(s => s.rating != null)
