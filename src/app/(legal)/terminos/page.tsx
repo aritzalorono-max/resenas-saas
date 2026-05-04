@@ -200,7 +200,32 @@ export default function TerminosPage() {
         </p>
       </Section>
 
-      <Section title="12. Modificación de las Condiciones">
+      <Section title="12. Tratamiento de datos por cuenta del usuario (Art. 28 RGPD)">
+        <p>
+          En el marco de la prestación del servicio, {COMPANY} actúa como <strong>encargado del tratamiento</strong>{" "}
+          por cuenta del usuario (negocio), que actúa como <strong>responsable del tratamiento</strong>, respecto a
+          los datos personales de los clientes finales (nombre y número de teléfono) introducidos en la Plataforma
+          para el envío de solicitudes de reseña.
+        </p>
+        <p>
+          En virtud de lo dispuesto en el artículo 28 del Reglamento (UE) 2016/679 (RGPD), {COMPANY} se compromete a:
+        </p>
+        <ul>
+          <li>Tratar los datos personales de los clientes finales únicamente siguiendo las instrucciones documentadas del responsable del tratamiento (el usuario).</li>
+          <li>Garantizar que las personas autorizadas para tratar los datos personales se hayan comprometido a respetar la confidencialidad.</li>
+          <li>Aplicar todas las medidas de seguridad técnicas y organizativas apropiadas conforme al artículo 32 RGPD.</li>
+          <li>No recurrir a otro encargado del tratamiento sin autorización previa del responsable, salvo los subencargados necesarios para la prestación del servicio (Twilio, Anthropic, Supabase, Vercel), cuya utilización el usuario acepta mediante el uso de la Plataforma.</li>
+          <li>Asistir al responsable del tratamiento en la atención de solicitudes de ejercicio de derechos de los interesados.</li>
+          <li>Suprimir o devolver todos los datos personales al responsable del tratamiento una vez finalizada la prestación del servicio, salvo que el derecho de la Unión o de los Estados miembros exija la conservación de los datos personales.</li>
+          <li>Poner a disposición del responsable del tratamiento toda la información necesaria para demostrar el cumplimiento de las obligaciones establecidas en el artículo 28 RGPD.</li>
+        </ul>
+        <p>
+          El usuario, como responsable del tratamiento, garantiza que cuenta con base jurídica suficiente para tratar
+          los datos de sus clientes y para encargar dicho tratamiento a {COMPANY}.
+        </p>
+      </Section>
+
+      <Section title="13. Modificación de las Condiciones">
         <p>
           {COMPANY} se reserva el derecho de modificar estas Condiciones en cualquier momento. Las modificaciones
           serán comunicadas al usuario mediante correo electrónico o aviso en la Plataforma con un mínimo de 15 días
@@ -209,7 +234,7 @@ export default function TerminosPage() {
         </p>
       </Section>
 
-      <Section title="13. Legislación aplicable y jurisdicción">
+      <Section title="14. Legislación aplicable y jurisdicción">
         <p>
           Estas Condiciones se rigen por la legislación española. Para la resolución de cualquier controversia
           derivada de la interpretación o el cumplimiento de estas Condiciones, las partes se someten, con renuncia
@@ -224,7 +249,7 @@ export default function TerminosPage() {
         </p>
       </Section>
 
-      <Section title="14. Contacto">
+      <Section title="15. Contacto">
         <p>
           Para cualquier consulta relacionada con estas Condiciones, puedes contactarnos en:{" "}
           <a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> o a través de{" "}

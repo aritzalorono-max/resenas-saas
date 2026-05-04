@@ -68,15 +68,15 @@ Si quieres compartir tu experiencia en {plataforma}, nos ayudaría mucho:
 
   positive_incentive: `¡Qué alegría saber eso, {nombre}! 🙌 Nos encanta que hayas tenido una gran experiencia en {negocio}.
 
-¿Te animarías a dejarnos una reseña de 5 ⭐ en {plataforma}? Es muy sencillo:
+¿Te animarías a dejarnos una reseña en {plataforma}? Es muy sencillo:
 
 👉 {url}
 
 Y como agradecimiento por tu tiempo, tu regalo: *{incentivo}* 🎁
 
-Cuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`,
+Cuando publiques tu reseña, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`,
 
-  screenshot_verified: `¡Muchísimas gracias, {nombre}! 🎉 Hemos comprobado tu reseña de 5 ⭐ en {plataforma}.
+  screenshot_verified: `¡Muchísimas gracias, {nombre}! 🎉 Hemos comprobado tu reseña en {plataforma}.
 
 Como prometimos, aquí tienes tu regalo: *{incentivo}* 🎁
 
@@ -120,15 +120,15 @@ Si quiere compartir su experiencia en {plataforma}, nos ayudaría mucho:
 
   positive_incentive: `¡Qué alegría saber eso, {nombre}! 🙌 Nos encanta que haya tenido una gran experiencia en {negocio}.
 
-¿Se animaría a dejarnos una reseña de 5 ⭐ en {plataforma}? Es muy sencillo:
+¿Se animaría a dejarnos una reseña en {plataforma}? Es muy sencillo:
 
 👉 {url}
 
 Y como agradecimiento por su tiempo, su regalo: *{incentivo}* 🎁
 
-Cuando publique su reseña de 5 estrellas, envíenos una captura de pantalla y se lo hacemos llegar enseguida. ¡Muchas gracias! 💚`,
+Cuando publique su reseña, envíenos una captura de pantalla y se lo hacemos llegar enseguida. ¡Muchas gracias! 💚`,
 
-  screenshot_verified: `¡Muchísimas gracias, {nombre}! 🎉 Hemos comprobado su reseña de 5 ⭐ en {plataforma}.
+  screenshot_verified: `¡Muchísimas gracias, {nombre}! 🎉 Hemos comprobado su reseña en {plataforma}.
 
 Como prometimos, aquí tiene su regalo: *{incentivo}* 🎁
 
@@ -172,7 +172,7 @@ Si te apetece, puedes dejarnos tu opinión en {plataforma}, ¡nos ayuda un mont�
 
   positive_incentive: `¡Genial, {nombre}! 🔥 ¡Nos alegra mogollón que te haya ido tan bien en {negocio}!
 
-¿Nos haces el mega favor de dejarnos una reseña de 5 ⭐ en {plataforma}? ¡Tardas solo un minuto!
+¿Nos haces el mega favor de dejarnos una reseña en {plataforma}? ¡Tardas solo un minuto!
 
 👉 {url}
 
@@ -180,7 +180,7 @@ Y de parte nuestra, tu regalo: *{incentivo}* 🎁🙌
 
 Cuando pongas la reseña, mándanos una captura y te lo mandamos al momento. ¡Eres lo mejor! 💚`,
 
-  screenshot_verified: `¡MUCHAS GRACIAS, {nombre}! 🎉🔥 ¡Hemos visto tu reseña de 5 ⭐ en {plataforma} y estamos súper contentos!
+  screenshot_verified: `¡MUCHAS GRACIAS, {nombre}! 🎉🔥 ¡Hemos visto tu reseña en {plataforma} y estamos súper contentos!
 
 Como te dijimos, aquí va tu regalo: *{incentivo}* 🎁
 
@@ -208,4 +208,4 @@ export const MESSAGE_TEMPLATES: Record<BusinessTone, ToneTemplates> = {
 // ---------------------------------------------------------------------------
 
 export const DEFAULT_WELCOME_MESSAGE =
-  "¡Hola {nombre}! Soy el equipo de {negocio}. ¿Cómo fue tu experiencia con nosotros hoy? Tu opinión nos ayuda a mejorar 😊";
+  "¡Hola {nombre}! Soy el equipo de {negocio}. ¿Cómo fue tu experiencia con nosotros hoy? Tu opinión nos ayuda a mejorar 😊 (Responde STOP si no deseas recibir más mensajes)";

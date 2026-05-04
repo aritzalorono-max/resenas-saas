@@ -545,6 +545,10 @@ export default function ClientesPage() {
                 </div>
               )}
 
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Al enviar confirmas que el cliente ha dado su consentimiento para recibir mensajes de WhatsApp conforme al RGPD y la LSSICE. Eres responsable de disponer de esa autorización.
+              </p>
+
               <button
                 type="submit"
                 disabled={loading}
@@ -804,19 +808,24 @@ export default function ClientesPage() {
 
           {/* Send button */}
           {bulkRows.length > 0 && sendStatus === "idle" && validCount > 0 && (
-            <button
-              onClick={handleBulkSend}
-              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl
-                         transition text-base flex items-center justify-center gap-2 shadow-md shadow-brand-200"
-            >
-              <Upload className="w-5 h-5" strokeWidth={2} />
-              Enviar {validCount} WhatsApp{validCount !== 1 ? "s" : ""}
-              {invalidCount > 0 && (
-                <span className="text-brand-200 font-normal text-sm ml-1">
-                  ({invalidCount} omitidos)
-                </span>
-              )}
-            </button>
+            <>
+              <p className="text-xs text-gray-400 leading-relaxed px-1">
+                Al enviar confirmas que todos los contactos han dado su consentimiento para recibir mensajes de WhatsApp conforme al RGPD y la LSSICE. Eres responsable de disponer de esa autorización.
+              </p>
+              <button
+                onClick={handleBulkSend}
+                className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl
+                           transition text-base flex items-center justify-center gap-2 shadow-md shadow-brand-200"
+              >
+                <Upload className="w-5 h-5" strokeWidth={2} />
+                Enviar {validCount} WhatsApp{validCount !== 1 ? "s" : ""}
+                {invalidCount > 0 && (
+                  <span className="text-brand-200 font-normal text-sm ml-1">
+                    ({invalidCount} omitidos)
+                  </span>
+                )}
+              </button>
+            </>
           )}
         </div>
       )}
