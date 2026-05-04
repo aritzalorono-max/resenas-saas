@@ -67,15 +67,15 @@ export default async function ResenasPage({
   const businessId = business?.id ?? "";
 
   // Fetch all requests for the selected month in one query
-  const { data: allRaw } = await supabase
+  const rawResult = await supabase
     .from("review_requests")
     .select("*")
     .eq("business_id", businessId)
     .gte("created_at", monthStart)
     .lt("created_at",  monthEnd)
-    .order("created_at", { ascending: false }) as { data: ReviewRequest[] | null };
+    .order("created_at", { ascending: false });
 
-  const all = allRaw ?? [];
+  const all = (rawResult.data ?? []) as ReviewRequest[];
 
   // ── Monthly summary stats ─────────────────────────────────────────────────
   const ms = {

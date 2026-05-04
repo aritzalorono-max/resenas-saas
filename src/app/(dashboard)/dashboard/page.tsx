@@ -19,32 +19,38 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: business } = await supabase
-    .from("businesses")
-    .select("*")
-    .eq("user_id", user!.id)
-    .single();
+  const [{ data: business }, statsResult] = await Promise.all([
+    supabase
+      .from("businesses")
+      .select("id, name, google_maps_url")
+      .eq("user_id", user!.id)
+      .single(),
+    supabase
+      .from("business_stats")
+      .select("*")
+      .eq("user_id", user!.id)
+      .single(),
+  ]);
+  const stats = (statsResult.data ?? null) as BusinessStats | null;
 
-  const { data: stats } = await supabase
-    .from("business_stats")
-    .select("*")
-    .eq("user_id", user!.id)
-    .single() as { data: BusinessStats | null };
+  const businessId = business?.id ?? "";
 
-  const { data: recent } = await supabase
-    .from("review_requests")
-    .select("*")
-    .eq("business_id", business?.id ?? "")
-    .order("created_at", { ascending: false })
-    .limit(10) as { data: ReviewRequest[] | null };
-
-  // Google Maps rating snapshots (last 60 days)
-  const { data: snapshots } = await supabase
-    .from("google_maps_snapshots")
-    .select("rating, review_count, fetched_at")
-    .eq("business_id", business?.id ?? "")
-    .order("fetched_at", { ascending: true })
-    .limit(60) as { data: Pick<GoogleMapsSnapshot, "rating" | "review_count" | "fetched_at">[] | null };
+  const [recentResult, snapshotsResult] = await Promise.all([
+    supabase
+      .from("review_requests")
+      .select("id, customer_name, customer_phone, status, customer_response, created_at")
+      .eq("business_id", businessId)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    supabase
+      .from("google_maps_snapshots")
+      .select("rating, review_count, fetched_at")
+      .eq("business_id", businessId)
+      .order("fetched_at", { ascending: true })
+      .limit(60),
+  ]);
+  const recent    = (recentResult.data    ?? null) as ReviewRequest[] | null;
+  const snapshots = (snapshotsResult.data ?? null) as Pick<GoogleMapsSnapshot, "rating" | "review_count" | "fetched_at">[] | null;
 
   const chartData = (snapshots ?? [])
     .filter(s => s.rating != null)
