@@ -9,11 +9,13 @@ import { GoogleButton } from "@/components/auth/GoogleButton";
 export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email:           "",
+    password:        "",
     confirmPassword: "",
   });
-  const [error, setError] = useState("");
+  const [termsAccepted,     setTermsAccepted]     = useState(false);
+  const [marketingAccepted, setMarketingAccepted] = useState(false);
+  const [error,   setError]   = useState("");
   const [loading, setLoading] = useState(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -23,6 +25,11 @@ export default function RegisterPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (!termsAccepted) {
+      setError("Debes aceptar los Términos de uso y la Política de privacidad para continuar");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError("Las contraseñas no coinciden");
@@ -38,8 +45,14 @@ export default function RegisterPage() {
     const supabase = createClient();
 
     const { data, error: signUpError } = await supabase.auth.signUp({
-      email: formData.email,
+      email:    formData.email,
       password: formData.password,
+      options: {
+        data: {
+          terms_accepted_at:  new Date().toISOString(),
+          marketing_consent:  marketingAccepted,
+        },
+      },
     });
 
     if (signUpError) {
@@ -62,6 +75,14 @@ export default function RegisterPage() {
       <p className="text-gray-500 mb-6">Empieza a recopilar reseñas en minutos</p>
 
       <GoogleButton label="Registrarse con Google" />
+
+      {/* Aviso de consentimiento para OAuth (LSSICE art. 21 + RGPD) */}
+      <p className="text-xs text-gray-400 text-center mt-2 leading-relaxed">
+        Al registrarte con Google confirmas que has leído y aceptas nuestros{" "}
+        <Link href="/terminos" className="underline hover:text-gray-600">Términos de uso</Link>
+        {" "}y la{" "}
+        <Link href="/privacidad" className="underline hover:text-gray-600">Política de privacidad</Link>.
+      </p>
 
       <div className="relative my-5">
         <div className="absolute inset-0 flex items-center">
@@ -119,6 +140,46 @@ export default function RegisterPage() {
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
             placeholder="••••••••"
           />
+        </div>
+
+        {/* ── Consentimientos (RGPD Art. 7 + LSSICE Art. 21) ── */}
+        <div className="space-y-3 pt-1">
+          {/* Obligatorio: T&C + Privacidad */}
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-brand-600
+                         focus:ring-brand-500 cursor-pointer"
+            />
+            <span className="text-sm text-gray-600 leading-snug">
+              He leído y acepto los{" "}
+              <Link href="/terminos" target="_blank" className="text-brand-600 underline hover:text-brand-700 font-medium">
+                Términos de uso
+              </Link>
+              {" "}y la{" "}
+              <Link href="/privacidad" target="_blank" className="text-brand-600 underline hover:text-brand-700 font-medium">
+                Política de privacidad
+              </Link>
+              <span className="text-red-500 ml-0.5">*</span>
+            </span>
+          </label>
+
+          {/* Opcional: comunicaciones comerciales */}
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={marketingAccepted}
+              onChange={(e) => setMarketingAccepted(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-brand-600
+                         focus:ring-brand-500 cursor-pointer"
+            />
+            <span className="text-sm text-gray-600 leading-snug">
+              Acepto recibir comunicaciones comerciales y novedades de ReseñasYa por email.
+              {" "}<span className="text-gray-400 text-xs">(Opcional. Puedes darte de baja en cualquier momento.)</span>
+            </span>
+          </label>
         </div>
 
         {error && (
