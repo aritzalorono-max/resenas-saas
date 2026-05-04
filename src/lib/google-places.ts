@@ -5,41 +5,72 @@
 
 const BASE = "https://maps.googleapis.com/maps/api/place";
 
-// Abort Google Places requests that hang. The API is usually fast (<1 s)
-// but without a timeout a hung request would block the cron for its full slot.
-const FETCH_TIMEOUT_MS = 8000;
-
 function apiKey(): string {
   return process.env.GOOGLE_PLACES_API_KEY ?? "";
 }
 
-function fetchWithTimeout(url: string): Promise<Response> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
+/**
+ * Resuelve una URL acortada de Google Maps (maps.app.goo.gl) siguiendo la redirección.
+ */
+export async function resolveShortUrl(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, { redirect: "follow", method: "HEAD" });
+    return res.url || url;
+  } catch {
+    return url;
+  }
 }
 
 /**
- * Intenta extraer el Place ID directamente de una URL de Google Maps.
- * Funciona con URLs largas que contienen el ID embebido en los datos del path.
+ * Extrae nombre y coordenadas de una URL de Google Maps.
+ * Ej: /maps/place/Mi+Negocio/@43.356,-3.011,...
  */
-export function extractPlaceIdFromUrl(url: string): string | null {
-  // Formato más común: ...!1sChIJxxxxxxxx...
-  const m1 = url.match(/!1s(ChIJ[A-Za-z0-9_-]+)/);
+function extractNameAndCoords(url: string): { name: string | null; lat: number | null; lng: number | null } {
+  const nameMatch = url.match(/\/maps\/place\/([^/@?]+)/);
+  const name = nameMatch ? decodeURIComponent(nameMatch[1].replace(/\+/g, " ")) : null;
+
+  const coordsMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  const lat = coordsMatch ? parseFloat(coordsMatch[1]) : null;
+  const lng = coordsMatch ? parseFloat(coordsMatch[2]) : null;
+
+  return { name, lat, lng };
+}
+
+/**
+ * Intenta extraer el Place ID directamente de una URL de Google Maps (formato ChIJ).
+ * Si recibe una URL acortada (maps.app.goo.gl), la resuelve primero.
+ * Si no encuentra el Place ID en la URL, busca por nombre + coordenadas como fallback.
+ */
+export async function extractPlaceIdFromUrl(url: string): Promise<string | null> {
+  let resolved = url;
+
+  // Resolve short URLs (maps.app.goo.gl, goo.gl, etc.)
+  if (/goo\.gl|maps\.app/i.test(url)) {
+    resolved = await resolveShortUrl(url);
+  }
+
+  // Formato ChIJ: ...!1sChIJxxxxxxxx...
+  const m1 = resolved.match(/!1s(ChIJ[A-Za-z0-9_-]+)/);
   if (m1) return m1[1];
 
   // Formato con query param explícito
-  const m2 = url.match(/[?&]placeid=(ChIJ[A-Za-z0-9_-]+)/i);
+  const m2 = resolved.match(/[?&]placeid=(ChIJ[A-Za-z0-9_-]+)/i);
   if (m2) return m2[1];
+
+  // Fallback: buscar por nombre + coordenadas extraídas de la URL
+  const { name, lat, lng } = extractNameAndCoords(resolved);
+  if (name) {
+    return findPlaceIdByName(name, lat ?? undefined, lng ?? undefined);
+  }
 
   return null;
 }
 
 /**
  * Busca el Place ID de un negocio por nombre usando Places Text Search.
- * Se usa como fallback cuando no se puede extraer el ID de la URL.
+ * Acepta coordenadas opcionales para acotar la búsqueda geográficamente.
  */
-export async function findPlaceIdByName(name: string): Promise<string | null> {
+export async function findPlaceIdByName(name: string, lat?: number, lng?: number): Promise<string | null> {
   const key = apiKey();
   if (!key) return null;
 
@@ -50,14 +81,18 @@ export async function findPlaceIdByName(name: string): Promise<string | null> {
     key,
   });
 
+  if (lat != null && lng != null) {
+    params.set("locationbias", `point:${lat},${lng}`);
+  }
+
   try {
-    const res  = await fetchWithTimeout(`${BASE}/findplacefromtext/json?${params}`);
+    const res  = await fetch(`${BASE}/findplacefromtext/json?${params}`);
     const data = await res.json() as { status: string; candidates?: { place_id: string }[] };
     if (data.status === "OK" && data.candidates?.[0]?.place_id) {
       return data.candidates[0].place_id;
     }
   } catch {
-    // network error or timeout — handled by caller
+    // network error — handled by caller
   }
   return null;
 }
@@ -81,7 +116,7 @@ export async function getPlaceRating(placeId: string): Promise<PlaceRating> {
   });
 
   try {
-    const res  = await fetchWithTimeout(`${BASE}/details/json?${params}`);
+    const res  = await fetch(`${BASE}/details/json?${params}`);
     const data = await res.json() as {
       status: string;
       result?: { rating?: number; user_ratings_total?: number };
@@ -93,7 +128,7 @@ export async function getPlaceRating(placeId: string): Promise<PlaceRating> {
       };
     }
   } catch {
-    // network error or timeout — handled by caller
+    // network error — handled by caller
   }
   return { rating: null, review_count: null };
 }
