@@ -23,5 +23,8 @@ export async function GET(
     .eq("code", code)
     .single();
 
-  redirect(data?.url ?? "/");
+  const url = data?.url ?? "";
+  // Only redirect to http/https URLs to prevent javascript: or data: redirects
+  const isSafe = url.startsWith("https://") || url.startsWith("http://");
+  redirect(isSafe ? url : "/");
 }

@@ -82,11 +82,9 @@ async function processOneBusiness(
 export async function GET(request: Request): Promise<Response> {
   // ── Auth check ────────────────────────────────────────────────────────────
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) {
-      return new Response("Unauthorized", { status: 401 });
-    }
+  const auth = request.headers.get("authorization");
+  if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
+    return new Response("Unauthorized", { status: 401 });
   }
 
   const supabase = await createServiceClient();

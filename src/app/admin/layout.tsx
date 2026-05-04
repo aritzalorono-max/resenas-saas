@@ -15,7 +15,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .map((e) => e.trim())
     .filter(Boolean);
 
-  if (adminEmails.length > 0 && !adminEmails.includes(user.email ?? "")) {
+  if (adminEmails.length === 0 || !adminEmails.includes(user.email ?? "")) {
     redirect("/dashboard");
   }
 

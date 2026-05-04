@@ -69,6 +69,15 @@ export async function analyzeScreenshot(mediaUrl: string): Promise<ScreenshotRes
   const authToken = process.env.TWILIO_AUTH_TOKEN!;
   const credentials = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
 
+  const ALLOWED_MEDIA_ORIGINS = [
+    "https://api.twilio.com/",
+    "https://media.twiliocdn.com/",
+    "https://mcs.us1.twilio.com/",
+  ];
+  if (!ALLOWED_MEDIA_ORIGINS.some(o => mediaUrl.startsWith(o))) {
+    throw new Error("URL de media no permitida");
+  }
+
   const imageResponse = await fetch(mediaUrl, {
     headers: { Authorization: `Basic ${credentials}` },
   });

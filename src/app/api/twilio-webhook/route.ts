@@ -245,6 +245,7 @@ export async function POST(request: Request): Promise<Response> {
         activeBusiness.name,
         activeBusiness.tone ?? "tuteo"
       );
+<<<<<<< HEAD
       logger.info(`Enviando mensaje de cierre (turno ${MAX_CONVERSATION_TURNS}/${MAX_CONVERSATION_TURNS}) a ${maskPhone(activeRequest.customer_phone)}`);
     } else {
       try {
