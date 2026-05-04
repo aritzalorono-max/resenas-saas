@@ -25,6 +25,7 @@
  */
 
 import { createServiceClient } from "@/lib/supabase/server";
+import { checkGeneralRateLimit, getClientIp } from "@/lib/rate-limit";
 import { analyzeSentiment, analyzeScreenshot, generateConversationalResponse } from "@/lib/claude";
 import { TWILIO_WHATSAPP_NUMBER, formatWhatsAppNumber, getPhoneVariants, getTwilioSender } from "@/lib/twilio";
 import { assignDiscountCode } from "@/lib/discount-codes";
@@ -84,6 +85,22 @@ function twilioEmptyResponse(): Response {
 export async function POST(request: Request): Promise<Response> {
   logger.info("Webhook de Twilio recibido");
 
+  // ── 0. Rate limiting por IP ───────────────────────────────────────────────
+  // Protege contra scraping masivo y ataques de fuerza bruta al endpoint.
+  // Límite generoso para no bloquear a Twilio en caso de reintentos legítimos.
+  const rateLimitSupabase = await createServiceClient();
+  const clientIp = getClientIp(request);
+  const ipRateLimit = await checkGeneralRateLimit(
+    rateLimitSupabase,
+    `webhook:ip:${clientIp}`,
+    5,   // ventana: 5 minutos
+    120  // max 120 requests/5min por IP (~2 req/s)
+  );
+  if (!ipRateLimit.allowed) {
+    logger.warn(`Rate limit por IP alcanzado: ${clientIp}`);
+    return new Response("Too Many Requests", { status: 429 });
+  }
+
   let rawBody: string;
   try {
     rawBody = await request.text();
@@ -104,6 +121,18 @@ export async function POST(request: Request): Promise<Response> {
   if (!fromNumber) {
     logger.warn("Webhook sin número de origen");
     return twilioEmptyResponse();
+  }
+
+  // Rate limiting por número de teléfono: máx 20 mensajes por hora desde el mismo número
+  const phoneRateLimit = await checkGeneralRateLimit(
+    rateLimitSupabase,
+    `webhook:phone:${fromNumber}`,
+    60,  // ventana: 60 minutos
+    20   // max 20 mensajes/hora por número
+  );
+  if (!phoneRateLimit.allowed) {
+    logger.warn(`Rate limit por teléfono alcanzado: ${maskPhone(fromNumber)}`);
+    return twilioEmptyResponse(); // Respuesta vacía (no error) para no alertar al abusador
   }
 
   logger.info(`Mensaje recibido de ${maskPhone(fromNumber)} → ${toNumber} | media: ${numMedia} | len: ${messageBody.length}`);
