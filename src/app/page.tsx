@@ -347,6 +347,19 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
+
+            {/* Vídeo demostrativo */}
+            <div className="mt-14">
+              <div className="relative w-full rounded-2xl overflow-hidden shadow-xl aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/Hu52ipdFzjk"
+                  title="Demostración ReseñasYa"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            </div>
           </div>
         </section>
 
