@@ -3,16 +3,17 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { Home, Send, Star, Settings, Printer, UserCircle, Gift, BarChart2 } from "lucide-react";
+import { Home, Send, Star, Settings, Printer, UserCircle, Gift, BarChart2, CreditCard } from "lucide-react";
 
 const navItems = [
-  { href: "/dashboard",     label: "Inicio",           Icon: Home      },
-  { href: "/clientes",      label: "Enviar solicitud",  Icon: Send      },
-  { href: "/resenas",       label: "Reseñas",           Icon: Star      },
-  { href: "/informes",      label: "Informes",          Icon: BarChart2 },
-  { href: "/incentivos",    label: "Incentivos",        Icon: Gift      },
-  { href: "/configuracion", label: "Configuración",     Icon: Settings  },
-  { href: "/cartel",        label: "Cartel QR",         Icon: Printer   },
+  { href: "/dashboard",     label: "Inicio",           Icon: Home        },
+  { href: "/clientes",      label: "Enviar solicitud",  Icon: Send        },
+  { href: "/resenas",       label: "Reseñas",           Icon: Star        },
+  { href: "/informes",      label: "Informes",          Icon: BarChart2   },
+  { href: "/incentivos",    label: "Incentivos",        Icon: Gift        },
+  { href: "/configuracion", label: "Configuración",     Icon: Settings    },
+  { href: "/cartel",        label: "Cartel QR",         Icon: Printer     },
+  { href: "/facturacion",   label: "Facturación",       Icon: CreditCard  },
 ];
 
 function Logo() {
