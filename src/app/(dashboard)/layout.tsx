@@ -62,7 +62,7 @@ export default async function DashboardLayout({
           )}
         </div>
 
-        <nav className="flex-1 p-3 space-y-0.5">
+        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {navItems.map(({ href, label, Icon }) => (
             <Link
               key={href}
