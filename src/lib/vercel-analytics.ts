@@ -20,7 +20,7 @@ async function vercelGet(path: string, params: Record<string, string>) {
   const url = `${VERCEL_API}${path}?${qs}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${TOKEN}` },
-    next:    { revalidate: 300 },
+    cache: "no-store",
   });
   if (!res.ok) return null;
   return res.json();
