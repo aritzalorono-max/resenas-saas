@@ -22,7 +22,7 @@ async function updateSubscription(
       stripe_subscription_id: sub.id,
       subscription_status: status,
       subscription_plan: ["active", "trialing"].includes(status) ? plan : "free",
-      subscription_period_end: new Date((sub as Stripe.Subscription & { current_period_end: number }).current_period_end * 1000).toISOString(),
+      subscription_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
     })
     .eq("id", businessId);
 }
@@ -64,14 +64,15 @@ export async function POST(req: NextRequest) {
         break;
       }
       case "invoice.payment_succeeded": {
-        const invoice = event.data.object as Stripe.Invoice & { subscription?: string; amount_paid: number };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const invoice = event.data.object as any;
         if (invoice.subscription) {
           const sub = await stripe.subscriptions.retrieve(invoice.subscription);
           const businessId = sub.metadata?.business_id;
           if (businessId) {
             await supabase.from("payments").insert({
               user_id: sub.metadata?.user_id,
-              amount: invoice.amount_paid,
+              amount: invoice.amount_paid ?? 0,
               currency: invoice.currency,
               plan: sub.metadata?.plan ?? "starter",
               status: "paid",
