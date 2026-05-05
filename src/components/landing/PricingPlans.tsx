@@ -5,7 +5,7 @@ const plans = [
   {
     name: "Gratis",
     tagline: "Para probar",
-    price: 0,
+    price: "0",
     requests: "5 WhatsApp / mes",
     highlight: false,
     cta: "Empezar gratis",
@@ -19,7 +19,7 @@ const plans = [
   {
     name: "Starter",
     tagline: "Para pequeños negocios",
-    price: 9.99,
+    price: "9,99",
     requests: "50 contactos / mes",
     highlight: false,
     cta: "Empezar",
@@ -34,7 +34,7 @@ const plans = [
   {
     name: "Pro",
     tagline: "El más completo",
-    price: 29.9,
+    price: "29,9",
     requests: "250 contactos / mes",
     highlight: true,
     badge: "Más popular",
@@ -88,7 +88,7 @@ export function PricingPlans() {
             {/* Price */}
             <div className="flex items-end gap-1 mb-2 leading-none">
               <span className={`text-5xl font-extrabold ${plan.highlight ? "text-white" : "text-gray-900"}`}>
-                {plan.price === 0 ? "0€" : `${plan.price}€`}
+                {plan.price}€
               </span>
               <span className={`text-sm mb-1.5 ${plan.highlight ? "text-brand-200" : "text-gray-400"}`}>
                 /mes
