@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { Home, Send, Star, Settings, Printer, UserCircle, Gift, BarChart2, CreditCard } from "lucide-react";
+import { Home, Send, Star, Settings, Printer, UserCircle, Gift, BarChart2, CreditCard, ShieldCheck } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard",     label: "Inicio",           Icon: Home        },
@@ -43,6 +43,11 @@ export default async function DashboardLayout({
     .eq("user_id", user.id)
     .single();
 
+  const isAdmin = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim())
+    .includes(user.email ?? "");
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
 
@@ -80,6 +85,15 @@ export default async function DashboardLayout({
             <UserCircle className="w-4 h-4 shrink-0" />
             Mi cuenta
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition font-medium"
+            >
+              <ShieldCheck className="w-4 h-4 shrink-0" />
+              Backoffice
+            </Link>
+          )}
           <LogoutButton />
         </div>
       </aside>
