@@ -80,6 +80,7 @@ export default function FacturacionPage() {
   const [error, setError]           = useState("");
   const [portalLoading, setPortalLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState("");
 
   const stripeSuccess  = searchParams.get("success") === "1";
   const stripeCanceled = searchParams.get("canceled") === "1";
@@ -149,6 +150,7 @@ export default function FacturacionPage() {
 
   async function handleCheckout(plan: "starter" | "pro") {
     setCheckoutLoading(plan);
+    setCheckoutError("");
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -156,11 +158,14 @@ export default function FacturacionPage() {
         body: JSON.stringify({ plan }),
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-      else setError(data.error ?? "Error al iniciar el pago");
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setCheckoutError(data.error ?? "Error al iniciar el pago");
+        setCheckoutLoading(null);
+      }
     } catch {
-      setError("Error de red. Inténtalo de nuevo.");
-    } finally {
+      setCheckoutError("Error de red. Inténtalo de nuevo.");
       setCheckoutLoading(null);
     }
   }
@@ -291,6 +296,9 @@ export default function FacturacionPage() {
                 </div>
               ))}
             </div>
+            {checkoutError && (
+              <div className="mt-3 bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3">{checkoutError}</div>
+            )}
             <p className="text-xs text-gray-400 mt-3 text-center">
               Puedes cancelar o cambiar de plan en cualquier momento desde el portal de suscripción.
             </p>
