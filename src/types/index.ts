@@ -100,7 +100,7 @@ export interface ReviewRequest {
  * Usado en el webhook para evitar una segunda consulta a la base de datos.
  */
 export interface ReviewRequestWithBusiness extends ReviewRequest {
-  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type" | "incentive_fixed_code" | "whatsapp_mode" | "own_twilio_account_sid" | "own_twilio_auth_token" | "own_twilio_whatsapp_number">;
+  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type" | "incentive_fixed_code" | "whatsapp_mode" | "own_twilio_account_sid" | "own_twilio_auth_token" | "own_twilio_whatsapp_number" | "google_place_id">;
 }
 
 /** Código de descuento generado o subido por el negocio */
