@@ -4,6 +4,7 @@ import "./globals.css";
 import { CookieBanner } from "@/components/cookies/CookieBanner";
 import { ConditionalScripts } from "@/components/cookies/ConditionalScripts";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CookieBanner />
         <ConditionalScripts />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
