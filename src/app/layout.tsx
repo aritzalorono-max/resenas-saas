@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookieBanner } from "@/components/cookies/CookieBanner";
 import { ConditionalScripts } from "@/components/cookies/ConditionalScripts";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -92,6 +93,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <CookieBanner />
         <ConditionalScripts />
+        <Analytics />
       </body>
     </html>
   );
