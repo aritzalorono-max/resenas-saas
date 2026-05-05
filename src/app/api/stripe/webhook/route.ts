@@ -8,13 +8,15 @@ export const runtime = "nodejs";
 
 async function updateSubscription(
   supabase: Awaited<ReturnType<typeof createServiceClient>>,
-  sub: Stripe.Subscription
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sub: any
 ) {
   const businessId = sub.metadata?.business_id;
   if (!businessId) return;
 
   const plan = (sub.metadata?.plan ?? "free") as string;
   const status = sub.status;
+  const periodEnd = sub.current_period_end ?? sub.items?.data?.[0]?.current_period_end ?? null;
 
   await supabase
     .from("businesses")
@@ -22,7 +24,7 @@ async function updateSubscription(
       stripe_subscription_id: sub.id,
       subscription_status: status,
       subscription_plan: ["active", "trialing"].includes(status) ? plan : "free",
-      subscription_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+      subscription_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
     })
     .eq("id", businessId);
 }
