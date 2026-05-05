@@ -19,7 +19,7 @@ const plans = [
   {
     name: "Starter",
     tagline: "Para pequeños negocios",
-    price: "9,99",
+    price: "9,9",
     requests: "50 contactos / mes",
     highlight: false,
     cta: "Empezar",
