@@ -1,5 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import type { ReviewStatus } from "@/types";
+import { getVercelAnalytics } from "@/lib/vercel-analytics";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -47,6 +48,7 @@ export default async function AdminPage() {
     { data: recentRequests },
     { count: todayCount },
     { data: recentPayments },
+    analytics,
   ] = await Promise.all([
     supabase.from("businesses")
       .select("id, user_id, name, description, google_maps_url, review_links, incentive_enabled, incentive_description, created_at")
@@ -67,6 +69,7 @@ export default async function AdminPage() {
       .select("id, user_id, amount, currency, plan, status, description, created_at")
       .order("created_at", { ascending: false })
       .limit(50),
+    getVercelAnalytics(30),
   ]);
 
   // Merge business + stats + user email
@@ -105,6 +108,37 @@ export default async function AdminPage() {
         <h1 className="text-2xl font-bold text-white">Visión general</h1>
         <p className="text-gray-500 text-sm mt-1">Todos los negocios y solicitudes de la plataforma</p>
       </div>
+
+      {/* ── Vercel Analytics ───────────────────────────────────────────── */}
+      {analytics ? (
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 sm:col-span-1">
+            <p className="text-gray-500 text-xs font-medium uppercase tracking-wide mb-1">Visitas únicas (30d)</p>
+            <p className="text-3xl font-extrabold text-white">{analytics.visitors.toLocaleString("es-ES")}</p>
+            <p className="text-gray-600 text-xs mt-1">Vercel Analytics · producción</p>
+          </div>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 sm:col-span-1">
+            <p className="text-gray-500 text-xs font-medium uppercase tracking-wide mb-1">Páginas vistas (30d)</p>
+            <p className="text-3xl font-extrabold text-white">{analytics.pageviews.toLocaleString("es-ES")}</p>
+            <p className="text-gray-600 text-xs mt-1">Vercel Analytics · producción</p>
+          </div>
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 sm:col-span-1">
+            <p className="text-gray-500 text-xs font-medium uppercase tracking-wide mb-3">Top páginas (30d)</p>
+            <ul className="space-y-1.5">
+              {analytics.topPages.slice(0, 5).map((p) => (
+                <li key={p.path} className="flex items-center justify-between gap-2">
+                  <span className="text-gray-400 text-xs truncate font-mono">{p.path}</span>
+                  <span className="text-white text-xs font-semibold shrink-0">{p.visitors.toLocaleString("es-ES")}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : (
+        <div className="bg-gray-900 border border-gray-800/50 rounded-xl px-5 py-4 text-gray-600 text-xs">
+          Analytics de Vercel no disponible — configura <code className="text-gray-500">VERCEL_TOKEN</code> y <code className="text-gray-500">VERCEL_PROJECT_ID</code> en las variables de entorno.
+        </div>
+      )}
 
       {/* ── KPI cards ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
