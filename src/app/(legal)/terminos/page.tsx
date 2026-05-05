@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const LAST_UPDATED = "20 de abril de 2026";
+const LAST_UPDATED = "5 de mayo de 2026";
 const COMPANY      = "ReseñasYa S.L.";
 const EMAIL        = "legal@resenasya.com";
 const APP_URL      = "https://resenasya.com";
@@ -133,6 +133,7 @@ export default function TerminosPage() {
           <li><strong>Twilio:</strong> proveedor del servicio de mensajería WhatsApp. El usuario deberá disponer de una cuenta activa en Twilio y cumplir con sus políticas de uso aceptable.</li>
           <li><strong>Anthropic (Claude AI):</strong> proveedor del servicio de análisis de sentimiento mediante inteligencia artificial.</li>
           <li><strong>Supabase:</strong> proveedor de la infraestructura de base de datos y autenticación.</li>
+          <li><strong>Stripe:</strong> proveedor del servicio de procesamiento de pagos y gestión de suscripciones. Los datos de tarjeta son gestionados directamente por Stripe y no son almacenados por {COMPANY}.</li>
           <li><strong>Google Maps:</strong> el usuario es responsable de disponer del enlace correcto a su perfil de Google My Business.</li>
         </ul>
         <p>

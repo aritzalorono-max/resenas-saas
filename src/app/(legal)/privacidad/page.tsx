@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const LAST_UPDATED = "20 de abril de 2026";
+const LAST_UPDATED = "5 de mayo de 2026";
 const COMPANY      = "ReseñasYa S.L.";
 const EMAIL_LEGAL  = "legal@resenasya.com";
 const EMAIL_DPD    = "privacidad@resenasya.com";
@@ -170,6 +170,7 @@ export default function PrivacidadPage() {
               ["Twilio Inc.", "Envío de mensajes WhatsApp", "EE.UU. — Cláusulas Contractuales Tipo UE"],
               ["Anthropic, PBC", "Análisis de sentimiento (IA)", "EE.UU. — Cláusulas Contractuales Tipo UE"],
               ["Vercel Inc.", "Alojamiento web (serverless)", "EE.UU. — Cláusulas Contractuales Tipo UE"],
+              ["Stripe, Inc.", "Procesamiento de pagos y suscripciones", "EE.UU. — Cláusulas Contractuales Tipo UE"],
             ].map(([p, s, c], i) => (
               <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
                 <td className="p-3 border border-gray-200 text-gray-600 font-medium">{p}</td>

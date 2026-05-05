@@ -64,6 +64,11 @@ export interface Business {
   own_twilio_whatsapp_number: string | null;
   /** Google Places ID para seguimiento automático de puntuación */
   google_place_id: string | null;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  subscription_status: "free" | "trialing" | "active" | "past_due" | "canceled" | "incomplete";
+  subscription_plan: "free" | "starter" | "pro";
+  subscription_period_end: string | null;
   created_at: string;
   updated_at: string;
 }

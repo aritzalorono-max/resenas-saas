@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const LAST_UPDATED = "22 de abril de 2026";
+const LAST_UPDATED = "5 de mayo de 2026";
 const COMPANY      = "ReseñasYa S.L.";
 const EMAIL        = "privacidad@resenasya.com";
 

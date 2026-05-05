@@ -75,7 +75,27 @@ export async function POST(
     );
   }
 
-  // ── 4. Rate limiting ──────────────────────────────────────────────────────
+  // ── 4. Límite mensual por plan ────────────────────────────────────────────
+  const PLAN_LIMITS: Record<string, number> = { free: 5, starter: 50, pro: 250 };
+  const planKey = business.subscription_plan ?? "free";
+  const planLimit = PLAN_LIMITS[planKey] ?? 5;
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+  const { count: monthCount } = await supabase
+    .from("review_requests")
+    .select("*", { count: "exact", head: true })
+    .eq("business_id", business.id)
+    .gte("created_at", monthStart.toISOString());
+  if ((monthCount ?? 0) >= planLimit) {
+    const planLabel = planKey === "free" ? "gratuito" : planKey;
+    return NextResponse.json(
+      { error: `Has alcanzado el límite de ${planLimit} envíos mensuales de tu plan ${planLabel}. Actualiza tu plan en Facturación para continuar.` },
+      { status: 429 }
+    );
+  }
+
+  // ── 5. Rate limiting (anti-abuso) ─────────────────────────────────────────
   const rateLimit = await checkRateLimit(supabase, business.id);
 
   if (!rateLimit.allowed) {
@@ -83,7 +103,7 @@ export async function POST(
     return NextResponse.json({ error: rateLimit.error! }, { status: 429 });
   }
 
-  logger.info(`Negocio: ${business.name} | Envíos recientes: ${rateLimit.count}`);
+  logger.info(`Negocio: ${business.name} | Plan: ${planKey} (${monthCount ?? 0}/${planLimit}) | Envíos recientes: ${rateLimit.count}`);
 
   // ── 5. Enviar WhatsApp ────────────────────────────────────────────────────
   const activeLink = business.review_links?.find((l) => l.url === business.google_maps_url);
