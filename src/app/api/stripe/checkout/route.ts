@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { stripe, PLANS, type PlanKey } from "@/lib/stripe";
+import { getStripe, PLANS, type PlanKey } from "@/lib/stripe";
 import { logger } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     // Crear o recuperar el Customer de Stripe
     let customerId = business.stripe_customer_id;
     if (!customerId) {
-      const customer = await stripe.customers.create({
+      const customer = await getStripe().customers.create({
         email: user.email,
         name: business.name,
         metadata: { user_id: user.id, business_id: business.id },
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
       payment_method_types: ["card"],

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import type Stripe from "stripe";
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = getStripe().webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err) {
     logger.warn("Webhook de Stripe con firma inválida", err);
     return new NextResponse("Invalid signature", { status: 400 });
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         if (session.mode === "subscription" && session.subscription) {
-          const sub = await stripe.subscriptions.retrieve(session.subscription as string);
+          const sub = await getStripe().subscriptions.retrieve(session.subscription as string);
           await updateSubscription(supabase, sub);
         }
         break;
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const invoice = event.data.object as any;
         if (invoice.subscription) {
-          const sub = await stripe.subscriptions.retrieve(invoice.subscription);
+          const sub = await getStripe().subscriptions.retrieve(invoice.subscription);
           const businessId = sub.metadata?.business_id;
           if (businessId) {
             await supabase.from("payments").insert({
