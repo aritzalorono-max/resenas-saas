@@ -46,6 +46,7 @@ export default async function AdminPage() {
     { data: { users } },
     { data: recentRequests },
     { count: todayCount },
+    { data: recentPayments },
   ] = await Promise.all([
     supabase.from("businesses")
       .select("id, user_id, name, description, google_maps_url, review_links, incentive_enabled, incentive_description, created_at")
@@ -61,6 +62,11 @@ export default async function AdminPage() {
       .from("review_requests")
       .select("*", { count: "exact", head: true })
       .gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
+    supabase
+      .from("payments")
+      .select("id, user_id, amount, currency, plan, status, description, created_at")
+      .order("created_at", { ascending: false })
+      .limit(50),
   ]);
 
   // Merge business + stats + user email
@@ -82,6 +88,15 @@ export default async function AdminPage() {
     : 0;
   const withIncentive   = enriched.filter((b) => b.incentive_enabled).length;
 
+  // Payments KPIs
+  const paidPayments  = (recentPayments ?? []).filter((p) => p.status === "paid");
+  const totalRevenue  = paidPayments.reduce((acc, p) => acc + p.amount, 0);
+  const payingUsers   = new Set(paidPayments.map((p) => p.user_id)).size;
+
+  function fmtMoney(cents: number, currency: string) {
+    return new Intl.NumberFormat("es-ES", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
+  }
+
   return (
     <div className="space-y-10">
 
@@ -92,12 +107,14 @@ export default async function AdminPage() {
       </div>
 
       {/* ── KPI cards ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {[
-          { label: "Negocios registrados", value: totalBusinesses, sub: `${withIncentive} con incentivo activo` },
-          { label: "Solicitudes totales",  value: totalRequests,   sub: "todas las épocas" },
-          { label: "Solicitudes hoy",      value: todayCount ?? 0, sub: new Date().toLocaleDateString("es-ES") },
-          { label: "Tasa positiva media",  value: pct(avgPositiveRate), sub: "media entre negocios" },
+          { label: "Negocios registrados", value: totalBusinesses,       sub: `${withIncentive} con incentivo` },
+          { label: "Usuarios totales",     value: users?.length ?? 0,    sub: `${payingUsers} con pagos` },
+          { label: "Solicitudes totales",  value: totalRequests,         sub: "todas las épocas" },
+          { label: "Solicitudes hoy",      value: todayCount ?? 0,       sub: new Date().toLocaleDateString("es-ES") },
+          { label: "Tasa positiva media",  value: pct(avgPositiveRate),  sub: "media entre negocios" },
+          { label: "Ingresos registrados", value: totalRevenue > 0 ? fmtMoney(totalRevenue, "eur") : "—", sub: `${paidPayments.length} pagos` },
         ].map(({ label, value, sub }) => (
           <div key={label} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
             <p className="text-gray-500 text-xs font-medium uppercase tracking-wide mb-1">{label}</p>
@@ -255,6 +272,76 @@ export default async function AdminPage() {
                       </td>
                       <td className="px-4 py-3 text-right text-gray-600 text-xs whitespace-nowrap">
                         {r.responded_at ? fmt(r.responded_at) : <span className="text-gray-800">—</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Payments ───────────────────────────────────────────────────── */}
+      <section>
+        <h2 className="text-lg font-semibold text-white mb-4">
+          Últimos pagos <span className="text-gray-600 font-normal text-sm ml-1">({recentPayments?.length ?? 0})</span>
+        </h2>
+        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wide">
+                  <th className="text-left px-4 py-3 font-medium">Usuario</th>
+                  <th className="text-left px-4 py-3 font-medium">Plan</th>
+                  <th className="text-left px-4 py-3 font-medium">Descripción</th>
+                  <th className="text-left px-4 py-3 font-medium">Estado</th>
+                  <th className="text-right px-4 py-3 font-medium">Importe</th>
+                  <th className="text-right px-4 py-3 font-medium">Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(recentPayments ?? []).length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="text-center py-10 text-gray-600">
+                      No hay pagos registrados todavía
+                    </td>
+                  </tr>
+                )}
+                {(recentPayments ?? []).map((p) => {
+                  const owner = usersMap.get(p.user_id);
+                  const statusCls: Record<string, string> = {
+                    paid:     "bg-green-900/60 text-green-400",
+                    pending:  "bg-yellow-900/60 text-yellow-400",
+                    failed:   "bg-red-900/60 text-red-400",
+                    refunded: "bg-gray-800 text-gray-500",
+                  };
+                  const statusLabel: Record<string, string> = {
+                    paid: "Pagado", pending: "Pendiente", failed: "Fallido", refunded: "Reembolso",
+                  };
+                  return (
+                    <tr key={p.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+                      <td className="px-4 py-3 text-gray-300 text-xs truncate max-w-[200px]">
+                        {owner?.email ?? p.user_id.slice(0, 8) + "…"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded-full font-medium">
+                          {p.plan}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 text-xs truncate max-w-[200px]">
+                        {p.description ?? "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${statusCls[p.status] ?? "bg-gray-800 text-gray-500"}`}>
+                          {statusLabel[p.status] ?? p.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right font-semibold text-white whitespace-nowrap">
+                        {fmtMoney(p.amount, p.currency)}
+                      </td>
+                      <td className="px-4 py-3 text-right text-gray-600 text-xs whitespace-nowrap">
+                        {fmtDate(p.created_at)}
                       </td>
                     </tr>
                   );
