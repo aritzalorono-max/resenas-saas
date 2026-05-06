@@ -54,10 +54,10 @@ export function PricingPlans() {
     <div>
       {/* Cards — horizontal carousel on mobile, 3-col grid on md+ */}
       <div className="
-        flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-6 px-6
+        flex overflow-x-auto snap-x snap-mandatory gap-4 pt-5 pb-4 -mx-6 px-6
         [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
         md:grid md:grid-cols-3 md:gap-6
-        md:overflow-visible md:pb-0 md:mx-0 md:px-0
+        md:overflow-visible md:pt-5 md:pb-0 md:mx-0 md:px-0
       ">
         {plans.map((plan) => (
           <div

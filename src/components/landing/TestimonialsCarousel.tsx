@@ -117,6 +117,30 @@ export function TestimonialsCarousel() {
 
   return (
     <div>
+      {/* Navigation above */}
+      <div className="flex items-center justify-end gap-2 mb-4">
+        <button
+          onClick={() => scroll("left")}
+          disabled={!canPrev}
+          aria-label="Anterior"
+          className="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center
+                     text-gray-600 hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50
+                     disabled:opacity-25 disabled:cursor-default transition shadow-sm"
+        >
+          <ChevronLeft size={20} strokeWidth={2.5} />
+        </button>
+        <button
+          onClick={() => scroll("right")}
+          disabled={!canNext}
+          aria-label="Siguiente"
+          className="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center
+                     text-gray-600 hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50
+                     disabled:opacity-25 disabled:cursor-default transition shadow-sm"
+        >
+          <ChevronRight size={20} strokeWidth={2.5} />
+        </button>
+      </div>
+
       {/* Scrollable row */}
       <div
         ref={ref}
@@ -154,30 +178,6 @@ export function TestimonialsCarousel() {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Navigation */}
-      <div className="flex items-center justify-center gap-3 mt-2">
-        <button
-          onClick={() => scroll("left")}
-          disabled={!canPrev}
-          aria-label="Anterior"
-          className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center
-                     text-gray-500 hover:border-brand-300 hover:text-brand-600
-                     disabled:opacity-30 disabled:cursor-default transition"
-        >
-          <ChevronLeft size={16} />
-        </button>
-        <button
-          onClick={() => scroll("right")}
-          disabled={!canNext}
-          aria-label="Siguiente"
-          className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center
-                     text-gray-500 hover:border-brand-300 hover:text-brand-600
-                     disabled:opacity-30 disabled:cursor-default transition"
-        >
-          <ChevronRight size={16} />
-        </button>
       </div>
     </div>
   );

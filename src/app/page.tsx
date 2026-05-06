@@ -146,12 +146,12 @@ const steps = [
   {
     number: "03",
     title: "Responde con su opinión",
-    desc: "El cliente escribe lo que piensa. Claude AI analiza el sentimiento al instante.",
+    desc: "El cliente escribe lo que piensa. La IA analiza su opinión al instante.",
   },
   {
     number: "04",
     title: "Respuesta inteligente",
-    desc: "Si es positiva → enlace a Google Maps, App Store o Play Store. Si es negativa → mensaje empático sin enlace.",
+    desc: "Si es positiva → enlace directo a la plataforma elegida. Si es negativa → respuesta empática en privado.",
   },
 ];
 
@@ -311,7 +311,7 @@ export default function LandingPage() {
             <p className="text-lg lg:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
               Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue
               que los satisfechos dejen reseña donde más te importa.
-              Para negocios locales, apps, webs, servicios y e-commerce.
+              Para cualquier negocio o servicio.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -327,7 +327,7 @@ export default function LandingPage() {
                 Ya tengo cuenta
               </Link>
             </div>
-            <p className="text-sm text-gray-400 mt-5">Sin tarjeta de crédito · Configuración en 5 minutos</p>
+            <p className="text-sm text-gray-400 mt-5">Sin tarjeta de crédito · Configuración en 1 minuto</p>
           </div>
         </section>
 
@@ -441,7 +441,7 @@ export default function LandingPage() {
                 Restaurantes, apps, abogados, e-commerce y más
               </h2>
               <p className="text-gray-500 text-lg">
-                Si tienes clientes y quieres más reseñas en Google, App Store o Play Store, ReseñasYa es para ti
+                Si tienes clientes y quieres más reseñas en Google, App Store, Play Store, Trustpilot… ReseñasYa es para ti
               </p>
             </div>
             <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-6 px-6
