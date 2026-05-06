@@ -116,30 +116,34 @@ export function TestimonialsCarousel() {
   };
 
   return (
-    <div>
-      {/* Navigation above */}
-      <div className="flex items-center justify-end gap-2 mb-4">
-        <button
-          onClick={() => scroll("left")}
-          disabled={!canPrev}
-          aria-label="Anterior"
-          className="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center
-                     text-gray-600 hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50
-                     disabled:opacity-25 disabled:cursor-default transition shadow-sm"
-        >
-          <ChevronLeft size={20} strokeWidth={2.5} />
-        </button>
-        <button
-          onClick={() => scroll("right")}
-          disabled={!canNext}
-          aria-label="Siguiente"
-          className="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center
-                     text-gray-600 hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50
-                     disabled:opacity-25 disabled:cursor-default transition shadow-sm"
-        >
-          <ChevronRight size={20} strokeWidth={2.5} />
-        </button>
-      </div>
+    <div className="relative">
+      {/* Flecha izquierda */}
+      <button
+        onClick={() => scroll("left")}
+        disabled={!canPrev}
+        aria-label="Anterior"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 z-10
+                   w-10 h-10 rounded-full bg-white border-2 border-gray-200 shadow-md
+                   flex items-center justify-center text-gray-700
+                   hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50
+                   disabled:opacity-0 disabled:pointer-events-none transition"
+      >
+        <ChevronLeft size={20} strokeWidth={2.5} />
+      </button>
+
+      {/* Flecha derecha */}
+      <button
+        onClick={() => scroll("right")}
+        disabled={!canNext}
+        aria-label="Siguiente"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 z-10
+                   w-10 h-10 rounded-full bg-white border-2 border-gray-200 shadow-md
+                   flex items-center justify-center text-gray-700
+                   hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50
+                   disabled:opacity-0 disabled:pointer-events-none transition"
+      >
+        <ChevronRight size={20} strokeWidth={2.5} />
+      </button>
 
       {/* Scrollable row */}
       <div
