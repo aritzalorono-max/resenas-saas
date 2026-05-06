@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 
-const EMAIL_SOPORTE = "prueba@gmail.com";
-const EMAIL_LEGAL   = "legal@resenasya.com";
+const EMAIL_SOPORTE = "contacto.resenasya@gmail.com";
 const TWITTER_URL   = "https://twitter.com/resenasya";
 const LINKEDIN_URL  = "https://linkedin.com/company/resenasya";
 const INSTAGRAM_URL = "https://instagram.com/resenasya";
@@ -39,7 +38,7 @@ export default function ContactoPage() {
       const body    = encodeURIComponent(
         `Nombre: ${form.nombre}\nEmail: ${form.email}\nAsunto: ${TOPICS.find(t => t.value === form.asunto)?.label}\n\n${form.mensaje}`
       );
-      const dest = form.asunto === "legal" ? EMAIL_LEGAL : EMAIL_SOPORTE;
+      const dest = EMAIL_SOPORTE;
       window.location.href = `mailto:${dest}?subject=${subject}&body=${body}`;
       setSent(true);
     } catch {
@@ -135,12 +134,6 @@ export default function ContactoPage() {
                     <option key={t.value} value={t.value}>{t.label}</option>
                   ))}
                 </select>
-                {form.asunto === "legal" && (
-                  <p className="text-xs text-gray-400 mt-1.5">
-                    Las consultas legales se enviarán a{" "}
-                    <a href={`mailto:${EMAIL_LEGAL}`} className="text-brand-600">{EMAIL_LEGAL}</a>
-                  </p>
-                )}
               </div>
 
               <div>
@@ -210,16 +203,6 @@ export default function ContactoPage() {
                 label="Soporte general"
                 value={EMAIL_SOPORTE}
                 href={`mailto:${EMAIL_SOPORTE}`}
-              />
-              <ContactItem
-                icon={
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                  </svg>
-                }
-                label="Legal y privacidad"
-                value={EMAIL_LEGAL}
-                href={`mailto:${EMAIL_LEGAL}`}
               />
             </div>
           </div>
