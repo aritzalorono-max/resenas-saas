@@ -438,7 +438,7 @@ export default function LandingPage() {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-8 lg:mb-14">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Restaurantes, apps, abogados, e-commerce y más
+                Para cualquier negocio que quiera más reseñas
               </h2>
               <p className="text-gray-500 text-lg">
                 Si tienes clientes y quieres más reseñas en Google, App Store, Play Store, Trustpilot… ReseñasYa es para ti
