@@ -37,12 +37,12 @@ export async function POST(request: NextRequest) {
   }
 
   // ── Rate limiting por email ───────────────────────────────────────────────
-  // Máx 3 intentos de registro con el mismo email en 1 hora
+  // Máx 5 intentos de registro con el mismo email en 1 hora
   const emailRl = await checkGeneralRateLimit(
     serviceClient,
     `register:email:${email.toLowerCase()}`,
     60,
-    3
+    5
   );
   if (!emailRl.allowed) {
     // Respuesta genérica para no confirmar si el email existe
@@ -96,5 +96,5 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, sessionCreated: !!data.session });
 }

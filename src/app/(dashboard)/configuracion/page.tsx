@@ -677,6 +677,27 @@ export default function ConfiguracionPage() {
         </button>
       </form>
 
+      {/* ── Acceso rápido (visible solo en móvil, donde el BottomNav no muestra estos items) ── */}
+      <div className="mt-8 lg:hidden">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Más opciones</p>
+        <div className="grid grid-cols-3 gap-3">
+          {([
+            { href: "/incentivos", label: "Incentivos",  emoji: "🎁" },
+            { href: "/cartel",     label: "Cartel QR",   emoji: "🖨️" },
+            { href: "/facturacion",label: "Facturación", emoji: "💳" },
+          ] as const).map(({ href, label, emoji }) => (
+            <a
+              key={href}
+              href={href}
+              className="flex flex-col items-center gap-2 bg-white border border-gray-200 rounded-xl p-4 hover:border-brand-200 transition"
+            >
+              <span className="text-2xl">{emoji}</span>
+              <span className="text-xs font-medium text-gray-700 text-center leading-tight">{label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
       {/* ── Webhook URL (siempre visible como referencia) ── */}
       <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-4">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">URL del webhook (para Twilio)</p>

@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [marketingAccepted, setMarketingAccepted] = useState(false);
   const [error,   setError]   = useState("");
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -60,8 +61,39 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push("/dashboard");
-    router.refresh();
+    // Check if we got a session (email confirmation disabled) or need to verify email
+    const data = await res.json().catch(() => ({}));
+    if (data.sessionCreated) {
+      router.push("/dashboard");
+      router.refresh();
+    } else {
+      setRegistered(true);
+    }
+  }
+
+  if (registered) {
+    return (
+      <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+        <div className="w-14 h-14 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg className="w-7 h-7 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+          </svg>
+        </div>
+        <h1 className="text-xl font-bold text-gray-900 mb-2">Revisa tu email</h1>
+        <p className="text-gray-500 text-sm mb-2 max-w-xs mx-auto">
+          Te hemos enviado un correo a <strong>{formData.email}</strong>.
+        </p>
+        <p className="text-gray-500 text-sm mb-6 max-w-xs mx-auto">
+          Haz clic en el enlace de confirmación para activar tu cuenta y acceder al panel.
+        </p>
+        <p className="text-xs text-gray-400">¿No lo ves? Revisa la carpeta de spam.</p>
+        <div className="mt-6">
+          <Link href="/login" className="text-sm text-brand-600 font-medium hover:underline">
+            ← Volver al inicio de sesión
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -27,8 +27,8 @@ export default function RecuperarPage() {
     setLoading(false);
 
     if (resetError) {
-      setError("No se pudo enviar el email. Comprueba la dirección e inténtalo de nuevo.");
-      return;
+      // Show the success screen anyway — prevents email enumeration and
+      // covers Supabase's own rate limit (which blocks repeated reset attempts)
     }
 
     setSent(true);

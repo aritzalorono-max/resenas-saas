@@ -273,6 +273,8 @@ export function PosterClient({
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
         }
       `}</style>

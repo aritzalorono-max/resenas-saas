@@ -93,7 +93,7 @@ export default async function DashboardPage() {
           <div>
             <p className="font-semibold text-amber-800 text-sm">Configura tu plataforma de reseñas</p>
             <p className="text-sm text-amber-700 mt-0.5">
-              Sin un enlace activo no podemos redirigir a tus clientes satisfechos a dejar reseña.{" "}
+              Sin un enlace activo no podemos redirigir a tus clientes satisfechos al dejar una reseña.{" "}
               <Link href="/configuracion" className="underline font-semibold">
                 Configurar →
               </Link>
