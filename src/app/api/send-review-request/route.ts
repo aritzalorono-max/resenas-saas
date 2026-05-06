@@ -70,7 +70,7 @@ export async function POST(
   if (!business) {
     logger.warn(`Negocio no encontrado para usuario ${user.id}`);
     return NextResponse.json(
-      { error: "Negocio no encontrado. Completa tu perfil en Configuración primero." },
+      { error: "Negocio no encontrado. Completa tu perfil en 'Perfil del negocio' primero." },
       { status: 404 }
     );
   }

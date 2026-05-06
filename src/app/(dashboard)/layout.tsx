@@ -11,7 +11,7 @@ const navItems = [
   { href: "/resenas",       label: "Reseñas",           Icon: Star        },
   { href: "/informes",      label: "Informes",          Icon: BarChart2   },
   { href: "/incentivos",    label: "Incentivos",        Icon: Gift        },
-  { href: "/configuracion", label: "Configuración",     Icon: Settings    },
+  { href: "/configuracion", label: "Perfil del negocio", Icon: Settings    },
   { href: "/cartel",        label: "Cartel QR",         Icon: Printer     },
   { href: "/facturacion",   label: "Facturación",       Icon: CreditCard  },
 ];

@@ -833,7 +833,7 @@ export default function ClientesPage() {
       {/* Active config summary */}
       {bizSummary && (
         <div className="mt-5 bg-white border border-gray-200 rounded-2xl p-4 space-y-2.5">
-          <h3 className="font-semibold text-gray-800 text-sm">Configuración activa</h3>
+          <h3 className="font-semibold text-gray-800 text-sm">Perfil activo</h3>
           <div className="space-y-2">
 
             {/* Platform */}
@@ -843,7 +843,7 @@ export default function ClientesPage() {
                 <span className="text-gray-500">Plataforma: </span>
                 {bizSummary.platformUrl
                   ? <span className="font-medium text-gray-900">{bizSummary.platformName}</span>
-                  : <span className="text-amber-600 font-medium">Sin configurar — ve a Configuración</span>}
+                  : <span className="text-amber-600 font-medium">Sin configurar — ve a Perfil del negocio</span>}
               </div>
             </div>
 
