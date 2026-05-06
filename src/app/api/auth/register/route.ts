@@ -66,7 +66,26 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     logger.warn("Error en registro de usuario");
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ error: "Error al crear la cuenta. Inténtalo de nuevo." }, { status: 400 });
+  }
+
+  if (data.user) {
+    const identities = data.user.identities ?? [];
+    const hasEmailIdentity = identities.some((i) => i.provider === "email");
+
+    if (!hasEmailIdentity) {
+      const hasGoogleIdentity = identities.some((i) => i.provider === "google");
+      if (hasGoogleIdentity) {
+        return NextResponse.json(
+          { error: "Este email ya está registrado con Google. Usa el botón 'Registrarse con Google' para acceder." },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json(
+        { error: "Ya existe una cuenta con este email. Inicia sesión o recupera tu contraseña." },
+        { status: 400 }
+      );
+    }
   }
 
   if (data.user) {

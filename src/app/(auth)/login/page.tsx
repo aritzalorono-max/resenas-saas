@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GoogleButton } from "@/components/auth/GoogleButton";
@@ -18,14 +17,15 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
 
-    if (signInError) {
-      setError("Email o contraseña incorrectos");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Error al iniciar sesión");
       setLoading(false);
       return;
     }
@@ -87,8 +87,22 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3">
-            {error}
+          <div className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3 space-y-1">
+            <p>{error}</p>
+            {error.includes("¿Quieres registrarte?") && (
+              <p>
+                <Link href="/register" className="font-semibold underline">
+                  Crear cuenta gratis
+                </Link>
+              </p>
+            )}
+            {error.includes("¿Olvidaste tu contraseña?") && (
+              <p>
+                <Link href="/recuperar" className="font-semibold underline">
+                  Recuperar contraseña
+                </Link>
+              </p>
+            )}
           </div>
         )}
 

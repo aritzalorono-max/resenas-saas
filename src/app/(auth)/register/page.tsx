@@ -117,7 +117,7 @@ export default function RegisterPage() {
             onChange={handleChange}
             required
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mínimo 8 caracteres"
           />
         </div>
 
