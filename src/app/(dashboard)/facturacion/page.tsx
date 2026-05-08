@@ -127,6 +127,15 @@ export default function FacturacionPage() {
     e.preventDefault();
     setError("");
     setSuccess(false);
+
+    // Validación de campos obligatorios
+    if (!form.nombre.trim()) { setError("El nombre es obligatorio"); return; }
+    if (!form.nif.trim())    { setError(`El ${form.tipo === "empresa" ? "CIF" : "NIF/NIE"} es obligatorio`); return; }
+    if (!form.direccion.trim())     { setError("La dirección es obligatoria"); return; }
+    if (!form.ciudad.trim())        { setError("La ciudad es obligatoria"); return; }
+    if (!form.codigo_postal.trim()) { setError("El código postal es obligatorio"); return; }
+    if (!form.pais.trim())          { setError("El país es obligatorio"); return; }
+
     setSaving(true);
     try {
       const res = await fetch("/api/facturacion", {
