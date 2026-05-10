@@ -35,10 +35,13 @@ export async function signUp(email: string, password: string, fullName: string, 
   if (authError) return { error: authError.message }
   if (!authData.user) return { error: 'No se pudo crear el usuario.' }
 
-  const { error: profileError } = await supabase
+  // Profile insert may fail if email confirmation is required (no session yet).
+  // The callback route will retry after the user confirms their email.
+  await supabase
     .from('guardias_profiles')
     .insert({ id: authData.user.id, full_name: fullName, role: 'medico' })
-  if (profileError) return { error: profileError.message }
+    .select()
+    .single()
 
   // If there's an invite token, auto-accept it
   if (inviteToken) {
