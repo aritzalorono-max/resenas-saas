@@ -46,7 +46,7 @@ export async function getMyTeams(): Promise<Team[]> {
     .select('team:guardias_teams(*)')
     .eq('profile_id', user.id)
     .eq('status', 'active')
-  return (data ?? []).map(d => d.team as Team)
+  return (data ?? []).map(d => d.team as Team).filter(Boolean)
 }
 
 // Returns the current user's role in their active team
