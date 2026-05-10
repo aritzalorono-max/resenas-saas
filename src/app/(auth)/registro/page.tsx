@@ -1,13 +1,12 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { signUp } from '@/lib/actions/auth'
-import { Stethoscope } from 'lucide-react'
+import { Stethoscope, Mail } from 'lucide-react'
 
 function RegistroForm() {
-  const router       = useRouter()
   const searchParams = useSearchParams()
   const inviteToken  = searchParams.get('invite') ?? undefined
 
@@ -17,6 +16,7 @@ function RegistroForm() {
   const [terms, setTerms]         = useState(false)
   const [error, setError]         = useState('')
   const [loading, setLoading]     = useState(false)
+  const [done, setDone]           = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -36,7 +36,6 @@ function RegistroForm() {
     }
 
     setLoading(true)
-    // Use email prefix as default display name; user can update later
     const defaultName = email.split('@')[0]
     const result = await signUp(email, password, defaultName, inviteToken)
     if (result.error) {
@@ -45,12 +44,7 @@ function RegistroForm() {
       return
     }
 
-    if (result.hasTeam) {
-      router.push('/dashboard')
-    } else {
-      router.push('/onboarding')
-    }
-    router.refresh()
+    setDone(true)
   }
 
   return (
@@ -67,71 +61,89 @@ function RegistroForm() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Crear cuenta</h2>
-
-          {error && (
-            <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
-              {error}
+          {done ? (
+            <div className="text-center py-4">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-blue-100 mb-4">
+                <Mail className="w-7 h-7 text-blue-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Revisa tu correo</h2>
+              <p className="text-gray-500 text-sm mb-1">
+                Hemos enviado un enlace de confirmación a:
+              </p>
+              <p className="font-medium text-gray-900 text-sm mb-4">{email}</p>
+              <p className="text-gray-400 text-xs">
+                Haz clic en el enlace del email para activar tu cuenta. Revisa también la carpeta de spam.
+              </p>
             </div>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Crear cuenta</h2>
+
+              {error && (
+                <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="label">Correo electrónico</label>
+                  <input type="email" required className="input" value={email}
+                    onChange={e => setEmail(e.target.value)} placeholder="tu@hospital.eus"
+                    autoComplete="email" />
+                </div>
+
+                <div>
+                  <label className="label">Confirmar correo electrónico</label>
+                  <input type="email" required className="input" value={emailConf}
+                    onChange={e => setEmailConf(e.target.value)} placeholder="tu@hospital.eus"
+                    autoComplete="off" />
+                </div>
+
+                <div>
+                  <label className="label">Contraseña</label>
+                  <input type="password" required className="input" value={password}
+                    onChange={e => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres"
+                    autoComplete="new-password" />
+                </div>
+
+                <div className="flex items-start gap-3 pt-1">
+                  <input
+                    id="terms" type="checkbox" checked={terms}
+                    onChange={e => setTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
+                    He leído y acepto los{' '}
+                    <Link href="/legal/terminos" target="_blank" className="text-blue-600 hover:underline">
+                      Términos de uso
+                    </Link>
+                    {' '}y la{' '}
+                    <Link href="/legal/privacidad" target="_blank" className="text-blue-600 hover:underline">
+                      Política de privacidad
+                    </Link>
+                  </label>
+                </div>
+
+                <button
+                  type="submit" disabled={loading || !terms}
+                  className="btn-primary w-full justify-center py-2.5 mt-2"
+                >
+                  {loading ? 'Creando cuenta…' : 'Crear cuenta'}
+                </button>
+              </form>
+
+              <p className="mt-6 text-center text-sm text-gray-500">
+                ¿Ya tienes cuenta?{' '}
+                <Link
+                  href={inviteToken ? `/login?invite=${inviteToken}` : '/login'}
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  Iniciar sesión
+                </Link>
+              </p>
+            </>
           )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="label">Correo electrónico</label>
-              <input type="email" required className="input" value={email}
-                onChange={e => setEmail(e.target.value)} placeholder="tu@hospital.eus"
-                autoComplete="email" />
-            </div>
-
-            <div>
-              <label className="label">Confirmar correo electrónico</label>
-              <input type="email" required className="input" value={emailConf}
-                onChange={e => setEmailConf(e.target.value)} placeholder="tu@hospital.eus"
-                autoComplete="off" />
-            </div>
-
-            <div>
-              <label className="label">Contraseña</label>
-              <input type="password" required className="input" value={password}
-                onChange={e => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres"
-                autoComplete="new-password" />
-            </div>
-
-            <div className="flex items-start gap-3 pt-1">
-              <input
-                id="terms" type="checkbox" checked={terms}
-                onChange={e => setTerms(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-              />
-              <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
-                He leído y acepto los{' '}
-                <Link href="/legal/terminos" target="_blank" className="text-blue-600 hover:underline">
-                  Términos de uso
-                </Link>
-                {' '}y la{' '}
-                <Link href="/legal/privacidad" target="_blank" className="text-blue-600 hover:underline">
-                  Política de privacidad
-                </Link>
-              </label>
-            </div>
-
-            <button
-              type="submit" disabled={loading || !terms}
-              className="btn-primary w-full justify-center py-2.5 mt-2"
-            >
-              {loading ? 'Creando cuenta…' : 'Crear cuenta'}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            ¿Ya tienes cuenta?{' '}
-            <Link
-              href={inviteToken ? `/login?invite=${inviteToken}` : '/login'}
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Iniciar sesión
-            </Link>
-          </p>
         </div>
       </div>
     </div>
