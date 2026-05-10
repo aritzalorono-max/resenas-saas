@@ -11,24 +11,34 @@ function RegistroForm() {
   const searchParams = useSearchParams()
   const inviteToken  = searchParams.get('invite') ?? undefined
 
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError]       = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [email, setEmail]         = useState('')
+  const [emailConf, setEmailConf] = useState('')
+  const [password, setPassword]   = useState('')
+  const [terms, setTerms]         = useState(false)
+  const [error, setError]         = useState('')
+  const [loading, setLoading]     = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
-    setLoading(true)
 
+    if (email !== emailConf) {
+      setError('Los correos electrónicos no coinciden.')
+      return
+    }
     if (password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres.')
-      setLoading(false)
+      return
+    }
+    if (!terms) {
+      setError('Debes aceptar los términos y la política de privacidad.')
       return
     }
 
-    const result = await signUp(email, password, fullName, inviteToken)
+    setLoading(true)
+    // Use email prefix as default display name; user can update later
+    const defaultName = email.split('@')[0]
+    const result = await signUp(email, password, defaultName, inviteToken)
     if (result.error) {
       setError(result.error)
       setLoading(false)
@@ -67,24 +77,48 @@ function RegistroForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="label">Nombre completo</label>
-              <input type="text" required className="input" value={fullName}
-                onChange={e => setFullName(e.target.value)} placeholder="Dra. María García" />
+              <label className="label">Correo electrónico</label>
+              <input type="email" required className="input" value={email}
+                onChange={e => setEmail(e.target.value)} placeholder="tu@hospital.eus"
+                autoComplete="email" />
             </div>
 
             <div>
-              <label className="label">Correo electrónico</label>
-              <input type="email" required className="input" value={email}
-                onChange={e => setEmail(e.target.value)} placeholder="tu@hospital.eus" />
+              <label className="label">Confirmar correo electrónico</label>
+              <input type="email" required className="input" value={emailConf}
+                onChange={e => setEmailConf(e.target.value)} placeholder="tu@hospital.eus"
+                autoComplete="off" />
             </div>
 
             <div>
               <label className="label">Contraseña</label>
               <input type="password" required className="input" value={password}
-                onChange={e => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+                onChange={e => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres"
+                autoComplete="new-password" />
             </div>
 
-            <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-2.5">
+            <div className="flex items-start gap-3 pt-1">
+              <input
+                id="terms" type="checkbox" checked={terms}
+                onChange={e => setTerms(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+              <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
+                He leído y acepto los{' '}
+                <Link href="/legal/terminos" target="_blank" className="text-blue-600 hover:underline">
+                  Términos de uso
+                </Link>
+                {' '}y la{' '}
+                <Link href="/legal/privacidad" target="_blank" className="text-blue-600 hover:underline">
+                  Política de privacidad
+                </Link>
+              </label>
+            </div>
+
+            <button
+              type="submit" disabled={loading || !terms}
+              className="btn-primary w-full justify-center py-2.5 mt-2"
+            >
               {loading ? 'Creando cuenta…' : 'Crear cuenta'}
             </button>
           </form>
