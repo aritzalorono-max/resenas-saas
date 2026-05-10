@@ -1,11 +1,6 @@
 export type UserRole = 'admin' | 'gestor' | 'medico'
 export type TeamRole = 'gestor' | 'medico'
 
-export const TEAM_ROLE_LABELS: Record<TeamRole, string> = {
-  gestor: 'Gestor',
-  medico: 'Médico',
-}
-
 export type DoctorCategoria =
   | 'R1' | 'R2' | 'R3' | 'R4' | 'R5'
   | 'Adjunto' | 'Jefe_Seccion' | 'Jefe_Servicio'
