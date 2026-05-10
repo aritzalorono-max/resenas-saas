@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Guardias Urología · Hospital de Galdakao',
-  description: 'Gestión de guardias del servicio de Urología del Hospital de Galdakano (Osakidetza)',
+  title: 'Guardias',
+  description: 'Gestión de guardias del servicio de Urología del Hospital de Galdakao (Osakidetza)',
+  icons: { icon: '/icon.svg' },
 }
 
 export const viewport: Viewport = {
