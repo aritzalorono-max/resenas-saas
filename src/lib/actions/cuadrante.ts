@@ -2,17 +2,22 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentProfile } from './auth'
 import { type DraftAssignment, type RulesConfig } from '@/types'
+
+async function getActiveTeamId() {
+  const profile = await getCurrentProfile()
+  return profile?.active_team_id ?? null
+}
 
 // ─── Rules config ─────────────────────────────────────────────────────────────
 
 export async function getRulesConfig(): Promise<RulesConfig | null> {
   const supabase = await createClient()
-  const { data } = await supabase
-    .from('guardias_rules_config')
-    .select('*')
-    .limit(1)
-    .single()
+  const teamId = await getActiveTeamId()
+  const query = supabase.from('guardias_rules_config').select('*').limit(1)
+  if (teamId) query.eq('team_id', teamId)
+  const { data } = await query.single()
   return data ?? null
 }
 
@@ -45,12 +50,10 @@ export async function updateRulesConfig(config: Partial<Omit<RulesConfig, 'id' |
 
 export async function listAssignments(fechaInicio: string, fechaFin: string) {
   const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('guardias_assignments')
-    .select('*')
-    .gte('fecha', fechaInicio)
-    .lte('fecha', fechaFin)
-    .order('fecha')
+  const teamId = await getActiveTeamId()
+  let query = supabase.from('guardias_assignments').select('*').gte('fecha', fechaInicio).lte('fecha', fechaFin).order('fecha')
+  if (teamId) query = query.eq('team_id', teamId)
+  const { data, error } = await query
   if (error) return { error: error.message, data: [] }
   return { data: data ?? [], error: null }
 }
@@ -72,8 +75,10 @@ export async function saveAssignments(
   if (delError) return { error: delError.message }
 
   // Insert new assignments
+  const teamId = await getActiveTeamId()
   const rows = assignments.map(a => ({
     ...a,
+    team_id:    teamId,
     created_by: user?.id ?? null,
     updated_by: user?.id ?? null,
   }))
@@ -148,11 +153,15 @@ export async function generateCuadrante(
   const maxMesActivo   = rules?.max_guardias_mes_activo ?? true
   const maxMes         = rules?.max_guardias_mes ?? 8
 
+  const teamId = await getActiveTeamId()
+
   // 2. Active doctors with profiles
-  const { data: doctors, error: docError } = await supabase
+  let doctorQuery = supabase
     .from('guardias_doctor_profiles')
     .select('id, profile_id, profile:guardias_profiles(id, full_name)')
     .eq('activo', true)
+  if (teamId) doctorQuery = doctorQuery.eq('team_id', teamId)
+  const { data: doctors, error: docError } = await doctorQuery
 
   if (docError || !doctors?.length) {
     return { assignments: [], error: 'No hay médicos activos registrados.' }
@@ -282,15 +291,18 @@ export async function generateCuadrante(
 
 async function recalcCountersForRange(fechaInicio: string, fechaFin: string) {
   const supabase = await createClient()
+  const teamId = await getActiveTeamId()
 
   const year = parseInt(fechaInicio.substring(0, 4))
 
   // Get all assignments for the full year
-  const { data: allAssignments } = await supabase
+  let assignQuery = supabase
     .from('guardias_assignments')
     .select('profile_id, tipo_dia, puntos')
     .gte('fecha', `${year}-01-01`)
     .lte('fecha', `${year}-12-31`)
+  if (teamId) assignQuery = assignQuery.eq('team_id', teamId)
+  const { data: allAssignments } = await assignQuery
 
   if (!allAssignments?.length) return
 
@@ -326,6 +338,7 @@ async function recalcCountersForRange(fechaInicio: string, fechaFin: string) {
   const rows = Object.entries(agg).map(([profile_id, counters]) => ({
     profile_id,
     anio: year,
+    team_id: teamId,
     ...counters,
     puntos_acumulados: Math.round(counters.puntos_acumulados * 100) / 100,
     updated_at: new Date().toISOString(),
