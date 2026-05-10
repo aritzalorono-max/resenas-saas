@@ -16,6 +16,8 @@ export default async function EquipoPage() {
     .eq('id', profile.active_team_id)
     .single()
 
+  if (!team) redirect('/onboarding')
+
   const [members, invitations, myRole] = await Promise.all([
     listTeamMembers(profile.active_team_id),
     listInvitations(profile.active_team_id),
