@@ -1,218 +1,156 @@
-// ---------------------------------------------------------------------------
-// Enums / union types
-// ---------------------------------------------------------------------------
+export type UserRole = 'admin' | 'gestor' | 'medico'
 
-/** Estado de una solicitud de reseña a lo largo de su ciclo de vida */
-export type ReviewStatus =
-  | "pending"              // enviada, esperando respuesta del cliente
-  | "positive"             // respuesta positiva confirmada por la IA
-  | "negative"             // respuesta negativa confirmada por la IA
-  | "neutral"              // respuesta ambigua o sin opinión clara
-  | "no_response"          // el cliente no respondió en el tiempo esperado
-  | "awaiting_screenshot"  // incentivo activo: esperando captura de 5★
-  | "rewarded";            // captura verificada y recompensa enviada
+export type DoctorCategoria =
+  | 'R1' | 'R2' | 'R3' | 'R4' | 'R5'
+  | 'Adjunto' | 'Jefe_Seccion' | 'Jefe_Servicio'
 
-/** Tono de comunicación que el negocio quiere usar con sus clientes */
-export type BusinessTone = "tuteo" | "usted" | "juvenil";
+export type HolidayTipo = 'nacional' | 'euskadi' | 'bizkaia' | 'galdakao' | 'especial'
 
-/** Tipo de código de descuento: generado aleatoriamente, extraído de un pool, o fijo siempre igual */
-export type IncentiveCodeType = "random" | "pool" | "fixed";
+export type DayTipo =
+  | 'laborable' | 'sabado' | 'domingo'
+  | 'festivo' | 'vispera' | 'puente' | 'festivo_especial'
 
-/** Cuándo se comunica el incentivo al cliente */
-export type IncentiveTiming = "initial" | "after_positive";
-
-/** Modo de envío de WhatsApp del negocio */
-export type WhatsAppMode = "shared" | "own" | "dedicated";
-
-// ---------------------------------------------------------------------------
-// Entidades de base de datos
-// ---------------------------------------------------------------------------
-
-/** Enlace a una plataforma de reseñas configurada por el negocio */
-export interface ReviewPlatformLink {
-  name: string;
-  url: string;
-  /** Código del acortador de URLs (6 chars). Undefined hasta que se guarda por primera vez. */
-  shortCode?: string;
+export interface GuardiasProfile {
+  id: string
+  full_name: string
+  role: UserRole
+  avatar_url: string | null
+  created_at: string
+  updated_at: string
 }
 
-/** Negocio registrado en la plataforma (uno por usuario) */
-export interface Business {
-  id: string;
-  user_id: string;
-  name: string;
-  description: string | null;
-  website_url: string | null;
-  /** URL de la plataforma de reseñas actualmente activa (se envía a los clientes) */
-  google_maps_url: string | null;
-  /** Todas las plataformas de reseñas configuradas */
-  review_links: ReviewPlatformLink[];
-  /** URL del logo del negocio (Clearbit o Supabase Storage) */
-  logo_url: string | null;
-  welcome_message: string;
-  tone: BusinessTone;
-  incentive_enabled: boolean;
-  incentive_description: string | null;
-  incentive_code_enabled: boolean;
-  incentive_code_type: IncentiveCodeType;
-  incentive_fixed_code: string | null;
-  incentive_timing: IncentiveTiming;
-  /** Modo de envío de WhatsApp: número compartido, propio o dedicado */
-  whatsapp_mode: WhatsAppMode;
-  own_twilio_account_sid: string | null;
-  own_twilio_auth_token: string | null;
-  own_twilio_whatsapp_number: string | null;
-  /** Google Places ID para seguimiento automático de puntuación */
-  google_place_id: string | null;
-  stripe_customer_id: string | null;
-  stripe_subscription_id: string | null;
-  subscription_status: "free" | "trialing" | "active" | "past_due" | "canceled" | "incomplete";
-  subscription_plan: "free" | "starter" | "pro";
-  subscription_period_end: string | null;
-  created_at: string;
-  updated_at: string;
+export interface DoctorProfile {
+  id: string
+  profile_id: string
+  categoria: DoctorCategoria
+  num_colegiado: string | null
+  especialidad: string
+  anio_inicio: number | null
+  activo: boolean
+  notas: string | null
+  created_at: string
+  updated_at: string
+  profile?: GuardiasProfile
 }
 
-/** Snapshot diario de la puntuación de un negocio en Google Maps */
-export interface GoogleMapsSnapshot {
-  id: string;
-  business_id: string;
-  place_id: string;
-  rating: number | null;
-  review_count: number | null;
-  fetched_at: string;
+export interface ShiftCounters {
+  id: string
+  profile_id: string
+  anio: number
+  total_guardias: number
+  guardias_laborable: number
+  guardias_sabado: number
+  guardias_domingo: number
+  guardias_festivo: number
+  guardias_vispera: number
+  guardias_puente: number
+  guardias_festivo_especial: number
+  puntos_acumulados: number
+  updated_at: string
 }
 
-/** Solicitud de reseña enviada a un cliente */
-export interface ReviewRequest {
-  id: string;
-  business_id: string;
-  customer_name: string;
-  customer_phone: string;
-  status: ReviewStatus;
-  customer_response: string | null;
-  sentiment_score: number | null;
-  twilio_message_sid: string | null;
-  follow_up_sent: boolean;
-  discount_code: string | null;
-  message_count: number;
-  created_at: string;
-  responded_at: string | null;
+export interface Holiday {
+  id: string
+  nombre: string
+  fecha: string
+  tipo: HolidayTipo
+  es_recurrente: boolean
+  notas: string | null
+  created_at: string
+  created_by: string | null
 }
 
-/**
- * ReviewRequest con datos del negocio incluidos (resultado de un JOIN).
- * Usado en el webhook para evitar una segunda consulta a la base de datos.
- */
-export interface ReviewRequestWithBusiness extends ReviewRequest {
-  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type" | "incentive_fixed_code" | "whatsapp_mode" | "own_twilio_account_sid" | "own_twilio_auth_token" | "own_twilio_whatsapp_number" | "google_place_id">;
+export interface SpecialDay {
+  id: string
+  fecha: string
+  tipo_override: 'puente' | 'vispera' | 'festivo_especial'
+  motivo: string | null
+  created_at: string
+  created_by: string | null
 }
 
-/** Código de descuento generado o subido por el negocio */
-export interface DiscountCode {
-  id: string;
-  business_id: string;
-  code: string;
-  type: IncentiveCodeType;
-  status: "available" | "used" | "expired";
-  review_request_id: string | null;
-  used_at: string | null;
-  created_at: string;
+export interface PenosidadConfig {
+  id: string
+  tipo_dia: DayTipo
+  nivel: number
+  etiqueta: string
+  descripcion: string | null
+  color: string
+  puntos_base: number
+  updated_at: string
+  updated_by: string | null
 }
 
-/** Estadísticas agregadas de un negocio (vista business_stats de Supabase) */
-export interface BusinessStats {
-  business_id: string;
-  user_id: string;
-  total_requests: number;
-  positive_count: number;
-  negative_count: number;
-  neutral_count: number;
-  pending_count: number;
-  no_response_count: number;
-  /** Porcentaje de respuestas positivas sobre el total de respondidas (0–100) */
-  positive_rate: number;
+export interface DayClassification {
+  fecha: string
+  anio: number
+  mes: number
+  dia_semana: number
+  tipo_dia: DayTipo
+  nombre_festivo: string | null
+  motivo_especial: string | null
 }
 
-// ---------------------------------------------------------------------------
-// Resultados de la IA
-// ---------------------------------------------------------------------------
-
-/** Resultado del análisis de sentimiento realizado por Claude */
-export interface SentimentResult {
-  sentiment: "positive" | "negative" | "neutral";
-  /** Puntuación de positividad: 0.0 (muy negativo) → 1.0 (muy positivo) */
-  score: number;
-  /** Resumen breve de la opinión en español */
-  summary: string;
+export const CATEGORIA_LABELS: Record<DoctorCategoria, string> = {
+  R1: 'Residente 1º año',
+  R2: 'Residente 2º año',
+  R3: 'Residente 3º año',
+  R4: 'Residente 4º año',
+  R5: 'Residente 5º año',
+  Adjunto: 'Médico Adjunto',
+  Jefe_Seccion: 'Jefe de Sección',
+  Jefe_Servicio: 'Jefe de Servicio',
 }
 
-/** Resultado del análisis de captura de pantalla de reseña de Google Maps */
-export interface ScreenshotResult {
-  isFiveStars: boolean;
-  confidence: number;
-  reason: string;
+export const TIPO_LABELS: Record<HolidayTipo, string> = {
+  nacional: 'Nacional',
+  euskadi: 'Euskadi',
+  bizkaia: 'Bizkaia',
+  galdakao: 'Galdakao',
+  especial: 'Especial',
 }
 
-// ---------------------------------------------------------------------------
-// Informes de análisis de reseñas
-// ---------------------------------------------------------------------------
-
-export interface ReportSentimentSummary {
-  total_analyzed: number;
-  positive_count: number;
-  negative_count: number;
-  neutral_count:  number;
-  avg_score:      number;
+export const TIPO_COLORS: Record<HolidayTipo, string> = {
+  nacional:  'bg-blue-100 text-blue-800',
+  euskadi:   'bg-red-100 text-red-800',
+  bizkaia:   'bg-green-100 text-green-800',
+  galdakao:  'bg-purple-100 text-purple-800',
+  especial:  'bg-orange-100 text-orange-800',
 }
 
-export interface ReportTheme {
-  theme:    string;
-  count:    number;
-  examples: string[];
+export const ROLE_LABELS: Record<UserRole, string> = {
+  admin:  'Administrador',
+  gestor: 'Gestor',
+  medico: 'Médico',
 }
 
-export interface ReportImprovementIdea {
-  title:            string;
-  description:      string;
-  based_on_count:   number;
-  example_comments: string[];
+export interface RulesConfig {
+  id: string
+  descanso_minimo_horas: number
+  descanso_activo: boolean
+  max_guardias_mes: number
+  max_guardias_mes_activo: boolean
+  updated_at: string
+  updated_by: string | null
 }
 
-export interface ReportPlatformComparison {
-  whatsapp_positive_rate: number;
-  platform_rating:        number | null;
-  platform_review_count:  number | null;
-  gap_description:        string;
+export interface Assignment {
+  id: string
+  fecha: string
+  profile_id: string
+  tipo_dia: DayTipo
+  puntos: number
+  notas: string | null
+  created_at: string
+  created_by: string | null
+  updated_at: string
+  updated_by: string | null
 }
 
-export interface ReportStarsCalculator {
-  current_rating:             number | null;
-  current_review_count:       number | null;
-  five_stars_needed_for_next: number | null;
-  next_target_rating:         number | null;
-}
-
-export interface ReportFrequencyRecommendation {
-  current_monthly_avg_requests: number;
-  conversion_rate:              number;
-  recommended_monthly_target:   number;
-  recommended_weekly_target:    number;
-  reasoning:                    string;
-}
-
-export interface BusinessReport {
-  id:                       string;
-  business_id:              string;
-  generated_at:             string;
-  period_start:             string;
-  period_end:               string;
-  total_analyzed:           number;
-  sentiment_summary:        ReportSentimentSummary;
-  positive_themes:          ReportTheme[];
-  negative_themes:          ReportTheme[];
-  improvement_ideas:        ReportImprovementIdea[];
-  platform_comparison:      ReportPlatformComparison;
-  stars_calculator:         ReportStarsCalculator;
-  frequency_recommendation: ReportFrequencyRecommendation;
+export interface DraftAssignment {
+  fecha: string
+  profile_id: string
+  tipo_dia: DayTipo
+  puntos: number
+  doctor_name: string
 }
