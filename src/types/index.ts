@@ -123,3 +123,34 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   gestor: 'Gestor',
   medico: 'Médico',
 }
+
+export interface RulesConfig {
+  id: string
+  descanso_minimo_horas: number
+  descanso_activo: boolean
+  max_guardias_mes: number
+  max_guardias_mes_activo: boolean
+  updated_at: string
+  updated_by: string | null
+}
+
+export interface Assignment {
+  id: string
+  fecha: string
+  profile_id: string
+  tipo_dia: DayTipo
+  puntos: number
+  notas: string | null
+  created_at: string
+  created_by: string | null
+  updated_at: string
+  updated_by: string | null
+}
+
+export interface DraftAssignment {
+  fecha: string
+  profile_id: string
+  tipo_dia: DayTipo
+  puntos: number
+  doctor_name: string
+}

@@ -3,12 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { type UserRole } from '@/types'
-import { LayoutDashboard, Users, CalendarDays, Star, Settings } from 'lucide-react'
+import { LayoutDashboard, Users, CalendarDays, Star, Settings, ClipboardList } from 'lucide-react'
 
 const NAV = [
   { href: '/dashboard',  label: 'Inicio',     icon: <LayoutDashboard size={20} />, roles: ['admin','gestor','medico'] },
   { href: '/medicos',    label: 'Médicos',    icon: <Users size={20} />,           roles: ['admin','gestor','medico'] },
   { href: '/calendario', label: 'Calendario', icon: <CalendarDays size={20} />,    roles: ['admin','gestor','medico'] },
+  { href: '/cuadrante',  label: 'Cuadrante',  icon: <ClipboardList size={20} />,   roles: ['admin','gestor','medico'] },
   { href: '/festivos',   label: 'Festivos',   icon: <Star size={20} />,            roles: ['admin','gestor'] },
   { href: '/penosidad',  label: 'Penosidad',  icon: <Settings size={20} />,        roles: ['admin','gestor'] },
 ]

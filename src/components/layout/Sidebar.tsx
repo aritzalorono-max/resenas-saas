@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { type UserRole } from '@/types'
 import {
   LayoutDashboard, Users, CalendarDays, Star, Settings,
-  LogOut, ChevronRight, Stethoscope,
+  LogOut, ChevronRight, Stethoscope, ClipboardList,
 } from 'lucide-react'
 
 interface NavItem {
@@ -20,6 +20,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard',  label: 'Inicio',     icon: <LayoutDashboard size={18} />, roles: ['admin','gestor','medico'] },
   { href: '/medicos',    label: 'Médicos',    icon: <Users size={18} />,           roles: ['admin','gestor','medico'] },
   { href: '/calendario', label: 'Calendario', icon: <CalendarDays size={18} />,    roles: ['admin','gestor','medico'] },
+  { href: '/cuadrante',  label: 'Cuadrante',  icon: <ClipboardList size={18} />,   roles: ['admin','gestor','medico'] },
   { href: '/festivos',   label: 'Festivos',   icon: <Star size={18} />,            roles: ['admin','gestor'] },
   { href: '/penosidad',  label: 'Penosidad',  icon: <Settings size={18} />,        roles: ['admin','gestor'] },
 ]
