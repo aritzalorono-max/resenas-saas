@@ -171,10 +171,10 @@ export interface Absence {
 }
 
 export const EXTRA_LABELS: Record<ExtraTipo, string> = {
-  peonada:          'Peonada',
-  autoconcierto:    'Autoconcierto',
+  peonada:            'Peonada',
+  autoconcierto:      'Autoconcierto',
   guardia_localizada: 'Guardia localizada',
-  otro:             'Otro',
+  otro:               'Otro',
 }
 
 export const ABSENCIA_LABELS: Record<AbsenciaTipo, string> = {
