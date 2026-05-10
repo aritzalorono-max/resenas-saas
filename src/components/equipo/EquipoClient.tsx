@@ -47,7 +47,7 @@ export function EquipoClient({ team: initialTeam, members: initialMembers, invit
   const [settingsLoading, setSettingsLoading]         = useState(false)
   const [settingsMsg, setSettingsMsg]                 = useState('')
 
-  const isGestor = myRole === 'gestor' || myRole === 'admin' as any
+  const isGestor = myRole === 'gestor'
 
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault()

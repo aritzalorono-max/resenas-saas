@@ -4,7 +4,7 @@ import { AcceptInvitationButton } from '@/components/onboarding/AcceptInvitation
 import { Stethoscope, CheckCircle, XCircle } from 'lucide-react'
 
 interface Props {
-  params: { token: string }
+  params: Promise<{ token: string }>
 }
 
 function PageShell({ children }: { children: React.ReactNode }) {
@@ -26,7 +26,7 @@ function PageShell({ children }: { children: React.ReactNode }) {
 }
 
 export default async function UnirseTokenPage({ params }: Props) {
-  const { token } = params
+  const { token } = await params
   const invitation = await getInvitationByToken(token)
 
   if (!invitation) {
