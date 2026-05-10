@@ -25,10 +25,13 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/registro')
-  const isApiRoute = pathname.startsWith('/api')
+  const isAuthRoute     = pathname.startsWith('/login') || pathname.startsWith('/registro')
+  const isApiRoute      = pathname.startsWith('/api')
+  const isOnboarding    = pathname.startsWith('/onboarding')
+  const isUnirse        = pathname.startsWith('/unirse')
+  const isPublicRoute   = isAuthRoute || isApiRoute || isUnirse
 
-  if (!user && !isAuthRoute && !isApiRoute) {
+  if (!user && !isPublicRoute && !isOnboarding) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
@@ -38,6 +41,22 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
+  }
+
+  // Redirect logged-in users with no active team to onboarding
+  // (only for dashboard routes, not onboarding/unirse itself)
+  if (user && !isPublicRoute && !isOnboarding && !isUnirse) {
+    const { data: profile } = await supabase
+      .from('guardias_profiles')
+      .select('active_team_id')
+      .eq('id', user.id)
+      .single()
+
+    if (profile && !profile.active_team_id) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/onboarding'
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse

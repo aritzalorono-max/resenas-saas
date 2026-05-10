@@ -2,9 +2,13 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentProfile } from './auth'
 import { type ExtraTipo, type AbsenciaTipo, type Extra, type Absence } from '@/types'
 
-// ─── Extras ──────────────────────────────────────────────────────────────────
+async function getActiveTeamId() {
+  const profile = await getCurrentProfile()
+  return profile?.active_team_id ?? null
+}
 
 export async function listExtras(profileId: string, anio: number): Promise<Extra[]> {
   const supabase = await createClient()
@@ -19,15 +23,13 @@ export async function listExtras(profileId: string, anio: number): Promise<Extra
 }
 
 export async function addExtra(data: {
-  profileId: string
-  fecha: string
-  tipo: ExtraTipo
-  descripcion?: string
-  horas?: number
+  profileId: string; fecha: string; tipo: ExtraTipo; descripcion?: string; horas?: number
 }) {
   const supabase = await createClient()
+  const teamId = await getActiveTeamId()
   const { error } = await supabase.from('guardias_extras').insert({
     profile_id:  data.profileId,
+    team_id:     teamId,
     fecha:       data.fecha,
     tipo:        data.tipo,
     descripcion: data.descripcion ?? null,
@@ -44,8 +46,6 @@ export async function deleteExtra(id: string) {
   return { success: true }
 }
 
-// ─── Absences ─────────────────────────────────────────────────────────────────
-
 export async function listAbsences(profileId: string, anio: number): Promise<Absence[]> {
   const supabase = await createClient()
   const { data } = await supabase
@@ -59,15 +59,13 @@ export async function listAbsences(profileId: string, anio: number): Promise<Abs
 }
 
 export async function addAbsence(data: {
-  profileId: string
-  fechaInicio: string
-  fechaFin: string
-  tipo: AbsenciaTipo
-  motivo?: string
+  profileId: string; fechaInicio: string; fechaFin: string; tipo: AbsenciaTipo; motivo?: string
 }) {
   const supabase = await createClient()
+  const teamId = await getActiveTeamId()
   const { error } = await supabase.from('guardias_absences').insert({
-    profile_id:  data.profileId,
+    profile_id:   data.profileId,
+    team_id:      teamId,
     fecha_inicio: data.fechaInicio,
     fecha_fin:    data.fechaFin,
     tipo:         data.tipo,
