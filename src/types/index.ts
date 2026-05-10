@@ -147,6 +147,43 @@ export interface Assignment {
   updated_by: string | null
 }
 
+export type ExtraTipo = 'peonada' | 'autoconcierto' | 'guardia_localizada' | 'otro'
+export type AbsenciaTipo = 'baja' | 'vacaciones' | 'asuntos_propios' | 'otro'
+
+export interface Extra {
+  id: string
+  profile_id: string
+  fecha: string
+  tipo: ExtraTipo
+  descripcion: string | null
+  horas: number
+  created_at: string
+}
+
+export interface Absence {
+  id: string
+  profile_id: string
+  fecha_inicio: string
+  fecha_fin: string
+  tipo: AbsenciaTipo
+  motivo: string | null
+  created_at: string
+}
+
+export const EXTRA_LABELS: Record<ExtraTipo, string> = {
+  peonada:          'Peonada',
+  autoconcierto:    'Autoconcierto',
+  guardia_localizada: 'Guardia localizada',
+  otro:             'Otro',
+}
+
+export const ABSENCIA_LABELS: Record<AbsenciaTipo, string> = {
+  baja:            'Baja médica',
+  vacaciones:      'Vacaciones',
+  asuntos_propios: 'Asuntos propios',
+  otro:            'Otro',
+}
+
 export interface DraftAssignment {
   fecha: string
   profile_id: string
