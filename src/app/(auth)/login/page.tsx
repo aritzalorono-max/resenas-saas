@@ -31,11 +31,10 @@ function LoginForm() {
     }
 
     if (inviteToken) {
-      router.push(`/unirse/${inviteToken}`)
+      window.location.href = `/unirse/${inviteToken}`
     } else {
-      router.push('/dashboard')
+      window.location.href = '/dashboard'
     }
-    router.refresh()
   }
 
   return (
