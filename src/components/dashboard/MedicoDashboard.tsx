@@ -149,6 +149,7 @@ export function MedicoDashboard({ profileId, fullName, doctor, counters, extras:
     } else {
       const newEntry: Extra = {
         id: Date.now().toString(), profile_id: profileId,
+        team_id: null,
         fecha: extraFecha, tipo: extraTipo,
         descripcion: extraDesc || null, horas: extraHoras,
         created_at: new Date().toISOString(),
@@ -173,6 +174,7 @@ export function MedicoDashboard({ profileId, fullName, doctor, counters, extras:
     } else {
       const newEntry: Absence = {
         id: Date.now().toString(), profile_id: profileId,
+        team_id: null,
         fecha_inicio: absInicio, fecha_fin: absFin,
         tipo: absTipo, motivo: absMotivo || null,
         created_at: new Date().toISOString(),
