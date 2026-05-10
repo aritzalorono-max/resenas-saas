@@ -1,13 +1,12 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { signIn } from '@/lib/actions/auth'
 import { Stethoscope } from 'lucide-react'
 
 function LoginForm() {
-  const router       = useRouter()
   const searchParams = useSearchParams()
   const inviteToken  = searchParams.get('invite') ?? null
 
@@ -21,20 +20,16 @@ function LoginForm() {
     setError('')
     setLoading(true)
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const result = await signIn(email, password)
 
-    if (error) {
+    if (result.error) {
       setError('Credenciales incorrectas. Verifica tu email y contraseña.')
       setLoading(false)
       return
     }
 
-    if (inviteToken) {
-      window.location.href = `/unirse/${inviteToken}`
-    } else {
-      window.location.href = '/dashboard'
-    }
+    // Server action set the auth cookies – safe to do a full navigation now
+    window.location.href = inviteToken ? `/unirse/${inviteToken}` : '/dashboard'
   }
 
   return (
