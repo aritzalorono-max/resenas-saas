@@ -33,3 +33,22 @@ export const CATEGORIA_COLORS: Record<DoctorCategoria, string> = {
   R4:      'bg-pink-100 text-pink-800',
   R5:      'bg-rose-100 text-rose-800',
 }
+
+export type TipoAusencia = 'Vacaciones' | 'Baja' | 'Excedencia' | 'Congreso' | 'Otros'
+
+export interface Ausencia {
+  id: string
+  profile_id: string
+  doctor_id: string
+  fecha: string
+  tipo: TipoAusencia
+  created_at: string
+}
+
+export const TIPO_AUSENCIA_BG: Record<TipoAusencia, string> = {
+  Vacaciones: 'bg-sky-500',
+  Baja:       'bg-red-500',
+  Excedencia: 'bg-amber-500',
+  Congreso:   'bg-purple-500',
+  Otros:      'bg-gray-400',
+}

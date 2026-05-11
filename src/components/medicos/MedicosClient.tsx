@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createDoctor, updateDoctor, deleteDoctor } from '@/lib/actions/doctors'
-import { type Doctor, type DoctorCategoria, CATEGORIA_LABELS, CATEGORIA_COLORS } from '@/types'
-import { Plus, X, Pencil, Trash2, UserCheck, UserX, AlertTriangle } from 'lucide-react'
+import { type Doctor, type DoctorCategoria, CATEGORIA_COLORS } from '@/types'
+import { Plus, X, Pencil, Trash2, UserCheck, UserX, AlertTriangle, CalendarDays } from 'lucide-react'
+import { CalendarioModal } from './CalendarioModal'
 
 const CATEGORIAS: DoctorCategoria[] = ['Adjunto', 'R1', 'R2', 'R3', 'R4', 'R5']
 
@@ -88,7 +89,14 @@ function DoctorModal({
 
 // ── Fila de médico ────────────────────────────────────────────────────────────
 
-function DoctorRow({ doctor, onEdit, onRefresh }: { doctor: Doctor; onEdit: () => void; onRefresh: () => void }) {
+function DoctorRow({
+  doctor, onEdit, onCalendario, onRefresh,
+}: {
+  doctor: Doctor
+  onEdit: () => void
+  onCalendario: () => void
+  onRefresh: () => void
+}) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [loading,       setLoading]       = useState(false)
 
@@ -121,6 +129,10 @@ function DoctorRow({ doctor, onEdit, onRefresh }: { doctor: Doctor; onEdit: () =
       {/* Acciones */}
       {!confirmDelete ? (
         <div className="flex items-center gap-1 shrink-0">
+          <button onClick={onCalendario} title="Ausencias"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors">
+            <CalendarDays size={15} />
+          </button>
           <button onClick={onEdit} title="Editar"
             className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
             <Pencil size={15} />
@@ -156,22 +168,18 @@ function DoctorRow({ doctor, onEdit, onRefresh }: { doctor: Doctor; onEdit: () =
 // ── Componente principal ──────────────────────────────────────────────────────
 
 export function MedicosClient({ doctors: initial }: { doctors: Doctor[] }) {
-  const router  = useRouter()
-  const [doctors,     setDoctors]     = useState<Doctor[]>(initial)
-  const [showModal,   setShowModal]   = useState(false)
-  const [editDoctor,  setEditDoctor]  = useState<Doctor | undefined>()
+  const router = useRouter()
+  const [doctors,   setDoctors]   = useState<Doctor[]>(initial)
+  const [showModal, setShowModal] = useState(false)
+  const [editDoctor, setEditDoctor] = useState<Doctor | undefined>()
+  const [calDoctor,  setCalDoctor]  = useState<Doctor | undefined>()
 
   useEffect(() => { setDoctors(initial) }, [initial])
 
-  function refresh() {
-    router.refresh()
-    setDoctors(doctors) // UI optimista; router.refresh() actualizará desde el servidor
-  }
-
-  function openAdd()          { setEditDoctor(undefined); setShowModal(true) }
-  function openEdit(d: Doctor){ setEditDoctor(d);          setShowModal(true) }
-  function closeModal()       { setShowModal(false); setEditDoctor(undefined) }
-  function onSaved()          { closeModal(); router.refresh() }
+  function openAdd()           { setEditDoctor(undefined); setShowModal(true) }
+  function openEdit(d: Doctor) { setEditDoctor(d);          setShowModal(true) }
+  function closeModal()        { setShowModal(false); setEditDoctor(undefined) }
+  function onSaved()           { closeModal(); router.refresh() }
 
   const activos   = doctors.filter(d => d.activo)
   const inactivos = doctors.filter(d => !d.activo)
@@ -208,7 +216,10 @@ export function MedicosClient({ doctors: initial }: { doctors: Doctor[] }) {
       {activos.length > 0 && (
         <div className="space-y-2 mb-6">
           {activos.map(d => (
-            <DoctorRow key={d.id} doctor={d} onEdit={() => openEdit(d)} onRefresh={() => router.refresh()} />
+            <DoctorRow key={d.id} doctor={d}
+              onEdit={() => openEdit(d)}
+              onCalendario={() => setCalDoctor(d)}
+              onRefresh={() => router.refresh()} />
           ))}
         </div>
       )}
@@ -219,15 +230,23 @@ export function MedicosClient({ doctors: initial }: { doctors: Doctor[] }) {
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Inactivos</p>
           <div className="space-y-2">
             {inactivos.map(d => (
-              <DoctorRow key={d.id} doctor={d} onEdit={() => openEdit(d)} onRefresh={() => router.refresh()} />
+              <DoctorRow key={d.id} doctor={d}
+                onEdit={() => openEdit(d)}
+                onCalendario={() => setCalDoctor(d)}
+                onRefresh={() => router.refresh()} />
             ))}
           </div>
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modal editar/añadir */}
       {showModal && (
         <DoctorModal doctor={editDoctor} onClose={closeModal} onSaved={onSaved} />
+      )}
+
+      {/* Modal calendario de ausencias */}
+      {calDoctor && (
+        <CalendarioModal doctor={calDoctor} onClose={() => setCalDoctor(undefined)} />
       )}
     </>
   )
