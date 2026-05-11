@@ -1,16 +1,19 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { signUp } from '@/lib/actions/auth'
-import { Stethoscope, Mail, Lock } from 'lucide-react'
+import { lookupTeamByCode } from '@/lib/actions/teams'
+import { Stethoscope, Mail, Lock, CheckCircle, XCircle, Loader2 } from 'lucide-react'
+
+type CodeStatus = 'idle' | 'loading' | 'found' | 'not_found'
 
 function RegistroForm() {
-  const searchParams  = useSearchParams()
-  const inviteToken   = searchParams.get('invite') ?? undefined
-  const presetEmail   = searchParams.get('email') ?? ''
-  const presetCodigo  = searchParams.get('codigo') ?? ''
+  const searchParams = useSearchParams()
+  const inviteToken  = searchParams.get('invite') ?? undefined
+  const presetEmail  = searchParams.get('email') ?? ''
+  const presetCodigo = searchParams.get('codigo') ?? ''
 
   const emailLocked = !!presetEmail
 
@@ -23,7 +26,30 @@ function RegistroForm() {
   const [loading, setLoading]     = useState(false)
   const [done, setDone]           = useState(false)
 
-  const hasInviteOrCode = !!(inviteToken || presetCodigo)
+  const [codeStatus, setCodeStatus] = useState<CodeStatus>(presetCodigo ? 'loading' : 'idle')
+  const [teamInfo, setTeamInfo]     = useState<{ nombre: string; hospital: string | null; especialidad: string | null } | null>(null)
+
+  // Lookup team info whenever code changes
+  useEffect(() => {
+    const normalized = teamCode.trim().toUpperCase().replace(/\s+/g, '')
+    if (normalized.length < 6) {
+      setCodeStatus('idle')
+      setTeamInfo(null)
+      return
+    }
+    setCodeStatus('loading')
+    const timer = setTimeout(async () => {
+      const result = await lookupTeamByCode(normalized)
+      if (result) {
+        setTeamInfo(result)
+        setCodeStatus('found')
+      } else {
+        setTeamInfo(null)
+        setCodeStatus('not_found')
+      }
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [teamCode])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -51,7 +77,6 @@ function RegistroForm() {
       setLoading(false)
       return
     }
-
     setDone(true)
   }
 
@@ -94,7 +119,7 @@ function RegistroForm() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email — locked if coming from invite link */}
+                {/* Email */}
                 <div>
                   <label className="label">
                     Correo electrónico
@@ -102,7 +127,8 @@ function RegistroForm() {
                   </label>
                   <div className="relative">
                     <input
-                      type="email" required className={`input ${emailLocked ? 'bg-gray-50 text-gray-500 pr-9' : ''}`}
+                      type="email" required
+                      className={`input ${emailLocked ? 'bg-gray-50 text-gray-500 pr-9' : ''}`}
                       value={email} onChange={e => !emailLocked && setEmail(e.target.value)}
                       readOnly={emailLocked} placeholder="tu@hospital.eus" autoComplete="email"
                     />
@@ -112,7 +138,7 @@ function RegistroForm() {
                   </div>
                 </div>
 
-                {/* Confirm email — hidden if email is locked */}
+                {/* Confirm email — hidden if email is pre-filled */}
                 {!emailLocked && (
                   <div>
                     <label className="label">Confirmar correo electrónico</label>
@@ -129,25 +155,47 @@ function RegistroForm() {
                     autoComplete="new-password" />
                 </div>
 
-                {/* Team code — always shown, pre-filled if coming from invite */}
+                {/* Team code with live lookup */}
                 <div>
                   <label className="label">
                     Código de equipo
-                    {!hasInviteOrCode && <span className="text-gray-400 font-normal"> (opcional)</span>}
+                    {!inviteToken && !presetCodigo && (
+                      <span className="text-gray-400 font-normal"> (opcional)</span>
+                    )}
                   </label>
-                  <input
-                    type="text"
-                    className={`input font-mono tracking-widest uppercase ${presetCodigo ? 'bg-gray-50' : ''}`}
-                    value={teamCode}
-                    onChange={e => setTeamCode(e.target.value.toUpperCase())}
-                    placeholder="ABC-123"
-                    maxLength={10}
-                  />
-                  <p className="text-xs text-gray-400 mt-1">
-                    {presetCodigo
-                      ? 'Código del equipo al que has sido invitado.'
-                      : 'Si tu gestor te ha dado un código, introdúcelo aquí para unirte automáticamente.'}
-                  </p>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="input font-mono tracking-widest uppercase pr-9"
+                      value={teamCode}
+                      onChange={e => setTeamCode(e.target.value.toUpperCase())}
+                      placeholder="ABC-123"
+                      maxLength={10}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                      {codeStatus === 'loading' && <Loader2 size={15} className="text-gray-400 animate-spin" />}
+                      {codeStatus === 'found'   && <CheckCircle size={15} className="text-green-500" />}
+                      {codeStatus === 'not_found' && <XCircle size={15} className="text-red-400" />}
+                    </span>
+                  </div>
+
+                  {/* Team info card */}
+                  {codeStatus === 'found' && teamInfo && (
+                    <div className="mt-2 rounded-lg bg-green-50 border border-green-200 px-3 py-2.5">
+                      <p className="text-sm font-semibold text-green-900">{teamInfo.nombre}</p>
+                      {(teamInfo.hospital || teamInfo.especialidad) && (
+                        <p className="text-xs text-green-700 mt-0.5">
+                          {[teamInfo.hospital, teamInfo.especialidad].filter(Boolean).join(' · ')}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {codeStatus === 'not_found' && (
+                    <p className="mt-1.5 text-xs text-red-500">Código no encontrado. Comprueba que esté bien escrito.</p>
+                  )}
+                  {codeStatus === 'idle' && !presetCodigo && (
+                    <p className="text-xs text-gray-400 mt-1">Si tu gestor te ha dado un código, introdúcelo aquí para unirte automáticamente.</p>
+                  )}
                 </div>
 
                 <div className="flex items-start gap-3 pt-1">
@@ -158,13 +206,9 @@ function RegistroForm() {
                   />
                   <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer leading-snug">
                     He leído y acepto los{' '}
-                    <Link href="/legal/terminos" target="_blank" className="text-blue-600 hover:underline">
-                      Términos de uso
-                    </Link>
+                    <Link href="/legal/terminos" target="_blank" className="text-blue-600 hover:underline">Términos de uso</Link>
                     {' '}y la{' '}
-                    <Link href="/legal/privacidad" target="_blank" className="text-blue-600 hover:underline">
-                      Política de privacidad
-                    </Link>
+                    <Link href="/legal/privacidad" target="_blank" className="text-blue-600 hover:underline">Política de privacidad</Link>
                   </label>
                 </div>
 
@@ -172,7 +216,7 @@ function RegistroForm() {
                   type="submit" disabled={loading || !terms}
                   className="btn-primary w-full justify-center py-2.5 mt-2"
                 >
-                  {loading ? 'Creando cuenta…' : 'Crear cuenta'}
+                  {loading ? 'Creando cuenta…' : teamInfo ? `Crear cuenta y unirme a ${teamInfo.nombre}` : 'Crear cuenta'}
                 </button>
               </form>
 
