@@ -24,7 +24,7 @@ export function MedicosClient({ doctors, profiles, counters, canEdit, anio }: Pr
 
   // Profiles without a doctor profile yet
   const profilesWithoutDoctor = profiles.filter(
-    p => p.role === 'medico' && !doctors.some(d => d.profile_id === p.id)
+    p => (p.role === 'medico' || p.role === 'gestor') && !doctors.some(d => d.profile_id === p.id)
   )
 
   function getCounters(profileId: string) {
