@@ -4,17 +4,14 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createDoctor, updateDoctor, deleteDoctor } from '@/lib/actions/doctors'
 import { type Doctor, type DoctorCategoria, CATEGORIA_COLORS } from '@/types'
-import { Plus, X, Pencil, Trash2, UserCheck, UserX, AlertTriangle, CalendarDays } from 'lucide-react'
+import { Plus, X, Pencil, Trash2, UserCheck, UserX, AlertTriangle, CalendarDays, SlidersHorizontal } from 'lucide-react'
 import { CalendarioModal } from './CalendarioModal'
+import { DoctorConfigModal } from './DoctorConfigModal'
 
 const CATEGORIAS: DoctorCategoria[] = ['Adjunto', 'R1', 'R2', 'R3', 'R4', 'R5']
 
-// ── Modal añadir / editar ─────────────────────────────────────────────────────
-
 function DoctorModal({
-  doctor,
-  onClose,
-  onSaved,
+  doctor, onClose, onSaved,
 }: {
   doctor?: Doctor
   onClose: () => void
@@ -49,21 +46,16 @@ function DoctorModal({
             <X size={20} />
           </button>
         </div>
-
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
             <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">{error}</div>
           )}
-
           <div>
             <label className="label">Nombre completo *</label>
-            <input
-              type="text" required autoFocus className="input"
+            <input type="text" required autoFocus className="input"
               value={nombre} onChange={e => setNombre(e.target.value)}
-              placeholder="Dr. García López"
-            />
+              placeholder="Dr. García López" />
           </div>
-
           <div>
             <label className="label">Categoría *</label>
             <select className="input" value={categoria} onChange={e => setCategoria(e.target.value as DoctorCategoria)}>
@@ -72,11 +64,8 @@ function DoctorModal({
               ))}
             </select>
           </div>
-
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center">
-              Cancelar
-            </button>
+            <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center">Cancelar</button>
             <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">
               {loading ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Añadir médico'}
             </button>
@@ -87,14 +76,13 @@ function DoctorModal({
   )
 }
 
-// ── Fila de médico ────────────────────────────────────────────────────────────
-
 function DoctorRow({
-  doctor, onEdit, onCalendario, onRefresh,
+  doctor, onEdit, onCalendario, onConfig, onRefresh,
 }: {
   doctor: Doctor
   onEdit: () => void
   onCalendario: () => void
+  onConfig: () => void
   onRefresh: () => void
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -116,24 +104,36 @@ function DoctorRow({
     <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-colors ${
       doctor.activo ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-200 opacity-60'
     }`}>
-      {/* Info */}
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-medium truncate ${doctor.activo ? 'text-gray-900' : 'text-gray-500 line-through'}`}>
           {doctor.nombre}
         </p>
-        <span className={`inline-flex mt-0.5 items-center rounded-full px-2 py-0.5 text-xs font-medium ${CATEGORIA_COLORS[doctor.categoria]}`}>
-          {doctor.categoria === 'Adjunto' ? 'Adjunto' : `Residente ${doctor.categoria}`}
-        </span>
+        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${CATEGORIA_COLORS[doctor.categoria]}`}>
+            {doctor.categoria === 'Adjunto' ? 'Adjunto' : `Residente ${doctor.categoria}`}
+          </span>
+          {!doctor.jornada_completa && doctor.reduccion_porcentaje && (
+            <span className="text-xs text-gray-400">{doctor.reduccion_porcentaje}% red.</span>
+          )}
+          {doctor.fecha_inicio_contrato && (
+            <span className="text-xs text-gray-400">
+              desde {doctor.fecha_inicio_contrato.split('-').reverse().join('/')}
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* Acciones */}
       {!confirmDelete ? (
         <div className="flex items-center gap-1 shrink-0">
           <button onClick={onCalendario} title="Ausencias"
             className="p-1.5 rounded-lg text-gray-400 hover:text-sky-600 hover:bg-sky-50 transition-colors">
             <CalendarDays size={15} />
           </button>
-          <button onClick={onEdit} title="Editar"
+          <button onClick={onConfig} title="Configuración"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
+            <SlidersHorizontal size={15} />
+          </button>
+          <button onClick={onEdit} title="Editar nombre/categoría"
             className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors">
             <Pencil size={15} />
           </button>
@@ -152,27 +152,22 @@ function DoctorRow({
           <AlertTriangle size={14} className="text-red-500" />
           <span className="text-xs text-red-600">¿Eliminar?</span>
           <button onClick={handleDelete} disabled={loading}
-            className="text-xs font-medium text-red-600 hover:text-red-800">
-            Sí
-          </button>
+            className="text-xs font-medium text-red-600 hover:text-red-800">Sí</button>
           <button onClick={() => setConfirmDelete(false)}
-            className="text-xs text-gray-500 hover:text-gray-700">
-            No
-          </button>
+            className="text-xs text-gray-500 hover:text-gray-700">No</button>
         </div>
       )}
     </div>
   )
 }
 
-// ── Componente principal ──────────────────────────────────────────────────────
-
 export function MedicosClient({ doctors: initial }: { doctors: Doctor[] }) {
   const router = useRouter()
-  const [doctors,   setDoctors]   = useState<Doctor[]>(initial)
-  const [showModal, setShowModal] = useState(false)
+  const [doctors,    setDoctors]    = useState<Doctor[]>(initial)
+  const [showModal,  setShowModal]  = useState(false)
   const [editDoctor, setEditDoctor] = useState<Doctor | undefined>()
   const [calDoctor,  setCalDoctor]  = useState<Doctor | undefined>()
+  const [cfgDoctor,  setCfgDoctor]  = useState<Doctor | undefined>()
 
   useEffect(() => { setDoctors(initial) }, [initial])
 
@@ -186,7 +181,6 @@ export function MedicosClient({ doctors: initial }: { doctors: Doctor[] }) {
 
   return (
     <>
-      {/* Cabecera */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Médicos</h1>
@@ -201,7 +195,6 @@ export function MedicosClient({ doctors: initial }: { doctors: Doctor[] }) {
         </button>
       </div>
 
-      {/* Lista vacía */}
       {doctors.length === 0 && (
         <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
           <p className="text-gray-500 text-sm mb-4">Aún no hay médicos. Añade el primero.</p>
@@ -212,19 +205,18 @@ export function MedicosClient({ doctors: initial }: { doctors: Doctor[] }) {
         </div>
       )}
 
-      {/* Médicos activos */}
       {activos.length > 0 && (
         <div className="space-y-2 mb-6">
           {activos.map(d => (
             <DoctorRow key={d.id} doctor={d}
               onEdit={() => openEdit(d)}
               onCalendario={() => setCalDoctor(d)}
+              onConfig={() => setCfgDoctor(d)}
               onRefresh={() => router.refresh()} />
           ))}
         </div>
       )}
 
-      {/* Médicos inactivos */}
       {inactivos.length > 0 && (
         <div>
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Inactivos</p>
@@ -233,20 +225,27 @@ export function MedicosClient({ doctors: initial }: { doctors: Doctor[] }) {
               <DoctorRow key={d.id} doctor={d}
                 onEdit={() => openEdit(d)}
                 onCalendario={() => setCalDoctor(d)}
+                onConfig={() => setCfgDoctor(d)}
                 onRefresh={() => router.refresh()} />
             ))}
           </div>
         </div>
       )}
 
-      {/* Modal editar/añadir */}
       {showModal && (
         <DoctorModal doctor={editDoctor} onClose={closeModal} onSaved={onSaved} />
       )}
 
-      {/* Modal calendario de ausencias */}
       {calDoctor && (
         <CalendarioModal doctor={calDoctor} onClose={() => setCalDoctor(undefined)} />
+      )}
+
+      {cfgDoctor && (
+        <DoctorConfigModal
+          doctor={cfgDoctor}
+          onClose={() => setCfgDoctor(undefined)}
+          onSaved={() => { setCfgDoctor(undefined); router.refresh() }}
+        />
       )}
     </>
   )
