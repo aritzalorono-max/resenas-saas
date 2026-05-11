@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getInvitationByToken, getTeamByCodigo } from '@/lib/actions/teams'
 import { JoinByCodeButton } from '@/components/onboarding/JoinByCodeButton'
+import { InviteRegisterForm } from '@/components/onboarding/InviteRegisterForm'
 import { Stethoscope, CheckCircle, XCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 
