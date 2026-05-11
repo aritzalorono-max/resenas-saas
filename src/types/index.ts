@@ -66,15 +66,17 @@ export interface TeamInvitation {
 
 export interface DoctorProfile {
   id: string
-  profile_id: string
+  profile_id: string | null
   team_id: string | null
+  nombre: string | null
   categoria: DoctorCategoria
-  num_colegiado: string | null
   especialidad: string
   anio_inicio: number | null
   activo: boolean
   jornada_completa: boolean
   reduccion_porcentaje: number | null
+  reduccion_fecha_inicio: string | null
+  reduccion_fecha_fin: string | null
   notas: string | null
   created_at: string
   updated_at: string
