@@ -52,7 +52,10 @@ export async function updateSession(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (!profile || !profile.active_team_id) {
+    // Only redirect when we're sure the profile exists but has no team.
+    // If profile is null (DB error / row missing), let the page handle it –
+    // redirecting here would create a login ↔ onboarding loop.
+    if (profile && !profile.active_team_id) {
       const url = request.nextUrl.clone()
       url.pathname = '/onboarding'
       return NextResponse.redirect(url)
