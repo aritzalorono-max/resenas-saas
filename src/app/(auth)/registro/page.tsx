@@ -13,6 +13,7 @@ function RegistroForm() {
   const [email, setEmail]         = useState('')
   const [emailConf, setEmailConf] = useState('')
   const [password, setPassword]   = useState('')
+  const [teamCode, setTeamCode]   = useState('')
   const [terms, setTerms]         = useState(false)
   const [error, setError]         = useState('')
   const [loading, setLoading]     = useState(false)
@@ -37,7 +38,8 @@ function RegistroForm() {
 
     setLoading(true)
     const defaultName = email.split('@')[0]
-    const result = await signUp(email, password, defaultName, inviteToken)
+    const normalizedCode = teamCode.trim().toUpperCase().replace(/\s+/g, '') || undefined
+    const result = await signUp(email, password, defaultName, inviteToken, normalizedCode)
     if (result.error) {
       setError(result.error)
       setLoading(false)
@@ -106,6 +108,20 @@ function RegistroForm() {
                     onChange={e => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres"
                     autoComplete="new-password" />
                 </div>
+
+                {!inviteToken && (
+                  <div>
+                    <label className="label">Código de equipo <span className="text-gray-400 font-normal">(opcional)</span></label>
+                    <input
+                      type="text" className="input font-mono tracking-widest uppercase"
+                      value={teamCode}
+                      onChange={e => setTeamCode(e.target.value)}
+                      placeholder="ABC-123"
+                      maxLength={10}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Si tu gestor te ha dado un código, introdúcelo aquí para unirte automáticamente.</p>
+                  </div>
+                )}
 
                 <div className="flex items-start gap-3 pt-1">
                   <input

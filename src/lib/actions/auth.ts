@@ -52,10 +52,20 @@ export async function signOut() {
   await supabase.auth.signOut()
 }
 
-export async function signUp(email: string, password: string, fullName: string, inviteToken?: string) {
+export async function signUp(email: string, password: string, fullName: string, inviteToken?: string, teamCode?: string) {
   const supabase = await createClient()
 
-  const { data: authData, error: authError } = await supabase.auth.signUp({ email, password })
+  // Build redirect URL so the callback can process teamCode after email confirmation
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const callbackParams = new URLSearchParams()
+  if (teamCode) callbackParams.set('teamCode', teamCode)
+  if (inviteToken) callbackParams.set('invite', inviteToken)
+  const emailRedirectTo = `${appUrl}/api/auth/callback${callbackParams.size ? `?${callbackParams}` : ''}`
+
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email, password,
+    options: { emailRedirectTo },
+  })
   if (authError) return { error: authError.message }
   if (!authData.user) return { error: 'No se pudo crear el usuario.' }
 
