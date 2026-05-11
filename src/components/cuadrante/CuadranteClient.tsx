@@ -535,9 +535,9 @@ export function CuadranteClient({ currentRole, activeDoctors, initialRules }: Pr
                             onChange={e => handleChangeDoctor(a.fecha, e.target.value)}
                             className="input py-1 text-sm max-w-[220px]"
                           >
-                            {activeDoctors.map(d => (
-                              <option key={d.profile_id} value={d.profile_id}>
-                                {d.profile?.full_name ?? 'Sin nombre'}
+                            {activeDoctors.filter(d => d.profile_id).map(d => (
+                              <option key={d.profile_id!} value={d.profile_id!}>
+                                {d.profile?.full_name ?? d.nombre ?? 'Sin nombre'}
                               </option>
                             ))}
                           </select>
