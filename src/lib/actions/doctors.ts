@@ -38,30 +38,22 @@ export async function getDoctorProfile(profileId: string): Promise<DoctorProfile
 export async function createDoctorProfile(data: {
   profileId?: string | null
   nombre?: string
+  email?: string | null
   categoria: DoctorCategoria
   especialidad?: string
-  anioInicio?: number
-  jornadaCompleta?: boolean
-  reduccionPorcentaje?: number | null
-  reduccionFechaInicio?: string | null
-  reduccionFechaFin?: string | null
   notas?: string
 }) {
   const supabase = await createClient()
   const teamId = await getActiveTeamId()
   if (!teamId) return { error: 'No hay equipo activo.' }
   const { error } = await supabase.from('guardias_doctor_profiles').insert({
-    profile_id:             data.profileId ?? null,
-    nombre:                 data.nombre ?? null,
-    team_id:                teamId,
-    categoria:              data.categoria,
-    especialidad:           data.especialidad ?? 'Urología',
-    anio_inicio:            data.anioInicio ?? null,
-    jornada_completa:       data.jornadaCompleta ?? true,
-    reduccion_porcentaje:   data.reduccionPorcentaje ?? null,
-    reduccion_fecha_inicio: data.reduccionFechaInicio ?? null,
-    reduccion_fecha_fin:    data.reduccionFechaFin ?? null,
-    notas:                  data.notas ?? null,
+    profile_id:  data.profileId ?? null,
+    nombre:      data.nombre ?? null,
+    email:       data.email ?? null,
+    team_id:     teamId,
+    categoria:   data.categoria,
+    especialidad: data.especialidad ?? 'Urología',
+    notas:       data.notas ?? null,
   })
   if (error) return { error: error.message }
   return { success: true }
@@ -69,6 +61,7 @@ export async function createDoctorProfile(data: {
 
 export async function updateDoctorProfile(id: string, data: {
   nombre?: string | null
+  email?: string | null
   categoria?: DoctorCategoria
   especialidad?: string
   anioInicio?: number | null
@@ -84,6 +77,7 @@ export async function updateDoctorProfile(id: string, data: {
     .from('guardias_doctor_profiles')
     .update({
       ...(data.nombre                !== undefined && { nombre:                 data.nombre }),
+      ...(data.email                 !== undefined && { email:                  data.email }),
       ...(data.categoria             !== undefined && { categoria:              data.categoria }),
       ...(data.especialidad          !== undefined && { especialidad:           data.especialidad }),
       ...(data.anioInicio            !== undefined && { anio_inicio:            data.anioInicio }),
