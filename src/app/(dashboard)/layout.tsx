@@ -6,7 +6,11 @@ import { MobileNav } from '@/components/layout/MobileNav'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const profile = await getCurrentProfile()
-  if (!profile) redirect('/login')
+  // If profile is null the user is not authenticated → send to login.
+  // If profile exists but no team → send to onboarding.
+  // Never loop back to /login for an authenticated user with a missing profile;
+  // redirect to /onboarding instead so it can be created there.
+  if (!profile) redirect('/onboarding')
   if (!profile.active_team_id) redirect('/onboarding')
 
   const teams = await getMyTeams()
