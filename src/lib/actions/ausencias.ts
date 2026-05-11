@@ -47,3 +47,28 @@ export async function deleteAusencia(doctorId: string, fecha: string) {
   if (error) return { error: error.message }
   return { success: true }
 }
+
+export async function deleteAusenciasMes(
+  doctorId: string,
+  year: number,
+  month: number,
+  tipo: TipoAusencia,
+) {
+  const supabase = await createClient()
+  const uid = await getUid()
+  if (!uid) return { error: 'No autenticado' }
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const mesStart = `${year}-${pad(month + 1)}-01`
+  const lastDay = new Date(year, month + 1, 0).getDate()
+  const mesEnd = `${year}-${pad(month + 1)}-${pad(lastDay)}`
+  const { error } = await supabase
+    .from('ausencias')
+    .delete()
+    .eq('doctor_id', doctorId)
+    .eq('profile_id', uid)
+    .eq('tipo', tipo)
+    .gte('fecha', mesStart)
+    .lte('fecha', mesEnd)
+  if (error) return { error: error.message }
+  return { success: true }
+}
