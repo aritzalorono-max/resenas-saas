@@ -306,6 +306,14 @@ export async function revokeInvitation(invitationId: string) {
 
 // ─── Get team by short join code (for shareable links) ───────────────────────
 
+export async function lookupTeamByCode(codigo: string): Promise<{ nombre: string; hospital: string | null; especialidad: string | null } | null> {
+  const supabase = await createClient()
+  const { data } = await supabase.rpc('lookup_team_by_code', { p_codigo: codigo })
+  if (!data || (Array.isArray(data) && data.length === 0)) return null
+  const row = Array.isArray(data) ? data[0] : data
+  return { nombre: row.nombre, hospital: row.hospital ?? null, especialidad: row.especialidad ?? null }
+}
+
 export async function getTeamByCodigo(codigo: string) {
   const supabase = await createClient()
   const { data } = await supabase
