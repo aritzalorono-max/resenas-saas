@@ -9,7 +9,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!profile) redirect('/onboarding')
   if (!profile.active_team_id) redirect('/onboarding')
 
-  const [teams, teamRole] = await Promise.all([getMyTeams(), getMyTeamRole()])
+  const [teams, teamRole] = await Promise.all([getMyTeams(), getMyTeamRole(profile.active_team_id)])
   const activeTeam = teams.find(t => t.id === profile.active_team_id) ?? null
   const displayRole = teamRole ?? profile.role
 

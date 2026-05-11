@@ -50,23 +50,20 @@ export async function getMyTeams(): Promise<Team[]> {
 }
 
 // Returns the current user's role in their active team
-export async function getMyTeamRole(): Promise<TeamRole | null> {
+export async function getMyTeamRole(teamId?: string): Promise<TeamRole | null> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
-  const { data: profile } = await supabase
-    .from('guardias_profiles')
-    .select('active_team_id')
-    .eq('id', user.id)
-    .single()
-  if (!profile?.active_team_id) return null
-  const { data } = await supabase
-    .from('guardias_team_members')
-    .select('role')
-    .eq('profile_id', user.id)
-    .eq('team_id', profile.active_team_id)
-    .single()
-  return (data?.role as TeamRole) ?? null
+
+  let resolvedTeamId = teamId
+  if (!resolvedTeamId) {
+    const { data: profileData } = await supabase.rpc('get_my_profile')
+    resolvedTeamId = (profileData as any)?.active_team_id
+  }
+  if (!resolvedTeamId) return null
+
+  const { data } = await supabase.rpc('get_my_team_role', { p_team_id: resolvedTeamId })
+  return (data as TeamRole) ?? null
 }
 
 // ─── Create team ──────────────────────────────────────────────────────────────
@@ -206,12 +203,17 @@ export async function switchTeam(teamId: string) {
 
 export async function listTeamMembers(teamId: string): Promise<TeamMember[]> {
   const supabase = await createClient()
-  const { data } = await supabase
-    .from('guardias_team_members')
-    .select('*, profile:guardias_profiles(id, full_name, role, avatar_url, active_team_id, created_at, updated_at)')
-    .eq('team_id', teamId)
-    .order('joined_at')
-  return (data ?? []) as TeamMember[]
+  const { data } = await supabase.rpc('list_team_members_with_profile', { p_team_id: teamId })
+  if (!data) return []
+  return (data as any[]).map(row => ({
+    id:         row.id,
+    team_id:    row.team_id,
+    profile_id: row.profile_id,
+    role:       row.role,
+    status:     row.status,
+    joined_at:  row.joined_at,
+    profile: { id: row.profile_id, full_name: row.full_name, avatar_url: row.avatar_url },
+  })) as TeamMember[]
 }
 
 export async function updateMemberRole(memberId: string, role: TeamRole) {
