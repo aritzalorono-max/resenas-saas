@@ -325,12 +325,12 @@ export async function getInvitationByToken(token: string) {
   if (!data || (Array.isArray(data) && data.length === 0)) return null
   const row = Array.isArray(data) ? data[0] : data
   return {
-    id:       row.id,
-    team_id:  row.team_id,
-    email:    row.email,
-    role:     row.role,
+    id:         row.id,
+    team_id:    row.team_id,
+    email:      row.email,
+    role:       row.role,
     expires_at: row.expires_at,
-    team: { nombre: row.team_nombre, hospital: row.team_hospital },
+    team: { nombre: row.team_nombre, hospital: row.team_hospital, codigo: row.team_codigo },
   }
 }
 
