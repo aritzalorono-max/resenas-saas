@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
-import { X, ChevronLeft, ChevronRight } from 'lucide-react'
-import { listAusencias, setAusencia, deleteAusencia } from '@/lib/actions/ausencias'
+import { X, ChevronLeft, ChevronRight, Eraser } from 'lucide-react'
+import { listAusencias, setAusencia, deleteAusencia, deleteAusenciasMes } from '@/lib/actions/ausencias'
 import { listPeriodos } from '@/lib/actions/periodos'
 import {
   type Doctor, type TipoAusencia, type TipoPeriodo, type Periodo,
@@ -54,9 +54,11 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
   const todayStr = toDateStr(hoy)
   const [mes, setMes] = useState(new Date(hoy.getFullYear(), hoy.getMonth(), 1))
   const [tipo, setTipo] = useState<TipoAusencia>('Vacaciones')
+  const [mode, setMode] = useState<'mark' | 'erase'>('mark')
   const [ausencias, setAusenciasMap] = useState<Map<string, TipoAusencia>>(new Map())
   const [periodos,  setPeriodos]     = useState<Periodo[]>([])
   const [saving, setSaving] = useState<Set<string>>(new Set())
+  const [limpiando, setLimpiando] = useState(false)
   const [, startTransition] = useTransition()
 
   useEffect(() => {
@@ -72,9 +74,22 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
     })
   }, [doctor.id])
 
+  const year = mes.getFullYear()
+  const month = mes.getMonth()
+
   async function handleDay(fecha: string) {
     if (saving.has(fecha)) return
     setSaving(prev => new Set(prev).add(fecha))
+
+    if (mode === 'erase') {
+      if (ausencias.has(fecha)) {
+        await deleteAusencia(doctor.id, fecha)
+        setAusenciasMap(prev => { const m = new Map(prev); m.delete(fecha); return m })
+      }
+      setSaving(prev => { const s = new Set(prev); s.delete(fecha); return s })
+      return
+    }
+
     const current = ausencias.get(fecha)
     const next = new Map(ausencias)
     if (current === tipo) {
@@ -88,11 +103,28 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
     setSaving(prev => { const s = new Set(prev); s.delete(fecha); return s })
   }
 
-  const year = mes.getFullYear()
-  const month = mes.getMonth()
+  async function limpiarMes() {
+    setLimpiando(true)
+    await deleteAusenciasMes(doctor.id, year, month, tipo)
+    setAusenciasMap(prev => {
+      const next = new Map(prev)
+      for (const [f, t] of prev.entries()) {
+        const d = new Date(f + 'T00:00:00')
+        if (t === tipo && d.getFullYear() === year && d.getMonth() === month) next.delete(f)
+      }
+      return next
+    })
+    setLimpiando(false)
+  }
+
   const days = getDaysInMonth(year, month)
   const offset = dow(days[0])
   const monthLabel = mes.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
+
+  const hayTipoEnMes = [...ausencias.entries()].some(([f, t]) => {
+    const d = new Date(f + 'T00:00:00')
+    return t === tipo && d.getFullYear() === year && d.getMonth() === month
+  })
 
   const totalesAus = TIPOS_AUSENCIA.map(t => ({
     t, n: [...ausencias.entries()]
@@ -128,11 +160,19 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
 
           <div className="flex flex-wrap gap-2">
             {TIPOS_AUSENCIA.map(t => (
-              <button key={t} onClick={() => setTipo(t)}
+              <button key={t} onClick={() => { setTipo(t); setMode('mark') }}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                  tipo === t ? TIPO_PILL_ACTIVE[t] : 'border-gray-200 text-gray-600 hover:border-gray-400 bg-white'
+                  tipo === t && mode === 'mark' ? TIPO_PILL_ACTIVE[t] : 'border-gray-200 text-gray-600 hover:border-gray-400 bg-white'
                 }`}>{t}</button>
             ))}
+            <button
+              onClick={() => setMode(m => m === 'erase' ? 'mark' : 'erase')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                mode === 'erase' ? 'bg-orange-500 text-white border-orange-500' : 'border-gray-200 text-gray-600 hover:border-gray-400 bg-white'
+              }`}>
+              <Eraser size={12} />
+              Borrar
+            </button>
           </div>
 
           <div className="flex items-center justify-between">
@@ -158,17 +198,22 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
               const tipoPer = tipoAus ? null : getPeriodoTipo(fecha, periodos)
               const isSaving = saving.has(fecha)
               const isToday = fecha === todayStr
-              const bgClass = tipoAus
-                ? `${TIPO_AUSENCIA_BG[tipoAus]} text-white`
-                : tipoPer ? TIPO_PERIODO_CAL[tipoPer] : 'text-gray-700 hover:bg-gray-100'
+              const isErase = mode === 'erase'
+              const bgClass = isErase && tipoAus
+                ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                : tipoAus
+                  ? `${TIPO_AUSENCIA_BG[tipoAus]} text-white`
+                  : tipoPer ? TIPO_PERIODO_CAL[tipoPer] : isErase ? 'text-gray-300' : 'text-gray-700 hover:bg-gray-100'
               return (
-                <button key={fecha} onClick={() => handleDay(fecha)} disabled={isSaving}
-                  title={tipoAus ?? (tipoPer ? `${TIPO_PERIODO_LABEL[tipoPer]} (periodo)` : tipo)}
+                <button key={fecha}
+                  onClick={() => handleDay(fecha)}
+                  disabled={isSaving || (isErase && !tipoAus)}
+                  title={tipoAus ? (isErase ? `Borrar ${tipoAus}` : tipoAus) : (tipoPer ? `${TIPO_PERIODO_LABEL[tipoPer]} (periodo)` : tipo)}
                   className={[
                     'aspect-square rounded-lg text-xs font-medium transition-all flex items-center justify-center select-none relative',
                     bgClass,
                     isToday && !tipoAus && !tipoPer ? 'ring-2 ring-offset-1 ring-blue-400' : '',
-                    isSaving ? 'opacity-50 cursor-wait' : 'cursor-pointer',
+                    isSaving ? 'opacity-50 cursor-wait' : (isErase && !tipoAus) ? 'cursor-default' : 'cursor-pointer',
                   ].join(' ')}>
                   {day.getDate()}
                   {tipoPer && !tipoAus && (
@@ -178,6 +223,15 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
               )
             })}
           </div>
+
+          {mode === 'mark' && hayTipoEnMes && (
+            <div className="flex justify-end">
+              <button onClick={limpiarMes} disabled={limpiando}
+                className="text-xs text-red-400 hover:text-red-600 transition-colors disabled:opacity-50">
+                {limpiando ? 'Limpiando…' : `Limpiar ${tipo.toLowerCase()} de este mes`}
+              </button>
+            </div>
+          )}
 
           {periodosMes.length > 0 && (
             <div className="rounded-lg bg-gray-50 border border-gray-200 p-3 space-y-1.5">

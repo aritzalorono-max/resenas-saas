@@ -80,3 +80,14 @@ export const TIPO_PERIODO_CAL: Record<TipoPeriodo, string> = {
   Excedencia: 'bg-amber-200 text-amber-800',
   Baja:       'bg-red-200 text-red-800',
 }
+
+export interface JornadaPeriodo {
+  id: string
+  profile_id: string
+  doctor_id: string
+  jornada_completa: boolean
+  reduccion_porcentaje: number | null
+  fecha_inicio: string
+  fecha_fin: string | null
+  created_at: string
+}
