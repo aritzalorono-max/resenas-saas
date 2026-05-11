@@ -35,14 +35,26 @@ export async function createDoctor(nombre: string, categoria: DoctorCategoria) {
   return { success: true }
 }
 
-export async function updateDoctor(id: string, data: { nombre?: string; categoria?: DoctorCategoria; activo?: boolean }) {
+export async function updateDoctor(id: string, data: {
+  nombre?: string
+  categoria?: DoctorCategoria
+  activo?: boolean
+  jornada_completa?: boolean
+  reduccion_porcentaje?: number | null
+  fecha_inicio_contrato?: string | null
+  fecha_fin_contrato?: string | null
+}) {
   const supabase = await createClient()
   const uid = await getUid()
   if (!uid) return { error: 'No autenticado' }
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() }
-  if (data.nombre    !== undefined) update.nombre    = data.nombre.trim()
-  if (data.categoria !== undefined) update.categoria = data.categoria
-  if (data.activo    !== undefined) update.activo    = data.activo
+  if (data.nombre                !== undefined) update.nombre                = data.nombre.trim()
+  if (data.categoria             !== undefined) update.categoria             = data.categoria
+  if (data.activo                !== undefined) update.activo                = data.activo
+  if (data.jornada_completa      !== undefined) update.jornada_completa      = data.jornada_completa
+  if (data.reduccion_porcentaje  !== undefined) update.reduccion_porcentaje  = data.reduccion_porcentaje
+  if (data.fecha_inicio_contrato !== undefined) update.fecha_inicio_contrato = data.fecha_inicio_contrato
+  if (data.fecha_fin_contrato    !== undefined) update.fecha_fin_contrato    = data.fecha_fin_contrato
   const { error } = await supabase.from('doctors').update(update).eq('id', id).eq('profile_id', uid)
   if (error) return { error: error.message }
   return { success: true }

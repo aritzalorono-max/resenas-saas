@@ -3,9 +3,13 @@
 import { useState, useEffect, useTransition } from 'react'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { listAusencias, setAusencia, deleteAusencia } from '@/lib/actions/ausencias'
-import { type Doctor, type TipoAusencia, TIPO_AUSENCIA_BG } from '@/types'
+import { listPeriodos } from '@/lib/actions/periodos'
+import {
+  type Doctor, type TipoAusencia, type TipoPeriodo, type Periodo,
+  TIPO_AUSENCIA_BG, TIPO_PERIODO_CAL, TIPO_PERIODO_LABEL,
+} from '@/types'
 
-const TIPOS: TipoAusencia[] = ['Vacaciones', 'Baja', 'Excedencia', 'Congreso', 'Otros']
+const TIPOS_AUSENCIA: TipoAusencia[] = ['Vacaciones', 'Baja', 'Congreso', 'Otros']
 
 const TIPO_PILL_ACTIVE: Record<TipoAusencia, string> = {
   Vacaciones: 'bg-sky-500 text-white border-sky-500',
@@ -35,21 +39,36 @@ function dow(d: Date): number {
   return (d.getDay() + 6) % 7
 }
 
+function getPeriodoTipo(fecha: string, periodos: Periodo[]): TipoPeriodo | null {
+  const d = new Date(fecha + 'T00:00:00')
+  for (const p of periodos) {
+    const s = new Date(p.fecha_inicio + 'T00:00:00')
+    const e = new Date(p.fecha_fin + 'T00:00:00')
+    if (d >= s && d <= e) return p.tipo
+  }
+  return null
+}
+
 export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: () => void }) {
   const hoy = new Date()
   const todayStr = toDateStr(hoy)
   const [mes, setMes] = useState(new Date(hoy.getFullYear(), hoy.getMonth(), 1))
   const [tipo, setTipo] = useState<TipoAusencia>('Vacaciones')
   const [ausencias, setAusenciasMap] = useState<Map<string, TipoAusencia>>(new Map())
+  const [periodos,  setPeriodos]     = useState<Periodo[]>([])
   const [saving, setSaving] = useState<Set<string>>(new Set())
   const [, startTransition] = useTransition()
 
   useEffect(() => {
     startTransition(async () => {
-      const data = await listAusencias(doctor.id)
+      const [ausData, perData] = await Promise.all([
+        listAusencias(doctor.id),
+        listPeriodos(doctor.id),
+      ])
       const map = new Map<string, TipoAusencia>()
-      data.forEach(a => map.set(a.fecha, a.tipo))
+      ausData.forEach(a => map.set(a.fecha, a.tipo))
       setAusenciasMap(map)
+      setPeriodos(perData)
     })
   }, [doctor.id])
 
@@ -75,17 +94,30 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
   const offset = dow(days[0])
   const monthLabel = mes.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
 
-  const totales = TIPOS.map(t => ({ t, n: [...ausencias.values()].filter(v => v === t).length })).filter(x => x.n > 0)
+  const totalesAus = TIPOS_AUSENCIA.map(t => ({
+    t, n: [...ausencias.entries()]
+      .filter(([f, v]) => {
+        const d = new Date(f + 'T00:00:00')
+        return v === t && d.getFullYear() === year && d.getMonth() === month
+      }).length,
+  })).filter(x => x.n > 0)
+
+  const periodosMes = periodos.filter(p => {
+    const s = new Date(p.fecha_inicio + 'T00:00:00')
+    const e = new Date(p.fecha_fin + 'T00:00:00')
+    const mesStart = new Date(year, month, 1)
+    const mesEnd = new Date(year, month + 1, 0)
+    return s <= mesEnd && e >= mesStart
+  })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
 
-        {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">{doctor.nombre}</h2>
-            <p className="text-xs text-gray-400 mt-0.5">Haz clic en los días para marcarlos</p>
+            <p className="text-xs text-gray-400 mt-0.5">Selecciona el tipo y haz clic en los días</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={20} />
@@ -94,24 +126,15 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
 
         <div className="p-5 space-y-4">
 
-          {/* Tipo selector */}
           <div className="flex flex-wrap gap-2">
-            {TIPOS.map(t => (
-              <button
-                key={t}
-                onClick={() => setTipo(t)}
+            {TIPOS_AUSENCIA.map(t => (
+              <button key={t} onClick={() => setTipo(t)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                  tipo === t
-                    ? TIPO_PILL_ACTIVE[t]
-                    : 'border-gray-200 text-gray-600 hover:border-gray-400 bg-white'
-                }`}
-              >
-                {t}
-              </button>
+                  tipo === t ? TIPO_PILL_ACTIVE[t] : 'border-gray-200 text-gray-600 hover:border-gray-400 bg-white'
+                }`}>{t}</button>
             ))}
           </div>
 
-          {/* Navegación de mes */}
           <div className="flex items-center justify-between">
             <button onClick={() => setMes(new Date(year, month - 1, 1))}
               className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-600">
@@ -124,7 +147,6 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
             </button>
           </div>
 
-          {/* Calendario */}
           <div className="grid grid-cols-7 gap-1">
             {DIAS.map(d => (
               <div key={d} className="text-center text-xs font-semibold text-gray-400 pb-1">{d}</div>
@@ -132,35 +154,49 @@ export function CalendarioModal({ doctor, onClose }: { doctor: Doctor; onClose: 
             {Array.from({ length: offset }).map((_, i) => <div key={`e${i}`} />)}
             {days.map(day => {
               const fecha = toDateStr(day)
-              const tipoDay = ausencias.get(fecha)
+              const tipoAus = ausencias.get(fecha)
+              const tipoPer = tipoAus ? null : getPeriodoTipo(fecha, periodos)
               const isSaving = saving.has(fecha)
               const isToday = fecha === todayStr
-
+              const bgClass = tipoAus
+                ? `${TIPO_AUSENCIA_BG[tipoAus]} text-white`
+                : tipoPer ? TIPO_PERIODO_CAL[tipoPer] : 'text-gray-700 hover:bg-gray-100'
               return (
-                <button
-                  key={fecha}
-                  onClick={() => handleDay(fecha)}
-                  disabled={isSaving}
-                  title={tipoDay ?? tipo}
+                <button key={fecha} onClick={() => handleDay(fecha)} disabled={isSaving}
+                  title={tipoAus ?? (tipoPer ? `${TIPO_PERIODO_LABEL[tipoPer]} (periodo)` : tipo)}
                   className={[
-                    'aspect-square rounded-lg text-xs font-medium transition-all flex items-center justify-center select-none',
-                    tipoDay
-                      ? `${TIPO_AUSENCIA_BG[tipoDay]} text-white`
-                      : 'text-gray-700 hover:bg-gray-100',
-                    isToday && !tipoDay ? 'ring-2 ring-offset-1 ring-blue-400' : '',
+                    'aspect-square rounded-lg text-xs font-medium transition-all flex items-center justify-center select-none relative',
+                    bgClass,
+                    isToday && !tipoAus && !tipoPer ? 'ring-2 ring-offset-1 ring-blue-400' : '',
                     isSaving ? 'opacity-50 cursor-wait' : 'cursor-pointer',
-                  ].join(' ')}
-                >
+                  ].join(' ')}>
                   {day.getDate()}
+                  {tipoPer && !tipoAus && (
+                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-current opacity-50" />
+                  )}
                 </button>
               )
             })}
           </div>
 
-          {/* Resumen */}
-          {totales.length > 0 && (
-            <div className="flex flex-wrap gap-3 pt-2 border-t border-gray-100">
-              {totales.map(({ t, n }) => (
+          {periodosMes.length > 0 && (
+            <div className="rounded-lg bg-gray-50 border border-gray-200 p-3 space-y-1.5">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Periodos activos</p>
+              {periodosMes.map(p => (
+                <div key={p.id} className="flex items-center gap-2 text-xs text-gray-600">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${TIPO_PERIODO_CAL[p.tipo].split(' ')[0]}`} />
+                  <span className="font-medium">{TIPO_PERIODO_LABEL[p.tipo]}</span>
+                  <span className="text-gray-400">
+                    {p.fecha_inicio.split('-').reverse().join('/')} → {p.fecha_fin.split('-').reverse().join('/')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {totalesAus.length > 0 && (
+            <div className="flex flex-wrap gap-3 pt-1 border-t border-gray-100">
+              {totalesAus.map(({ t, n }) => (
                 <div key={t} className="flex items-center gap-1.5 text-xs text-gray-600">
                   <span className={`w-2.5 h-2.5 rounded-full ${TIPO_AUSENCIA_BG[t]}`} />
                   {t}: <span className="font-semibold">{n}d</span>
