@@ -133,7 +133,7 @@ export function CuadranteClient({ currentRole, activeDoctors, initialRules }: Pr
     } else {
       const profileMap: Record<string, string> = {}
       for (const d of activeDoctors) {
-        profileMap[d.profile_id] = d.profile?.full_name ?? 'Sin nombre'
+        if (d.profile_id) profileMap[d.profile_id] = d.profile?.full_name ?? 'Sin nombre'
       }
       const mapped: DraftAssignment[] = data.map((a: any) => ({
         fecha:      a.fecha,
@@ -184,7 +184,7 @@ export function CuadranteClient({ currentRole, activeDoctors, initialRules }: Pr
     if (!canEdit) return
     const profileMap: Record<string, string> = {}
     for (const d of activeDoctors) {
-      profileMap[d.profile_id] = d.profile?.full_name ?? 'Sin nombre'
+      if (d.profile_id) profileMap[d.profile_id] = d.profile?.full_name ?? 'Sin nombre'
     }
     const newName = profileMap[newProfileId] ?? 'Desconocido'
 
