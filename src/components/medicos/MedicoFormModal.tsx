@@ -19,7 +19,6 @@ export function MedicoFormModal({ doctorProfile, prefillNombre, prefillProfileId
   const isEdit = !!doctorProfile
 
   const [nombre,    setNombre]    = useState(doctorProfile?.nombre ?? prefillNombre ?? '')
-  const [email,     setEmail]     = useState(doctorProfile?.email ?? '')
   const [categoria, setCategoria] = useState<DoctorCategoria>(doctorProfile?.categoria ?? 'Adjunto')
   const [activo,    setActivo]    = useState(doctorProfile?.activo ?? true)
   const [error,     setError]     = useState('')
@@ -36,7 +35,6 @@ export function MedicoFormModal({ doctorProfile, prefillNombre, prefillProfileId
     if (isEdit) {
       result = await updateDoctorProfile(doctorProfile.id, {
         nombre: nombre.trim(),
-        email:  email.trim() || null,
         categoria,
         activo,
       })
@@ -44,7 +42,6 @@ export function MedicoFormModal({ doctorProfile, prefillNombre, prefillProfileId
       result = await createDoctorProfile({
         profileId: prefillProfileId ?? null,
         nombre:    nombre.trim(),
-        email:     email.trim() || null,
         categoria,
       })
     }
@@ -76,15 +73,6 @@ export function MedicoFormModal({ doctorProfile, prefillNombre, prefillProfileId
               type="text" required autoFocus={!prefillNombre} className="input"
               value={nombre} onChange={e => setNombre(e.target.value)}
               placeholder="Dr. García López"
-            />
-          </div>
-
-          <div>
-            <label className="label">Email <span className="text-gray-400 font-normal">(opcional)</span></label>
-            <input
-              type="email" className="input"
-              value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="doctor@hospital.eus"
             />
           </div>
 

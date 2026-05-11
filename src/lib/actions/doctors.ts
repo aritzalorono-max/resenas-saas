@@ -46,14 +46,13 @@ export async function createDoctorProfile(data: {
   const supabase = await createClient()
   const teamId = await getActiveTeamId()
   if (!teamId) return { error: 'No hay equipo activo.' }
-  // Use RPC to bypass PostgREST schema cache for the email column
-  const { error } = await supabase.rpc('create_doctor_profile', {
-    p_profile_id:   data.profileId ?? null,
-    p_team_id:      teamId,
-    p_nombre:       data.nombre ?? null,
-    p_email:        data.email ?? null,
-    p_categoria:    data.categoria,
-    p_especialidad: data.especialidad ?? 'Urología',
+  const { error } = await supabase.from('guardias_doctor_profiles').insert({
+    profile_id:   data.profileId ?? null,
+    nombre:       data.nombre ?? null,
+    team_id:      teamId,
+    categoria:    data.categoria,
+    especialidad: data.especialidad ?? 'Urología',
+    notas:        data.notas ?? null,
   })
   if (error) return { error: error.message }
   return { success: true }
@@ -73,10 +72,6 @@ export async function updateDoctorProfile(id: string, data: {
   notas?: string | null
 }) {
   const supabase = await createClient()
-  // Update email via RPC to bypass PostgREST schema cache
-  if (data.email !== undefined) {
-    await supabase.rpc('update_doctor_email', { p_id: id, p_email: data.email })
-  }
   const rest = {
     ...(data.nombre                !== undefined && { nombre:                 data.nombre }),
     ...(data.categoria             !== undefined && { categoria:              data.categoria }),
