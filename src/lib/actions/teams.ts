@@ -320,14 +320,18 @@ export async function getTeamByCodigo(codigo: string) {
 
 export async function getInvitationByToken(token: string) {
   const supabase = await createClient()
-  const { data } = await supabase
-    .from('guardias_team_invitations')
-    .select('*, team:guardias_teams(id, nombre, hospital, especialidad)')
-    .eq('token', token)
-    .is('used_at', null)
-    .gt('expires_at', new Date().toISOString())
-    .single()
-  return data ?? null
+  // Use SECURITY DEFINER RPC so anon users can also read valid invitations
+  const { data } = await supabase.rpc('get_invitation_by_token', { p_token: token })
+  if (!data || (Array.isArray(data) && data.length === 0)) return null
+  const row = Array.isArray(data) ? data[0] : data
+  return {
+    id:       row.id,
+    team_id:  row.team_id,
+    email:    row.email,
+    role:     row.role,
+    expires_at: row.expires_at,
+    team: { nombre: row.team_nombre, hospital: row.team_hospital },
+  }
 }
 
 export async function acceptInvitation(token: string) {

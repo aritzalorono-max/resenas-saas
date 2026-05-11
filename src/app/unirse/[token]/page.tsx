@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { getInvitationByToken, getTeamByCodigo } from '@/lib/actions/teams'
-import { AcceptInvitationButton } from '@/components/onboarding/AcceptInvitationButton'
 import { JoinByCodeButton } from '@/components/onboarding/JoinByCodeButton'
+import { InviteRegisterForm } from '@/components/onboarding/InviteRegisterForm'
 import { Stethoscope, CheckCircle, XCircle } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
 
 interface Props {
   params: Promise<{ token: string }>
@@ -26,8 +27,6 @@ function PageShell({ children }: { children: React.ReactNode }) {
   )
 }
 
-// Short team codes look like "ABC-123" (7 chars with dash) or "ABCDEF" (6 chars).
-// UUIDs are 36 chars. Anything ≤ 8 chars is treated as a join code.
 function isShortCode(token: string) {
   return token.length <= 8
 }
@@ -38,7 +37,6 @@ export default async function UnirseTokenPage({ params }: Props) {
   // Handle shareable team code link (e.g. /unirse/ABC-123)
   if (isShortCode(token)) {
     const team = await getTeamByCodigo(token)
-
     if (!team) {
       return (
         <PageShell>
@@ -53,7 +51,6 @@ export default async function UnirseTokenPage({ params }: Props) {
         </PageShell>
       )
     }
-
     return (
       <PageShell>
         <div className="text-center">
@@ -88,19 +85,33 @@ export default async function UnirseTokenPage({ params }: Props) {
     )
   }
 
-  const team = (invitation as any).team
+  // Check if user is already logged in
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const isLoggedIn = !!user
+  const loggedInEmail = user?.email ?? ''
+
+  const team = invitation.team as any
 
   return (
     <PageShell>
-      <div className="text-center">
-        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-gray-900 mb-1">Invitación al equipo</h2>
-        <p className="text-gray-500 text-sm mb-6">
-          Has sido invitado a unirte a{' '}
-          <strong className="text-gray-900">{team?.nombre}</strong>
-          {team?.hospital ? ` · ${team.hospital}` : ''}.
-        </p>
-        <AcceptInvitationButton token={token} />
+      <div>
+        <div className="text-center mb-6">
+          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+          <h2 className="text-xl font-semibold text-gray-900">Invitación al equipo</h2>
+          <p className="text-gray-500 text-sm mt-1">
+            <strong className="text-gray-900">{team?.nombre}</strong>
+            {team?.hospital ? ` · ${team.hospital}` : ''}
+          </p>
+        </div>
+        <InviteRegisterForm
+          token={token}
+          email={invitation.email}
+          teamNombre={team?.nombre ?? ''}
+          teamHospital={team?.hospital}
+          isLoggedIn={isLoggedIn}
+          loggedInEmail={loggedInEmail}
+        />
       </div>
     </PageShell>
   )
