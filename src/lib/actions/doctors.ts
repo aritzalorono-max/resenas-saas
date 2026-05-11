@@ -65,18 +65,22 @@ export async function updateDoctorProfile(id: string, data: {
   especialidad?: string
   anioInicio?: number | null
   activo?: boolean
+  jornadaCompleta?: boolean
+  reduccionPorcentaje?: number | null
   notas?: string | null
 }) {
   const supabase = await createClient()
   const { error } = await supabase
     .from('guardias_doctor_profiles')
     .update({
-      ...(data.categoria    !== undefined && { categoria:      data.categoria }),
-      ...(data.numColegiado !== undefined && { num_colegiado:  data.numColegiado }),
-      ...(data.especialidad !== undefined && { especialidad:   data.especialidad }),
-      ...(data.anioInicio   !== undefined && { anio_inicio:    data.anioInicio }),
-      ...(data.activo       !== undefined && { activo:         data.activo }),
-      ...(data.notas        !== undefined && { notas:          data.notas }),
+      ...(data.categoria           !== undefined && { categoria:             data.categoria }),
+      ...(data.numColegiado        !== undefined && { num_colegiado:         data.numColegiado }),
+      ...(data.especialidad        !== undefined && { especialidad:          data.especialidad }),
+      ...(data.anioInicio          !== undefined && { anio_inicio:           data.anioInicio }),
+      ...(data.activo              !== undefined && { activo:                data.activo }),
+      ...(data.jornadaCompleta     !== undefined && { jornada_completa:      data.jornadaCompleta }),
+      ...(data.reduccionPorcentaje !== undefined && { reduccion_porcentaje:  data.reduccionPorcentaje }),
+      ...(data.notas               !== undefined && { notas:                 data.notas }),
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
