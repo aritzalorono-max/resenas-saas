@@ -16,6 +16,10 @@ export interface Doctor {
   nombre: string
   categoria: DoctorCategoria
   activo: boolean
+  jornada_completa: boolean
+  reduccion_porcentaje: number | null
+  fecha_inicio_contrato: string | null
+  fecha_fin_contrato: string | null
   created_at: string
   updated_at: string
 }
@@ -51,4 +55,28 @@ export const TIPO_AUSENCIA_BG: Record<TipoAusencia, string> = {
   Excedencia: 'bg-amber-500',
   Congreso:   'bg-purple-500',
   Otros:      'bg-gray-400',
+}
+
+export type TipoPeriodo = 'NoGuardia' | 'Excedencia' | 'Baja'
+
+export interface Periodo {
+  id: string
+  profile_id: string
+  doctor_id: string
+  tipo: TipoPeriodo
+  fecha_inicio: string
+  fecha_fin: string
+  created_at: string
+}
+
+export const TIPO_PERIODO_LABEL: Record<TipoPeriodo, string> = {
+  NoGuardia:  'No hace guardia',
+  Excedencia: 'Excedencia',
+  Baja:       'Baja',
+}
+
+export const TIPO_PERIODO_CAL: Record<TipoPeriodo, string> = {
+  NoGuardia:  'bg-slate-200 text-slate-700',
+  Excedencia: 'bg-amber-200 text-amber-800',
+  Baja:       'bg-red-200 text-red-800',
 }
