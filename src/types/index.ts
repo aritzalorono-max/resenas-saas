@@ -175,6 +175,10 @@ export interface RulesConfig {
   descanso_activo: boolean
   max_guardias_mes: number
   max_guardias_mes_activo: boolean
+  considerar_bajas: boolean
+  considerar_jornadas_reducidas: boolean
+  considerar_excedencias: boolean
+  considerar_incorporacion_parcial: boolean
   updated_at: string
   updated_by: string | null
 }

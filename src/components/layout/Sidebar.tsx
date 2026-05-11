@@ -7,7 +7,7 @@ import { switchTeam } from '@/lib/actions/teams'
 import { type UserRole, type Team } from '@/types'
 import {
   LayoutDashboard, Users, CalendarDays, Star, Settings,
-  LogOut, ChevronRight, Stethoscope, ClipboardList, Building2, ChevronDown,
+  LogOut, ChevronRight, Stethoscope, ClipboardList, Building2, ChevronDown, Scale,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -25,6 +25,7 @@ const NAV: NavItem[] = [
   { href: '/cuadrante',  label: 'Cuadrante',  icon: <ClipboardList size={18} />,   roles: ['admin','gestor','medico'] },
   { href: '/festivos',   label: 'Festivos',   icon: <Star size={18} />,            roles: ['admin','gestor'] },
   { href: '/penosidad',  label: 'Penosidad',  icon: <Settings size={18} />,        roles: ['admin','gestor'] },
+  { href: '/reglas',     label: 'Reglas',     icon: <Scale size={18} />,           roles: ['admin','gestor'] },
   { href: '/equipo',     label: 'Mi Equipo',  icon: <Building2 size={18} />,       roles: ['admin','gestor','medico'] },
 ]
 
