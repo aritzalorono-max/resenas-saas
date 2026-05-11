@@ -46,14 +46,16 @@ export async function createDoctorProfile(data: {
   const supabase = await createClient()
   const teamId = await getActiveTeamId()
   if (!teamId) return { error: 'No hay equipo activo.' }
-  const { error } = await supabase.from('guardias_doctor_profiles').insert({
-    profile_id:   data.profileId ?? null,
-    nombre:       data.nombre ?? null,
-    team_id:      teamId,
-    categoria:    data.categoria,
-    especialidad: data.especialidad ?? 'Urología',
-    notas:        data.notas ?? null,
-  })
+  const { error } = await supabase
+    .from('guardias_doctor_profiles')
+    .insert({
+      profile_id:   data.profileId ?? null,
+      nombre:       data.nombre ?? null,
+      team_id:      teamId,
+      categoria:    data.categoria,
+      especialidad: data.especialidad ?? 'Urología',
+      notas:        data.notas ?? null,
+    })
   if (error) return { error: error.message }
   return { success: true }
 }
