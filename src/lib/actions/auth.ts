@@ -1,44 +1,8 @@
-// @ts-nocheck
 'use server'
 
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { type GuardiasProfile, type UserRole } from '@/types'
-
-export async function getCurrentProfile(): Promise<GuardiasProfile | null> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-
-  // Use SECURITY DEFINER function to bypass any RLS issues
-  const { data: rpcData } = await supabase.rpc('get_my_profile')
-  if (rpcData) return rpcData as GuardiasProfile
-
-  // Fallback: direct select (may be blocked by RLS in some edge cases)
-  const { data } = await supabase
-    .from('guardias_profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
-  if (data) return data
-
-  // Profile missing – try to create it
-  const defaultName = (user.email ?? '').split('@')[0]
-  const { data: newProfile } = await supabase
-    .from('guardias_profiles')
-    .insert({ id: user.id, full_name: defaultName, role: 'medico' })
-    .select()
-    .single()
-  if (newProfile) return newProfile
-
-  // Insert may fail if the row already exists (race condition).
-  // Try one final select before giving up.
-  const { data: retry } = await supabase
-    .from('guardias_profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
-  return retry ?? null
-}
+import { type Profile } from '@/types'
 
 export async function signIn(email: string, password: string) {
   const supabase = await createClient()
@@ -47,105 +11,30 @@ export async function signIn(email: string, password: string) {
   return { success: true }
 }
 
+export async function signUp(email: string, password: string) {
+  const supabase = await createClient()
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: `${appUrl}/api/auth/callback` },
+  })
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()
-}
-
-export async function signUp(email: string, password: string, fullName: string, inviteToken?: string, teamCode?: string) {
-  const supabase = await createClient()
-
-  // Build redirect URL so the callback can process teamCode after email confirmation
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  const callbackParams = new URLSearchParams()
-  if (teamCode) callbackParams.set('teamCode', teamCode)
-  if (inviteToken) callbackParams.set('invite', inviteToken)
-  const emailRedirectTo = `${appUrl}/api/auth/callback${callbackParams.size ? `?${callbackParams}` : ''}`
-
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email, password,
-    options: { emailRedirectTo },
-  })
-  if (authError) return { error: authError.message }
-  if (!authData.user) return { error: 'No se pudo crear el usuario.' }
-
-  // Profile insert may fail if email confirmation is required (no session yet).
-  // The callback route will retry after the user confirms their email.
-  await supabase
-    .from('guardias_profiles')
-    .insert({ id: authData.user.id, full_name: fullName, role: 'medico' })
-    .select()
-    .single()
-
-  // If there's an invite token, auto-accept it
-  if (inviteToken) {
-    const { data: inv } = await supabase
-      .from('guardias_team_invitations')
-      .select('*')
-      .eq('token', inviteToken)
-      .is('used_at', null)
-      .gt('expires_at', new Date().toISOString())
-      .single()
-
-    if (inv) {
-      await supabase
-        .from('guardias_team_members')
-        .insert({ team_id: inv.team_id, profile_id: authData.user.id, role: inv.role, status: 'active' })
-
-      await supabase
-        .from('guardias_team_invitations')
-        .update({ used_at: new Date().toISOString() })
-        .eq('token', inviteToken)
-
-      await supabase
-        .from('guardias_profiles')
-        .update({ active_team_id: inv.team_id })
-        .eq('id', authData.user.id)
-
-      return { success: true, hasTeam: true }
-    }
-  }
-
-  return { success: true, hasTeam: false }
-}
-
-export async function listProfiles(): Promise<GuardiasProfile[]> {
-  const supabase = await createClient()
-  const { data } = await supabase
-    .from('guardias_profiles')
-    .select('*')
-    .order('full_name')
-  return data ?? []
-}
-
-export async function updateProfileRole(profileId: string, role: UserRole) {
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from('guardias_profiles')
-    .update({ role, updated_at: new Date().toISOString() })
-    .eq('id', profileId)
-  if (error) return { error: error.message }
-  return { success: true }
+  redirect('/login')
 }
 
 export async function requestPasswordReset(email: string) {
   const supabase = await createClient()
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${appUrl}/restablecer`,
+    redirectTo: `${appUrl}/api/auth/callback?next=/restablecer`,
   })
-  if (error) return { error: error.message }
-  return { success: true }
-}
-
-export async function updateProfileName(fullName: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'No autenticado' }
-  const { error } = await supabase
-    .from('guardias_profiles')
-    .update({ full_name: fullName.trim() })
-    .eq('id', user.id)
   if (error) return { error: error.message }
   return { success: true }
 }
@@ -157,12 +46,39 @@ export async function updatePassword(newPassword: string) {
   return { success: true }
 }
 
-export async function deleteAccount() {
+export async function getProfile(): Promise<Profile | null> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+  return data ?? null
+}
+
+export async function updateProfile(data: {
+  fullName?: string
+  hospital?: string
+  especialidad?: string
+  nombreServicio?: string
+}) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
-  // Sign out first, then delete profile (cascade deletes team memberships)
-  await supabase.from('guardias_profiles').delete().eq('id', user.id)
+
+  const update: Record<string, string> = { updated_at: new Date().toISOString() }
+  if (data.fullName      !== undefined) update.full_name       = data.fullName
+  if (data.hospital      !== undefined) update.hospital        = data.hospital
+  if (data.especialidad  !== undefined) update.especialidad    = data.especialidad
+  if (data.nombreServicio !== undefined) update.nombre_servicio = data.nombreServicio
+
+  const { error } = await supabase.from('profiles').update(update).eq('id', user.id)
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function deleteAccount() {
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('delete_my_account')
+  if (error) return { error: error.message }
   await supabase.auth.signOut()
   return { success: true }
 }

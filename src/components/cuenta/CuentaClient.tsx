@@ -1,265 +1,202 @@
 'use client'
 
 import { useState } from 'react'
-import { updateProfileName, updatePassword, deleteAccount, signOut } from '@/lib/actions/auth'
-import { updateDoctorProfile } from '@/lib/actions/doctors'
-import { type DoctorProfile, type DoctorCategoria, CATEGORIA_LABELS } from '@/types'
-import { User, Lock, Trash2, LogOut, Stethoscope } from 'lucide-react'
-
-const CATEGORIAS: DoctorCategoria[] = ['R1', 'R2', 'R3', 'R4', 'R5', 'Adjunto']
+import { updateProfile, updatePassword, deleteAccount } from '@/lib/actions/auth'
+import { type Profile } from '@/types'
+import { Save, KeyRound, LogOut, Trash2, AlertTriangle, CheckCircle } from 'lucide-react'
+import { signOut } from '@/lib/actions/auth'
 
 interface Props {
-  fullName: string
+  profile: Profile | null
   email: string
-  doctorProfile: DoctorProfile | null
 }
 
-export function CuentaClient({ fullName: initialName, email, doctorProfile }: Props) {
-  const [name, setName]               = useState(initialName)
-  const [nameLoading, setNameLoading] = useState(false)
-  const [nameMsg, setNameMsg]         = useState('')
-
-  const [newPwd, setNewPwd]         = useState('')
-  const [confirmPwd, setConfirmPwd] = useState('')
-  const [pwdLoading, setPwdLoading] = useState(false)
-  const [pwdMsg, setPwdMsg]         = useState('')
-
-  const [deleteConfirm, setDeleteConfirm] = useState('')
-  const [deleteLoading, setDeleteLoading] = useState(false)
-  const [deleteError, setDeleteError]     = useState('')
-
-  // Doctor profile fields
-  const [categoria, setCategoria]           = useState<DoctorCategoria>(doctorProfile?.categoria ?? 'Adjunto')
-  const [jornadaCompleta, setJornadaCompleta] = useState(doctorProfile?.jornada_completa ?? true)
-  const [reduccion, setReduccion]           = useState<string>(
-    doctorProfile?.reduccion_porcentaje != null ? String(doctorProfile.reduccion_porcentaje) : ''
+function SuccessMsg({ msg }: { msg: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-700">
+      <CheckCircle size={15} className="shrink-0" />
+      {msg}
+    </div>
   )
-  const [docLoading, setDocLoading] = useState(false)
-  const [docMsg, setDocMsg]         = useState('')
+}
 
-  async function handleNameSave(e: React.FormEvent) {
+function ErrorMsg({ msg }: { msg: string }) {
+  return (
+    <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">{msg}</div>
+  )
+}
+
+export function CuentaClient({ profile, email }: Props) {
+  // ── Datos del servicio ────────────────────────────────────────────────────
+  const [fullName,       setFullName]       = useState(profile?.full_name       ?? '')
+  const [hospital,       setHospital]       = useState(profile?.hospital        ?? '')
+  const [especialidad,   setEspecialidad]   = useState(profile?.especialidad    ?? '')
+  const [nombreServicio, setNombreServicio] = useState(profile?.nombre_servicio ?? '')
+  const [profileMsg,     setProfileMsg]     = useState<{ ok?: string; err?: string }>({})
+  const [profileLoading, setProfileLoading] = useState(false)
+
+  // ── Cambiar contraseña ────────────────────────────────────────────────────
+  const [newPass,      setNewPass]      = useState('')
+  const [confirmPass,  setConfirmPass]  = useState('')
+  const [passMsg,      setPassMsg]      = useState<{ ok?: string; err?: string }>({})
+  const [passLoading,  setPassLoading]  = useState(false)
+
+  // ── Eliminar cuenta ───────────────────────────────────────────────────────
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteLoading,     setDeleteLoading]     = useState(false)
+  const [deleteErr,         setDeleteErr]         = useState('')
+
+  async function handleProfileSave(e: React.FormEvent) {
     e.preventDefault()
-    if (!name.trim()) return
-    setNameLoading(true)
-    setNameMsg('')
-    const result = await updateProfileName(name)
-    setNameMsg(result.error ? `Error: ${result.error}` : 'Nombre actualizado.')
-    setNameLoading(false)
+    setProfileMsg({})
+    setProfileLoading(true)
+    const result = await updateProfile({
+      fullName:       fullName.trim(),
+      hospital:       hospital.trim(),
+      especialidad:   especialidad.trim(),
+      nombreServicio: nombreServicio.trim(),
+    })
+    if (result.error) setProfileMsg({ err: result.error })
+    else              setProfileMsg({ ok: 'Datos guardados correctamente.' })
+    setProfileLoading(false)
   }
 
   async function handlePasswordSave(e: React.FormEvent) {
     e.preventDefault()
-    setPwdMsg('')
-    if (newPwd !== confirmPwd) { setPwdMsg('Las contraseñas no coinciden.'); return }
-    if (newPwd.length < 8) { setPwdMsg('La contraseña debe tener al menos 8 caracteres.'); return }
-    setPwdLoading(true)
-    const result = await updatePassword(newPwd)
-    if (result.error) {
-      setPwdMsg(`Error: ${result.error}`)
-    } else {
-      setPwdMsg('Contraseña actualizada correctamente.')
-      setNewPwd(''); setConfirmPwd('')
-    }
-    setPwdLoading(false)
+    setPassMsg({})
+    if (newPass.length < 6)    { setPassMsg({ err: 'La contraseña debe tener al menos 6 caracteres.' }); return }
+    if (newPass !== confirmPass){ setPassMsg({ err: 'Las contraseñas no coinciden.' }); return }
+    setPassLoading(true)
+    const result = await updatePassword(newPass)
+    if (result.error) setPassMsg({ err: result.error })
+    else { setPassMsg({ ok: 'Contraseña actualizada correctamente.' }); setNewPass(''); setConfirmPass('') }
+    setPassLoading(false)
   }
 
-  async function handleDocSave(e: React.FormEvent) {
-    e.preventDefault()
-    if (!doctorProfile) return
-    setDocLoading(true)
-    setDocMsg('')
-    const reduccionNum = !jornadaCompleta && reduccion !== '' ? parseFloat(reduccion) : null
-    const result = await updateDoctorProfile(doctorProfile.id, {
-      categoria,
-      jornadaCompleta,
-      reduccionPorcentaje: reduccionNum,
-    })
-    setDocMsg(result.error ? `Error: ${result.error}` : 'Perfil médico actualizado.')
-    setDocLoading(false)
-  }
-
-  async function handleSignOut() {
-    await signOut()
-    window.location.href = '/login'
-  }
-
-  async function handleDelete(e: React.FormEvent) {
-    e.preventDefault()
-    if (deleteConfirm !== email) { setDeleteError('El email no coincide.'); return }
+  async function handleDeleteAccount() {
     setDeleteLoading(true)
+    setDeleteErr('')
     const result = await deleteAccount()
-    if (result.error) {
-      setDeleteError(result.error)
-      setDeleteLoading(false)
-      return
-    }
+    if (result.error) { setDeleteErr(result.error); setDeleteLoading(false); return }
     window.location.href = '/login'
   }
 
   return (
-    <div className="max-w-xl space-y-8">
+    <div className="space-y-6 max-w-xl">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Mi cuenta</h1>
-        <p className="text-gray-500 text-sm mt-0.5">{email}</p>
+        <p className="text-gray-500 mt-1 text-sm">{email}</p>
       </div>
 
-      {/* Nombre */}
-      <section className="card space-y-4">
-        <div className="flex items-center gap-2 mb-1">
-          <User size={16} className="text-gray-400" />
-          <h2 className="font-semibold text-gray-900">Nombre</h2>
-        </div>
-        <form onSubmit={handleNameSave} className="space-y-3">
-          <input
-            type="text" required className="input" value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="Tu nombre completo"
-          />
-          {nameMsg && (
-            <p className={`text-sm ${nameMsg.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>{nameMsg}</p>
-          )}
-          <button type="submit" disabled={nameLoading} className="btn-primary">
-            {nameLoading ? 'Guardando…' : 'Guardar nombre'}
+      {/* ── Datos del servicio ── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <h2 className="font-semibold text-gray-900 mb-4">Datos del servicio</h2>
+        <form onSubmit={handleProfileSave} className="space-y-4">
+          {profileMsg.ok  && <SuccessMsg msg={profileMsg.ok} />}
+          {profileMsg.err && <ErrorMsg msg={profileMsg.err} />}
+
+          <div>
+            <label className="label">Tu nombre</label>
+            <input type="text" className="input" value={fullName}
+              onChange={e => setFullName(e.target.value)} placeholder="Dr. García López" />
+          </div>
+          <div>
+            <label className="label">Hospital</label>
+            <input type="text" className="input" value={hospital}
+              onChange={e => setHospital(e.target.value)} placeholder="Hospital Universitario de Galdakao" />
+          </div>
+          <div>
+            <label className="label">Especialidad</label>
+            <input type="text" className="input" value={especialidad}
+              onChange={e => setEspecialidad(e.target.value)} placeholder="Urología" />
+          </div>
+          <div>
+            <label className="label">Nombre del servicio</label>
+            <input type="text" className="input" value={nombreServicio}
+              onChange={e => setNombreServicio(e.target.value)} placeholder="Servicio de Urología" />
+          </div>
+
+          <button type="submit" disabled={profileLoading} className="btn-primary">
+            <Save size={15} />
+            {profileLoading ? 'Guardando…' : 'Guardar cambios'}
           </button>
         </form>
       </section>
 
-      {/* Perfil médico */}
-      {doctorProfile && (
-        <section className="card space-y-4">
-          <div className="flex items-center gap-2 mb-1">
-            <Stethoscope size={16} className="text-gray-400" />
-            <h2 className="font-semibold text-gray-900">Perfil médico</h2>
-          </div>
-          <form onSubmit={handleDocSave} className="space-y-4">
-            <div>
-              <label className="label">Categoría</label>
-              <select
-                className="input"
-                value={categoria}
-                onChange={e => setCategoria(e.target.value as DoctorCategoria)}
-              >
-                {CATEGORIAS.map(c => (
-                  <option key={c} value={c}>{CATEGORIA_LABELS[c]}</option>
-                ))}
-              </select>
-            </div>
+      {/* ── Cambiar contraseña ── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <h2 className="font-semibold text-gray-900 mb-4">Cambiar contraseña</h2>
+        <form onSubmit={handlePasswordSave} className="space-y-4">
+          {passMsg.ok  && <SuccessMsg msg={passMsg.ok} />}
+          {passMsg.err && <ErrorMsg msg={passMsg.err} />}
 
-            <div>
-              <label className="label">Jornada</label>
-              <div className="flex gap-3">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio" name="jornada" value="completa"
-                    checked={jornadaCompleta}
-                    onChange={() => { setJornadaCompleta(true); setReduccion('') }}
-                    className="text-blue-600"
-                  />
-                  <span className="text-sm text-gray-700">Jornada completa</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio" name="jornada" value="reduccion"
-                    checked={!jornadaCompleta}
-                    onChange={() => setJornadaCompleta(false)}
-                    className="text-blue-600"
-                  />
-                  <span className="text-sm text-gray-700">Reducción de jornada</span>
-                </label>
-              </div>
-
-              {!jornadaCompleta && (
-                <div className="mt-3 flex items-center gap-2">
-                  <input
-                    type="number" min="1" max="99" step="1"
-                    required={!jornadaCompleta}
-                    className="input w-28"
-                    value={reduccion}
-                    onChange={e => setReduccion(e.target.value)}
-                    placeholder="50"
-                  />
-                  <span className="text-sm text-gray-500">% de reducción</span>
-                </div>
-              )}
-            </div>
-
-            {docMsg && (
-              <p className={`text-sm ${docMsg.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>{docMsg}</p>
-            )}
-            <button type="submit" disabled={docLoading} className="btn-primary">
-              {docLoading ? 'Guardando…' : 'Guardar perfil médico'}
-            </button>
-          </form>
-        </section>
-      )}
-
-      {/* Contraseña */}
-      <section className="card space-y-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Lock size={16} className="text-gray-400" />
-          <h2 className="font-semibold text-gray-900">Cambiar contraseña</h2>
-        </div>
-        <form onSubmit={handlePasswordSave} className="space-y-3">
           <div>
             <label className="label">Nueva contraseña</label>
-            <input
-              type="password" required className="input" value={newPwd}
-              onChange={e => setNewPwd(e.target.value)}
-              placeholder="Mínimo 8 caracteres"
-            />
+            <input type="password" className="input" value={newPass}
+              onChange={e => setNewPass(e.target.value)} placeholder="Mínimo 6 caracteres"
+              autoComplete="new-password" />
           </div>
           <div>
             <label className="label">Confirmar contraseña</label>
-            <input
-              type="password" required className="input" value={confirmPwd}
-              onChange={e => setConfirmPwd(e.target.value)}
-              placeholder="Repite la contraseña"
-            />
+            <input type="password" className="input" value={confirmPass}
+              onChange={e => setConfirmPass(e.target.value)} placeholder="Repite la contraseña"
+              autoComplete="new-password" />
           </div>
-          {pwdMsg && (
-            <p className={`text-sm ${pwdMsg.startsWith('Error') || pwdMsg.includes('no coinciden') || pwdMsg.includes('al menos') ? 'text-red-600' : 'text-green-600'}`}>{pwdMsg}</p>
+
+          <button type="submit" disabled={passLoading} className="btn-primary">
+            <KeyRound size={15} />
+            {passLoading ? 'Guardando…' : 'Actualizar contraseña'}
+          </button>
+        </form>
+      </section>
+
+      {/* ── Sesión y cuenta ── */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <h2 className="font-semibold text-gray-900 mb-4">Sesión y cuenta</h2>
+        <div className="space-y-3">
+          <form action={signOut}>
+            <button type="submit" className="btn-secondary w-full justify-center">
+              <LogOut size={15} />
+              Cerrar sesión
+            </button>
+          </form>
+
+          {!showDeleteConfirm ? (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="w-full flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 transition-colors"
+            >
+              <Trash2 size={15} />
+              Eliminar cuenta
+            </button>
+          ) : (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 space-y-3">
+              <div className="flex items-start gap-2">
+                <AlertTriangle size={16} className="text-red-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-red-800">
+                  Esta acción es <strong>irreversible</strong>. Se borrarán todos tus datos permanentemente.
+                </p>
+              </div>
+              {deleteErr && <ErrorMsg msg={deleteErr} />}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setShowDeleteConfirm(false); setDeleteErr('') }}
+                  className="btn-secondary flex-1 justify-center text-xs py-1.5"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleteLoading}
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  <Trash2 size={13} />
+                  {deleteLoading ? 'Eliminando…' : 'Sí, eliminar'}
+                </button>
+              </div>
+            </div>
           )}
-          <button type="submit" disabled={pwdLoading} className="btn-primary">
-            {pwdLoading ? 'Actualizando…' : 'Cambiar contraseña'}
-          </button>
-        </form>
-      </section>
-
-      {/* Cerrar sesión */}
-      <section className="card">
-        <div className="flex items-center gap-2 mb-3">
-          <LogOut size={16} className="text-gray-400" />
-          <h2 className="font-semibold text-gray-900">Sesión</h2>
         </div>
-        <p className="text-sm text-gray-500 mb-4">Cerrar sesión en este dispositivo.</p>
-        <button onClick={handleSignOut} className="btn-secondary">
-          Cerrar sesión
-        </button>
-      </section>
-
-      {/* Eliminar cuenta */}
-      <section className="card border-red-100 space-y-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Trash2 size={16} className="text-red-400" />
-          <h2 className="font-semibold text-red-700">Eliminar cuenta</h2>
-        </div>
-        <p className="text-sm text-gray-500">
-          Esta acción es <strong>irreversible</strong>. Se eliminarán todos tus datos. Para confirmar, escribe tu email.
-        </p>
-        <form onSubmit={handleDelete} className="space-y-3">
-          <input
-            type="email" required className="input border-red-200 focus:ring-red-500" value={deleteConfirm}
-            onChange={e => setDeleteConfirm(e.target.value)}
-            placeholder={email}
-          />
-          {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
-          <button
-            type="submit" disabled={deleteLoading || deleteConfirm !== email}
-            className="btn-primary bg-red-600 hover:bg-red-700 focus:ring-red-500"
-          >
-            {deleteLoading ? 'Eliminando…' : 'Eliminar cuenta permanentemente'}
-          </button>
-        </form>
       </section>
     </div>
   )

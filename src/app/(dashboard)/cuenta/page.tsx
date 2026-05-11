@@ -1,25 +1,13 @@
-import { redirect } from 'next/navigation'
-import { getCurrentProfile } from '@/lib/actions/auth'
-import { getDoctorProfile } from '@/lib/actions/doctors'
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { CuentaClient } from '@/components/cuenta/CuentaClient'
 
 export default async function CuentaPage() {
-  const profile = await getCurrentProfile()
-  if (!profile) redirect('/login')
-
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
 
-  const doctorProfile = profile.active_team_id
-    ? await getDoctorProfile(profile.id)
-    : null
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
 
-  return (
-    <CuentaClient
-      fullName={profile.full_name}
-      email={user?.email ?? ''}
-      doctorProfile={doctorProfile}
-    />
-  )
+  return <CuentaClient profile={profile} email={user.email!} />
 }

@@ -1,34 +1,19 @@
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getCurrentProfile } from '@/lib/actions/auth'
-import { listDoctors, listAllShiftCounters } from '@/lib/actions/doctors'
-import { listTeamMembers, listInvitations, getMyTeamRole } from '@/lib/actions/teams'
 import { MedicosClient } from '@/components/medicos/MedicosClient'
+import { type Doctor } from '@/types'
 
 export default async function MedicosPage() {
-  const anio = new Date().getFullYear()
-  const profile = await getCurrentProfile()
-  if (!profile?.active_team_id) redirect('/login')
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
 
-  const teamId = profile.active_team_id as string
+  const { data } = await supabase
+    .from('doctors')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('categoria')
+    .order('nombre')
 
-  const [doctors, members, invitations, counters, teamRole] = await Promise.all([
-    listDoctors(),
-    listTeamMembers(teamId),
-    listInvitations(teamId),
-    listAllShiftCounters(anio),
-    getMyTeamRole(teamId),
-  ])
-
-  const canEdit = profile.role === 'admin' || profile.role === 'gestor' || teamRole === 'gestor'
-
-  return (
-    <MedicosClient
-      doctors={doctors}
-      members={members}
-      invitations={invitations}
-      counters={counters}
-      canEdit={canEdit}
-      anio={anio}
-    />
-  )
+  return <MedicosClient doctors={(data ?? []) as Doctor[]} />
 }
