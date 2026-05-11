@@ -3,10 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from '@/lib/actions/auth'
-import { Stethoscope, LogOut, UserCog, Users } from 'lucide-react'
+import { Stethoscope, LogOut, UserCog, Users, BarChart3 } from 'lucide-react'
 
 const NAV = [
   { href: '/medicos', label: 'Médicos', icon: <Users size={15} /> },
+  { href: '/resumen', label: 'Resumen', icon: <BarChart3 size={15} /> },
 ]
 
 export function Header({ serviceName }: { serviceName: string }) {
