@@ -302,6 +302,18 @@ export async function revokeInvitation(invitationId: string) {
   return { success: true }
 }
 
+// ─── Get team by short join code (for shareable links) ───────────────────────
+
+export async function getTeamByCodigo(codigo: string) {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('guardias_teams')
+    .select('id, nombre, hospital, especialidad')
+    .eq('codigo', codigo.toUpperCase())
+    .single()
+  return data ?? null
+}
+
 // ─── Accept invitation (by token) ────────────────────────────────────────────
 
 export async function getInvitationByToken(token: string) {
