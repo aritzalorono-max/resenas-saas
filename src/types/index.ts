@@ -73,6 +73,8 @@ export interface DoctorProfile {
   especialidad: string
   anio_inicio: number | null
   activo: boolean
+  jornada_completa: boolean
+  reduccion_porcentaje: number | null
   notas: string | null
   created_at: string
   updated_at: string

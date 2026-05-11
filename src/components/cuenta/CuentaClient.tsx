@@ -2,19 +2,23 @@
 
 import { useState } from 'react'
 import { updateProfileName, updatePassword, deleteAccount, signOut } from '@/lib/actions/auth'
-import { User, Lock, Trash2, LogOut } from 'lucide-react'
+import { updateDoctorProfile } from '@/lib/actions/doctors'
+import { type DoctorProfile, type DoctorCategoria, CATEGORIA_LABELS } from '@/types'
+import { User, Lock, Trash2, LogOut, Stethoscope } from 'lucide-react'
+
+const CATEGORIAS: DoctorCategoria[] = ['R1', 'R2', 'R3', 'R4', 'R5', 'Adjunto']
 
 interface Props {
   fullName: string
   email: string
+  doctorProfile: DoctorProfile | null
 }
 
-export function CuentaClient({ fullName: initialName, email }: Props) {
-  const [name, setName]           = useState(initialName)
+export function CuentaClient({ fullName: initialName, email, doctorProfile }: Props) {
+  const [name, setName]               = useState(initialName)
   const [nameLoading, setNameLoading] = useState(false)
-  const [nameMsg, setNameMsg]     = useState('')
+  const [nameMsg, setNameMsg]         = useState('')
 
-  const [currentPwd, setCurrentPwd] = useState('')
   const [newPwd, setNewPwd]         = useState('')
   const [confirmPwd, setConfirmPwd] = useState('')
   const [pwdLoading, setPwdLoading] = useState(false)
@@ -23,6 +27,15 @@ export function CuentaClient({ fullName: initialName, email }: Props) {
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteError, setDeleteError]     = useState('')
+
+  // Doctor profile fields
+  const [categoria, setCategoria]           = useState<DoctorCategoria>(doctorProfile?.categoria ?? 'Adjunto')
+  const [jornadaCompleta, setJornadaCompleta] = useState(doctorProfile?.jornada_completa ?? true)
+  const [reduccion, setReduccion]           = useState<string>(
+    doctorProfile?.reduccion_porcentaje != null ? String(doctorProfile.reduccion_porcentaje) : ''
+  )
+  const [docLoading, setDocLoading] = useState(false)
+  const [docMsg, setDocMsg]         = useState('')
 
   async function handleNameSave(e: React.FormEvent) {
     e.preventDefault()
@@ -45,9 +58,24 @@ export function CuentaClient({ fullName: initialName, email }: Props) {
       setPwdMsg(`Error: ${result.error}`)
     } else {
       setPwdMsg('Contraseña actualizada correctamente.')
-      setCurrentPwd(''); setNewPwd(''); setConfirmPwd('')
+      setNewPwd(''); setConfirmPwd('')
     }
     setPwdLoading(false)
+  }
+
+  async function handleDocSave(e: React.FormEvent) {
+    e.preventDefault()
+    if (!doctorProfile) return
+    setDocLoading(true)
+    setDocMsg('')
+    const reduccionNum = !jornadaCompleta && reduccion !== '' ? parseFloat(reduccion) : null
+    const result = await updateDoctorProfile(doctorProfile.id, {
+      categoria,
+      jornadaCompleta,
+      reduccionPorcentaje: reduccionNum,
+    })
+    setDocMsg(result.error ? `Error: ${result.error}` : 'Perfil médico actualizado.')
+    setDocLoading(false)
   }
 
   async function handleSignOut() {
@@ -95,6 +123,75 @@ export function CuentaClient({ fullName: initialName, email }: Props) {
           </button>
         </form>
       </section>
+
+      {/* Perfil médico */}
+      {doctorProfile && (
+        <section className="card space-y-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Stethoscope size={16} className="text-gray-400" />
+            <h2 className="font-semibold text-gray-900">Perfil médico</h2>
+          </div>
+          <form onSubmit={handleDocSave} className="space-y-4">
+            <div>
+              <label className="label">Categoría</label>
+              <select
+                className="input"
+                value={categoria}
+                onChange={e => setCategoria(e.target.value as DoctorCategoria)}
+              >
+                {CATEGORIAS.map(c => (
+                  <option key={c} value={c}>{CATEGORIA_LABELS[c]}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="label">Jornada</label>
+              <div className="flex gap-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio" name="jornada" value="completa"
+                    checked={jornadaCompleta}
+                    onChange={() => { setJornadaCompleta(true); setReduccion('') }}
+                    className="text-blue-600"
+                  />
+                  <span className="text-sm text-gray-700">Jornada completa</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio" name="jornada" value="reduccion"
+                    checked={!jornadaCompleta}
+                    onChange={() => setJornadaCompleta(false)}
+                    className="text-blue-600"
+                  />
+                  <span className="text-sm text-gray-700">Reducción de jornada</span>
+                </label>
+              </div>
+
+              {!jornadaCompleta && (
+                <div className="mt-3 flex items-center gap-2">
+                  <input
+                    type="number" min="1" max="99" step="1"
+                    required={!jornadaCompleta}
+                    className="input w-28"
+                    value={reduccion}
+                    onChange={e => setReduccion(e.target.value)}
+                    placeholder="50"
+                  />
+                  <span className="text-sm text-gray-500">% de reducción</span>
+                </div>
+              )}
+            </div>
+
+            {docMsg && (
+              <p className={`text-sm ${docMsg.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>{docMsg}</p>
+            )}
+            <button type="submit" disabled={docLoading} className="btn-primary">
+              {docLoading ? 'Guardando…' : 'Guardar perfil médico'}
+            </button>
+          </form>
+        </section>
+      )}
 
       {/* Contraseña */}
       <section className="card space-y-4">
