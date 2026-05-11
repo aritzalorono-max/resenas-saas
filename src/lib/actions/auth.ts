@@ -14,14 +14,24 @@ export async function getCurrentProfile(): Promise<GuardiasProfile | null> {
     .eq('id', user.id)
     .single()
   if (data) return data
-  // Profile missing (e.g. email confirmation happened before the column existed) – create it now
+
+  // Profile missing – try to create it
   const defaultName = (user.email ?? '').split('@')[0]
   const { data: newProfile } = await supabase
     .from('guardias_profiles')
     .insert({ id: user.id, full_name: defaultName, role: 'medico' })
     .select()
     .single()
-  return newProfile
+  if (newProfile) return newProfile
+
+  // Insert may fail if the row already exists (race condition).
+  // Try one final select before giving up.
+  const { data: retry } = await supabase
+    .from('guardias_profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+  return retry ?? null
 }
 
 export async function signIn(email: string, password: string) {
