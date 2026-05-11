@@ -8,6 +8,12 @@ export async function getCurrentProfile(): Promise<GuardiasProfile | null> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
+
+  // Use SECURITY DEFINER function to bypass any RLS issues
+  const { data: rpcData } = await supabase.rpc('get_my_profile')
+  if (rpcData) return rpcData as GuardiasProfile
+
+  // Fallback: direct select (may be blocked by RLS in some edge cases)
   const { data } = await supabase
     .from('guardias_profiles')
     .select('*')
