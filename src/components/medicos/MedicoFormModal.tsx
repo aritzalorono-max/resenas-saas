@@ -3,54 +3,66 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { createDoctorProfile, updateDoctorProfile } from '@/lib/actions/doctors'
-import { type DoctorProfile, type GuardiasProfile, type DoctorCategoria, CATEGORIA_LABELS } from '@/types'
+import { type DoctorProfile, type DoctorCategoria, CATEGORIA_LABELS } from '@/types'
 
-const CATEGORIAS = Object.keys(CATEGORIA_LABELS) as DoctorCategoria[]
+const CATEGORIAS: DoctorCategoria[] = ['R1', 'R2', 'R3', 'R4', 'R5', 'Adjunto']
 
 interface Props {
-  profile?: GuardiasProfile         // for creating a doctor profile for an existing user
-  doctorProfile?: DoctorProfile     // for editing
+  doctorProfile?: DoctorProfile   // editing existing
+  prefillNombre?: string          // creating for a known team member
+  prefillProfileId?: string
   onClose: () => void
   onSaved: () => void
 }
 
-export function MedicoFormModal({ profile, doctorProfile, onClose, onSaved }: Props) {
+export function MedicoFormModal({ doctorProfile, prefillNombre, prefillProfileId, onClose, onSaved }: Props) {
   const isEdit = !!doctorProfile
 
+  const [nombre,        setNombre]        = useState(doctorProfile?.nombre ?? prefillNombre ?? '')
   const [categoria,     setCategoria]     = useState<DoctorCategoria>(doctorProfile?.categoria ?? 'Adjunto')
-  const [numColegiado,  setNumColegiado]  = useState(doctorProfile?.num_colegiado ?? '')
-  const [especialidad,  setEspecialidad]  = useState(doctorProfile?.especialidad ?? 'Urología')
-  const [anioInicio,    setAnioInicio]    = useState<string>(String(doctorProfile?.anio_inicio ?? ''))
+  const [anioInicio,    setAnioInicio]    = useState(String(doctorProfile?.anio_inicio ?? ''))
   const [activo,        setActivo]        = useState(doctorProfile?.activo ?? true)
-  const [notas,         setNotas]         = useState(doctorProfile?.notas ?? '')
-  const [error,         setError]         = useState('')
-  const [loading,       setLoading]       = useState(false)
+
+  const [jornadaCompleta, setJornadaCompleta] = useState(doctorProfile?.jornada_completa ?? true)
+  const [reduccionPct,  setReduccionPct]  = useState(String(doctorProfile?.reduccion_porcentaje ?? ''))
+  const [fechaInicio,   setFechaInicio]   = useState(doctorProfile?.reduccion_fecha_inicio ?? '')
+  const [fechaFin,      setFechaFin]      = useState(doctorProfile?.reduccion_fecha_fin ?? '')
+
+  const [error,   setError]   = useState('')
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    if (!nombre.trim()) { setError('El nombre es obligatorio.'); return }
+    if (!jornadaCompleta && !reduccionPct) { setError('Indica el porcentaje de reducción.'); return }
+
     setLoading(true)
+
+    const jornadaData = {
+      jornadaCompleta,
+      reduccionPorcentaje: !jornadaCompleta && reduccionPct ? parseFloat(reduccionPct) : null,
+      reduccionFechaInicio: !jornadaCompleta && fechaInicio ? fechaInicio : null,
+      reduccionFechaFin:    !jornadaCompleta && fechaFin    ? fechaFin    : null,
+    }
 
     let result: { error?: string; success?: boolean }
 
     if (isEdit) {
       result = await updateDoctorProfile(doctorProfile.id, {
+        nombre:    nombre.trim(),
         categoria,
-        numColegiado:  numColegiado || null,
-        especialidad,
-        anioInicio:    anioInicio ? Number(anioInicio) : null,
+        anioInicio: anioInicio ? Number(anioInicio) : null,
         activo,
-        notas:         notas || null,
+        ...jornadaData,
       })
     } else {
-      if (!profile) { setError('Perfil de usuario no especificado.'); setLoading(false); return }
       result = await createDoctorProfile({
-        profileId:     profile.id,
+        profileId:  prefillProfileId ?? null,
+        nombre:     nombre.trim(),
         categoria,
-        numColegiado:  numColegiado || undefined,
-        especialidad,
-        anioInicio:    anioInicio ? Number(anioInicio) : undefined,
-        notas:         notas || undefined,
+        anioInicio: anioInicio ? Number(anioInicio) : undefined,
+        ...jornadaData,
       })
     }
 
@@ -63,7 +75,7 @@ export function MedicoFormModal({ profile, doctorProfile, onClose, onSaved }: Pr
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-900">
-            {isEdit ? 'Editar perfil médico' : `Configurar perfil de ${profile?.full_name}`}
+            {isEdit ? 'Editar médico' : 'Añadir médico'}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />
@@ -76,38 +88,77 @@ export function MedicoFormModal({ profile, doctorProfile, onClose, onSaved }: Pr
           )}
 
           <div>
-            <label className="label">Categoría profesional *</label>
-            <select className="input" value={categoria} onChange={e => setCategoria(e.target.value as DoctorCategoria)}>
-              {CATEGORIAS.map(cat => (
-                <option key={cat} value={cat}>{CATEGORIA_LABELS[cat]}</option>
-              ))}
-            </select>
+            <label className="label">Nombre completo *</label>
+            <input
+              type="text" required className="input" value={nombre}
+              onChange={e => setNombre(e.target.value)}
+              placeholder="Dr. García López"
+              autoFocus={!prefillNombre}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="label">Nº Colegiado</label>
-              <input type="text" className="input" value={numColegiado}
-                onChange={e => setNumColegiado(e.target.value)} placeholder="28/12345" />
+              <label className="label">Categoría *</label>
+              <select className="input" value={categoria} onChange={e => setCategoria(e.target.value as DoctorCategoria)}>
+                {CATEGORIAS.map(cat => (
+                  <option key={cat} value={cat}>{CATEGORIA_LABELS[cat]}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="label">Año de inicio</label>
-              <input type="number" className="input" value={anioInicio}
+              <input
+                type="number" className="input" value={anioInicio}
                 onChange={e => setAnioInicio(e.target.value)}
-                placeholder={String(new Date().getFullYear())} min={1970} max={2100} />
+                placeholder={String(new Date().getFullYear())} min={1970} max={2100}
+              />
             </div>
           </div>
 
+          {/* Jornada */}
           <div>
-            <label className="label">Especialidad</label>
-            <input type="text" className="input" value={especialidad}
-              onChange={e => setEspecialidad(e.target.value)} />
-          </div>
+            <label className="label">Jornada</label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="jornada" checked={jornadaCompleta}
+                  onChange={() => { setJornadaCompleta(true); setReduccionPct(''); setFechaInicio(''); setFechaFin('') }}
+                  className="text-blue-600" />
+                <span className="text-sm text-gray-700">Jornada completa</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="jornada" checked={!jornadaCompleta}
+                  onChange={() => setJornadaCompleta(false)}
+                  className="text-blue-600" />
+                <span className="text-sm text-gray-700">Reducción de jornada</span>
+              </label>
+            </div>
 
-          <div>
-            <label className="label">Notas</label>
-            <textarea rows={2} className="input resize-none" value={notas}
-              onChange={e => setNotas(e.target.value)} placeholder="Observaciones opcionales…" />
+            {!jornadaCompleta && (
+              <div className="mt-3 space-y-3 p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number" min="1" max="99" step="1" required
+                    className="input w-24" value={reduccionPct}
+                    onChange={e => setReduccionPct(e.target.value)}
+                    placeholder="50"
+                  />
+                  <span className="text-sm text-gray-600">% de reducción</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="label">Fecha inicio</label>
+                    <input type="date" className="input" value={fechaInicio}
+                      onChange={e => setFechaInicio(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="label">Fecha fin</label>
+                    <input type="date" className="input" value={fechaFin}
+                      onChange={e => setFechaFin(e.target.value)} />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {isEdit && (
@@ -119,11 +170,9 @@ export function MedicoFormModal({ profile, doctorProfile, onClose, onSaved }: Pr
           )}
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center">
-              Cancelar
-            </button>
+            <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center">Cancelar</button>
             <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">
-              {loading ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear perfil'}
+              {loading ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Añadir médico'}
             </button>
           </div>
         </form>

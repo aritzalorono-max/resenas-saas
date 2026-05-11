@@ -36,51 +36,63 @@ export async function getDoctorProfile(profileId: string): Promise<DoctorProfile
 }
 
 export async function createDoctorProfile(data: {
-  profileId: string
+  profileId?: string | null
+  nombre?: string
   categoria: DoctorCategoria
-  numColegiado?: string
   especialidad?: string
   anioInicio?: number
+  jornadaCompleta?: boolean
+  reduccionPorcentaje?: number | null
+  reduccionFechaInicio?: string | null
+  reduccionFechaFin?: string | null
   notas?: string
 }) {
   const supabase = await createClient()
   const teamId = await getActiveTeamId()
   if (!teamId) return { error: 'No hay equipo activo.' }
   const { error } = await supabase.from('guardias_doctor_profiles').insert({
-    profile_id:    data.profileId,
-    team_id:       teamId,
-    categoria:     data.categoria,
-    num_colegiado: data.numColegiado ?? null,
-    especialidad:  data.especialidad ?? 'Urología',
-    anio_inicio:   data.anioInicio ?? null,
-    notas:         data.notas ?? null,
+    profile_id:             data.profileId ?? null,
+    nombre:                 data.nombre ?? null,
+    team_id:                teamId,
+    categoria:              data.categoria,
+    especialidad:           data.especialidad ?? 'Urología',
+    anio_inicio:            data.anioInicio ?? null,
+    jornada_completa:       data.jornadaCompleta ?? true,
+    reduccion_porcentaje:   data.reduccionPorcentaje ?? null,
+    reduccion_fecha_inicio: data.reduccionFechaInicio ?? null,
+    reduccion_fecha_fin:    data.reduccionFechaFin ?? null,
+    notas:                  data.notas ?? null,
   })
   if (error) return { error: error.message }
   return { success: true }
 }
 
 export async function updateDoctorProfile(id: string, data: {
+  nombre?: string | null
   categoria?: DoctorCategoria
-  numColegiado?: string | null
   especialidad?: string
   anioInicio?: number | null
   activo?: boolean
   jornadaCompleta?: boolean
   reduccionPorcentaje?: number | null
+  reduccionFechaInicio?: string | null
+  reduccionFechaFin?: string | null
   notas?: string | null
 }) {
   const supabase = await createClient()
   const { error } = await supabase
     .from('guardias_doctor_profiles')
     .update({
-      ...(data.categoria           !== undefined && { categoria:             data.categoria }),
-      ...(data.numColegiado        !== undefined && { num_colegiado:         data.numColegiado }),
-      ...(data.especialidad        !== undefined && { especialidad:          data.especialidad }),
-      ...(data.anioInicio          !== undefined && { anio_inicio:           data.anioInicio }),
-      ...(data.activo              !== undefined && { activo:                data.activo }),
-      ...(data.jornadaCompleta     !== undefined && { jornada_completa:      data.jornadaCompleta }),
-      ...(data.reduccionPorcentaje !== undefined && { reduccion_porcentaje:  data.reduccionPorcentaje }),
-      ...(data.notas               !== undefined && { notas:                 data.notas }),
+      ...(data.nombre                !== undefined && { nombre:                 data.nombre }),
+      ...(data.categoria             !== undefined && { categoria:              data.categoria }),
+      ...(data.especialidad          !== undefined && { especialidad:           data.especialidad }),
+      ...(data.anioInicio            !== undefined && { anio_inicio:            data.anioInicio }),
+      ...(data.activo                !== undefined && { activo:                 data.activo }),
+      ...(data.jornadaCompleta       !== undefined && { jornada_completa:       data.jornadaCompleta }),
+      ...(data.reduccionPorcentaje   !== undefined && { reduccion_porcentaje:   data.reduccionPorcentaje }),
+      ...(data.reduccionFechaInicio  !== undefined && { reduccion_fecha_inicio: data.reduccionFechaInicio }),
+      ...(data.reduccionFechaFin     !== undefined && { reduccion_fecha_fin:    data.reduccionFechaFin }),
+      ...(data.notas                 !== undefined && { notas:                  data.notas }),
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
