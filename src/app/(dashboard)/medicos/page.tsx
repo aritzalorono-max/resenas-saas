@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/lib/actions/auth'
 import { listDoctors, listAllShiftCounters } from '@/lib/actions/doctors'
-import { listTeamMembers, listInvitations } from '@/lib/actions/teams'
+import { listTeamMembers, listInvitations, getMyTeamRole } from '@/lib/actions/teams'
 import { MedicosClient } from '@/components/medicos/MedicosClient'
 
 export default async function MedicosPage() {
@@ -11,14 +11,15 @@ export default async function MedicosPage() {
 
   const teamId = profile.active_team_id as string
 
-  const [doctors, members, invitations, counters] = await Promise.all([
+  const [doctors, members, invitations, counters, teamRole] = await Promise.all([
     listDoctors(),
     listTeamMembers(teamId),
     listInvitations(teamId),
     listAllShiftCounters(anio),
+    getMyTeamRole(teamId),
   ])
 
-  const canEdit = profile.role === 'admin' || profile.role === 'gestor'
+  const canEdit = profile.role === 'admin' || profile.role === 'gestor' || teamRole === 'gestor'
 
   return (
     <MedicosClient
