@@ -117,3 +117,32 @@ export async function updateProfileRole(profileId: string, role: UserRole) {
   if (error) return { error: error.message }
   return { success: true }
 }
+
+export async function updateProfileName(fullName: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+  const { error } = await supabase
+    .from('guardias_profiles')
+    .update({ full_name: fullName.trim() })
+    .eq('id', user.id)
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function updatePassword(newPassword: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function deleteAccount() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+  // Sign out first, then delete profile (cascade deletes team memberships)
+  await supabase.from('guardias_profiles').delete().eq('id', user.id)
+  await supabase.auth.signOut()
+  return { success: true }
+}

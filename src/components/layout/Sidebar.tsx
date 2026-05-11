@@ -124,12 +124,17 @@ export function Sidebar({ role, fullName, teamName, teams, activeTeamId }: Props
 
       {/* User */}
       <div className="px-3 pb-4 border-t border-slate-800 pt-4">
-        <div className="px-3 py-2 mb-2">
-          <p className="text-white text-sm font-medium truncate">{fullName}</p>
-          <p className="text-slate-400 text-xs capitalize">{
-            role === 'admin' ? 'Administrador' : role === 'gestor' ? 'Médico · Gestor' : 'Médico'
-          }</p>
-        </div>
+        <Link href="/cuenta" className="flex items-center gap-3 px-3 py-2 mb-1 rounded-lg hover:bg-slate-800 transition-colors group">
+          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 text-white text-sm font-semibold">
+            {fullName.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-white text-sm font-medium truncate group-hover:text-blue-300 transition-colors">{fullName}</p>
+            <p className="text-slate-400 text-xs">{
+              role === 'admin' ? 'Administrador' : role === 'gestor' ? 'Médico · Gestor' : 'Médico'
+            }</p>
+          </div>
+        </Link>
         <button
           onClick={handleSignOut}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
