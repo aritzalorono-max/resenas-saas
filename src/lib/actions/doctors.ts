@@ -3,7 +3,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentProfile } from './auth'
-import { type DoctorCategoria, type DoctorProfile, type ShiftCounters } from '@/types'
+import { type DoctorCategoria, type DoctorProfile, type DoctorPeriodo, type PeriodoTipo, type ShiftCounters } from '@/types'
 
 async function getActiveTeamId(): Promise<string | null> {
   const profile = await getCurrentProfile()
@@ -139,6 +139,72 @@ export async function upsertShiftCounters(profileId: string, anio: number, count
       ...counters,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'profile_id,anio,team_id' })
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+// ─── Doctor Periodos ──────────────────────────────────────────────────────────
+
+export async function listDoctorPeriodos(doctorProfileId: string): Promise<DoctorPeriodo[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('guardias_doctor_periodos')
+    .select('*')
+    .eq('doctor_profile_id', doctorProfileId)
+    .order('fecha_inicio')
+  return (data ?? []) as DoctorPeriodo[]
+}
+
+export async function createDoctorPeriodo(data: {
+  doctorProfileId: string
+  tipo: PeriodoTipo
+  fechaInicio: string
+  fechaFin?: string | null
+  reduccionPorcentaje?: number | null
+  notas?: string | null
+}) {
+  const supabase = await createClient()
+  const teamId = await getActiveTeamId()
+  if (!teamId) return { error: 'No hay equipo activo.' }
+  const { error } = await supabase.from('guardias_doctor_periodos').insert({
+    doctor_profile_id:    data.doctorProfileId,
+    team_id:              teamId,
+    tipo:                 data.tipo,
+    fecha_inicio:         data.fechaInicio,
+    fecha_fin:            data.fechaFin ?? null,
+    reduccion_porcentaje: data.reduccionPorcentaje ?? null,
+    notas:                data.notas ?? null,
+  })
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function updateDoctorPeriodo(id: string, data: {
+  tipo?: PeriodoTipo
+  fechaInicio?: string
+  fechaFin?: string | null
+  reduccionPorcentaje?: number | null
+  notas?: string | null
+}) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('guardias_doctor_periodos')
+    .update({
+      ...(data.tipo                !== undefined && { tipo:                 data.tipo }),
+      ...(data.fechaInicio         !== undefined && { fecha_inicio:         data.fechaInicio }),
+      ...(data.fechaFin            !== undefined && { fecha_fin:            data.fechaFin }),
+      ...(data.reduccionPorcentaje !== undefined && { reduccion_porcentaje: data.reduccionPorcentaje }),
+      ...(data.notas               !== undefined && { notas:                data.notas }),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
+export async function deleteDoctorPeriodo(id: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('guardias_doctor_periodos').delete().eq('id', id)
   if (error) return { error: error.message }
   return { success: true }
 }

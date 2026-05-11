@@ -64,6 +64,21 @@ export interface TeamInvitation {
 
 // ─── Doctors ─────────────────────────────────────────────────────────────────
 
+export type PeriodoTipo = 'reduccion' | 'excedencia' | 'baja'
+
+export interface DoctorPeriodo {
+  id: string
+  doctor_profile_id: string
+  team_id: string
+  tipo: PeriodoTipo
+  fecha_inicio: string
+  fecha_fin: string | null
+  reduccion_porcentaje: number | null
+  notas: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface DoctorProfile {
   id: string
   profile_id: string | null

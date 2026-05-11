@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MedicoFormModal } from './MedicoFormModal'
-import { type DoctorProfile, type TeamMember, type TeamInvitation, type ShiftCounters, CATEGORIA_LABELS } from '@/types'
-import { UserPlus, Pencil, Clock } from 'lucide-react'
+import { DoctorPeriodosModal } from './DoctorPeriodosModal'
+import { listDoctorPeriodos } from '@/lib/actions/doctors'
+import { type DoctorProfile, type DoctorPeriodo, type TeamMember, type TeamInvitation, type ShiftCounters, CATEGORIA_LABELS } from '@/types'
+import { UserPlus, Pencil, Clock, CalendarDays } from 'lucide-react'
 
 interface Props {
   doctors: DoctorProfile[]
@@ -18,6 +20,7 @@ interface Props {
 type ModalState =
   | { type: 'create'; prefillNombre?: string; prefillProfileId?: string }
   | { type: 'edit'; doctor: DoctorProfile }
+  | { type: 'periodos'; doctor: DoctorProfile; periodos: DoctorPeriodo[] }
   | null
 
 export function MedicosClient({ doctors, members, invitations, counters, canEdit, anio }: Props) {
@@ -38,6 +41,11 @@ export function MedicosClient({ doctors, members, invitations, counters, canEdit
 
   function getDoctorName(doc: DoctorProfile) {
     return doc.nombre ?? doc.profile?.full_name ?? '—'
+  }
+
+  async function openPeriodos(doc: DoctorProfile) {
+    const periodos = await listDoctorPeriodos(doc.id)
+    setModal({ type: 'periodos', doctor: doc, periodos })
   }
 
   function handleSaved() {
@@ -134,10 +142,16 @@ export function MedicosClient({ doctors, members, invitations, counters, canEdit
                   {canEdit && (
                     <td className="table-td">
                       {doc && (
-                        <button onClick={() => setModal({ type: 'edit', doctor: doc })}
-                          className="text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
-                          <Pencil size={15} />
-                        </button>
+                        <div className="flex gap-1">
+                          <button onClick={() => openPeriodos(doc)}
+                            className="text-gray-400 hover:text-blue-600 transition-colors" title="Disponibilidad">
+                            <CalendarDays size={15} />
+                          </button>
+                          <button onClick={() => setModal({ type: 'edit', doctor: doc })}
+                            className="text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
+                            <Pencil size={15} />
+                          </button>
+                        </div>
                       )}
                     </td>
                   )}
@@ -171,10 +185,16 @@ export function MedicosClient({ doctors, members, invitations, counters, canEdit
                   </td>
                   {canEdit && (
                     <td className="table-td">
-                      <button onClick={() => setModal({ type: 'edit', doctor: doc })}
-                        className="text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
-                        <Pencil size={15} />
-                      </button>
+                      <div className="flex gap-1">
+                        <button onClick={() => openPeriodos(doc)}
+                          className="text-gray-400 hover:text-blue-600 transition-colors" title="Disponibilidad">
+                          <CalendarDays size={15} />
+                        </button>
+                        <button onClick={() => setModal({ type: 'edit', doctor: doc })}
+                          className="text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
+                          <Pencil size={15} />
+                        </button>
+                      </div>
                     </td>
                   )}
                 </tr>
@@ -227,6 +247,14 @@ export function MedicosClient({ doctors, members, invitations, counters, canEdit
           doctorProfile={modal.doctor}
           onClose={() => setModal(null)}
           onSaved={handleSaved}
+        />
+      )}
+      {modal?.type === 'periodos' && (
+        <DoctorPeriodosModal
+          doctor={modal.doctor}
+          anio={anio}
+          initialPeriodos={modal.periodos}
+          onClose={() => setModal(null)}
         />
       )}
     </>
