@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createDoctor, updateDoctor, deleteDoctor } from '@/lib/actions/doctors'
 import { type Doctor, type DoctorCategoria, CATEGORIA_LABELS, CATEGORIA_COLORS } from '@/types'
@@ -160,6 +160,8 @@ export function MedicosClient({ doctors: initial }: { doctors: Doctor[] }) {
   const [doctors,     setDoctors]     = useState<Doctor[]>(initial)
   const [showModal,   setShowModal]   = useState(false)
   const [editDoctor,  setEditDoctor]  = useState<Doctor | undefined>()
+
+  useEffect(() => { setDoctors(initial) }, [initial])
 
   function refresh() {
     router.refresh()
