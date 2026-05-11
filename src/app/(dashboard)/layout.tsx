@@ -1,25 +1,22 @@
 import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/lib/actions/auth'
-import { getMyTeams } from '@/lib/actions/teams'
+import { getMyTeams, getMyTeamRole } from '@/lib/actions/teams'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { MobileNav } from '@/components/layout/MobileNav'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const profile = await getCurrentProfile()
-  // If profile is null the user is not authenticated → send to login.
-  // If profile exists but no team → send to onboarding.
-  // Never loop back to /login for an authenticated user with a missing profile;
-  // redirect to /onboarding instead so it can be created there.
   if (!profile) redirect('/onboarding')
   if (!profile.active_team_id) redirect('/onboarding')
 
-  const teams = await getMyTeams()
+  const [teams, teamRole] = await Promise.all([getMyTeams(), getMyTeamRole()])
   const activeTeam = teams.find(t => t.id === profile.active_team_id) ?? null
+  const displayRole = teamRole ?? profile.role
 
   return (
     <div className="flex min-h-screen">
       <Sidebar
-        role={profile.role}
+        role={displayRole}
         fullName={profile.full_name}
         teamName={activeTeam?.nombre ?? null}
         teams={teams}
@@ -42,7 +39,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </main>
       </div>
 
-      <MobileNav role={profile.role} />
+      <MobileNav role={displayRole} />
     </div>
   )
 }
