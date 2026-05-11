@@ -28,8 +28,7 @@ export function OnboardingClient({ fullName }: { fullName: string }) {
     setLoading(true)
     const result = await createTeam({ nombre, hospital, especialidad })
     if (result.error) { setError(result.error); setLoading(false); return }
-    router.push('/dashboard')
-    router.refresh()
+    window.location.href = '/dashboard'
   }
 
   async function handleJoin(e: React.FormEvent) {
@@ -38,8 +37,7 @@ export function OnboardingClient({ fullName }: { fullName: string }) {
     setLoading(true)
     const result = await joinTeamByCode(code.trim())
     if (result.error) { setError(result.error); setLoading(false); return }
-    router.push('/dashboard')
-    router.refresh()
+    window.location.href = '/dashboard'
   }
 
   return (
