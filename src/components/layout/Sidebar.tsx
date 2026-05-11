@@ -127,7 +127,7 @@ export function Sidebar({ role, fullName, teamName, teams, activeTeamId }: Props
         <div className="px-3 py-2 mb-2">
           <p className="text-white text-sm font-medium truncate">{fullName}</p>
           <p className="text-slate-400 text-xs capitalize">{
-            role === 'admin' ? 'Administrador' : role === 'gestor' ? 'Gestor' : 'Médico'
+            role === 'admin' ? 'Administrador' : role === 'gestor' ? 'Médico · Gestor' : 'Médico'
           }</p>
         </div>
         <button
