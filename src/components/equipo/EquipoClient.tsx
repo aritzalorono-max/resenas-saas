@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   createInvitation, revokeInvitation, updateMemberRole, removeMember,
   regenerateTeamCode, updateTeam,
@@ -23,7 +22,6 @@ interface Props {
 type Tab = 'members' | 'invitations' | 'settings'
 
 export function EquipoClient({ team: initialTeam, members: initialMembers, invitations: initialInvitations, myRole, myProfileId }: Props) {
-  const router = useRouter()
   const [tab, setTab] = useState<Tab>('members')
   const [team, setTeam] = useState(initialTeam)
   const [members, setMembers] = useState(initialMembers)
@@ -35,6 +33,9 @@ export function EquipoClient({ team: initialTeam, members: initialMembers, invit
   const [inviteLoading, setInviteLoading] = useState(false)
   const [inviteError, setInviteError] = useState('')
   const [inviteSuccess, setInviteSuccess] = useState('')
+  const [inviteLink, setInviteLink]   = useState('')
+  const [inviteLinkCopied, setInviteLinkCopied] = useState(false)
+  const [copiedInvId, setCopiedInvId] = useState<string | null>(null)
 
   // Copy state
   const [codeCopied, setCodeCopied] = useState(false)
@@ -53,16 +54,31 @@ export function EquipoClient({ team: initialTeam, members: initialMembers, invit
     e.preventDefault()
     setInviteError('')
     setInviteSuccess('')
+    setInviteLink('')
     setInviteLoading(true)
     const result = await createInvitation(team.id, inviteEmail, inviteRole)
     if (result.error) {
       setInviteError(result.error)
     } else {
-      setInviteSuccess(`Invitación enviada a ${inviteEmail}`)
+      const link = `${window.location.origin}/unirse/${result.token}`
+      setInviteSuccess(`Invitación creada para ${inviteEmail}`)
+      setInviteLink(link)
       setInviteEmail('')
-      router.refresh()
+      setInvitations(prev => result.invitation ? [...prev, result.invitation as TeamInvitation] : prev)
     }
     setInviteLoading(false)
+  }
+
+  async function handleCopyInviteLink() {
+    await navigator.clipboard.writeText(inviteLink)
+    setInviteLinkCopied(true)
+    setTimeout(() => setInviteLinkCopied(false), 2000)
+  }
+
+  async function handleCopyInvLink(token: string, id: string) {
+    await navigator.clipboard.writeText(`${window.location.origin}/unirse/${token}`)
+    setCopiedInvId(id)
+    setTimeout(() => setCopiedInvId(null), 2000)
   }
 
   async function handleRevokeInvitation(id: string) {
@@ -266,7 +282,19 @@ export function EquipoClient({ team: initialTeam, members: initialMembers, invit
             <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">{inviteError}</div>
           )}
           {inviteSuccess && (
-            <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-700">{inviteSuccess}</div>
+            <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-700 space-y-2">
+              <p>{inviteSuccess}</p>
+              {inviteLink && (
+                <div className="flex items-center gap-2">
+                  <input readOnly value={inviteLink} className="input text-xs font-mono flex-1 bg-green-50 border-green-200 py-1" />
+                  <button onClick={handleCopyInviteLink} className="btn-secondary gap-1.5 text-xs shrink-0 py-1.5">
+                    {inviteLinkCopied ? <Check size={13} /> : <Copy size={13} />}
+                    {inviteLinkCopied ? 'Copiado' : 'Copiar'}
+                  </button>
+                </div>
+              )}
+              <p className="text-xs text-green-600">Envía este enlace al médico por WhatsApp, email o el canal que prefieras.</p>
+            </div>
           )}
 
           {invitations.length === 0 ? (
@@ -279,7 +307,7 @@ export function EquipoClient({ team: initialTeam, members: initialMembers, invit
                     <th className="table-th">Email</th>
                     <th className="table-th">Rol</th>
                     <th className="table-th">Caduca</th>
-                    <th className="table-th w-16"></th>
+                    <th className="table-th w-24"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -293,13 +321,22 @@ export function EquipoClient({ team: initialTeam, members: initialMembers, invit
                         {new Date(inv.expires_at).toLocaleDateString('es-ES')}
                       </td>
                       <td className="table-td">
-                        <button
-                          onClick={() => handleRevokeInvitation(inv.id)}
-                          className="text-gray-400 hover:text-red-500 transition-colors"
-                          title="Revocar invitación"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleCopyInvLink(inv.token, inv.id)}
+                            className="text-gray-400 hover:text-blue-500 transition-colors"
+                            title="Copiar enlace de invitación"
+                          >
+                            {copiedInvId === inv.id ? <Check size={14} className="text-green-500" /> : <LinkIcon size={14} />}
+                          </button>
+                          <button
+                            onClick={() => handleRevokeInvitation(inv.id)}
+                            className="text-gray-400 hover:text-red-500 transition-colors"
+                            title="Revocar invitación"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
