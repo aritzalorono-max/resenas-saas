@@ -84,6 +84,7 @@ export interface DoctorProfile {
   profile_id: string | null
   team_id: string | null
   nombre: string | null
+  email: string | null
   categoria: DoctorCategoria
   especialidad: string
   anio_inicio: number | null
