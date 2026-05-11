@@ -1,4 +1,5 @@
 // @ts-nocheck
+// no-rpc
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
