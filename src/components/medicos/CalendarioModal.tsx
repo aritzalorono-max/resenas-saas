@@ -9,7 +9,7 @@ import {
   TIPO_AUSENCIA_BG, TIPO_PERIODO_CAL, TIPO_PERIODO_LABEL,
 } from '@/types'
 
-const TIPOS_AUSENCIA: TipoAusencia[] = ['Vacaciones', 'Baja', 'Excedencia', 'Congreso', 'Otros']
+const TIPOS_AUSENCIA: TipoAusencia[] = ['Vacaciones', 'Baja', 'Congreso', 'Otros']
 
 const TIPO_PILL_ACTIVE: Record<TipoAusencia, string> = {
   Vacaciones: 'bg-sky-500 text-white border-sky-500',
