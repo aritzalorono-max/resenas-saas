@@ -1,7 +1,7 @@
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getInvitationByToken, getTeamByCodigo } from '@/lib/actions/teams'
 import { JoinByCodeButton } from '@/components/onboarding/JoinByCodeButton'
-import { InviteRegisterForm } from '@/components/onboarding/InviteRegisterForm'
 import { Stethoscope, CheckCircle, XCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 
@@ -51,15 +51,20 @@ export default async function UnirseTokenPage({ params }: Props) {
         </PageShell>
       )
     }
+    // Check if logged in — if yes, show join button; if no, go to registro with code pre-filled
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      redirect(`/registro?codigo=${encodeURIComponent(token.toUpperCase())}`)
+    }
     return (
       <PageShell>
         <div className="text-center">
           <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-1">Únete al equipo</h2>
           <p className="text-gray-500 text-sm mb-6">
-            Te han invitado a unirte a{' '}
             <strong className="text-gray-900">{team.nombre}</strong>
-            {team.hospital ? ` · ${team.hospital}` : ''}.
+            {team.hospital ? ` · ${team.hospital}` : ''}
           </p>
           <JoinByCodeButton codigo={token} />
         </div>
@@ -85,34 +90,20 @@ export default async function UnirseTokenPage({ params }: Props) {
     )
   }
 
-  // Check if user is already logged in
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const isLoggedIn = !!user
-  const loggedInEmail = user?.email ?? ''
 
-  const team = invitation.team as any
+  // Not logged in → redirect to /registro with email + team code pre-filled
+  if (!user) {
+    const team = invitation.team as any
+    const params = new URLSearchParams({
+      email:  invitation.email,
+      invite: token,
+    })
+    if (team?.codigo) params.set('codigo', team.codigo)
+    redirect(`/registro?${params}`)
+  }
 
-  return (
-    <PageShell>
-      <div>
-        <div className="text-center mb-6">
-          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-          <h2 className="text-xl font-semibold text-gray-900">Invitación al equipo</h2>
-          <p className="text-gray-500 text-sm mt-1">
-            <strong className="text-gray-900">{team?.nombre}</strong>
-            {team?.hospital ? ` · ${team.hospital}` : ''}
-          </p>
-        </div>
-        <InviteRegisterForm
-          token={token}
-          email={invitation.email}
-          teamNombre={team?.nombre ?? ''}
-          teamHospital={team?.hospital}
-          isLoggedIn={isLoggedIn}
-          loggedInEmail={loggedInEmail}
-        />
-      </div>
-    </PageShell>
-  )
+  // Already logged in → redirect to accept invitation
+  redirect(`/dashboard`)
 }
