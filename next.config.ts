@@ -26,7 +26,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Elimina la cabecera X-Powered-By (seguridad + limpieza de headers)
+  poweredByHeader: false,
+
   experimental: {
+    // Tree-shaking agresivo de lucide-react: pasa de importar ~1500 iconos
+    // a importar solo los usados. Reducción de bundle ~200-400 KB en prod.
+    optimizePackageImports: ["lucide-react"],
     serverActions: {
       allowedOrigins: [
         "localhost:3000",
@@ -35,15 +41,43 @@ const nextConfig: NextConfig = {
     },
   },
 
+  // Dominios permitidos para next/image (logos de negocios en Supabase Storage)
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+    // Formatos modernos — Vercel los sirve automáticamente según Accept header
+    formats: ["image/avif", "image/webp"],
+  },
+
   async headers() {
     return [
       {
-        // Aplica las cabeceras de seguridad a todas las rutas
+        // Cabeceras de seguridad a todas las rutas
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        // Cache largo para assets estáticos inmutables (JS/CSS con hash en nombre)
+        source: "/_next/static/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Cache moderado para archivos públicos (iconos, manifest)
+        source: "/(favicon\\.ico|icon\\.svg|manifest\\.json|og-image\\.png)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
+        ],
       },
     ];
   },
 };
 
 export default nextConfig;
+

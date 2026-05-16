@@ -6,7 +6,12 @@ import { ConditionalScripts } from "@/components/cookies/ConditionalScripts";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",       // evita FOIT (flash invisible text) → mejora CLS y LCP
+  preload: true,
+  variable: "--font-inter",
+});
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
 
@@ -88,8 +93,21 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
+    ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+    : null;
+
   return (
     <html lang="es">
+      <head>
+        {/* Preconnect a Supabase para reducir latencia en la primera petición */}
+        {supabaseHost && (
+          <>
+            <link rel="preconnect" href={`https://${supabaseHost}`} />
+            <link rel="dns-prefetch" href={`https://${supabaseHost}`} />
+          </>
+        )}
+      </head>
       <body className={inter.className}>
         {children}
         <CookieBanner />
