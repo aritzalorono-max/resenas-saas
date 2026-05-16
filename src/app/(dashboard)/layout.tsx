@@ -37,11 +37,14 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login");
 
-  const { data: business } = await supabase
+  const { data: business, error: bizError } = await supabase
     .from("businesses")
     .select("name")
     .eq("user_id", user.id)
     .single();
+
+  // Redirect new users to the onboarding wizard (only when DB is reachable and name is empty)
+  if (!bizError && !business?.name) redirect("/onboarding");
 
   const isAdmin = (process.env.ADMIN_EMAILS ?? "")
     .split(",")

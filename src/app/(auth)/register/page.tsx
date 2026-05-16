@@ -64,7 +64,7 @@ export default function RegisterPage() {
     // Check if we got a session (email confirmation disabled) or need to verify email
     const data = await res.json().catch(() => ({}));
     if (data.sessionCreated) {
-      router.push("/dashboard");
+      router.push("/onboarding");
       router.refresh();
     } else {
       setRegistered(true);
