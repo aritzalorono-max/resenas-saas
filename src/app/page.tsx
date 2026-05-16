@@ -56,7 +56,6 @@ const schemaOrg = {
       description:
         "Plataforma SaaS que automatiza la captación de reseñas en Google Maps, App Store y Play Store mediante WhatsApp e inteligencia artificial. Para negocios locales, apps móviles y e-commerce.",
       url: process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com",
-      screenshot: "/og-image.png",
       featureList: [
         "Envío automático de WhatsApp a clientes",
         "Análisis de sentimiento con IA",
@@ -125,6 +124,27 @@ const schemaOrg = {
           },
         },
       ],
+    },
+    {
+      "@type": "Organization",
+      name: "ReseñasYa",
+      legalName: "Buy & Click, SL",
+      url: process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com",
+      logo: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com"}/icon.svg`,
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "contacto.resenasya@gmail.com",
+        contactType: "customer support",
+        availableLanguage: "Spanish",
+      },
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Avda. Ribera de Axpe 11 2D-202",
+        addressLocality: "Erandio",
+        addressRegion: "Bizkaia",
+        postalCode: "48950",
+        addressCountry: "ES",
+      },
     },
   ],
 };

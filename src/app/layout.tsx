@@ -51,21 +51,12 @@ export const metadata: Metadata = {
     title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
     description:
       "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "ReseñasYa — Automatiza tus reseñas en Google, App Store, Play Store y Trustpilot",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "ReseñasYa — Más reseñas de 5★ automáticamente por WhatsApp",
     description:
       "IA + WhatsApp para conseguir más reseñas en Google Maps, App Store, Play Store o Trustpilot. Para cualquier negocio.",
-    images: ["/og-image.png"],
   },
   appleWebApp: {
     capable: true,

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 
 export const metadata: Metadata = {
-  title: "Política de Cookies",
+  title: "Política de Cookies | ReseñasYa",
   description: "Información sobre el uso de cookies en ReseñasYa conforme a la normativa europea.",
   alternates: { canonical: "/cookies" },
   robots: { index: false },

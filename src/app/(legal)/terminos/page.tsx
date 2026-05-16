@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Términos y Condiciones",
+  title: "Términos y Condiciones | ReseñasYa",
   description: "Condiciones generales de uso del servicio ReseñasYa.",
   alternates: { canonical: "/terminos" },
   robots: { index: false },

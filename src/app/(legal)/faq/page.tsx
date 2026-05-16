@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ChevronDown } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Preguntas frecuentes — ReseñasYa",
+  title: "Preguntas frecuentes | ReseñasYa",
   description:
     "Resuelve tus dudas sobre ReseñasYa: cómo funciona, qué plataformas soporta, si es legal y cómo personalizar los mensajes de WhatsApp.",
   alternates: { canonical: "/faq" },
@@ -60,9 +60,23 @@ const faqs = [
   },
 ];
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.q,
+    acceptedAnswer: { "@type": "Answer", text: faq.a },
+  })),
+};
+
 export default function FaqPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Preguntas frecuentes</h1>
         <p className="text-gray-500 text-lg">
