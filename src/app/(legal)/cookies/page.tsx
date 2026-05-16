@@ -8,9 +8,9 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const LAST_UPDATED = "5 de mayo de 2026";
-const COMPANY      = "ReseñasYa S.L.";
-const EMAIL        = "privacidad@resenasya.com";
+const LAST_UPDATED = "16 de mayo de 2026";
+const COMPANY      = "Buy & Click, SL";
+const EMAIL        = "contacto.resenasya@gmail.com";
 
 export default function CookiesPage() {
   return (

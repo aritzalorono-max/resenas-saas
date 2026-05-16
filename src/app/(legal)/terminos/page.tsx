@@ -7,9 +7,9 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const LAST_UPDATED = "5 de mayo de 2026";
-const COMPANY      = "ReseñasYa S.L.";
-const EMAIL        = "legal@resenasya.com";
+const LAST_UPDATED = "16 de mayo de 2026";
+const COMPANY      = "Buy & Click, SL";
+const EMAIL        = "contacto.resenasya@gmail.com";
 const APP_URL      = "https://resenasya.com";
 
 export default function TerminosPage() {
@@ -27,8 +27,14 @@ export default function TerminosPage() {
           regulan el acceso y la utilización del servicio <strong>ReseñasYa</strong>, disponible en{" "}
           <a href={APP_URL} className="text-brand-600 hover:underline">{APP_URL}</a> (en adelante, "la Plataforma"),
           titularidad de <strong>{COMPANY}</strong>, empresa debidamente constituida conforme a la legislación española,
-          con domicilio social en España y correo electrónico de contacto:{" "}
+          con CIF <strong>B-95612958</strong>, domicilio social en <strong>Avda. Ribera de Axpe 11, 2D&nbsp;-&nbsp;202,
+          48950 Erandio (Bizkaia)</strong>, inscrita en el Registro Mercantil de Vizcaya, Tomo 5138, Folio 19,
+          Inscripción 1.ª, Hoja BI-56789, y correo electrónico de contacto:{" "}
           <a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a>.
+        </p>
+        <p>
+          La marca <strong>ReseñasYa</strong> es titularidad de <strong>{COMPANY}</strong>, registrada en la Oficina
+          Española de Patentes y Marcas bajo la denominación <em>Buy &amp; Click</em>.
         </p>
         <p>
           Al registrarte y utilizar la Plataforma, aceptas íntegramente estas Condiciones. Si no estás de acuerdo con

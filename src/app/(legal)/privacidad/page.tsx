@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const LAST_UPDATED = "5 de mayo de 2026";
-const COMPANY      = "ReseñasYa S.L.";
-const EMAIL_LEGAL  = "legal@resenasya.com";
-const EMAIL_DPD    = "privacidad@resenasya.com";
+const LAST_UPDATED = "16 de mayo de 2026";
+const COMPANY      = "Buy & Click, SL";
+const EMAIL_LEGAL  = "contacto.resenasya@gmail.com";
+const EMAIL_DPD    = "contacto.resenasya@gmail.com";
 const APP_URL      = "https://resenasya.com";
 
 export default function PrivacidadPage() {
@@ -33,8 +33,10 @@ export default function PrivacidadPage() {
         <Table rows={[
           ["Denominación social", COMPANY],
           ["Forma jurídica", "Sociedad de Responsabilidad Limitada (S.L.)"],
-          ["NIF", "Pendiente de inscripción registral"],
-          ["Domicilio social", "España"],
+          ["CIF", "B-95612958"],
+          ["Domicilio social", "Avda. Ribera de Axpe 11, 2D - 202, 48950 Erandio (Bizkaia)"],
+          ["Registro Mercantil", "R.M. de Vizcaya, Tomo 5138, Folio 19, Inscripción 1.ª, Hoja BI-56789"],
+          ["Marca registrada", "Buy & Click (Oficina Española de Patentes y Marcas)"],
           ["Correo electrónico", EMAIL_LEGAL],
           ["Sitio web", APP_URL],
           ["Actividad", "Servicios SaaS de gestión de reputación online"],
