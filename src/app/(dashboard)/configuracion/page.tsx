@@ -73,38 +73,48 @@ export default function ConfiguracionPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-      const { data } = await supabase
-        .from("businesses")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
+        const { data, error: dbError } = await supabase
+          .from("businesses")
+          .select("*")
+          .eq("user_id", user.id)
+          .single();
 
-      if (data) {
-        setBusiness(data);
-        setWhatsappMode((data.whatsapp_mode as WhatsAppMode) ?? "shared");
-        setOwnAccountSid(data.own_twilio_account_sid ?? "");
-        setOwnAuthToken(data.own_twilio_auth_token ?? "");
-        setOwnWhatsappNumber(data.own_twilio_whatsapp_number ?? "");
-        const links: ReviewPlatformLink[] = data.review_links ?? [];
-        const active = links.find((l) => l.url === data.google_maps_url);
-        const others = links.filter((l) => l.url !== data.google_maps_url);
-        setForm({
-          name: data.name ?? "",
-          description: data.description ?? "",
-          website_url: data.website_url ?? "",
-          activePlatformName: active?.name ?? "Google Maps",
-          activeShortCode: active?.shortCode,
-          google_maps_url: data.google_maps_url ?? "",
-          otherPlatforms: others,
-          welcome_message: data.welcome_message ?? DEFAULT_WELCOME_MESSAGE,
-          tone: data.tone ?? "tuteo",
-        });
+        if (dbError && dbError.code !== "PGRST116") {
+          setError("No se pudo cargar la configuración. Recarga la página.");
+          return;
+        }
+
+        if (data) {
+          setBusiness(data);
+          setWhatsappMode((data.whatsapp_mode as WhatsAppMode) ?? "shared");
+          setOwnAccountSid(data.own_twilio_account_sid ?? "");
+          setOwnAuthToken(data.own_twilio_auth_token ?? "");
+          setOwnWhatsappNumber(data.own_twilio_whatsapp_number ?? "");
+          const links: ReviewPlatformLink[] = data.review_links ?? [];
+          const active = links.find((l) => l.url === data.google_maps_url);
+          const others = links.filter((l) => l.url !== data.google_maps_url);
+          setForm({
+            name: data.name ?? "",
+            description: data.description ?? "",
+            website_url: data.website_url ?? "",
+            activePlatformName: active?.name ?? "Google Maps",
+            activeShortCode: active?.shortCode,
+            google_maps_url: data.google_maps_url ?? "",
+            otherPlatforms: others,
+            welcome_message: data.welcome_message ?? DEFAULT_WELCOME_MESSAGE,
+            tone: data.tone ?? "tuteo",
+          });
+        }
+      } catch {
+        setError("Error de conexión al cargar la configuración. Recarga la página.");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     load();
   }, []);
@@ -131,7 +141,7 @@ export default function ConfiguracionPage() {
         setForm((p) => ({ ...p, welcome_message: data.message }));
       }
     } catch {
-      // silencioso — el usuario puede seguir editando manualmente
+      setError("No se pudo generar el mensaje automáticamente. Puedes escribirlo manualmente.");
     } finally {
       setGeneratingMsg(false);
     }
@@ -235,6 +245,22 @@ export default function ConfiguracionPage() {
 
   if (loading) {
     return <div className="flex items-center justify-center h-64 text-gray-400">Cargando...</div>;
+  }
+
+  if (!business && error) {
+    return (
+      <div className="max-w-lg">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+          <p className="text-red-700 font-medium mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-sm font-semibold text-red-700 underline hover:no-underline"
+          >
+            Recargar página
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const currentTone = TONE_OPTIONS.find((o) => o.value === form.tone)!;

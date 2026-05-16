@@ -58,6 +58,7 @@ const DEFAULT_COUNTRY = COUNTRIES[0];
 const MAX_RETRIES     = 2;
 const RETRY_DELAY_MS  = 1500;
 const SEND_DELAY_MS   = 400;
+const FETCH_TIMEOUT_MS = 30_000;
 
 // Safeguards for bulk import
 const MAX_FILE_SIZE_MB = 10;
@@ -79,11 +80,24 @@ async function sendWithRetry(
   payload: { customer_name: string; customer_phone: string },
   retries = MAX_RETRIES
 ): Promise<Response> {
-  const res = await fetch("/api/send-review-request", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  let res: Response;
+  try {
+    res = await fetch("/api/send-review-request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    clearTimeout(tid);
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new Error("La solicitud tardó demasiado. Comprueba tu conexión e inténtalo de nuevo.");
+    }
+    throw err;
+  }
+  clearTimeout(tid);
   if (!res.ok && res.status >= 500 && retries > 0) {
     await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
     return sendWithRetry(payload, retries - 1);
@@ -300,8 +314,9 @@ export default function ClientesPage() {
       if (!res.ok) { setError(data.error ?? "Error al enviar la solicitud"); return; }
       setSuccess(true);
       setForm({ customer_name: "", customer_phone: "" });
-    } catch {
-      setError("Error de conexión. Comprueba tu conexión a internet e inténtalo de nuevo.");
+    } catch (err) {
+      const msg = err instanceof Error && err.message ? err.message : "Error de conexión. Comprueba tu conexión a internet e inténtalo de nuevo.";
+      setError(msg);
     } finally {
       clearTimeout(retryTimer);
       setLoading(false);
@@ -369,8 +384,9 @@ export default function ClientesPage() {
           const data = await res.json().catch(() => ({}));
           result.errors.push({ name: row.name, reason: data.error ?? `Error ${res.status}` });
         }
-      } catch {
-        result.errors.push({ name: row.name, reason: "Error de conexión" });
+      } catch (err) {
+        const msg = err instanceof Error && err.message ? err.message : "Error de conexión";
+        result.errors.push({ name: row.name, reason: msg });
       }
       setSendProgress(i + 1);
       if (i < valid.length - 1) await new Promise((r) => setTimeout(r, SEND_DELAY_MS));
