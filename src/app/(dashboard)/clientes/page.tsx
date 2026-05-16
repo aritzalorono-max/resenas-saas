@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, FileSpreadsheet, Download, X, CheckCircle2, AlertCircle, Loader2, MapPin, Gift, Clock, Tag } from "lucide-react";
+import { Upload, FileSpreadsheet, Download, X, CheckCircle2, AlertCircle, Loader2, MapPin, Gift, Clock, Tag, ChevronDown, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 
 interface BusinessSummary {
+  businessName: string;
+  welcomeMessage: string;
   platformName: string;
   platformUrl: string | null;
   incentiveEnabled: boolean;
@@ -189,12 +192,14 @@ export default function ClientesPage() {
       const supabase = createClient();
       const { data: biz } = await supabase
         .from("businesses")
-        .select("google_maps_url, review_links, incentive_enabled, incentive_description, incentive_timing, incentive_code_type, incentive_fixed_code")
+        .select("name, welcome_message, google_maps_url, review_links, incentive_enabled, incentive_description, incentive_timing, incentive_code_type, incentive_fixed_code")
         .single();
       if (!biz) return;
       const links: { name: string; url: string }[] = biz.review_links ?? [];
       const active = links.find((l) => l.url === biz.google_maps_url);
       setBizSummary({
+        businessName: biz.name ?? "",
+        welcomeMessage: biz.welcome_message ?? DEFAULT_WELCOME_MESSAGE,
         platformName: active?.name ?? (biz.google_maps_url ? "Plataforma configurada" : "Sin configurar"),
         platformUrl: biz.google_maps_url,
         incentiveEnabled: biz.incentive_enabled ?? false,
@@ -219,6 +224,7 @@ export default function ClientesPage() {
   const [retrying, setRetrying] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef   = useRef<HTMLInputElement>(null);
 
@@ -381,8 +387,8 @@ export default function ClientesPage() {
     <div className="max-w-lg animate-fade-in">
       <div className="mb-5 lg:mb-8">
         <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Enviar solicitud de reseña</h1>
-        <p className="text-gray-400 text-sm mt-1">
-          Introduce los datos del cliente para enviarle un WhatsApp
+        <p className="text-gray-500 text-sm mt-1">
+          El cliente recibirá un WhatsApp pidiéndole su opinión. Si es positiva, la IA le invita a dejar reseña.
         </p>
       </div>
 
@@ -532,7 +538,7 @@ export default function ClientesPage() {
                   />
                 </div>
                 <p className="text-xs text-gray-400 mt-1.5">
-                  {country.flag} {country.dial} — número local sin prefijo
+                  Escribe solo el número local, sin el {country.dial} ni el 0 inicial
                 </p>
               </div>
 
@@ -545,8 +551,38 @@ export default function ClientesPage() {
                 </div>
               )}
 
+              {/* Vista previa del mensaje */}
+              {bizSummary && (
+                <div className="border border-gray-200 rounded-xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewOpen((o) => !o)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-50 transition"
+                  >
+                    <span className="flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                      Ver mensaje que recibirá el cliente
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${previewOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+                  </button>
+                  {previewOpen && (
+                    <div className="px-4 pb-4 pt-1 border-t border-gray-100 bg-[#f0f2f5]">
+                      <div className="bg-[#dcf8c6] rounded-xl rounded-tl-none px-3.5 py-2.5 text-sm text-gray-800 whitespace-pre-wrap mt-3 shadow-sm max-w-[85%]">
+                        {(bizSummary.welcomeMessage || DEFAULT_WELCOME_MESSAGE)
+                          .replace(/\{nombre\}/g, form.customer_name.trim() || "el cliente")
+                          .replace(/\{negocio\}/g, bizSummary.businessName || "tu negocio")}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-2">
+                        Este es el primer mensaje que recibirá por WhatsApp. Puedes editarlo en{" "}
+                        <a href="/configuracion" className="text-brand-600 hover:underline font-medium">Ajustes</a>.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <p className="text-xs text-gray-400 leading-relaxed">
-                Al enviar confirmas que el cliente ha dado su consentimiento para recibir mensajes de WhatsApp conforme al RGPD y la LSSICE. Eres responsable de disponer de esa autorización.
+                Al enviar confirmas que el cliente ha dado su consentimiento para recibir mensajes de WhatsApp conforme al RGPD y la LSSICE.
               </p>
 
               <button
@@ -843,7 +879,7 @@ export default function ClientesPage() {
                 <span className="text-gray-500">Plataforma: </span>
                 {bizSummary.platformUrl
                   ? <span className="font-medium text-gray-900">{bizSummary.platformName}</span>
-                  : <span className="text-amber-600 font-medium">Sin configurar — ve a Perfil del negocio</span>}
+                  : <a href="/configuracion" className="text-amber-600 font-medium hover:underline">Sin configurar — ve a Ajustes →</a>}
               </div>
             </div>
 

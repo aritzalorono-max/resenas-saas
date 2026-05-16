@@ -9,7 +9,7 @@ const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string 
   negative:            { label: "Negativa",       badge: "bg-red-100 text-red-600",       dot: "bg-red-400"     },
   neutral:             { label: "Neutral",        badge: "bg-gray-100 text-gray-600",     dot: "bg-gray-400"    },
   no_response:         { label: "Sin respuesta",  badge: "bg-gray-100 text-gray-500",     dot: "bg-gray-300"    },
-  awaiting_screenshot: { label: "Esp. captura",   badge: "bg-purple-100 text-purple-700", dot: "bg-purple-400"  },
+  awaiting_screenshot: { label: "Cap. pendiente",  badge: "bg-purple-100 text-purple-700", dot: "bg-purple-400"  },
   rewarded:            { label: "Recompensado",   badge: "bg-brand-100 text-brand-700",   dot: "bg-brand-500"   },
 };
 
@@ -21,8 +21,8 @@ const STATUS_TABS = [
   { value: "negative",           label: "Negativas"     },
   { value: "neutral",            label: "Neutrales"     },
   { value: "pending",            label: "Pendientes"    },
-  { value: "no_response",        label: "Sin resp."     },
-  { value: "awaiting_screenshot",label: "Captura"       },
+  { value: "no_response",        label: "Sin respuesta" },
+  { value: "awaiting_screenshot",label: "Cap. pend."    },
   { value: "rewarded",           label: "Recompensadas" },
 ];
 

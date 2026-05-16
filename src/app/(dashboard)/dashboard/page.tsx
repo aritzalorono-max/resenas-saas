@@ -12,7 +12,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   negative:             { label: "Negativa",         color: "bg-red-100 text-red-600"       },
   neutral:              { label: "Neutral",          color: "bg-gray-100 text-gray-600"     },
   no_response:          { label: "Sin respuesta",    color: "bg-gray-100 text-gray-500"     },
-  awaiting_screenshot:  { label: "Esp. captura",     color: "bg-purple-100 text-purple-700" },
+  awaiting_screenshot:  { label: "Cap. pendiente",   color: "bg-purple-100 text-purple-700" },
   rewarded:             { label: "Recompensado",     color: "bg-brand-100 text-brand-700"   },
 };
 
@@ -165,15 +165,62 @@ export default async function DashboardPage() {
         <p className="text-gray-400 text-sm mt-1">Resumen de tu actividad de reseñas</p>
       </div>
 
-      {/* Alerta Google Maps */}
-      {!business?.google_maps_url && (
+      {/* Onboarding — primeros pasos (solo cuando no hay solicitudes enviadas aún) */}
+      {total === 0 && (
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-card animate-slide-up">
+          <p className="text-sm font-bold text-gray-900 mb-4">Por dónde empezar</p>
+          <ol className="space-y-3">
+            <li className="flex items-start gap-3">
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5
+                ${business?.google_maps_url ? "bg-green-500 text-white" : "bg-brand-600 text-white"}`}>
+                {business?.google_maps_url ? "✓" : "1"}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-semibold ${business?.google_maps_url ? "text-gray-400 line-through" : "text-gray-900"}`}>
+                  Añade tu enlace de reseñas
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {business?.google_maps_url
+                    ? "Enlace configurado correctamente."
+                    : "Google Maps, App Store, Trustpilot… lo que uses."}
+                </p>
+                {!business?.google_maps_url && (
+                  <Link href="/configuracion" className="inline-block mt-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700">
+                    Ir a Ajustes →
+                  </Link>
+                )}
+              </div>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900">Envía tu primera solicitud de reseña</p>
+                <p className="text-xs text-gray-400 mt-0.5">Introduce el nombre y teléfono de un cliente. Le llegará un WhatsApp automático.</p>
+                <Link href="/clientes" className="inline-block mt-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700">
+                  Enviar solicitud →
+                </Link>
+              </div>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-500">Ve las respuestas en Reseñas</p>
+                <p className="text-xs text-gray-400 mt-0.5">Cuando el cliente responda, verás aquí su valoración y si dejó reseña.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      )}
+
+      {/* Alerta Google Maps (solo si ya hay solicitudes pero falta la URL) */}
+      {total > 0 && !business?.google_maps_url && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-start gap-3 animate-slide-up">
-          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" strokeWidth={1.75} />
+          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" strokeWidth={1.75} aria-hidden="true" />
           <div>
-            <p className="font-semibold text-amber-800 text-sm">Configura tu plataforma de reseñas</p>
+            <p className="font-semibold text-amber-800 text-sm">Falta el enlace de reseñas</p>
             <p className="text-sm text-amber-700 mt-0.5">
-              Sin un enlace activo no podemos redirigir a tus clientes satisfechos al dejar una reseña.{" "}
-              <Link href="/configuracion" className="underline font-semibold">Configurar →</Link>
+              Sin él los clientes satisfechos no pueden ser redirigidos a dejar su reseña.{" "}
+              <Link href="/configuracion" className="underline font-semibold">Configurar ahora →</Link>
             </p>
           </div>
         </div>

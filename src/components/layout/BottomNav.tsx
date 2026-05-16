@@ -9,7 +9,7 @@ const navItems = [
   { href: "/clientes",      label: "Enviar",    Icon: Send      },
   { href: "/resenas",       label: "Reseñas",   Icon: Star      },
   { href: "/informes",      label: "Informes",  Icon: BarChart2 },
-  { href: "/configuracion", label: "Perfil",     Icon: Settings  },
+  { href: "/configuracion", label: "Ajustes",    Icon: Settings  },
 ];
 
 /** Barra de navegación inferior visible solo en móvil (< lg) */
