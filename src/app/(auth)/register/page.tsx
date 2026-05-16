@@ -132,6 +132,8 @@ export default function RegisterPage() {
             value={formData.email}
             onChange={handleChange}
             required
+            autoComplete="email"
+            aria-required="true"
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
             placeholder="tu@email.com"
           />
@@ -148,6 +150,8 @@ export default function RegisterPage() {
             value={formData.password}
             onChange={handleChange}
             required
+            autoComplete="new-password"
+            aria-required="true"
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
             placeholder="Mínimo 8 caracteres"
           />
@@ -164,6 +168,8 @@ export default function RegisterPage() {
             value={formData.confirmPassword}
             onChange={handleChange}
             required
+            autoComplete="new-password"
+            aria-required="true"
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
             placeholder="••••••••"
           />

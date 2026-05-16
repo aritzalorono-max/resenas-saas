@@ -29,7 +29,7 @@ export function BottomNav() {
                         text-xs font-medium transition-colors
                         ${isActive
                           ? "text-brand-600"
-                          : "text-gray-400 active:text-brand-600"
+                          : "text-gray-500 active:text-brand-600"
                         }`}
           >
             <Icon size={20} strokeWidth={isActive ? 2 : 1.75} />

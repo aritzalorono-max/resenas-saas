@@ -48,10 +48,11 @@ export function PosterClient({
         </div>
         <button
           onClick={() => window.print()}
+          aria-label="Imprimir o guardar cartel como PDF"
           className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-700 active:bg-gray-800
                      text-white text-sm font-medium px-5 py-3 rounded-xl transition w-full sm:w-auto shrink-0"
         >
-          <Printer size={16} />
+          <Printer size={16} aria-hidden="true" />
           Imprimir / Guardar PDF
         </button>
       </div>

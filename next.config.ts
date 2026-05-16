@@ -70,7 +70,7 @@ const nextConfig: NextConfig = {
       },
       {
         // Cache moderado para archivos públicos (iconos, manifest)
-        source: "/(favicon\\.ico|icon\\.svg|manifest\\.json|og-image\\.png)",
+        source: "/(favicon\\.ico|icon\\.svg|manifest\\.json)",
         headers: [
           { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
         ],

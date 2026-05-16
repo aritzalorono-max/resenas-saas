@@ -58,6 +58,8 @@ export default function NuevaContrasenaPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             autoFocus
+            autoComplete="new-password"
+            aria-required="true"
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
             placeholder="Mínimo 6 caracteres"
           />
@@ -73,6 +75,8 @@ export default function NuevaContrasenaPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            autoComplete="new-password"
+            aria-required="true"
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
             placeholder="••••••••"
           />

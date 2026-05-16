@@ -213,6 +213,7 @@ export function GoogleMapsRatingSection({
         <button
           onClick={handleSync}
           disabled={loading}
+          aria-label={loading ? "Actualizando puntuación de Google Maps" : "Actualizar puntuación de Google Maps"}
           className="flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-700 font-medium disabled:opacity-50 transition"
         >
           {loading ? (

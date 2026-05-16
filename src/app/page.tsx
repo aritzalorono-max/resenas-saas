@@ -316,7 +316,7 @@ export default function LandingPage() {
 
             {/* Platform strip */}
             <div className="flex items-center justify-center gap-2 flex-wrap mb-8">
-              <span className="text-xs text-gray-400 mr-1">En</span>
+              <span className="text-xs text-gray-500 mr-1">En</span>
               {["Google Maps", "App Store", "Play Store", "Trustpilot"].map((p) => (
                 <span
                   key={p}
@@ -325,7 +325,7 @@ export default function LandingPage() {
                   {p}
                 </span>
               ))}
-              <span className="text-xs text-gray-400 ml-1">y más</span>
+              <span className="text-xs text-gray-500 ml-1">y más</span>
             </div>
 
             <p className="text-lg lg:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -347,7 +347,7 @@ export default function LandingPage() {
                 Ya tengo cuenta
               </Link>
             </div>
-            <p className="text-sm text-gray-400 mt-5">Sin tarjeta de crédito · Configuración en 1 minuto</p>
+            <p className="text-sm text-gray-500 mt-5">Sin tarjeta de crédito · Configuración en 1 minuto</p>
           </div>
         </section>
 
@@ -556,10 +556,10 @@ export default function LandingPage() {
 
             {/* Bottom bar */}
             <div className="border-t border-gray-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-500">
                 © {new Date().getFullYear()} ReseñasYa S.L. Todos los derechos reservados.
               </p>
-              <div className="flex flex-wrap gap-4 text-xs text-gray-400 items-center">
+              <div className="flex flex-wrap gap-4 text-xs text-gray-500 items-center">
                 <Link href="/privacidad" className="hover:text-gray-600 transition">Privacidad</Link>
                 <Link href="/terminos" className="hover:text-gray-600 transition">Términos</Link>
                 <Link href="/cookies" className="hover:text-gray-600 transition">Cookies</Link>

@@ -21,13 +21,18 @@ export function CookieSettingsModal({ initialPrefs, onSave, onAcceptAll, onClose
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl shadow-2xl flex flex-col max-h-[90dvh] overflow-hidden">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cookie-settings-title"
+        className="bg-white w-full sm:max-w-lg sm:rounded-2xl shadow-2xl flex flex-col max-h-[90dvh] overflow-hidden"
+      >
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-2.5">
             <ShieldCheck className="w-5 h-5 text-brand-600" />
-            <h2 className="font-bold text-gray-900 text-base">Configurar cookies</h2>
+            <h2 id="cookie-settings-title" className="font-bold text-gray-900 text-base">Configurar cookies</h2>
           </div>
           <button
             onClick={onClose}

@@ -81,7 +81,7 @@ export function PricingPlans() {
             <p className={`text-xs font-bold uppercase tracking-widest mb-0.5 ${plan.highlight ? "text-brand-200" : "text-brand-600"}`}>
               {plan.name}
             </p>
-            <p className={`text-xs mb-5 ${plan.highlight ? "text-brand-100" : "text-gray-400"}`}>
+            <p className={`text-xs mb-5 ${plan.highlight ? "text-brand-100" : "text-gray-500"}`}>
               {plan.tagline}
             </p>
 
@@ -90,7 +90,7 @@ export function PricingPlans() {
               <span className={`text-5xl font-extrabold ${plan.highlight ? "text-white" : "text-gray-900"}`}>
                 {plan.price}€
               </span>
-              <span className={`text-sm mb-1.5 ${plan.highlight ? "text-brand-200" : "text-gray-400"}`}>
+              <span className={`text-sm mb-1.5 ${plan.highlight ? "text-brand-200" : "text-gray-500"}`}>
                 /mes
               </span>
             </div>

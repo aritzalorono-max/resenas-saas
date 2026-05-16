@@ -250,12 +250,17 @@ export default function CuentaPage() {
       {/* Modal cerrar sesión */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="logout-modal-title"
+            className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full"
+          >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
-                <LogOut className="w-5 h-5 text-gray-600" />
+                <LogOut className="w-5 h-5 text-gray-600" aria-hidden="true" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900">¿Cerrar sesión?</h3>
+              <h3 id="logout-modal-title" className="text-lg font-bold text-gray-900">¿Cerrar sesión?</h3>
             </div>
             <p className="text-sm text-gray-500 mb-6">
               Se cerrará tu sesión en este dispositivo. Podrás volver a entrar cuando quieras.
@@ -282,12 +287,17 @@ export default function CuentaPage() {
       {/* Modal eliminar cuenta */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+            className="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full"
+          >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+                <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900">¿Eliminar cuenta?</h3>
+              <h3 id="delete-modal-title" className="text-lg font-bold text-gray-900">¿Eliminar cuenta?</h3>
             </div>
 
             <p className="text-sm text-gray-600 mb-4">
