@@ -85,29 +85,47 @@ export default async function ResenasPage({
 
   pageQuery = pageQuery.range(offset, offset + PAGE_SIZE - 1);
 
-  // Run both queries in parallel:
-  //   statsQuery — fetches only (status, discount_code) for the full month to compute
-  //                the summary bar. Lightweight even for large months.
-  //   pageQuery  — fetches full rows but only PAGE_SIZE of them via SQL LIMIT/OFFSET.
-  const [statsResult, pageResult] = await Promise.all([
-    supabase
-      .from("review_requests")
-      .select("status, discount_code")
-      .eq("business_id", businessId)
-      .gte("created_at", monthStart)
-      .lt("created_at",  monthEnd),
+  // Ejecuta 6 COUNT queries + la pageQuery en paralelo.
+  // Los COUNT usan head:true → 0 bytes de datos transferidos, solo el header count.
+  // Esto reemplaza el antiguo statsQuery que descargaba TODAS las filas del mes.
+  // Con índices parciales (migration_022), cada COUNT es O(log N).
+  const [
+    { count: cTotal    },
+    { count: cPositive },
+    { count: cNegative },
+    { count: cNeutral  },
+    { count: cRewarded },
+    { count: cPending  },
+    pageResult,
+  ] = await Promise.all([
+    supabase.from("review_requests").select("*", { count: "exact", head: true })
+      .eq("business_id", businessId).gte("created_at", monthStart).lt("created_at", monthEnd),
+    supabase.from("review_requests").select("*", { count: "exact", head: true })
+      .eq("business_id", businessId).gte("created_at", monthStart).lt("created_at", monthEnd)
+      .in("status", ["positive", "awaiting_screenshot", "rewarded"]),
+    supabase.from("review_requests").select("*", { count: "exact", head: true })
+      .eq("business_id", businessId).gte("created_at", monthStart).lt("created_at", monthEnd)
+      .eq("status", "negative"),
+    supabase.from("review_requests").select("*", { count: "exact", head: true })
+      .eq("business_id", businessId).gte("created_at", monthStart).lt("created_at", monthEnd)
+      .eq("status", "neutral"),
+    supabase.from("review_requests").select("*", { count: "exact", head: true })
+      .eq("business_id", businessId).gte("created_at", monthStart).lt("created_at", monthEnd)
+      .eq("status", "rewarded"),
+    supabase.from("review_requests").select("*", { count: "exact", head: true })
+      .eq("business_id", businessId).gte("created_at", monthStart).lt("created_at", monthEnd)
+      .eq("status", "pending"),
     pageQuery,
   ]);
 
-  // ── Monthly summary stats (computed from lightweight stats query) ─────────
-  const allStats = (statsResult.data ?? []) as { status: string; discount_code: string | null }[];
+  // ── Monthly summary stats (de COUNT queries sin transferencia de datos) ────
   const ms = {
-    total:    allStats.length,
-    positive: allStats.filter(r => ["positive", "awaiting_screenshot", "rewarded"].includes(r.status)).length,
-    negative: allStats.filter(r => r.status === "negative").length,
-    neutral:  allStats.filter(r => r.status === "neutral").length,
-    rewarded: allStats.filter(r => r.status === "rewarded").length,
-    pending:  allStats.filter(r => r.status === "pending").length,
+    total:    cTotal    ?? 0,
+    positive: cPositive ?? 0,
+    negative: cNegative ?? 0,
+    neutral:  cNeutral  ?? 0,
+    rewarded: cRewarded ?? 0,
+    pending:  cPending  ?? 0,
   };
   const responded    = ms.positive + ms.negative + ms.neutral;
   const positiveRate = responded > 0 ? Math.round((ms.positive / responded) * 100) : 0;
