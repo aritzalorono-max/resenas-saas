@@ -135,11 +135,10 @@ export default function OnboardingPage() {
     try {
       const supabase  = createClient();
       const url       = withUrl ? reviewUrl.trim() : null;
-      const links     = url ? [{ name: platform.name, url }] : [];
       const { error: dbError } = await supabase
         .from("businesses")
         .upsert(
-          { user_id: userId, name: businessName.trim(), google_maps_url: url, review_links: links },
+          { user_id: userId, name: businessName.trim(), google_maps_url: url },
           { onConflict: "user_id" }
         );
       if (dbError) {
