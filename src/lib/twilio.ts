@@ -137,3 +137,29 @@ export async function sendWhatsAppMessageWith(
   });
   return message.sid;
 }
+
+/**
+ * Envía un WhatsApp usando una Content Template aprobada por Meta.
+ * Necesario para mensajes de iniciativa (fuera de la ventana de 24h).
+ *
+ * @param client - Cliente Twilio
+ * @param fromNumber - Número de origen en formato whatsapp:+34...
+ * @param to - Número de destino
+ * @param contentSid - SID de la plantilla (HXxxxx)
+ * @param variables - Variables de la plantilla, ej: { "1": "María", "2": "Cafetería El Sol" }
+ */
+export async function sendWhatsAppTemplateWith(
+  client: ReturnType<typeof twilio>,
+  fromNumber: string,
+  to: string,
+  contentSid: string,
+  variables: Record<string, string>
+): Promise<string> {
+  const message = await client.messages.create({
+    from: fromNumber,
+    to: formatWhatsAppNumber(to),
+    contentSid,
+    contentVariables: JSON.stringify(variables),
+  });
+  return message.sid;
+}

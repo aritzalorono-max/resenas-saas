@@ -14,7 +14,7 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
-import { getTwilioSender, sendWhatsAppMessageWith } from "@/lib/twilio";
+import { getTwilioSender, sendWhatsAppMessageWith, sendWhatsAppTemplateWith } from "@/lib/twilio";
 import { getBusinessByUserId } from "@/lib/business";
 import { createReviewRequest } from "@/lib/review-requests";
 import { validateCustomerName, validatePhone } from "@/lib/validation";
@@ -120,15 +120,23 @@ export async function POST(
   }
 
   const { client: bizClient, fromNumber: bizFrom } = getTwilioSender(business);
+  const templateSid = process.env.TWILIO_REVIEW_REQUEST_TEMPLATE_SID;
 
   let messageSid: string;
   try {
-    messageSid = await sendWhatsAppMessageWith(bizClient, bizFrom, customerPhone, messageText);
+    if (templateSid) {
+      messageSid = await sendWhatsAppTemplateWith(bizClient, bizFrom, customerPhone, templateSid, {
+        "1": customerName,
+        "2": business.name,
+      });
+    } else {
+      messageSid = await sendWhatsAppMessageWith(bizClient, bizFrom, customerPhone, messageText);
+    }
     logger.info(`WhatsApp enviado desde ${bizFrom}. SID: ${messageSid}`);
   } catch (twilioError) {
     logger.error("Error al enviar el WhatsApp via Twilio", twilioError);
     return NextResponse.json(
-      { error: "No se pudo enviar el WhatsApp. Comprueba que el número es correcto y que el cliente ha aceptado el sandbox de Twilio." },
+      { error: "No se pudo enviar el WhatsApp. Comprueba que el número de teléfono es correcto." },
       { status: 502 }
     );
   }
