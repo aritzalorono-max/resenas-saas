@@ -534,34 +534,42 @@ export default function ConfiguracionPage() {
             </button>
           </div>
 
-          {whatsappMode !== "own" && (
-            <div className="flex gap-2.5 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-              <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-              </svg>
-              <p className="text-xs text-amber-700 leading-relaxed">
-                <strong>Con número compartido el texto del mensaje no es personalizable.</strong> Se usa una plantilla aprobada por Meta con tu nombre de negocio y el nombre del cliente. Para usar tu propio mensaje necesitas un <strong>número dedicado</strong>.
-              </p>
-            </div>
-          )}
-
-          <textarea
-            id="welcome_message" name="welcome_message" value={form.welcome_message}
-            onChange={handleChange} rows={4}
-            disabled={whatsappMode !== "own"}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition resize-none disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed"
-            placeholder="Escribe el mensaje o usa el botón ✨ para generarlo con IA"
-          />
-
-          {form.welcome_message && (
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <p className="text-xs font-medium text-gray-500 mb-2">Vista previa:</p>
-              <p className="text-sm text-gray-800 whitespace-pre-wrap">
-                {form.welcome_message
-                  .replace("{nombre}", "María")
-                  .replace("{negocio}", form.name || "tu negocio")}
-              </p>
-            </div>
+          {whatsappMode !== "own" ? (
+            <>
+              <div className="flex gap-2.5 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+                <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                </svg>
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  <strong>Con número compartido el texto del mensaje no es personalizable.</strong> Se usa una plantilla fija aprobada por Meta. Para usar tu propio texto necesitas un <strong>número dedicado</strong>.
+                </p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <p className="text-xs font-medium text-gray-500 mb-2">Así recibirá el mensaje tu cliente:</p>
+                <p className="text-sm text-gray-800 whitespace-pre-wrap">
+                  {`¡Hola María! Soy del equipo de ${form.name || "tu negocio"}. ¿Cómo fue tu experiencia con nosotros? Tu opinión nos ayuda a mejorar 😊`}
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <textarea
+                id="welcome_message" name="welcome_message" value={form.welcome_message}
+                onChange={handleChange} rows={4}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition resize-none"
+                placeholder="Escribe el mensaje o usa el botón ✨ para generarlo con IA"
+              />
+              {form.welcome_message && (
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <p className="text-xs font-medium text-gray-500 mb-2">Vista previa:</p>
+                  <p className="text-sm text-gray-800 whitespace-pre-wrap">
+                    {form.welcome_message
+                      .replace("{nombre}", "María")
+                      .replace("{negocio}", form.name || "tu negocio")}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
 
