@@ -56,6 +56,7 @@ export default function ConfiguracionPage() {
     tone: "tuteo" as BusinessTone,
   });
   const [whatsappMode, setWhatsappMode]         = useState<WhatsAppMode>("shared");
+  const [remindersEnabled, setRemindersEnabled] = useState(true);
   const [ownAccountSid, setOwnAccountSid]       = useState("");
   const [ownAuthToken, setOwnAuthToken]         = useState("");
   const [ownWhatsappNumber, setOwnWhatsappNumber] = useState("");
@@ -92,6 +93,7 @@ export default function ConfiguracionPage() {
         if (data) {
           setBusiness(data);
           setWhatsappMode((data.whatsapp_mode as WhatsAppMode) ?? "shared");
+          setRemindersEnabled(data.reminders_enabled ?? true);
           setOwnAccountSid(data.own_twilio_account_sid ?? "");
           setOwnAuthToken(data.own_twilio_auth_token ?? "");
           setOwnWhatsappNumber(data.own_twilio_whatsapp_number ?? "");
@@ -211,6 +213,7 @@ export default function ConfiguracionPage() {
           welcome_message: form.welcome_message,
           tone: form.tone,
           whatsapp_mode: whatsappMode,
+          reminders_enabled: remindersEnabled,
           own_twilio_account_sid: ownAccountSid,
           own_twilio_auth_token: ownAuthToken,
           own_twilio_whatsapp_number: ownWhatsappNumber,
@@ -570,6 +573,39 @@ export default function ConfiguracionPage() {
                 </div>
               )}
             </>
+          )}
+        </div>
+
+        {/* ── Recordatorios automáticos ── */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="font-semibold text-gray-900 text-lg">Recordatorios automáticos</h2>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Si el cliente no responde, se le envía un recordatorio automático
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setRemindersEnabled(!remindersEnabled)}
+              className={`relative shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${remindersEnabled ? "bg-brand-600" : "bg-gray-200"}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${remindersEnabled ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+          </div>
+          {remindersEnabled && (
+            <div className="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-100 space-y-2">
+              <p className="text-xs font-medium text-gray-500 mb-1">Cuándo se envían:</p>
+              <div className="flex items-center gap-3">
+                <span className="w-5 h-5 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">1</span>
+                <span className="text-sm text-gray-700">A las <strong>24 horas</strong> si no ha respondido</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="w-5 h-5 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">2</span>
+                <span className="text-sm text-gray-700">A las <strong>72 horas</strong> si sigue sin responder</span>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">Cada recordatorio cuenta como un envío adicional a efectos de facturación.</p>
+            </div>
           )}
         </div>
 

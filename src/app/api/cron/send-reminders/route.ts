@@ -1,0 +1,150 @@
+/**
+ * GET /api/cron/send-reminders
+ *
+ * Cron job que envía recordatorios automáticos a clientes que no respondieron.
+ *
+ * Lógica de tiempos:
+ *   - 1er recordatorio: 24h después del envío inicial (reminder_count = 0)
+ *   - 2º recordatorio: 72h después del envío inicial (reminder_count = 1)
+ *   - Máximo 2 recordatorios por solicitud
+ *
+ * Cada recordatorio cuenta como un envío adicional a efectos de facturación.
+ * Solo se envía si el negocio tiene reminders_enabled = true.
+ *
+ * Requiere TWILIO_REMINDER_TEMPLATE_SID en las variables de entorno.
+ */
+
+import { createServiceClient } from "@/lib/supabase/server";
+import { getTwilioSender, sendWhatsAppTemplateWith } from "@/lib/twilio";
+import { logger } from "@/lib/logger";
+
+export const runtime  = "nodejs";
+export const maxDuration = 60;
+
+const MAX_REMINDERS   = 2;
+// Horas desde created_at en que se envía cada recordatorio
+const REMINDER_HOURS  = [24, 72] as const;
+
+export async function GET(request: Request) {
+  const cronSecret = process.env.CRON_SECRET;
+  const auth       = request.headers.get("authorization");
+  if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  const templateSid = process.env.TWILIO_REMINDER_TEMPLATE_SID;
+  if (!templateSid) {
+    logger.warn("Cron recordatorios: TWILIO_REMINDER_TEMPLATE_SID no configurado, omitiendo");
+    return Response.json({ skipped: true, reason: "no template sid" });
+  }
+
+  const supabase = await createServiceClient();
+  const now      = new Date();
+
+  // Busca solicitudes pending con recordatorios pendientes de enviar
+  const { data: requests, error } = await supabase
+    .from("review_requests")
+    .select(`
+      id,
+      customer_name,
+      customer_phone,
+      reminder_count,
+      created_at,
+      businesses!inner (
+        id,
+        name,
+        reminders_enabled,
+        subscription_plan,
+        whatsapp_mode,
+        own_twilio_account_sid,
+        own_twilio_auth_token,
+        own_twilio_whatsapp_number
+      )
+    `)
+    .eq("status", "pending")
+    .lt("reminder_count", MAX_REMINDERS);
+
+  if (error) {
+    logger.error("Cron recordatorios: error consultando solicitudes", error);
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  if (!requests?.length) {
+    logger.info("Cron recordatorios: sin solicitudes pendientes");
+    return Response.json({ sent: 0 });
+  }
+
+  let sent    = 0;
+  let skipped = 0;
+
+  for (const req of requests) {
+    const business = req.businesses as {
+      id: string;
+      name: string;
+      reminders_enabled: boolean;
+      subscription_plan: string | null;
+      whatsapp_mode: string | null;
+      own_twilio_account_sid: string | null;
+      own_twilio_auth_token: string | null;
+      own_twilio_whatsapp_number: string | null;
+    };
+
+    if (!business.reminders_enabled) { skipped++; continue; }
+
+    const createdAt     = new Date(req.created_at);
+    const hoursElapsed  = (now.getTime() - createdAt.getTime()) / 3_600_000;
+    const targetHours   = REMINDER_HOURS[req.reminder_count as 0 | 1];
+
+    if (hoursElapsed < targetHours) { skipped++; continue; }
+
+    // Comprobar límite mensual del plan (reminders cuentan como envíos)
+    const PLAN_LIMITS: Record<string, number> = { free: 5, starter: 50, pro: 250 };
+    const planKey   = business.subscription_plan ?? "free";
+    const planLimit = PLAN_LIMITS[planKey] ?? 5;
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+
+    const { data: usageData } = await supabase
+      .from("review_requests")
+      .select("id, reminder_count")
+      .eq("business_id", business.id)
+      .gte("created_at", monthStart.toISOString());
+
+    const monthlyUsage = (usageData ?? []).reduce(
+      (sum, r) => sum + 1 + (r.reminder_count ?? 0), 0
+    );
+
+    if (monthlyUsage >= planLimit) {
+      logger.info(`Cron recordatorios: negocio ${business.id} alcanzó límite mensual`);
+      skipped++;
+      continue;
+    }
+
+    // Enviar recordatorio
+    try {
+      const { client, fromNumber } = getTwilioSender(business);
+      await sendWhatsAppTemplateWith(client, fromNumber, req.customer_phone, templateSid, {
+        "1": req.customer_name,
+        "2": business.name,
+      });
+
+      await supabase
+        .from("review_requests")
+        .update({
+          reminder_count:   req.reminder_count + 1,
+          last_reminder_at: now.toISOString(),
+        })
+        .eq("id", req.id);
+
+      logger.info(`Recordatorio ${req.reminder_count + 1} enviado a ${req.customer_name} (${req.customer_phone})`);
+      sent++;
+    } catch (err) {
+      logger.error(`Error enviando recordatorio a ${req.customer_phone}`, err);
+      skipped++;
+    }
+  }
+
+  logger.info(`Cron recordatorios: ${sent} enviados, ${skipped} omitidos`);
+  return Response.json({ sent, skipped });
+}

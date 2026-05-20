@@ -50,6 +50,7 @@ export interface UpdateBusinessParams {
   incentive_description: string | null;
   incentive_code_enabled: boolean;
   incentive_code_type: Business["incentive_code_type"];
+  reminders_enabled: boolean;
 }
 
 /**
