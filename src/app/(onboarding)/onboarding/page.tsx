@@ -142,7 +142,7 @@ export default function OnboardingPage() {
           { onConflict: "user_id" }
         );
       if (dbError) {
-        setError("No se pudo guardar. Inténtalo de nuevo.");
+        setError(`Error: ${dbError.message} (${dbError.code})`);
         return;
       }
       setStep(3);
