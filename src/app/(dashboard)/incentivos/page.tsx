@@ -56,7 +56,7 @@ export default function IncentivosPage() {
       .eq("user_id", user.id)
       .single();
 
-    if (!biz) return;
+    if (!biz) { setLoading(false); return; }
     const id = bId ?? biz.id;
     setBusinessId(id);
     setBusinessName(biz.name ?? "");
