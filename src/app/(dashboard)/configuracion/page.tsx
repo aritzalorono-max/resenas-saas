@@ -371,6 +371,16 @@ export default function ConfiguracionPage() {
                 className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm"
                 placeholder={activePlaceholder}
               />
+              {form.google_maps_url && (
+                <button
+                  type="button"
+                  onClick={() => setForm((p) => ({ ...p, google_maps_url: "", activeShortCode: undefined }))}
+                  className="shrink-0 text-gray-400 hover:text-red-500 transition text-lg leading-none px-1"
+                  title="Borrar enlace"
+                >
+                  ×
+                </button>
+              )}
             </div>
             {form.google_maps_url ? (
               <div className="mt-2 space-y-1">
