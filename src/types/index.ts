@@ -64,8 +64,8 @@ export interface Business {
   own_twilio_whatsapp_number: string | null;
   /** Google Places ID para seguimiento automático de puntuación */
   google_place_id: string | null;
-  /** Si está activo, se envían recordatorios automáticos a clientes que no responden */
-  reminders_enabled: boolean;
+  /** Número máximo de recordatorios automáticos: 0 = ninguno, 1 = uno, 2 = dos */
+  reminder_max_count: number;
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   subscription_status: "free" | "trialing" | "active" | "past_due" | "canceled" | "incomplete";

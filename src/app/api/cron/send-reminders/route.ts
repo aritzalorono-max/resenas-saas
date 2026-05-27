@@ -53,7 +53,7 @@ export async function GET(request: Request) {
       businesses!inner (
         id,
         name,
-        reminders_enabled,
+        reminder_max_count,
         subscription_plan,
         whatsapp_mode,
         own_twilio_account_sid,
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
     const business = (req.businesses as unknown) as {
       id: string;
       name: string;
-      reminders_enabled: boolean;
+      reminder_max_count: number;
       subscription_plan: string | null;
       whatsapp_mode: string | null;
       own_twilio_account_sid: string | null;
@@ -89,7 +89,7 @@ export async function GET(request: Request) {
       own_twilio_whatsapp_number: string | null;
     };
 
-    if (!business.reminders_enabled) { skipped++; continue; }
+    if (!business.reminder_max_count || req.reminder_count >= business.reminder_max_count) { skipped++; continue; }
 
     const createdAt     = new Date(req.created_at);
     const hoursElapsed  = (now.getTime() - createdAt.getTime()) / 3_600_000;
