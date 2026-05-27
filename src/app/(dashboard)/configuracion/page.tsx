@@ -68,6 +68,7 @@ export default function ConfiguracionPage() {
   const [error, setError]           = useState("");
   const [generatingMsg, setGeneratingMsg] = useState(false);
   const [toneExpanded, setToneExpanded]       = useState(false);
+  const [showLinkHelp, setShowLinkHelp]       = useState(false);
   const [addingPlatform, setAddingPlatform]   = useState(false);
   const [newPlatformName, setNewPlatformName] = useState("Google Maps");
   const [newPlatformUrl, setNewPlatformUrl]   = useState("");
@@ -325,9 +326,57 @@ export default function ConfiguracionPage() {
 
           {/* Plataforma activa */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Enlace activo <span className="text-gray-400 font-normal">(el que recibirán tus clientes)</span>
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-sm font-medium text-gray-700">
+                Enlace activo <span className="text-gray-400 font-normal">(el que recibirán tus clientes)</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowLinkHelp((v) => !v)}
+                className="flex items-center gap-1 text-xs text-brand-600 hover:text-brand-800 font-medium transition"
+              >
+                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                ¿Cómo obtener el enlace?
+              </button>
+            </div>
+
+            {showLinkHelp && (
+              <div className="mb-3 bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-4">
+                <p className="text-xs font-semibold text-blue-800 uppercase tracking-wide">Dos formas de obtener el enlace</p>
+
+                {/* Opción 1 */}
+                <div className="flex gap-3">
+                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">Si eres el propietario del negocio <span className="text-blue-500 font-normal">(recomendado)</span></p>
+                    <ol className="mt-1.5 space-y-1 text-xs text-blue-700 list-none">
+                      <li>→ Busca tu negocio en Google Maps</li>
+                      <li>→ Pulsa en la ficha del negocio</li>
+                      <li>→ Ve a la pestaña <strong>"Reseñas"</strong></li>
+                      <li>→ Pulsa <strong>"Obtener más reseñas"</strong></li>
+                      <li>→ Copia el enlace <code className="bg-blue-100 px-1 rounded">https://g.page/r/…/review</code></li>
+                    </ol>
+                  </div>
+                </div>
+
+                {/* Opción 2 */}
+                <div className="flex gap-3">
+                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">Si no tienes acceso al perfil de empresa</p>
+                    <ol className="mt-1.5 space-y-1 text-xs text-blue-700 list-none">
+                      <li>→ Busca tu negocio en Google Maps</li>
+                      <li>→ Pulsa en la ficha del negocio</li>
+                      <li>→ Pulsa el botón <strong>"Escribir una reseña"</strong></li>
+                      <li>→ Copia la URL de la barra del navegador en ese momento</li>
+                    </ol>
+                    <p className="mt-1.5 text-xs text-blue-500">El enlace será largo, pero la app lo acortará automáticamente al guardar.</p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="flex flex-col xs:flex-row gap-2">
               <select
                 value={form.activePlatformName}

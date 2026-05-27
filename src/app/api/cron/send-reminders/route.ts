@@ -78,7 +78,7 @@ export async function GET(request: Request) {
   let skipped = 0;
 
   for (const req of requests) {
-    const business = req.businesses as {
+    const business = (req.businesses as unknown) as {
       id: string;
       name: string;
       reminders_enabled: boolean;
