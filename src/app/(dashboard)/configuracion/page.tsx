@@ -808,13 +808,15 @@ export default function ConfiguracionPage() {
         </div>
       </div>
 
-      {/* ── Webhook URL (siempre visible como referencia) ── */}
+      {/* ── Webhook URL (solo visible en modo own) ── */}
+      {whatsappMode === "own" && (
       <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-4">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">URL del webhook (para Twilio)</p>
         <code className="block bg-white border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg font-mono break-all">
           {typeof window !== "undefined" ? window.location.origin : "https://tu-dominio.com"}/api/twilio-webhook
         </code>
       </div>
+      )}
     </div>
   );
 }
