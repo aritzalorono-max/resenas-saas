@@ -396,9 +396,6 @@ export default function IncentivosPage() {
 
           const msgClass = "text-sm text-gray-800 leading-relaxed";
           const biz = businessName || "tu negocio";
-          const intro = timing === "initial"
-            ? `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${biz}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\n`
-            : `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${biz}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}? Es muy sencillo:\n\n👉 [enlace a ${platformName}]\n\n`;
 
           return (
             <div className="space-y-3">
@@ -410,8 +407,8 @@ export default function IncentivosPage() {
                 <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                   <p className={`${msgClass} whitespace-pre-wrap`}>
                     {timing === "initial"
-                      ? `Hola María, ¿cómo fue tu experiencia en ${biz}?\n\nRecuerda que si nos puntúas 5 estrellas en ${platformName} y nos envías una captura de pantalla, recibirás de regalo: ${incentiveDescription}.`
-                      : `Hola María, ¿cómo fue tu experiencia en ${biz}?`}
+                      ? `¡Hola María! ¿Cómo fue tu experiencia en ${biz}? Si nos puntúas 5 estrellas y nos envías una captura recibirás: ${incentiveDescription} 🎁 ¿Nos cuentas cómo te fue?`
+                      : `¡Hola María! ¿Cómo fue tu experiencia en ${biz}?`}
                   </p>
                 </div>
               </div>
@@ -429,12 +426,9 @@ export default function IncentivosPage() {
                 <p className="text-xs text-gray-400 ml-1">3. Respuesta automática (opinión positiva)</p>
                 <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                   <p className={`${msgClass} whitespace-pre-wrap`}>
-                    {intro}{"Y como agradecimiento por tu tiempo, tu regalo: "}
-                    <strong>{incentiveDescription}</strong>
-                    {" 🎁"}
                     {timing === "initial"
-                      ? "\n\nCuando la publiques, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚"
-                      : "\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚"}
+                      ? `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${biz}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\nCuando la publiques, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`
+                      : `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${biz}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo, tu regalo: ${incentiveDescription} 🎁\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`}
                   </p>
                 </div>
               </div>
