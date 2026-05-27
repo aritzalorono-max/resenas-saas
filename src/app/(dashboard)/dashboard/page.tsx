@@ -20,16 +20,21 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 // Streaming Server Components (se ejecutan en paralelo tras el batch inicial)
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function ChartSection({ businessId, hasApiKey }: { businessId: string; hasApiKey: boolean }) {
+async function ChartSection({ businessId, placeId, hasApiKey }: { businessId: string; placeId: string | null; hasApiKey: boolean }) {
   if (!businessId) return <GoogleMapsRatingSection data={[]} hasApiKey={hasApiKey} />;
 
   const supabase = await createClient();
-  const { data: snapshots } = await supabase
+  let query = supabase
     .from("google_maps_snapshots")
     .select("rating, review_count, fetched_at")
     .eq("business_id", businessId)
     .order("fetched_at", { ascending: true })
     .limit(60);
+
+  // Only show snapshots for the current place to avoid mixing data from different businesses
+  if (placeId) query = query.eq("place_id", placeId);
+
+  const { data: snapshots } = await query;
 
   const chartData: RatingPoint[] = (snapshots ?? [])
     .filter(s => s.rating != null)
@@ -126,7 +131,7 @@ export default async function DashboardPage() {
   const [{ data: business }, statsResult] = await Promise.all([
     supabase
       .from("businesses")
-      .select("id, name, google_maps_url")
+      .select("id, name, google_maps_url, google_place_id")
       .eq("user_id", user!.id)
       .single(),
     supabase
@@ -138,6 +143,7 @@ export default async function DashboardPage() {
 
   const stats      = (statsResult.data ?? null) as BusinessStats | null;
   const businessId = business?.id ?? "";
+  const placeId    = business?.google_place_id ?? null;
   const hasApiKey  = !!process.env.GOOGLE_PLACES_API_KEY;
 
   const total     = stats?.total_requests ?? 0;
@@ -289,7 +295,7 @@ export default async function DashboardPage() {
             <div className="h-36 bg-gray-100 rounded-xl" />
           </div>
         }>
-          <ChartSection businessId={businessId} hasApiKey={hasApiKey} />
+          <ChartSection businessId={businessId} placeId={placeId} hasApiKey={hasApiKey} />
         </Suspense>
       </div>
 
