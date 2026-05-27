@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { getStripe, PLANS, type PlanKey } from "@/lib/stripe";
 import { logger } from "@/lib/logger";
 
@@ -16,14 +16,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plan no válido" }, { status: 400 });
     }
 
-    const { data: business } = await supabase
+    const service = await createServiceClient();
+
+    let { data: business } = await service
       .from("businesses")
       .select("id, name, stripe_customer_id, stripe_subscription_id, subscription_status")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
+
+    // Auto-create a minimal business record if the user hasn't configured one yet
+    if (!business) {
+      const { data: created } = await service
+        .from("businesses")
+        .insert({ user_id: user.id, name: user.email ?? "Mi negocio", welcome_message: "" })
+        .select("id, name, stripe_customer_id, stripe_subscription_id, subscription_status")
+        .single();
+      business = created;
+    }
 
     if (!business) {
-      return NextResponse.json({ error: "Negocio no encontrado" }, { status: 404 });
+      return NextResponse.json({ error: "Error al preparar el negocio" }, { status: 500 });
     }
 
     // Si ya tiene suscripción activa, redirigir al portal
@@ -40,7 +52,7 @@ export async function POST(req: NextRequest) {
         metadata: { user_id: user.id, business_id: business.id },
       });
       customerId = customer.id;
-      await supabase
+      await service
         .from("businesses")
         .update({ stripe_customer_id: customerId })
         .eq("id", business.id);
