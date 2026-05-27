@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 import { validateUrl } from "@/lib/validation";
+import { extractPlaceIdFromUrl } from "@/lib/google-places";
 import { logger } from "@/lib/logger";
 import type { ReviewPlatformLink, BusinessTone, WhatsAppMode } from "@/types";
 
@@ -149,6 +150,21 @@ export async function POST(request: NextRequest) {
       }
     } catch {
       // short_links table might not exist yet
+    }
+
+    // Resolve Google Place ID from the Maps URL (silently, best-effort)
+    const mapsUrl = payload.google_maps_url;
+    if (businessId && mapsUrl && process.env.GOOGLE_PLACES_API_KEY) {
+      try {
+        const placeId = await extractPlaceIdFromUrl(mapsUrl);
+        if (placeId) {
+          const service = await createServiceClient();
+          await service.from("businesses").update({ google_place_id: placeId }).eq("id", businessId);
+          logger.info(`Place ID resuelto al guardar config: ${placeId}`);
+        }
+      } catch {
+        // non-critical
+      }
     }
 
     return NextResponse.json({ success: true, review_links: allLinks });

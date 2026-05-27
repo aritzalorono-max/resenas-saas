@@ -324,9 +324,12 @@ export async function POST(request: Request): Promise<Response> {
   const placeReviewUrl   = business.google_place_id
     ? `https://search.google.com/local/writereview?placeid=${business.google_place_id}`
     : null;
-  const reviewUrl        = activeLink?.shortCode
-    ? `${appOrigin}/r/${activeLink.shortCode}`
-    : (placeReviewUrl ?? business.google_maps_url ?? "");
+  // Prefer direct review form URL (best UX: opens 5-star form directly)
+  // Fall back to our short link, then the original Maps URL
+  const reviewUrl = placeReviewUrl
+    ?? (activeLink?.shortCode ? `${appOrigin}/r/${activeLink.shortCode}` : null)
+    ?? business.google_maps_url
+    ?? "";
 
   // ── 4. Analizar sentimiento con Claude ────────────────────────────────────
   let sentiment: Awaited<ReturnType<typeof analyzeSentiment>>;

@@ -27,7 +27,7 @@ const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; exam
 ];
 
 const PLATFORMS: { name: string; placeholder: string }[] = [
-  { name: "Google Maps",  placeholder: "https://g.page/tu-negocio/review" },
+  { name: "Google Maps",  placeholder: "https://maps.app.goo.gl/..." },
   { name: "Trustpilot",  placeholder: "https://www.trustpilot.com/review/tu-negocio.com" },
   { name: "App Store",   placeholder: "https://apps.apple.com/app/idXXXXXXXXXX" },
   { name: "Play Store",  placeholder: "https://play.google.com/store/apps/details?id=com.tu.app" },
@@ -343,38 +343,17 @@ export default function ConfiguracionPage() {
             </div>
 
             {showLinkHelp && (
-              <div className="mb-3 bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-4">
-                <p className="text-xs font-semibold text-blue-800 uppercase tracking-wide">Dos formas de obtener el enlace</p>
-
-                {/* Opción 1 */}
-                <div className="flex gap-3">
-                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
-                  <div>
-                    <p className="text-sm font-medium text-blue-900">Si eres el propietario del negocio <span className="text-blue-500 font-normal">(recomendado)</span></p>
-                    <ol className="mt-1.5 space-y-1 text-xs text-blue-700 list-none">
-                      <li>→ Busca tu negocio en Google Maps</li>
-                      <li>→ Pulsa en la ficha del negocio</li>
-                      <li>→ Ve a la pestaña <strong>"Reseñas"</strong></li>
-                      <li>→ Pulsa <strong>"Obtener más reseñas"</strong></li>
-                      <li>→ Copia el enlace <code className="bg-blue-100 px-1 rounded">https://g.page/r/…/review</code></li>
-                    </ol>
-                  </div>
-                </div>
-
-                {/* Opción 2 */}
-                <div className="flex gap-3">
-                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
-                  <div>
-                    <p className="text-sm font-medium text-blue-900">Si no tienes acceso al perfil de empresa</p>
-                    <ol className="mt-1.5 space-y-1 text-xs text-blue-700 list-none">
-                      <li>→ Busca tu negocio en Google Maps</li>
-                      <li>→ Pulsa en la ficha del negocio</li>
-                      <li>→ Pulsa el botón <strong>"Escribir una reseña"</strong></li>
-                      <li>→ Copia la URL de la barra del navegador en ese momento</li>
-                    </ol>
-                    <p className="mt-1.5 text-xs text-blue-500">El enlace será largo, pero la app lo acortará automáticamente al guardar.</p>
-                  </div>
-                </div>
+              <div className="mb-3 bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-3">
+                <p className="text-xs font-semibold text-blue-800 uppercase tracking-wide">Cómo obtener el enlace</p>
+                <ol className="space-y-1.5 text-xs text-blue-700 list-none">
+                  <li>→ Abre <strong>Google Maps</strong> en el móvil o PC</li>
+                  <li>→ Busca tu negocio y pulsa en la ficha</li>
+                  <li>→ Pulsa el botón <strong>"Compartir"</strong></li>
+                  <li>→ Copia el enlace <code className="bg-blue-100 px-1 rounded">maps.app.goo.gl/…</code></li>
+                </ol>
+                <p className="text-xs text-blue-500">
+                  La app convierte ese enlace automáticamente en un enlace directo al formulario de reseña. Tus clientes podrán dejar su opinión con un solo toque.
+                </p>
               </div>
             )}
             <div className="flex flex-col xs:flex-row gap-2">
