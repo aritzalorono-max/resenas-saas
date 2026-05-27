@@ -44,8 +44,8 @@ function extractNameAndCoords(url: string): { name: string | null; lat: number |
 export async function extractPlaceIdFromUrl(url: string): Promise<string | null> {
   let resolved = url;
 
-  // Resolve short URLs (maps.app.goo.gl, goo.gl, etc.)
-  if (/goo\.gl|maps\.app/i.test(url)) {
+  // Resolve short URLs (maps.app.goo.gl, goo.gl, g.page, etc.)
+  if (/goo\.gl|maps\.app|g\.page/i.test(url)) {
     resolved = await resolveShortUrl(url);
   }
 
