@@ -287,6 +287,9 @@ export default function LandingPage() {
               <a href="#precios" className="text-gray-500 hover:text-gray-900 text-sm font-medium hidden sm:block">
                 Precios
               </a>
+              <Link href="/blog" className="text-gray-500 hover:text-gray-900 text-sm font-medium hidden sm:block">
+                Blog
+              </Link>
               <Link href="/login" className="text-gray-500 hover:text-gray-900 text-sm font-medium hidden sm:block">
                 Iniciar sesión
               </Link>
@@ -427,12 +430,18 @@ export default function LandingPage() {
 
             <CaseStudiesCarousel />
 
-            <div className="text-center mt-8">
+            <div className="text-center mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/casos-exito"
+                className="border-2 border-brand-600 text-brand-700 font-bold px-7 py-3.5 rounded-xl text-base hover:bg-brand-50 transition inline-block"
+              >
+                Ver todos los casos →
+              </Link>
               <Link
                 href="/register"
                 className="bg-brand-600 hover:bg-brand-700 text-white font-bold px-7 py-3.5 rounded-xl text-base transition shadow-lg shadow-brand-200 inline-block"
               >
-                Empieza gratis y escribe tu caso de éxito →
+                Empieza gratis →
               </Link>
             </div>
           </div>
@@ -527,6 +536,8 @@ export default function LandingPage() {
                   <ul className="space-y-2">
                     <li><a href="#precios" className="text-sm text-gray-500 hover:text-gray-800 transition">Precios</a></li>
                     <li><a href="#sectores" className="text-sm text-gray-500 hover:text-gray-800 transition">Sectores</a></li>
+                    <li><Link href="/casos-exito" className="text-sm text-gray-500 hover:text-gray-800 transition">Casos de éxito</Link></li>
+                    <li><Link href="/blog" className="text-sm text-gray-500 hover:text-gray-800 transition">Blog</Link></li>
                     <li><Link href="/faq" className="text-sm text-gray-500 hover:text-gray-800 transition">Preguntas frecuentes</Link></li>
                     <li><Link href="/register" className="text-sm text-gray-500 hover:text-gray-800 transition">Crear cuenta</Link></li>
                     <li><Link href="/login" className="text-sm text-gray-500 hover:text-gray-800 transition">Iniciar sesión</Link></li>
