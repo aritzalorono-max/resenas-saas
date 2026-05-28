@@ -49,7 +49,7 @@ El momento más eficaz es justo cuando el cliente acaba de tener la experiencia 
 
 Cada paso extra que el cliente tenga que dar reduce la conversión a la mitad. Si tienes que decirle «busca mi negocio en Google, haz clic en reseñas, luego en escribir reseña...» habrás perdido el 80% antes de que llegue.
 
-La URL directa de reseña de Google Maps (del tipo `g.page/tu-negocio/review`) lleva al cliente directamente a la pantalla de escritura. Sin pasos intermedios.
+La URL directa de reseña de Google Maps (del tipo «g.page/tu-negocio/review») lleva al cliente directamente a la pantalla de escritura. Sin pasos intermedios.
 
 ### 3. Usa WhatsApp, no el correo electrónico
 
