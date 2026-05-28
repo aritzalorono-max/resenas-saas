@@ -91,26 +91,41 @@ export default function ConfiguracionPage() {
           return;
         }
 
-        if (data) {
-          setBusiness(data);
-          setWhatsappMode((data.whatsapp_mode as WhatsAppMode) ?? "shared");
-          setReminderMaxCount((data.reminder_max_count ?? 2) as 0 | 1 | 2);
-          setOwnAccountSid(data.own_twilio_account_sid ?? "");
-          setOwnAuthToken(data.own_twilio_auth_token ?? "");
-          setOwnWhatsappNumber(data.own_twilio_whatsapp_number ?? "");
-          const links: ReviewPlatformLink[] = data.review_links ?? [];
-          const active = links.find((l) => l.url === data.google_maps_url);
-          const others = links.filter((l) => l.url !== data.google_maps_url);
+        // Si no hay negocio, crearlo con valores por defecto
+        let businessData = data;
+        if (!businessData) {
+          const { data: created, error: createError } = await supabase
+            .from("businesses")
+            .insert({ user_id: user.id, name: user.email ?? "Mi negocio", welcome_message: DEFAULT_WELCOME_MESSAGE })
+            .select("*")
+            .single();
+          if (createError) {
+            setError("No se pudo inicializar el perfil del negocio. Recarga la página.");
+            return;
+          }
+          businessData = created;
+        }
+
+        if (businessData) {
+          setBusiness(businessData);
+          setWhatsappMode((businessData.whatsapp_mode as WhatsAppMode) ?? "shared");
+          setReminderMaxCount((businessData.reminder_max_count ?? 2) as 0 | 1 | 2);
+          setOwnAccountSid(businessData.own_twilio_account_sid ?? "");
+          setOwnAuthToken(businessData.own_twilio_auth_token ?? "");
+          setOwnWhatsappNumber(businessData.own_twilio_whatsapp_number ?? "");
+          const links: ReviewPlatformLink[] = businessData.review_links ?? [];
+          const active = links.find((l) => l.url === businessData.google_maps_url);
+          const others = links.filter((l) => l.url !== businessData.google_maps_url);
           setForm({
-            name: data.name ?? "",
-            description: data.description ?? "",
-            website_url: data.website_url ?? "",
+            name: businessData.name ?? "",
+            description: businessData.description ?? "",
+            website_url: businessData.website_url ?? "",
             activePlatformName: active?.name ?? "Google Maps",
             activeShortCode: active?.shortCode,
-            google_maps_url: data.google_maps_url ?? "",
+            google_maps_url: businessData.google_maps_url ?? "",
             otherPlatforms: others,
-            welcome_message: data.welcome_message ?? DEFAULT_WELCOME_MESSAGE,
-            tone: data.tone ?? "tuteo",
+            welcome_message: businessData.welcome_message ?? DEFAULT_WELCOME_MESSAGE,
+            tone: businessData.tone ?? "tuteo",
           });
         }
       } catch {
