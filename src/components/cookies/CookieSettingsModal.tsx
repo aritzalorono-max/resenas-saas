@@ -85,7 +85,7 @@ export function CookieSettingsModal({ initialPrefs, onSave, onAcceptAll, onClose
                       className="disabled:cursor-default"
                     >
                       {isEnabled
-                        ? <ToggleRight className={`w-9 h-9 ${cat.required ? "text-gray-300" : "text-brand-600"}`} />
+                        ? <ToggleRight className={`w-9 h-9 ${cat.required ? "text-green-400" : "text-brand-600"}`} />
                         : <ToggleLeft  className="w-9 h-9 text-gray-300" />}
                     </button>
                   </div>
