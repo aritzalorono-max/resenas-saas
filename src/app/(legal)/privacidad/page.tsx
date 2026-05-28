@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "Privacidad y Aviso Legal | ReseñasYa",
   description: "Política de privacidad, aviso legal y protección de datos de ReseñasYa conforme al RGPD.",
   alternates: { canonical: "/privacidad" },
-  robots: { index: false },
+  robots: { index: true, follow: true },
 };
 
 const LAST_UPDATED = "16 de mayo de 2026";

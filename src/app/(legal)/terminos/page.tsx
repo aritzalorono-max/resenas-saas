@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "Términos y Condiciones | ReseñasYa",
   description: "Condiciones generales de uso del servicio ReseñasYa.",
   alternates: { canonical: "/terminos" },
-  robots: { index: false },
+  robots: { index: true, follow: true },
 };
 
 const LAST_UPDATED = "28 de mayo de 2026";

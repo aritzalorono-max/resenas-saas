@@ -7,6 +7,13 @@ export const metadata: Metadata = {
   title: "Blog | ReseñasYa — Consejos para conseguir más reseñas",
   description: "Guías, estrategias y consejos prácticos para conseguir más reseñas en Google Maps, Trustpilot, App Store y Play Store. SEO local, reputación online y automatización.",
   alternates: { canonical: "/blog" },
+  robots: { index: true, follow: true },
+  openGraph: {
+    title: "Blog ReseñasYa — Consejos para conseguir más reseñas",
+    description: "Guías, estrategias y consejos prácticos para conseguir más reseñas en Google Maps, Trustpilot, App Store y Play Store.",
+    url: "/blog",
+    type: "website",
+  },
 };
 
 const categoryColors: Record<string, string> = {

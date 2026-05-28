@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   title: "Casos de éxito | ReseñasYa",
   description: "Descubre cómo restaurantes, clínicas, gimnasios y e-commerce han multiplicado sus reseñas en Google Maps, Trustpilot y App Store con ReseñasYa.",
   alternates: { canonical: "/casos-exito" },
+  robots: { index: true, follow: true },
+  openGraph: {
+    title: "Casos de éxito | ReseñasYa",
+    description: "Descubre cómo restaurantes, clínicas, gimnasios y e-commerce han multiplicado sus reseñas en Google Maps, Trustpilot y App Store con ReseñasYa.",
+    url: "/casos-exito",
+    type: "website",
+  },
 };
 
 const cases = [
