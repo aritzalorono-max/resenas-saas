@@ -168,7 +168,8 @@ const sectorIcons = [
   { Icon: GraduationCap, key: "sectorAcademies"   as const },
 ];
 
-export default async function LandingPage() {
+export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const t = await getTranslations("home");
   const nav = await getTranslations("nav");
   const footer = await getTranslations("footer");
@@ -296,18 +297,20 @@ export default async function LandingPage() {
               ))}
             </div>
 
-            {/* Vídeo demostrativo */}
-            <div className="mt-14">
-              <div className="relative w-full rounded-2xl overflow-hidden shadow-xl aspect-video">
-                <iframe
-                  src="https://www.youtube.com/embed/Hu52ipdFzjk"
-                  title="Demostración ReseñasYa"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full"
-                />
+            {/* Vídeo demostrativo — solo en español */}
+            {locale === "es" && (
+              <div className="mt-14">
+                <div className="relative w-full rounded-2xl overflow-hidden shadow-xl aspect-video">
+                  <iframe
+                    src="https://www.youtube.com/embed/Hu52ipdFzjk"
+                    title="Demostración ReseñasYa"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="absolute inset-0 w-full h-full"
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
 
