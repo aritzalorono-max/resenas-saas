@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { Globe } from "lucide-react";
-import { useTransition, useState } from "react";
+import { useTransition, useState, useRef, useEffect } from "react";
 
 const LOCALE_LABELS: Record<string, string> = {
   es: "Español",
@@ -22,6 +22,26 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  function handleOpen() {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        top: rect.bottom + 4,
+        right: window.innerWidth - rect.right,
+      });
+    }
+    setOpen((o) => !o);
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    function onScroll() { setOpen(false); }
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    return () => window.removeEventListener("scroll", onScroll, { capture: true });
+  }, [open]);
 
   function handleSelect(nextLocale: string) {
     setOpen(false);
@@ -33,7 +53,8 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   return (
     <div className="relative">
       <button
-        onClick={() => setOpen((o) => !o)}
+        ref={buttonRef}
+        onClick={handleOpen}
         disabled={isPending}
         aria-label={t("languageSwitcher")}
         className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition rounded-lg border border-gray-200 hover:border-gray-300 px-2.5 py-1.5 hover:bg-gray-50 ${
@@ -49,10 +70,13 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
       {open && (
         <>
           <div
-            className="fixed inset-0 z-40"
+            className="fixed inset-0 z-[60]"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute right-0 mt-1 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+          <div
+            className="fixed w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-[61]"
+            style={dropdownStyle}
+          >
             {routing.locales.map((loc) => (
               <button
                 key={loc}
