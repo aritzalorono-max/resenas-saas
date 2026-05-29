@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 export function GenerateButton({ hasReport }: { hasReport: boolean }) {
-  const t = useTranslations("informes");
+  const t      = useTranslations("informes");
+  const locale = useLocale();
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState<string | null>(null);
   const router                = useRouter();
@@ -15,7 +16,11 @@ export function GenerateButton({ hasReport }: { hasReport: boolean }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/generate-report", { method: "POST" });
+      const res = await fetch("/api/generate-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale }),
+      });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error ?? t("errorGenerating"));
