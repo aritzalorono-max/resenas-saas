@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, TrendingUp, Utensils, Dumbbell, ShoppingBag, Stethoscope, Smartphone, Coffee } from "lucide-react";
 
 const caseStudies = [
@@ -79,6 +80,7 @@ const caseStudies = [
 ];
 
 export function CaseStudiesCarousel() {
+  const t = useTranslations("home");
   const ref = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
@@ -158,11 +160,11 @@ export function CaseStudiesCarousel() {
             {/* Before / After */}
             <div className="grid grid-cols-2 gap-0 divide-x divide-gray-100">
               <div className="p-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">Antes</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">{t("casesBeforeLabel")}</p>
                 <p className="text-xs text-gray-600 leading-relaxed">{before}</p>
               </div>
               <div className="p-4 bg-brand-50/40">
-                <p className="text-[10px] font-bold text-brand-600 uppercase tracking-wide mb-1.5">Después</p>
+                <p className="text-[10px] font-bold text-brand-600 uppercase tracking-wide mb-1.5">{t("casesAfterLabel")}</p>
                 <p className="text-xs text-gray-700 leading-relaxed font-medium">{after}</p>
               </div>
             </div>

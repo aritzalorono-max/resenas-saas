@@ -153,99 +153,27 @@ const schemaOrg = {
 
 // ── Contenido ─────────────────────────────────────────────────────────────────
 
-const sectors = [
-  {
-    Icon: Utensils,
-    name: "Restaurantes",
-    headline: "Más reseñas Google Maps para restaurantes",
-    desc: "Envía el WhatsApp justo cuando el cliente pide la cuenta — el momento de mayor satisfacción. Funciona para restaurantes, bares, hamburgueserías, sushi, pizzerías y cualquier tipo de cocina.",
-    keywords: ["restaurante", "bar", "fast food", "sushi", "pizzería"],
-  },
-  {
-    Icon: Coffee,
-    name: "Cafeterías y brunch",
-    headline: "Reseñas Google para cafeterías",
-    desc: "Convierte cada café de la mañana en una reseña. El volumen de clientes diarios hace que los resultados se noten desde la primera semana.",
-    keywords: ["cafetería", "brunch", "pastelería", "panadería"],
-  },
-  {
-    Icon: Scissors,
-    name: "Peluquerías y estética",
-    headline: "Reseñas Google para peluquerías",
-    desc: "El cliente sale con un look espectacular. Aprovecha ese momento de satisfacción para pedirle que comparta su experiencia en Google Maps.",
-    keywords: ["peluquería", "barbería", "uñas", "estética"],
-  },
-  {
-    Icon: Brain,
-    name: "Psicólogos y terapeutas",
-    headline: "Reseñas de psicólogos en Google Maps",
-    desc: "La reputación online es clave para que nuevos pacientes te encuentren. Automatiza la captación de valoraciones con máxima discreción y respeto.",
-    keywords: ["psicólogo", "terapeuta", "coach", "bienestar"],
-  },
-  {
-    Icon: Stethoscope,
-    name: "Clínicas y salud",
-    headline: "Reseñas Google Maps para clínicas",
-    desc: "Cada paciente satisfecho puede atraer a nuevos. El filtro de sentimiento gestiona los casos delicados en privado, sin exposición pública.",
-    keywords: ["dentista", "clínica", "fisio", "médico"],
-  },
-  {
-    Icon: Scale,
-    name: "Abogados y despachos",
-    headline: "Reseñas Google para abogados",
-    desc: "En un sector donde la confianza lo es todo, las reseñas positivas marcan la diferencia. Automatiza la captación sin que parezca forzado.",
-    keywords: ["abogado", "notaría", "procurador", "legal"],
-  },
-  {
-    Icon: Briefcase,
-    name: "Gestorías y asesorías",
-    headline: "Reseñas para gestorías y asesorías",
-    desc: "Tus clientes te recomiendan en persona, pero pocos lo hacen en Google. Un WhatsApp en el momento justo cambia esa dinámica.",
-    keywords: ["gestoría", "asesoría", "contabilidad", "fiscal"],
-  },
-  {
-    Icon: BedDouble,
-    name: "Hoteles y alojamientos",
-    headline: "Automatiza reseñas para hoteles",
-    desc: "Contacta con el huésped justo al salir del check-out. Maximiza las positivas en Google y gestiona las negativas antes de que lleguen a TripAdvisor.",
-    keywords: ["hotel", "hostal", "apartamento turístico"],
-  },
-  {
-    Icon: ShoppingBag,
-    name: "E-commerce",
-    headline: "Reseñas para tiendas online",
-    desc: "Tras cada pedido entregado, envía un WhatsApp automático. Consigue reseñas en Google Maps de tu empresa, en Trustpilot o en tu plataforma favorita.",
-    keywords: ["tienda online", "e-commerce", "envío", "pedidos"],
-  },
-  {
-    Icon: Smartphone,
-    name: "Apps móviles",
-    headline: "Más valoraciones en App Store y Play Store",
-    desc: "Pide la valoración a tus usuarios activos por WhatsApp en el momento de máximo engagement. Consigue más estrellas en App Store y Play Store sin depender de los pop-ups in-app.",
-    keywords: ["App Store", "Play Store", "iOS", "Android"],
-  },
-  {
-    Icon: Dumbbell,
-    name: "Gimnasios y deporte",
-    headline: "Reseñas Google para gimnasios",
-    desc: "Aumenta tu visibilidad local y atrae más socios. Automatiza las peticiones de reseña tras cada clase o entrenamiento personal.",
-    keywords: ["gimnasio", "crossfit", "yoga", "pilates"],
-  },
-  {
-    Icon: GraduationCap,
-    name: "Academias y formación",
-    headline: "Reseñas Google para academias y centros de formación",
-    desc: "Al terminar el curso o el taller es el momento ideal. Consigue que tus alumnos compartan su experiencia y atraigan a nuevos estudiantes.",
-    keywords: ["academia", "autoescuela", "idiomas", "formación"],
-  },
+const sectorIcons = [
+  { Icon: Utensils,     key: "sectorRestaurants" as const },
+  { Icon: Coffee,       key: "sectorCafes"        as const },
+  { Icon: Scissors,     key: "sectorBeauty"       as const },
+  { Icon: Brain,        key: "sectorPsychologists" as const },
+  { Icon: Stethoscope,  key: "sectorClinics"      as const },
+  { Icon: Scale,        key: "sectorLegal"        as const },
+  { Icon: Briefcase,    key: "sectorAccountants"  as const },
+  { Icon: BedDouble,    key: "sectorHotels"       as const },
+  { Icon: ShoppingBag,  key: "sectorEcommerce"    as const },
+  { Icon: Smartphone,   key: "sectorApps"         as const },
+  { Icon: Dumbbell,     key: "sectorGyms"         as const },
+  { Icon: GraduationCap, key: "sectorAcademies"   as const },
 ];
-
-
 
 export default async function LandingPage() {
   const t = await getTranslations("home");
   const nav = await getTranslations("nav");
   const footer = await getTranslations("footer");
+
+  const sectors = sectorIcons.map(({ Icon, key }) => ({ Icon, name: t(key), key }));
 
   const steps = [
     {
@@ -388,9 +316,9 @@ export default async function LandingPage() {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8 md:mb-12">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                La conversación que consigue reseñas
+                {t("conversationTitle")}
               </h2>
-              <p className="text-gray-500 text-lg">Completamente automática, personalizada y válida para cualquier plataforma de reseñas</p>
+              <p className="text-gray-500 text-lg">{t("conversationSubtitle")}</p>
             </div>
             <ConversationTabs />
           </div>
@@ -403,7 +331,7 @@ export default async function LandingPage() {
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
                 {t("testimonialsTitle")}
               </h2>
-              <p className="text-gray-500 text-lg">Lo que dicen quienes llevan semanas generando reseñas con ReseñasYa</p>
+              <p className="text-gray-500 text-lg">{t("testimonialsSubtitle")}</p>
             </div>
             <TestimonialsCarousel />
           </div>
@@ -449,10 +377,10 @@ export default async function LandingPage() {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-8 lg:mb-10">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
-                Simple y sin sorpresas
+                {t("pricingTitle")}
               </h2>
               <p className="text-gray-500 text-lg">
-                Sin permanencia · Cancela cuando quieras
+                {t("pricingSubtitle")}
               </p>
             </div>
             <PricingPlans />
@@ -472,9 +400,9 @@ export default async function LandingPage() {
             </div>
             <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 -mx-6 px-6
                             [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {sectors.map(({ Icon, name, headline }) => (
+              {sectors.map(({ Icon, name, key }) => (
                 <div
-                  key={name}
+                  key={key}
                   className="shrink-0 snap-center w-[38vw] sm:w-[22vw] lg:w-[14vw]
                              bg-white rounded-2xl p-4 border border-gray-100 hover:border-brand-200
                              transition-all flex flex-col items-center text-center gap-2"

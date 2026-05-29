@@ -2,15 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { CheckCircle2, Shield, Star, ShoppingBag, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Tab = "positive" | "negative" | "incentive" | "ecommerce";
 
 const DURATION = 4500;
 
-const TABS: {
+const TAB_STYLES: {
   id: Tab;
-  label: string;
-  sublabel: string;
   activeClass: string;
   inactiveClass: string;
   barColor: string;
@@ -18,8 +17,6 @@ const TABS: {
 }[] = [
   {
     id: "positive",
-    label: "Satisfecho",
-    sublabel: "→ pide reseña",
     activeClass: "bg-green-50 text-green-700 border-green-200",
     inactiveClass: "bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700",
     barColor: "bg-green-500",
@@ -27,8 +24,6 @@ const TABS: {
   },
   {
     id: "negative",
-    label: "Insatisfecho",
-    sublabel: "→ gestión privada",
     activeClass: "bg-red-50 text-red-600 border-red-200",
     inactiveClass: "bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700",
     barColor: "bg-red-500",
@@ -36,8 +31,6 @@ const TABS: {
   },
   {
     id: "incentive",
-    label: "Incentivo",
-    sublabel: "→ código automático",
     activeClass: "bg-amber-50 text-amber-700 border-amber-200",
     inactiveClass: "bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700",
     barColor: "bg-amber-500",
@@ -45,8 +38,6 @@ const TABS: {
   },
   {
     id: "ecommerce",
-    label: "E-commerce",
-    sublabel: "→ cliente inicia",
     activeClass: "bg-indigo-50 text-indigo-700 border-indigo-200",
     inactiveClass: "bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700",
     barColor: "bg-indigo-500",
@@ -54,14 +45,22 @@ const TABS: {
   },
 ];
 
+const TAB_LABELS: Record<Tab, { label: "tabPositive"|"tabNegative"|"tabIncentive"|"tabEcommerce"; sub: "tabPositiveSub"|"tabNegativeSub"|"tabIncentiveSub"|"tabEcommerceSub" }> = {
+  positive:  { label: "tabPositive",  sub: "tabPositiveSub"  },
+  negative:  { label: "tabNegative",  sub: "tabNegativeSub"  },
+  incentive: { label: "tabIncentive", sub: "tabIncentiveSub" },
+  ecommerce: { label: "tabEcommerce", sub: "tabEcommerceSub" },
+};
+
 export function ConversationTabs() {
+  const t = useTranslations("home");
   const [active, setActive] = useState<Tab>("positive");
   const [progressKey, setProgressKey] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      const idx = TABS.findIndex((t) => t.id === active);
-      const next = TABS[(idx + 1) % TABS.length].id;
+      const idx = TAB_STYLES.findIndex((tab) => tab.id === active);
+      const next = TAB_STYLES[(idx + 1) % TAB_STYLES.length].id;
       setActive(next);
       setProgressKey((k) => k + 1);
     }, DURATION);
@@ -78,7 +77,7 @@ export function ConversationTabs() {
 
       {/* Tab pills with progress bars */}
       <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full sm:w-auto">
-        {TABS.map((tab) => {
+        {TAB_STYLES.map((tab) => {
           const isActive = active === tab.id;
           return (
             <button
@@ -92,8 +91,8 @@ export function ConversationTabs() {
               {tab.id === "negative"  && <Shield       className={`w-3.5 h-3.5 shrink-0 ${isActive ? tab.iconClass : ""}`} />}
               {tab.id === "incentive" && <Star         className={`w-3.5 h-3.5 shrink-0 fill-current ${isActive ? tab.iconClass : ""}`} />}
               {tab.id === "ecommerce" && <ShoppingBag  className={`w-3.5 h-3.5 shrink-0 ${isActive ? tab.iconClass : ""}`} />}
-              <span>{tab.label}</span>
-              <span className="hidden sm:inline text-[10px] font-normal opacity-60">{tab.sublabel}</span>
+              <span>{t(TAB_LABELS[tab.id].label)}</span>
+              <span className="hidden sm:inline text-[10px] font-normal opacity-60">{t(TAB_LABELS[tab.id].sub)}</span>
 
               {/* Progress bar track */}
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200" />
