@@ -6,27 +6,6 @@ import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 import type { Business, BusinessTone, ReviewPlatformLink, WhatsAppMode } from "@/types";
 import { useTranslations } from "next-intl";
 
-const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; example: string }[] = [
-  {
-    value: "tuteo",
-    label: "Trato de tú",
-    sublabel: "Cercano y amigable",
-    example: "¿Te animarías a dejarnos una reseña...?",
-  },
-  {
-    value: "usted",
-    label: "Trato de usted",
-    sublabel: "Formal y profesional",
-    example: "¿Se animaría a dejarnos una reseña...?",
-  },
-  {
-    value: "juvenil",
-    label: "Muy informal",
-    sublabel: "Desenfadado y cercano",
-    example: "¿Nos echas una mano dejando una reseña...?",
-  },
-];
-
 const PLATFORMS: { name: string; placeholder: string }[] = [
   { name: "Google Maps",  placeholder: "https://maps.app.goo.gl/..." },
   { name: "Trustpilot",  placeholder: "https://www.trustpilot.com/review/tu-negocio.com" },
@@ -43,18 +22,37 @@ const PLATFORMS: { name: string; placeholder: string }[] = [
 export default function ConfiguracionPage() {
   const t = useTranslations("configuracion");
   const tCommon = useTranslations("common");
+
+  const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; example: string }[] = [
+    {
+      value: "tuteo",
+      label: t("toneTuteoLabel"),
+      sublabel: t("toneTuteoSublabel"),
+      example: t("toneTuteoExample"),
+    },
+    {
+      value: "usted",
+      label: t("toneUstedLabel"),
+      sublabel: t("toneUstedSublabel"),
+      example: t("toneUstedExample"),
+    },
+    {
+      value: "juvenil",
+      label: t("toneJuvenilLabel"),
+      sublabel: t("toneJuvenilSublabel"),
+      example: t("toneJuvenilExample"),
+    },
+  ];
+
   const [business, setBusiness] = useState<Business | null>(null);
   const [form, setForm] = useState({
     name: "",
     description: "",
     website_url: "",
-    // Plataforma activa
     activePlatformName: "Google Maps",
     activeShortCode: undefined as string | undefined,
     google_maps_url: "",
-    // Plataformas adicionales
     otherPlatforms: [] as ReviewPlatformLink[],
-    // Mensaje y tono
     welcome_message: "",
     tone: "tuteo" as BusinessTone,
   });
@@ -94,7 +92,6 @@ export default function ConfiguracionPage() {
           return;
         }
 
-        // Si no hay negocio, crearlo con valores por defecto
         let businessData = data;
         if (!businessData) {
           const { data: created, error: createError } = await supabase
@@ -103,7 +100,7 @@ export default function ConfiguracionPage() {
             .select("*")
             .single();
           if (createError) {
-            setError("No se pudo inicializar el perfil del negocio. Recarga la página.");
+            setError(t("errorInit"));
             return;
           }
           businessData = created;
@@ -132,7 +129,7 @@ export default function ConfiguracionPage() {
           });
         }
       } catch {
-        setError("Error de conexión al cargar la configuración. Recarga la página.");
+        setError(t("errorConnection"));
       } finally {
         setLoading(false);
       }
@@ -162,7 +159,7 @@ export default function ConfiguracionPage() {
         setForm((p) => ({ ...p, welcome_message: data.message }));
       }
     } catch {
-      setError("No se pudo generar el mensaje automáticamente. Puedes escribirlo manualmente.");
+      setError(t("errorGenerateMsg"));
     } finally {
       setGeneratingMsg(false);
     }
@@ -191,7 +188,6 @@ export default function ConfiguracionPage() {
     setForm((p) => ({
       ...p,
       otherPlatforms: [...p.otherPlatforms, { name: newPlatformName, url }],
-      // If no active URL yet, set this as active
       activePlatformName: p.google_maps_url ? p.activePlatformName : newPlatformName,
       google_maps_url: p.google_maps_url || url,
     }));
@@ -246,7 +242,6 @@ export default function ConfiguracionPage() {
         return;
       }
 
-      // Actualizar estado local con los shortCodes generados por el servidor
       const savedLinks: ReviewPlatformLink[] = data.review_links ?? review_links;
       const savedActive = savedLinks.find((l) => l.url === form.google_maps_url);
       setForm((p) => ({
@@ -259,7 +254,7 @@ export default function ConfiguracionPage() {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error("[ReseñasYa] Error de red al guardar:", err);
-      setError("Error de red. Comprueba tu conexión e inténtalo de nuevo.");
+      setError(t("errorNetwork"));
     } finally {
       setSaving(false);
     }
@@ -278,7 +273,7 @@ export default function ConfiguracionPage() {
             onClick={() => window.location.reload()}
             className="text-sm font-semibold text-red-700 underline hover:no-underline"
           >
-            Recargar página
+            {t("reloadPage")}
           </button>
         </div>
       </div>
@@ -298,9 +293,9 @@ export default function ConfiguracionPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
 
-        {/* ── Datos del negocio ── */}
+        {/* ── Business data ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-          <h2 className="font-semibold text-gray-900 text-lg">Datos del negocio</h2>
+          <h2 className="font-semibold text-gray-900 text-lg">{t("businessDataTitle")}</h2>
 
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -338,15 +333,15 @@ export default function ConfiguracionPage() {
           </div>
         </div>
 
-        {/* ── Plataforma de reseñas ── */}
+        {/* ── Review platforms ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="font-semibold text-gray-900 text-lg">{t("platformsTitle")}</h2>
 
-          {/* Plataforma activa */}
+          {/* Active platform */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-sm font-medium text-gray-700">
-                Enlace activo <span className="text-gray-400 font-normal">(el que recibirán tus clientes)</span>
+                {t("activeLinkLabel")} <span className="text-gray-400 font-normal">{t("activeLinkDesc")}</span>
               </label>
               <button
                 type="button"
@@ -356,22 +351,20 @@ export default function ConfiguracionPage() {
                 <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
-                ¿Cómo obtener el enlace?
+                {t("howToGetLink")}
               </button>
             </div>
 
             {showLinkHelp && (
               <div className="mb-3 bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-3">
-                <p className="text-xs font-semibold text-blue-800 uppercase tracking-wide">Cómo obtener el enlace</p>
+                <p className="text-xs font-semibold text-blue-800 uppercase tracking-wide">{t("linkHelpTitle")}</p>
                 <ol className="space-y-1.5 text-xs text-blue-700 list-none">
-                  <li>→ Abre <strong>Google Maps</strong> en el móvil o PC</li>
-                  <li>→ Busca tu negocio y pulsa en la ficha</li>
-                  <li>→ Pulsa el botón <strong>"Compartir"</strong></li>
-                  <li>→ Copia el enlace <code className="bg-blue-100 px-1 rounded">maps.app.goo.gl/…</code></li>
+                  <li>{t.rich("linkHelpStep1", { b: (c) => <strong key="s1">{c}</strong> })}</li>
+                  <li>{t("linkHelpStep2")}</li>
+                  <li>{t.rich("linkHelpStep3", { b: (c) => <strong key="s3">{c}</strong> })}</li>
+                  <li>{t("linkHelpStep4")} <code className="bg-blue-100 px-1 rounded">{t("linkHelpStep4code")}</code></li>
                 </ol>
-                <p className="text-xs text-blue-500">
-                  La app convierte ese enlace automáticamente en un enlace directo al formulario de reseña. Tus clientes podrán dejar su opinión con un solo toque.
-                </p>
+                <p className="text-xs text-blue-500">{t("linkHelpNote")}</p>
               </div>
             )}
             <div className="flex flex-col xs:flex-row gap-2">
@@ -394,7 +387,7 @@ export default function ConfiguracionPage() {
                   type="button"
                   onClick={() => setForm((p) => ({ ...p, google_maps_url: "", activeShortCode: undefined }))}
                   className="shrink-0 text-gray-400 hover:text-red-500 transition text-lg leading-none px-1"
-                  title="Borrar enlace"
+                  title={t("clearLink")}
                 >
                   ×
                 </button>
@@ -404,31 +397,27 @@ export default function ConfiguracionPage() {
               <div className="mt-2 space-y-1">
                 {form.activeShortCode ? (
                   <p className="text-xs text-gray-700">
-                    <span className="text-gray-400">Enlace en WhatsApp: </span>
+                    <span className="text-gray-400">{t("whatsappLinkLabel")} </span>
                     <span className="font-semibold text-brand-600">
                       {typeof window !== "undefined" ? window.location.origin : ""}/r/{form.activeShortCode}
                     </span>
                   </p>
                 ) : (
-                  <p className="text-xs text-gray-400">
-                    El enlace acortado se generará al guardar.
-                  </p>
+                  <p className="text-xs text-gray-400">{t("shortCodePending")}</p>
                 )}
                 <p className="text-xs text-gray-400">
-                  Destino:{" "}
+                  {t("linkDestination")}{" "}
                   <a href={form.google_maps_url} target="_blank" rel="noopener noreferrer" className="hover:underline break-all">
                     {form.google_maps_url}
                   </a>
                 </p>
               </div>
             ) : (
-              <p className="text-xs text-gray-400 mt-2">
-                Introduce el enlace para que tus clientes puedan dejar su reseña.
-              </p>
+              <p className="text-xs text-gray-400 mt-2">{t("noLinkHint")}</p>
             )}
           </div>
 
-          {/* Plataformas adicionales */}
+          {/* Additional platforms */}
           {form.otherPlatforms.length > 0 && (
             <div className="space-y-1.5">
               {form.otherPlatforms.map((link) => (
@@ -440,21 +429,21 @@ export default function ConfiguracionPage() {
                     onClick={() => handleActivatePlatform(link)}
                     className="text-xs text-brand-600 font-semibold hover:text-brand-800 shrink-0"
                   >
-                    Activar
+                    {t("activate")}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleRemovePlatform(link.url)}
                     className="text-xs text-gray-400 hover:text-red-500 shrink-0"
                   >
-                    Eliminar
+                    {t("remove")}
                   </button>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Añadir otra plataforma */}
+          {/* Add platform */}
           {addingPlatform ? (
             <div className="flex flex-col gap-2 pt-1">
               <div className="flex gap-2">
@@ -471,7 +460,7 @@ export default function ConfiguracionPage() {
                   type="button"
                   onClick={() => { setAddingPlatform(false); setNewPlatformUrl(""); }}
                   className="shrink-0 text-gray-400 hover:text-gray-600 p-2.5 rounded-lg hover:bg-gray-100 transition"
-                  aria-label="Cancelar"
+                  aria-label={t("cancel")}
                 >
                   ✕
                 </button>
@@ -488,7 +477,7 @@ export default function ConfiguracionPage() {
                   type="button" onClick={handleAddPlatform} disabled={!newPlatformUrl.trim()}
                   className="shrink-0 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition"
                 >
-                  Añadir
+                  {t("addBtn")}
                 </button>
               </div>
             </div>
@@ -497,12 +486,12 @@ export default function ConfiguracionPage() {
               type="button" onClick={() => setAddingPlatform(true)}
               className="text-sm text-brand-600 hover:text-brand-800 font-medium"
             >
-              + Añadir otra plataforma
+              {t("addPlatform")}
             </button>
           )}
         </div>
 
-        {/* ── Tono de comunicación ── */}
+        {/* ── Communication tone ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -519,7 +508,7 @@ export default function ConfiguracionPage() {
                 onClick={() => setToneExpanded(true)}
                 className="shrink-0 text-sm text-brand-600 font-medium hover:text-brand-800 mt-0.5"
               >
-                Cambiar
+                {t("change")}
               </button>
             )}
           </div>
@@ -556,14 +545,14 @@ export default function ConfiguracionPage() {
           )}
         </div>
 
-        {/* ── Mensaje inicial de WhatsApp ── */}
+        {/* ── Welcome message ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="font-semibold text-gray-900 text-lg">{t("welcomeMessage")}</h2>
               <p className="text-sm text-gray-400 mt-0.5">
-                Usa <code className="bg-gray-100 px-1 rounded">{"{nombre}"}</code> y{" "}
-                <code className="bg-gray-100 px-1 rounded">{"{negocio}"}</code> como variables
+                {t("welcomeHintPrefix")} <code className="bg-gray-100 px-1 rounded">{"{nombre}"}</code> {t("welcomeHintAnd")}{" "}
+                <code className="bg-gray-100 px-1 rounded">{"{negocio}"}</code> {t("welcomeHintSuffix")}
               </p>
             </div>
             <button
@@ -571,7 +560,7 @@ export default function ConfiguracionPage() {
               onClick={handleGenerateMessage}
               disabled={generatingMsg || !form.name || whatsappMode !== "own"}
               className="shrink-0 flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
-              title={!form.name ? "Introduce primero el nombre del negocio" : "Generar mensaje con IA"}
+              title={!form.name ? t("generateHintNoName") : t("generateHint")}
             >
               {generatingMsg ? (
                 <>
@@ -579,7 +568,7 @@ export default function ConfiguracionPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                   </svg>
-                  Generando...
+                  {t("generatingBtn")}
                 </>
               ) : (
                 <>
@@ -587,7 +576,7 @@ export default function ConfiguracionPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
                   </svg>
-                  Generar con IA
+                  {t("generateAIBtn")}
                 </>
               )}
             </button>
@@ -600,13 +589,13 @@ export default function ConfiguracionPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
                 </svg>
                 <p className="text-xs text-amber-700 leading-relaxed">
-                  <strong>Con número compartido el texto del mensaje no es personalizable.</strong> Se usa una plantilla fija aprobada por Meta. Para usar tu propio texto necesitas un <strong>número dedicado</strong>.
+                  {t.rich("sharedModeWarning", { strong: (c) => <strong key="smw">{c}</strong> })}
                 </p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <p className="text-xs font-medium text-gray-500 mb-2">Así recibirá el mensaje tu cliente:</p>
+                <p className="text-xs font-medium text-gray-500 mb-2">{t("sharedPreviewLabel")}</p>
                 <p className="text-sm text-gray-800 whitespace-pre-wrap">
-                  {`¡Hola María! Soy del equipo de ${form.name || "tu negocio"}. ¿Cómo fue tu experiencia con nosotros? Tu opinión nos ayuda a mejorar 😊`}
+                  {t("sharedPreviewMsg", { name: form.name || t("yourBusiness") })}
                 </p>
               </div>
             </>
@@ -616,15 +605,15 @@ export default function ConfiguracionPage() {
                 id="welcome_message" name="welcome_message" value={form.welcome_message}
                 onChange={handleChange} rows={4}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition resize-none"
-                placeholder="Escribe el mensaje o usa el botón ✨ para generarlo con IA"
+                placeholder={t("welcomePlaceholder")}
               />
               {form.welcome_message && (
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <p className="text-xs font-medium text-gray-500 mb-2">Vista previa:</p>
+                  <p className="text-xs font-medium text-gray-500 mb-2">{t("previewLabel")}</p>
                   <p className="text-sm text-gray-800 whitespace-pre-wrap">
                     {form.welcome_message
-                      .replace("{nombre}", "María")
-                      .replace("{negocio}", form.name || "tu negocio")}
+                      .replace("{nombre}", t("sampleCustomerName"))
+                      .replace("{negocio}", form.name || t("yourBusiness"))}
                   </p>
                 </div>
               )}
@@ -632,19 +621,17 @@ export default function ConfiguracionPage() {
           )}
         </div>
 
-        {/* ── Recordatorios automáticos ── */}
+        {/* ── Automatic reminders ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div>
-            <h2 className="font-semibold text-gray-900 text-lg">Recordatorios automáticos</h2>
-            <p className="text-sm text-gray-400 mt-0.5">
-              Si el cliente no responde, se le envía un WhatsApp de recordatorio automáticamente
-            </p>
+            <h2 className="font-semibold text-gray-900 text-lg">{t("remindersTitle")}</h2>
+            <p className="text-sm text-gray-400 mt-0.5">{t("remindersDesc")}</p>
           </div>
           <div className="space-y-2 mt-2">
             {([
-              { value: 0, label: "Sin recordatorios", desc: "" },
-              { value: 1, label: "1 recordatorio",    desc: "Al día siguiente a las 10h" },
-              { value: 2, label: "2 recordatorios",   desc: "Al día siguiente y 3 días después, a las 10h" },
+              { value: 0, label: t("reminders0Label"), desc: "" },
+              { value: 1, label: t("reminders1Label"), desc: t("reminders1Desc") },
+              { value: 2, label: t("reminders2Label"), desc: t("reminders2Desc") },
             ] as { value: 0|1|2; label: string; desc: string }[]).map(({ value, label, desc }) => (
               <button
                 key={value}
@@ -662,19 +649,19 @@ export default function ConfiguracionPage() {
               </button>
             ))}
           </div>
-          <p className="text-xs text-gray-400 mt-1">Cada recordatorio cuenta como un envío adicional a efectos de facturación.</p>
+          <p className="text-xs text-gray-400 mt-1">{t("remindersBillingNote")}</p>
         </div>
 
-        {/* ── Número de WhatsApp ── */}
+        {/* ── WhatsApp number ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div>
-            <h2 className="font-semibold text-gray-900 text-lg">Número de WhatsApp para envíos</h2>
-            <p className="text-sm text-gray-400 mt-0.5">Elige desde qué número saldrán los mensajes a tus clientes</p>
+            <h2 className="font-semibold text-gray-900 text-lg">{t("whatsappTitle")}</h2>
+            <p className="text-sm text-gray-400 mt-0.5">{t("whatsappDesc")}</p>
           </div>
 
           <div className="space-y-3">
 
-            {/* Opción 1: Compartido */}
+            {/* Option 1: Shared */}
             <button
               type="button"
               onClick={() => setWhatsappMode("shared")}
@@ -685,14 +672,14 @@ export default function ConfiguracionPage() {
                   {whatsappMode === "shared" && <span className="w-2 h-2 rounded-full bg-brand-500" />}
                 </span>
                 <div>
-                  <p className="font-semibold text-sm text-gray-900">Número compartido de ReseñasYa</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Los mensajes salen del número de la plataforma. Sin configuración, funciona desde el primer momento.</p>
+                  <p className="font-semibold text-sm text-gray-900">{t("sharedTitle")}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{t("sharedDesc")}</p>
                   <p className="text-xs font-mono text-gray-400 mt-1">+1 415 523 8886 (sandbox Twilio)</p>
                 </div>
               </div>
             </button>
 
-            {/* Opción 2: Propio */}
+            {/* Option 2: Own */}
             <div className={`rounded-xl border-2 transition ${whatsappMode === "own" ? "border-brand-500 bg-brand-50" : "border-gray-200"}`}>
               <button
                 type="button"
@@ -704,18 +691,17 @@ export default function ConfiguracionPage() {
                     {whatsappMode === "own" && <span className="w-2 h-2 rounded-full bg-brand-500" />}
                   </span>
                   <div>
-                    <p className="font-semibold text-sm text-gray-900">Tu propio número de WhatsApp Business</p>
-                    <p className="text-xs text-gray-500 mt-0.5">Los mensajes salen desde tu número de empresa. Los clientes ven tu marca, no ReseñasYa.</p>
+                    <p className="font-semibold text-sm text-gray-900">{t("ownTitle")}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{t("ownDesc")}</p>
                   </div>
                 </div>
               </button>
 
               {whatsappMode === "own" && (
                 <div className="px-4 pb-4 space-y-4">
-                  {/* Credenciales */}
                   <div className="grid grid-cols-1 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Account SID de Twilio</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">{t("twilioAccountSid")}</label>
                       <input
                         type="text"
                         value={ownAccountSid}
@@ -725,7 +711,7 @@ export default function ConfiguracionPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Auth Token de Twilio</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">{t("twilioAuthToken")}</label>
                       <div className="relative">
                         <input
                           type={showOwnToken ? "text" : "password"}
@@ -735,12 +721,12 @@ export default function ConfiguracionPage() {
                           className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
                         />
                         <button type="button" onClick={() => setShowOwnToken((v) => !v)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
-                          {showOwnToken ? "Ocultar" : "Ver"}
+                          {showOwnToken ? t("hideToken") : t("showToken")}
                         </button>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Tu número de WhatsApp</label>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">{t("ownWhatsappNumberLabel")}</label>
                       <input
                         type="text"
                         value={ownWhatsappNumber}
@@ -751,17 +737,16 @@ export default function ConfiguracionPage() {
                     </div>
                   </div>
 
-                  {/* Guía paso a paso */}
                   <details className="bg-amber-50 border border-amber-100 rounded-lg">
                     <summary className="px-4 py-3 text-sm font-semibold text-amber-800 cursor-pointer select-none">
-                      📋 Cómo conectar tu número — guía paso a paso
+                      {t("setupGuideTitle")}
                     </summary>
                     <ol className="px-4 pb-4 mt-1 space-y-3 text-xs text-amber-900 list-decimal list-inside leading-relaxed">
-                      <li><strong>Crea una cuenta en Twilio</strong> — <span className="font-mono">twilio.com</span> (es gratuito para empezar).</li>
-                      <li><strong>Activa WhatsApp Business</strong> — en Twilio Console ve a <em>Messaging → Senders → WhatsApp Senders</em> y pulsa <em>"Add Sender"</em>.</li>
-                      <li><strong>Conecta tu número</strong> — Twilio te guiará por el proceso de verificación de Meta (WhatsApp). Necesitarás una cuenta de Meta Business. El proceso tarda 1-3 días hábiles.</li>
-                      <li><strong>Copia tus credenciales</strong> — desde la pantalla de inicio de Twilio Console copia el <em>Account SID</em> y el <em>Auth Token</em> e introdúcelos arriba.</li>
-                      <li><strong>Configura el webhook</strong> — en Twilio Console ve a tu número de WhatsApp y en <em>"When a message comes in"</em> introduce esta URL:</li>
+                      <li>{t.rich("setupStep1", { strong: (c) => <strong key="ss1">{c}</strong>, em: (c) => <em key="se1">{c}</em> })}</li>
+                      <li>{t.rich("setupStep2", { strong: (c) => <strong key="ss2">{c}</strong>, em: (c) => <em key="se2">{c}</em> })}</li>
+                      <li>{t.rich("setupStep3", { strong: (c) => <strong key="ss3">{c}</strong>, em: (c) => <em key="se3">{c}</em> })}</li>
+                      <li>{t.rich("setupStep4", { strong: (c) => <strong key="ss4">{c}</strong>, em: (c) => <em key="se4">{c}</em> })}</li>
+                      <li>{t.rich("setupStep5", { strong: (c) => <strong key="ss5">{c}</strong>, em: (c) => <em key="se5">{c}</em> })}</li>
                     </ol>
                     <div className="mx-4 mb-4 bg-white border border-amber-200 rounded px-3 py-2 font-mono text-xs text-gray-700 break-all">
                       {typeof window !== "undefined" ? window.location.origin : "https://tu-dominio.com"}/api/twilio-webhook
@@ -771,7 +756,7 @@ export default function ConfiguracionPage() {
               )}
             </div>
 
-            {/* Opción 3: Dedicado */}
+            {/* Option 3: Dedicated */}
             <button
               type="button"
               onClick={() => setWhatsappMode("dedicated")}
@@ -783,14 +768,12 @@ export default function ConfiguracionPage() {
                 </span>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="font-semibold text-sm text-gray-900">Número dedicado gestionado por ReseñasYa</p>
-                    <span className="text-[10px] font-semibold bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">Próximamente</span>
+                    <p className="font-semibold text-sm text-gray-900">{t("dedicatedTitle")}</p>
+                    <span className="text-[10px] font-semibold bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full">{t("comingSoon")}</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-0.5">Te asignamos un número exclusivo para tu negocio. Nosotros nos encargamos de todo: configuración, mantenimiento y soporte con Meta.</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{t("dedicatedDesc")}</p>
                   {whatsappMode === "dedicated" && (
-                    <p className="text-xs text-brand-700 font-medium mt-2">
-                      Nos pondremos en contacto contigo en cuanto esta opción esté disponible. Escríbenos a <span className="font-mono">prueba@gmail.com</span>.
-                    </p>
+                    <p className="text-xs text-brand-700 font-medium mt-2">{t("dedicatedContact")}</p>
                   )}
                 </div>
               </div>
@@ -815,14 +798,14 @@ export default function ConfiguracionPage() {
         </button>
       </form>
 
-      {/* ── Acceso rápido (visible solo en móvil, donde el BottomNav no muestra estos items) ── */}
+      {/* ── Quick access (mobile only) ── */}
       <div className="mt-8 lg:hidden">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Más opciones</p>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">{t("moreOptions")}</p>
         <div className="grid grid-cols-3 gap-3">
           {([
-            { href: "/incentivos", label: "Incentivos",  emoji: "🎁" },
-            { href: "/cartel",     label: "Cartel QR",   emoji: "🖨️" },
-            { href: "/facturacion",label: "Facturación", emoji: "💳" },
+            { href: "/incentivos", label: t("quickIncentivos"),  emoji: "🎁" },
+            { href: "/cartel",     label: t("quickCartel"),      emoji: "🖨️" },
+            { href: "/facturacion",label: t("quickFacturacion"), emoji: "💳" },
           ] as const).map(({ href, label, emoji }) => (
             <a
               key={href}
@@ -836,14 +819,14 @@ export default function ConfiguracionPage() {
         </div>
       </div>
 
-      {/* ── Webhook URL (solo visible en modo own) ── */}
+      {/* ── Webhook URL (own mode only) ── */}
       {whatsappMode === "own" && (
-      <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-4">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">URL del webhook (para Twilio)</p>
-        <code className="block bg-white border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg font-mono break-all">
-          {typeof window !== "undefined" ? window.location.origin : "https://tu-dominio.com"}/api/twilio-webhook
-        </code>
-      </div>
+        <div className="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-4">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{t("webhookLabel")}</p>
+          <code className="block bg-white border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg font-mono break-all">
+            {typeof window !== "undefined" ? window.location.origin : "https://tu-dominio.com"}/api/twilio-webhook
+          </code>
+        </div>
       )}
     </div>
   );
