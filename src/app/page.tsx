@@ -343,12 +343,6 @@ export default function LandingPage() {
               >
                 Crear cuenta gratis →
               </Link>
-              <Link
-                href="/login"
-                className="border-2 border-gray-200 text-gray-700 font-semibold px-8 py-4 rounded-xl text-lg hover:border-brand-300 transition"
-              >
-                Ya tengo cuenta
-              </Link>
             </div>
             <p className="text-sm text-gray-500 mt-5">Sin tarjeta de crédito · Configuración en 1 minuto</p>
           </div>
