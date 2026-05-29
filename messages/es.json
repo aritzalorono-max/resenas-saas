@@ -376,7 +376,17 @@
     "statusNeutral": "Neutral",
     "statusNoResponse": "Sin respuesta",
     "statusAwaitingScreenshot": "Cap. pendiente",
-    "statusRewarded": "Recompensado"
+    "statusRewarded": "Recompensado",
+    "backToReviews": "Volver a reseñas",
+    "sentAt": "Enviado:",
+    "sentimentAI": "Sentimiento analizado por IA",
+    "sentimentPositive": "Positivo",
+    "sentimentNeutral": "Neutral",
+    "sentimentNegative": "Negativo",
+    "discountCodeLabel": "Código de incentivo asignado",
+    "customerNoResponse": "El cliente no respondió",
+    "awaitingResponse": "Esperando respuesta del cliente…",
+    "additionalMessages": "{count} mensaje{s} adicional{es} en la conversación"
   },
   "configuracion": {
     "title": "Perfil del negocio",

@@ -4,23 +4,17 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Gift } from "lucide-react";
 import { buildFollowUpMessage, buildIncentiveFollowUp } from "@/lib/messages";
 import type { ReviewRequest, Business } from "@/types";
+import { getTranslations, getLocale } from "next-intl/server";
 
-const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
-  pending:             { label: "Pendiente",      badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-400"   },
-  positive:            { label: "Positiva",       badge: "bg-green-100 text-green-700",   dot: "bg-green-500"   },
-  negative:            { label: "Negativa",       badge: "bg-red-100 text-red-600",       dot: "bg-red-400"     },
-  neutral:             { label: "Neutral",        badge: "bg-gray-100 text-gray-600",     dot: "bg-gray-400"    },
-  no_response:         { label: "Sin respuesta",  badge: "bg-gray-100 text-gray-500",     dot: "bg-gray-300"    },
-  awaiting_screenshot: { label: "Esp. captura",   badge: "bg-purple-100 text-purple-700", dot: "bg-purple-400"  },
-  rewarded:            { label: "Recompensado",   badge: "bg-brand-100 text-brand-700",   dot: "bg-brand-500"   },
+const STATUS_STYLE: Record<string, { badge: string; dot: string }> = {
+  pending:             { badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-400"   },
+  positive:            { badge: "bg-green-100 text-green-700",   dot: "bg-green-500"   },
+  negative:            { badge: "bg-red-100 text-red-600",       dot: "bg-red-400"     },
+  neutral:             { badge: "bg-gray-100 text-gray-600",     dot: "bg-gray-400"    },
+  no_response:         { badge: "bg-gray-100 text-gray-500",     dot: "bg-gray-300"    },
+  awaiting_screenshot: { badge: "bg-purple-100 text-purple-700", dot: "bg-purple-400"  },
+  rewarded:            { badge: "bg-brand-100 text-brand-700",   dot: "bg-brand-500"   },
 };
-
-function fmt(iso: string, opts?: Intl.DateTimeFormatOptions) {
-  return new Date(iso).toLocaleDateString("es-ES", {
-    day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
-    ...opts,
-  });
-}
 
 // Bubble: message sent by the bot (right side, green)
 function BotBubble({ text, time }: { text: string; time?: string }) {
@@ -55,7 +49,13 @@ export default async function ResenasDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const [{ id }, t, locale] = await Promise.all([params, getTranslations("resenas"), getLocale()]);
+
+  function fmt(iso: string) {
+    return new Date(iso).toLocaleDateString(locale, {
+      day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+    });
+  }
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -79,7 +79,16 @@ export default async function ResenasDetailPage({
 
   if (!req) notFound();
 
-  const config = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.pending;
+  const style = STATUS_STYLE[req.status] ?? STATUS_STYLE.pending;
+  const statusLabel: Record<string, string> = {
+    pending:             t("statusPending"),
+    positive:            t("statusPositive"),
+    negative:            t("statusNegative"),
+    neutral:             t("statusNeutral"),
+    no_response:         t("statusNoResponse"),
+    awaiting_screenshot: t("statusAwaitingScreenshot"),
+    rewarded:            t("statusRewarded"),
+  };
   const tone = business.tone ?? "tuteo";
 
   // ── Reconstruct conversation messages ─────────────────────────────────────
@@ -140,8 +149,8 @@ export default async function ResenasDetailPage({
 
   const sentimentLabel =
     req.sentiment_score == null ? null :
-    req.sentiment_score >= 0.6  ? "Positivo" :
-    req.sentiment_score >= 0.4  ? "Neutral"  : "Negativo";
+    req.sentiment_score >= 0.6  ? t("sentimentPositive") :
+    req.sentiment_score >= 0.4  ? t("sentimentNeutral")  : t("sentimentNegative");
 
   const sentimentColor =
     req.sentiment_score == null ? "text-gray-400" :
@@ -161,7 +170,7 @@ export default async function ResenasDetailPage({
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition mb-5"
       >
         <ArrowLeft className="w-4 h-4" />
-        Volver a reseñas
+        {t("backToReviews")}
       </Link>
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
@@ -170,11 +179,11 @@ export default async function ResenasDetailPage({
           <div>
             <h1 className="text-base font-bold text-gray-900">{req.customer_name}</h1>
             <p className="text-xs text-gray-400 mt-0.5">{req.customer_phone}</p>
-            <p className="text-xs text-gray-400 mt-0.5">Enviado: {fmt(req.created_at)}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{t("sentAt")} {fmt(req.created_at)}</p>
           </div>
-          <span className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full shrink-0 ${config.badge}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
-            {config.label}
+          <span className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full shrink-0 ${style.badge}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+            {statusLabel[req.status] ?? t("statusPending")}
           </span>
         </div>
 
@@ -182,7 +191,7 @@ export default async function ResenasDetailPage({
         {req.sentiment_score != null && (
           <div className="mt-3 pt-3 border-t border-gray-100">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-gray-500">Sentimiento analizado por IA</span>
+              <span className="text-xs text-gray-500">{t("sentimentAI")}</span>
               <span className={`text-xs font-semibold ${sentimentColor}`}>
                 {sentimentLabel} · {(req.sentiment_score * 100).toFixed(0)}%
               </span>
@@ -201,7 +210,7 @@ export default async function ResenasDetailPage({
           <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
             <Gift className="w-4 h-4 text-brand-500 shrink-0" />
             <div>
-              <p className="text-xs text-gray-400">Código de incentivo asignado</p>
+              <p className="text-xs text-gray-400">{t("discountCodeLabel")}</p>
               <p className="text-sm font-bold text-brand-700">{req.discount_code}</p>
             </div>
           </div>
@@ -239,13 +248,13 @@ export default async function ResenasDetailPage({
           ) : req.status === "no_response" ? (
             <div className="text-center py-4">
               <span className="text-xs bg-white/60 text-gray-500 px-3 py-1.5 rounded-full">
-                El cliente no respondió
+                {t("customerNoResponse")}
               </span>
             </div>
           ) : (
             <div className="text-center py-4">
               <span className="text-xs bg-white/60 text-amber-600 px-3 py-1.5 rounded-full">
-                Esperando respuesta del cliente…
+                {t("awaitingResponse")}
               </span>
             </div>
           )}
@@ -262,7 +271,7 @@ export default async function ResenasDetailPage({
           {req.message_count > 0 && (
             <div className="text-center py-2">
               <span className="text-xs bg-white/60 text-gray-500 px-3 py-1.5 rounded-full">
-                {req.message_count} mensaje{req.message_count !== 1 ? "s" : ""} adicional{req.message_count !== 1 ? "es" : ""} en la conversación
+                {t("additionalMessages", { count: req.message_count, s: req.message_count !== 1 ? "s" : "", es: req.message_count !== 1 ? "es" : "", i: req.message_count !== 1 ? "i" : "o", ns: req.message_count !== 1 ? "ns" : "", is: req.message_count !== 1 ? "is" : "", en: req.message_count !== 1 ? "en" : "" })}
               </span>
             </div>
           )}
