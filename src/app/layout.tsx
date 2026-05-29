@@ -5,10 +5,11 @@ import { CookieBanner } from "@/components/cookies/CookieBanner";
 import { ConditionalScripts } from "@/components/cookies/ConditionalScripts";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { getLocale } from "next-intl/server";
 
 const inter = Inter({
   subsets: ["latin"],
-  display: "swap",       // evita FOIT (flash invisible text) → mejora CLS y LCP
+  display: "swap",
   preload: true,
   variable: "--font-inter",
 });
@@ -22,27 +23,12 @@ export const metadata: Metadata = {
     template: "%s | ReseñasYa",
   },
   description:
-    "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
-  keywords: [
-    "reseñas google maps",
-    "conseguir reseñas google",
-    "más reseñas app store",
-    "valoraciones play store",
-    "reseñas trustpilot automáticas",
-    "automatizar reseñas whatsapp",
-    "whatsapp reseñas clientes",
-    "gestión reputación online negocio",
-    "reseñas positivas google maps restaurante",
-    "software reseñas negocios locales",
-    "reseñas psicólogo abogado gestoría",
-  ],
+    "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot.",
   authors: [{ name: "ReseñasYa" }],
   creator: "ReseñasYa",
   publisher: "ReseñasYa",
   manifest: "/manifest.json",
-  alternates: {
-    canonical: APP_URL,
-  },
+  alternates: { canonical: APP_URL },
   openGraph: {
     type: "website",
     locale: "es_ES",
@@ -50,28 +36,16 @@ export const metadata: Metadata = {
     siteName: "ReseñasYa",
     title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
     description:
-      "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
+      "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot.",
   },
   twitter: {
     card: "summary_large_image",
     title: "ReseñasYa — Más reseñas de 5★ automáticamente por WhatsApp",
-    description:
-      "IA + WhatsApp para conseguir más reseñas en Google Maps, App Store, Play Store o Trustpilot. Para cualquier negocio.",
+    description: "IA + WhatsApp para conseguir más reseñas en Google Maps, App Store, Play Store o Trustpilot.",
   },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "ReseñasYa",
-  },
-  icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true },
-  },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "ReseñasYa" },
+  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
 };
 
 export const viewport: Viewport = {
@@ -81,15 +55,16 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+
   const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
     ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
     : null;
 
   return (
-    <html lang="es">
+    <html lang={locale}>
       <head>
-        {/* Preconnect a Supabase para reducir latencia en la primera petición */}
         {supabaseHost && (
           <>
             <link rel="preconnect" href={`https://${supabaseHost}`} />

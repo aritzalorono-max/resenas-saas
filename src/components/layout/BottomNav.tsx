@@ -1,20 +1,20 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { Home, Send, Star, BarChart2, Settings } from "lucide-react";
 
-const navItems = [
-  { href: "/dashboard",     label: "Inicio",    Icon: Home      },
-  { href: "/clientes",      label: "Enviar",    Icon: Send      },
-  { href: "/resenas",       label: "Reseñas",   Icon: Star      },
-  { href: "/informes",      label: "Informes",  Icon: BarChart2 },
-  { href: "/configuracion", label: "Ajustes",    Icon: Settings  },
-];
-
-/** Barra de navegación inferior visible solo en móvil (< lg) */
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useTranslations("common");
+
+  const navItems = [
+    { href: "/dashboard",     label: t("home"),           Icon: Home      },
+    { href: "/clientes",      label: t("sendRequest"),    Icon: Send      },
+    { href: "/resenas",       label: t("reviews"),        Icon: Star      },
+    { href: "/informes",      label: t("reports"),        Icon: BarChart2 },
+    { href: "/configuracion", label: t("businessProfile"), Icon: Settings  },
+  ];
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200

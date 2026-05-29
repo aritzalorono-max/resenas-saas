@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { fetchGoogleMapsSnapshot } from "@/app/(dashboard)/dashboard/actions";
+import { fetchGoogleMapsSnapshot } from "@/app/[locale]/(dashboard)/dashboard/actions";
 import { useRouter } from "next/navigation";
 
 export interface RatingPoint {
