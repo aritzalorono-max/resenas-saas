@@ -50,11 +50,12 @@ type RecentListProps = {
   recentTitle: string;
   viewAll: string;
   noRecent: string;
+  noRecentDesc: string;
   noDataLink: string;
 };
 
-async function RecentSection({ businessId, statusLabels, recentTitle, viewAll, noRecent, noDataLink }: { businessId: string; statusLabels: Record<string, { label: string; color: string }>; recentTitle: string; viewAll: string; noRecent: string; noDataLink: string }) {
-  if (!businessId) return <RecentList recent={null} statusLabels={statusLabels} recentTitle={recentTitle} viewAll={viewAll} noRecent={noRecent} noDataLink={noDataLink} />;
+async function RecentSection({ businessId, statusLabels, recentTitle, viewAll, noRecent, noRecentDesc, noDataLink }: { businessId: string; statusLabels: Record<string, { label: string; color: string }>; recentTitle: string; viewAll: string; noRecent: string; noRecentDesc: string; noDataLink: string }) {
+  if (!businessId) return <RecentList recent={null} statusLabels={statusLabels} recentTitle={recentTitle} viewAll={viewAll} noRecent={noRecent} noRecentDesc={noRecentDesc} noDataLink={noDataLink} />;
 
   const supabase = await createClient();
   const { data: recent } = await supabase
@@ -64,10 +65,10 @@ async function RecentSection({ businessId, statusLabels, recentTitle, viewAll, n
     .order("created_at", { ascending: false })
     .limit(10);
 
-  return <RecentList recent={(recent ?? null) as ReviewRequest[] | null} statusLabels={statusLabels} recentTitle={recentTitle} viewAll={viewAll} noRecent={noRecent} noDataLink={noDataLink} />;
+  return <RecentList recent={(recent ?? null) as ReviewRequest[] | null} statusLabels={statusLabels} recentTitle={recentTitle} viewAll={viewAll} noRecent={noRecent} noRecentDesc={noRecentDesc} noDataLink={noDataLink} />;
 }
 
-function RecentList({ recent, statusLabels, recentTitle, viewAll, noRecent, noDataLink }: RecentListProps) {
+function RecentList({ recent, statusLabels, recentTitle, viewAll, noRecent, noRecentDesc, noDataLink }: RecentListProps) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
       <div className="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between">
@@ -86,7 +87,7 @@ function RecentList({ recent, statusLabels, recentTitle, viewAll, noRecent, noDa
           </div>
           <p className="font-semibold text-gray-700 text-sm">{noRecent}</p>
           <p className="text-xs text-gray-400 mt-1 mb-4 max-w-xs">
-            Cuando envíes tu primera solicitud de reseña aparecerá aquí
+            {noRecentDesc}
           </p>
           <Link
             href="/clientes"
@@ -171,8 +172,8 @@ export default async function DashboardPage() {
     negative:            { label: t("negative"),   color: STATUS_COLORS.negative            },
     neutral:             { label: t("neutral"),    color: STATUS_COLORS.neutral             },
     no_response:         { label: t("noResponse"), color: STATUS_COLORS.no_response         },
-    awaiting_screenshot: { label: "Cap. pendiente",color: STATUS_COLORS.awaiting_screenshot },
-    rewarded:            { label: "Recompensado",  color: STATUS_COLORS.rewarded            },
+    awaiting_screenshot: { label: t("awaitingScreenshot"), color: STATUS_COLORS.awaiting_screenshot },
+    rewarded:            { label: t("rewarded"),           color: STATUS_COLORS.rewarded            },
   };
 
   const bars = [
@@ -187,7 +188,7 @@ export default async function DashboardPage() {
       {/* Título — renderizado inmediatamente tras batch 1 */}
       <div className="mb-6 lg:mb-8">
         <h1 className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
-          Bienvenido,<br className="sm:hidden" /> {business?.name ?? ""}
+          {t("welcome")},<br className="sm:hidden" /> {business?.name ?? ""}
         </h1>
         <p className="text-gray-400 text-sm mt-1">{t("subtitle")}</p>
       </div>
@@ -195,7 +196,7 @@ export default async function DashboardPage() {
       {/* Onboarding — primeros pasos (solo cuando no hay solicitudes enviadas aún) */}
       {total === 0 && (
         <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-card animate-slide-up">
-          <p className="text-sm font-bold text-gray-900 mb-4">Por dónde empezar</p>
+          <p className="text-sm font-bold text-gray-900 mb-4">{t("onboardingTitle")}</p>
           <ol className="space-y-3">
             <li className="flex items-start gap-3">
               <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5
@@ -204,16 +205,14 @@ export default async function DashboardPage() {
               </span>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-semibold ${business?.google_maps_url ? "text-gray-400 line-through" : "text-gray-900"}`}>
-                  Añade tu enlace de reseñas
+                  {t("step1Title")}
                 </p>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  {business?.google_maps_url
-                    ? "Enlace configurado correctamente."
-                    : "Google Maps, App Store, Trustpilot… lo que uses."}
+                  {business?.google_maps_url ? t("step1Done") : t("step1Desc")}
                 </p>
                 {!business?.google_maps_url && (
                   <Link href="/configuracion" className="inline-block mt-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700">
-                    Ir a Ajustes →
+                    {t("goToSettings")}
                   </Link>
                 )}
               </div>
@@ -221,18 +220,18 @@ export default async function DashboardPage() {
             <li className="flex items-start gap-3">
               <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900">Envía tu primera solicitud de reseña</p>
-                <p className="text-xs text-gray-400 mt-0.5">Introduce el nombre y teléfono de un cliente. Le llegará un WhatsApp automático.</p>
+                <p className="text-sm font-semibold text-gray-900">{t("step2Title")}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t("step2Desc")}</p>
                 <Link href="/clientes" className="inline-block mt-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700">
-                  Enviar solicitud →
+                  {t("sendRequest")}
                 </Link>
               </div>
             </li>
             <li className="flex items-start gap-3">
               <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-500">Ve las respuestas en Reseñas</p>
-                <p className="text-xs text-gray-400 mt-0.5">Cuando el cliente responda, verás aquí su valoración y si dejó reseña.</p>
+                <p className="text-sm font-semibold text-gray-500">{t("step3Title")}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t("step3Desc")}</p>
               </div>
             </li>
           </ol>
@@ -244,10 +243,10 @@ export default async function DashboardPage() {
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 flex items-start gap-3 animate-slide-up">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" strokeWidth={1.75} aria-hidden="true" />
           <div>
-            <p className="font-semibold text-amber-800 text-sm">Falta el enlace de reseñas</p>
+            <p className="font-semibold text-amber-800 text-sm">{t("alertNoLink")}</p>
             <p className="text-sm text-amber-700 mt-0.5">
-              Sin él los clientes satisfechos no pueden ser redirigidos a dejar su reseña.{" "}
-              <Link href="/configuracion" className="underline font-semibold">Configurar ahora →</Link>
+              {t("alertNoLinkDesc")}{" "}
+              <Link href="/configuracion" className="underline font-semibold">{t("alertNoLinkCta")}</Link>
             </p>
           </div>
         </div>
@@ -330,10 +329,10 @@ export default async function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-white font-bold text-base lg:text-lg leading-snug">
-              ¿Tienes un cliente delante?
+              {t("ctaTitle")}
             </p>
             <p className="text-brand-100 text-sm mt-0.5">
-              Envíale un WhatsApp de reseña ahora mismo
+              {t("ctaDesc")}
             </p>
           </div>
           <div className="bg-white/20 rounded-xl p-2.5 ml-3 shrink-0">
@@ -368,6 +367,7 @@ export default async function DashboardPage() {
           recentTitle={t("recentTitle")}
           viewAll={t("viewAll")}
           noRecent={t("noRecent")}
+          noRecentDesc={t("noRecentDesc")}
           noDataLink={t("noDataLink")}
         />
       </Suspense>

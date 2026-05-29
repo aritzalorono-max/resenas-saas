@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { fetchGoogleMapsSnapshot } from "@/app/[locale]/(dashboard)/dashboard/actions";
 import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
 
 export interface RatingPoint {
   date: string;          // ISO string
@@ -18,7 +19,7 @@ function StarIcon({ className }: { className?: string }) {
   );
 }
 
-function RatingLineChart({ data }: { data: RatingPoint[] }) {
+function RatingLineChart({ data, reviewsLabel, locale }: { data: RatingPoint[]; reviewsLabel: string; locale: string }) {
   const [hovered, setHovered] = useState<number | null>(null);
 
   if (data.length === 0) return null;
@@ -49,7 +50,7 @@ function RatingLineChart({ data }: { data: RatingPoint[] }) {
   const gridRatings = [minR, (minR + maxR) / 2, maxR].map(r => Math.round(r * 10) / 10);
 
   const fmt = (iso: string) =>
-    new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+    new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "short" });
 
   // Label positions: first, middle, last
   const labelIdxs = Array.from(new Set([0, Math.floor((data.length - 1) / 2), data.length - 1]));
@@ -67,7 +68,7 @@ function RatingLineChart({ data }: { data: RatingPoint[] }) {
         >
           <p className="font-semibold">{data[hovered].rating.toFixed(1)}★</p>
           {data[hovered].review_count != null && (
-            <p className="text-gray-300">{data[hovered].review_count} reseñas</p>
+            <p className="text-gray-300">{data[hovered].review_count} {reviewsLabel}</p>
           )}
           <p className="text-gray-400">{fmt(data[hovered].date)}</p>
         </div>
@@ -165,6 +166,8 @@ export function GoogleMapsRatingSection({
   data: RatingPoint[];
   hasApiKey: boolean;
 }) {
+  const t      = useTranslations("dashboard");
+  const locale = useLocale();
   const router    = useRouter();
   const [loading, setLoading] = useState(false);
   const [msg,     setMsg]     = useState<string | null>(null);
@@ -181,10 +184,10 @@ export function GoogleMapsRatingSection({
     const result = await fetchGoogleMapsSnapshot();
     setLoading(false);
     if (result.ok) {
-      setMsg("¡Datos actualizados!");
+      setMsg(t("ratingUpdated"));
       router.refresh();
     } else {
-      setMsg(result.error ?? "Error al actualizar");
+      setMsg(result.error ?? t("ratingError"));
     }
   }
 
@@ -193,10 +196,10 @@ export function GoogleMapsRatingSection({
       <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-card">
         <h2 className="text-sm font-semibold text-gray-900 mb-1 flex items-center gap-2">
           <StarIcon className="w-4 h-4 text-yellow-400" />
-          Puntuación en Google Maps
+          {t("ratingTitle")}
         </h2>
         <p className="text-xs text-gray-400 mt-2">
-          Configura la variable de entorno <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">GOOGLE_PLACES_API_KEY</code> para activar el seguimiento automático de tu puntuación.
+          {t("ratingNoApiKey")}
         </p>
       </div>
     );
@@ -208,12 +211,12 @@ export function GoogleMapsRatingSection({
       <div className="flex items-center justify-between gap-3 mb-4">
         <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
           <StarIcon className="w-4 h-4 text-yellow-400" />
-          Puntuación en Google Maps
+          {t("ratingTitle")}
         </h2>
         <button
           onClick={handleSync}
           disabled={loading}
-          aria-label={loading ? "Actualizando puntuación de Google Maps" : "Actualizar puntuación de Google Maps"}
+          aria-label={loading ? t("ratingSyncing") : t("ratingSync")}
           className="flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-700 font-medium disabled:opacity-50 transition"
         >
           {loading ? (
@@ -226,7 +229,7 @@ export function GoogleMapsRatingSection({
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           )}
-          {loading ? "Actualizando…" : "Actualizar ahora"}
+          {loading ? t("ratingSyncing") : t("ratingSync")}
         </button>
       </div>
 
@@ -239,11 +242,8 @@ export function GoogleMapsRatingSection({
       {data.length === 0 ? (
         <div className="text-center py-8">
           <StarIcon className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-          <p className="text-sm font-medium text-gray-500">Sin datos todavía</p>
-          <p className="text-xs text-gray-400 mt-1">
-            Pulsa &ldquo;Actualizar ahora&rdquo; para cargar tu puntuación actual,<br />
-            o espera al registro automático diario.
-          </p>
+          <p className="text-sm font-medium text-gray-500">{t("ratingNoData")}</p>
+          <p className="text-xs text-gray-400 mt-1">{t("ratingNoDataDesc")}</p>
         </div>
       ) : (
         <>
@@ -258,17 +258,17 @@ export function GoogleMapsRatingSection({
             <div className="flex flex-col gap-0.5">
               {diff !== null && diff !== 0 && (
                 <span className={`text-xs font-semibold ${diff > 0 ? "text-green-600" : "text-red-500"}`}>
-                  {diff > 0 ? "▲" : "▼"} {Math.abs(diff).toFixed(1)} en {data.length} días
+                  {diff > 0 ? "▲" : "▼"} {Math.abs(diff).toFixed(1)} {t("ratingDays", { count: data.length })}
                 </span>
               )}
               {reviewsDiff !== null && reviewsDiff > 0 && (
                 <span className="text-xs text-green-600 font-medium">
-                  +{reviewsDiff} reseña{reviewsDiff !== 1 ? "s" : ""} nuevas
+                  {t("ratingNewReviews", { count: reviewsDiff })}
                 </span>
               )}
               {latest!.review_count != null && (
                 <span className="text-xs text-gray-400">
-                  {latest!.review_count.toLocaleString("es-ES")} reseñas en total
+                  {t("ratingTotal", { count: latest!.review_count.toLocaleString(locale) })}
                 </span>
               )}
             </div>
@@ -276,10 +276,10 @@ export function GoogleMapsRatingSection({
 
           {/* Chart */}
           {data.length >= 2 ? (
-            <RatingLineChart data={data} />
+            <RatingLineChart data={data} reviewsLabel={t("ratingReviews")} locale={locale} />
           ) : (
             <p className="text-xs text-gray-400 text-center py-4">
-              Se necesitan al menos 2 registros para mostrar la evolución
+              {t("ratingMinRecords")}
             </p>
           )}
         </>
