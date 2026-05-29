@@ -113,7 +113,12 @@
       "backToLogin": "← Volver al inicio de sesión",
       "successTitle": "Revisa tu correo",
       "successDesc": "Si existe una cuenta con ese email, recibirás un enlace para restablecer tu contraseña.",
-      "errorDefault": "Error al enviar el correo"
+      "errorDefault": "Error al enviar el correo",
+      "successSpam": "Si no ves el email en unos minutos, revisa la carpeta de spam.",
+      "googleAccountTitle": "Esta cuenta usa Google",
+      "googleAccountDesc": "La cuenta {email} está vinculada a Google y no tiene contraseña propia, por lo que no es posible restablecerla.",
+      "googleAccountDesc2": "Para acceder, usa el botón \"Continuar con Google\" en la pantalla de inicio de sesión.",
+      "googleLoginLink": "Ir al inicio de sesión"
     },
     "newPassword": {
       "title": "Nueva contraseña",
@@ -348,6 +353,7 @@
     "expand": "Expandir",
     "collapse": "Colapsar",
     "using": "Utilizamos:",
-    "mayActivate": "Servicios que podrían activarse:"
+    "mayActivate": "Servicios que podrían activarse:",
+    "close": "Cerrar"
   }
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 import type { Business, BusinessTone, ReviewPlatformLink, WhatsAppMode } from "@/types";
+import { useTranslations } from "next-intl";
 
 const TONE_OPTIONS: { value: BusinessTone; label: string; sublabel: string; example: string }[] = [
   {
@@ -40,6 +41,8 @@ const PLATFORMS: { name: string; placeholder: string }[] = [
 
 
 export default function ConfiguracionPage() {
+  const t = useTranslations("configuracion");
+  const tCommon = useTranslations("common");
   const [business, setBusiness] = useState<Business | null>(null);
   const [form, setForm] = useState({
     name: "",
@@ -87,7 +90,7 @@ export default function ConfiguracionPage() {
           .single();
 
         if (dbError && dbError.code !== "PGRST116") {
-          setError("No se pudo cargar la configuración. Recarga la página.");
+          setError(t("errorLoad"));
           return;
         }
 
@@ -203,7 +206,7 @@ export default function ConfiguracionPage() {
     setSuccess(false);
 
     if (!business) {
-      setError("No se pudo cargar el negocio. Recarga la página.");
+      setError(t("errorLoad"));
       return;
     }
 
@@ -239,7 +242,7 @@ export default function ConfiguracionPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Error al guardar los cambios");
+        setError(data.error ?? t("errorSave"));
         return;
       }
 
@@ -263,7 +266,7 @@ export default function ConfiguracionPage() {
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center h-64 text-gray-400">Cargando...</div>;
+    return <div className="flex items-center justify-center h-64 text-gray-400">{tCommon("loading")}</div>;
   }
 
   if (!business && error) {
@@ -289,8 +292,8 @@ export default function ConfiguracionPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Perfil del negocio</h1>
-        <p className="text-gray-500 mt-1">Personaliza la información de tu negocio</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-500 mt-1">{t("subtitle")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -301,43 +304,43 @@ export default function ConfiguracionPage() {
 
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">
-              Nombre del negocio *
+              {t("businessName")} *
             </label>
             <input
               id="name" name="name" type="text" value={form.name} onChange={handleChange} required
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-              placeholder="Ej: Cafetería El Sol"
+              placeholder={t("businessNamePlaceholder")}
             />
           </div>
 
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">
-              Descripción breve
+              {t("description")}
             </label>
             <textarea
               id="description" name="description" value={form.description} onChange={handleChange}
               rows={2} maxLength={200}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition resize-none"
-              placeholder="Ej: Cafetería familiar en el centro, especializada en desayunos y brunch"
+              placeholder={t("descriptionPlaceholder")}
             />
             <p className="text-xs text-gray-400 mt-1">{form.description.length}/200</p>
           </div>
 
           <div>
             <label htmlFor="website_url" className="block text-sm font-medium text-gray-700 mb-1.5">
-              Página web
+              {t("websiteUrl")}
             </label>
             <input
               id="website_url" name="website_url" type="url" value={form.website_url} onChange={handleChange}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-              placeholder="https://www.tu-negocio.com"
+              placeholder={t("websiteUrlPlaceholder")}
             />
           </div>
         </div>
 
         {/* ── Plataforma de reseñas ── */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-          <h2 className="font-semibold text-gray-900 text-lg">Plataforma de reseñas</h2>
+          <h2 className="font-semibold text-gray-900 text-lg">{t("platformsTitle")}</h2>
 
           {/* Plataforma activa */}
           <div>
@@ -503,7 +506,7 @@ export default function ConfiguracionPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="font-semibold text-gray-900 text-lg">Tono de comunicación</h2>
+              <h2 className="font-semibold text-gray-900 text-lg">{t("tone")}</h2>
               {!toneExpanded && (
                 <p className="text-sm text-gray-500 mt-0.5">
                   {currentTone.label} — {currentTone.sublabel}
@@ -557,7 +560,7 @@ export default function ConfiguracionPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="font-semibold text-gray-900 text-lg">Mensaje inicial de WhatsApp</h2>
+              <h2 className="font-semibold text-gray-900 text-lg">{t("welcomeMessage")}</h2>
               <p className="text-sm text-gray-400 mt-0.5">
                 Usa <code className="bg-gray-100 px-1 rounded">{"{nombre}"}</code> y{" "}
                 <code className="bg-gray-100 px-1 rounded">{"{negocio}"}</code> como variables
@@ -800,7 +803,7 @@ export default function ConfiguracionPage() {
         )}
         {success && (
           <div className="bg-green-50 text-green-700 text-sm rounded-lg px-4 py-3">
-            ✅ Cambios guardados correctamente
+            ✅ {t("saved")}
           </div>
         )}
 
@@ -808,7 +811,7 @@ export default function ConfiguracionPage() {
           type="submit" disabled={saving}
           className="bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold px-6 py-2.5 rounded-lg transition"
         >
-          {saving ? "Guardando..." : "Guardar cambios"}
+          {saving ? t("saving") : t("save")}
         </button>
       </form>
 

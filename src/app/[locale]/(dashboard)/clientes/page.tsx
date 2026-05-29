@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Upload, FileSpreadsheet, Download, X, CheckCircle2, AlertCircle, Loader2, MapPin, Gift, Clock, Tag, ChevronDown, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
@@ -197,6 +198,7 @@ async function parseFileToRows(file: File, dialCode: string): Promise<BulkRow[]>
 
 export default function ClientesPage() {
   const router = useRouter();
+  const t = useTranslations("clientes");
 
   // Business summary
   const [bizSummary, setBizSummary] = useState<BusinessSummary | null>(null);
@@ -402,9 +404,9 @@ export default function ClientesPage() {
   return (
     <div className="max-w-lg animate-fade-in">
       <div className="mb-5 lg:mb-8">
-        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Enviar solicitud de reseña</h1>
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">{t("title")}</h1>
         <p className="text-gray-500 text-sm mt-1">
-          El cliente recibirá un WhatsApp pidiéndole su opinión. Si es positiva, la IA le invita a dejar reseña.
+          {t("subtitle")}
         </p>
       </div>
 
@@ -418,7 +420,7 @@ export default function ClientesPage() {
               mode === m ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            {m === "manual" ? "Un contacto" : "Importar Excel"}
+            {m === "manual" ? "Un contacto" : t("bulkBtn")}
           </button>
         ))}
       </div>
@@ -433,9 +435,9 @@ export default function ClientesPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">¡WhatsApp enviado!</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">{t("successTitle")}</h2>
               <p className="text-gray-500 mb-6 text-sm max-w-xs mx-auto">
-                El cliente recibirá el mensaje en su WhatsApp en breve.
+                {t("successDesc", { name: form.customer_name.trim() || "el cliente" })}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
@@ -443,7 +445,7 @@ export default function ClientesPage() {
                   className="flex-1 bg-brand-600 hover:bg-brand-700 active:bg-brand-800
                              text-white font-semibold py-3.5 rounded-xl transition text-base"
                 >
-                  Enviar otro
+                  {t("sendAnother")}
                 </button>
                 <button
                   onClick={() => router.push("/resenas")}
@@ -458,7 +460,7 @@ export default function ClientesPage() {
             <form onSubmit={handleManualSubmit} className="space-y-5">
               <div>
                 <label htmlFor="customer_name" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Nombre del cliente
+                  {t("name")}
                 </label>
                 <input
                   id="customer_name"
@@ -472,13 +474,13 @@ export default function ClientesPage() {
                   className="w-full px-4 py-3.5 border border-gray-300 rounded-xl
                              focus:ring-2 focus:ring-brand-500 focus:border-transparent
                              outline-none transition text-base disabled:opacity-60 disabled:bg-gray-50"
-                  placeholder="Ej: María García"
+                  placeholder={t("namePlaceholder")}
                 />
               </div>
 
               <div>
                 <label htmlFor="customer_phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Teléfono (WhatsApp)
+                  {t("phone")}
                 </label>
                 <div className={`flex rounded-xl border overflow-visible transition
                   ${loading ? "border-gray-200 opacity-60" : "border-gray-300 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent"}`}>
@@ -491,7 +493,7 @@ export default function ClientesPage() {
                                  active:bg-gray-200 border-r border-gray-300 rounded-l-xl
                                  transition h-full text-sm font-medium text-gray-700 whitespace-nowrap
                                  min-w-[80px] justify-center disabled:cursor-not-allowed"
-                      aria-label="Seleccionar país"
+                      aria-label={t("country")}
                     >
                       <span className="text-xl leading-none">{country.flag}</span>
                       <span className="text-gray-500 text-xs">{country.dial}</span>
@@ -577,7 +579,7 @@ export default function ClientesPage() {
                   >
                     <span className="flex items-center gap-2">
                       <MessageSquare className="w-4 h-4 text-gray-400" aria-hidden="true" />
-                      Ver mensaje que recibirá el cliente
+                      {t("preview")}
                     </span>
                     <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${previewOpen ? "rotate-180" : ""}`} aria-hidden="true" />
                   </button>
@@ -614,14 +616,14 @@ export default function ClientesPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                     </svg>
-                    {retrying ? "Reintentando envío..." : "Enviando WhatsApp..."}
+                    {retrying ? "Reintentando envío..." : t("submitting")}
                   </>
                 ) : (
                   <>
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
-                    Enviar por WhatsApp
+                    {t("submit")}
                   </>
                 )}
               </button>
@@ -656,7 +658,7 @@ export default function ClientesPage() {
                   onClick={() => fileInputRef.current?.click()}
                   className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition"
                 >
-                  Seleccionar archivo
+                  {t("bulkBtn")}
                 </button>
                 <a
                   href="/plantilla-resenasya.csv"

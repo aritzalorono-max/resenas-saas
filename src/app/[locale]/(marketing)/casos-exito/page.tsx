@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { TrendingUp, Utensils, Dumbbell, ShoppingBag, Stethoscope, Smartphone, Coffee } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Casos de éxito | ReseñasYa",
@@ -132,7 +133,8 @@ const cases = [
   },
 ];
 
-export default function CasosExitoPage() {
+export default async function CasosExitoPage() {
+  const t = await getTranslations("casosExito");
   return (
     <>
       {/* Hero */}
@@ -140,14 +142,13 @@ export default function CasosExitoPage() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-6">
             <TrendingUp className="w-3.5 h-3.5" strokeWidth={2} />
-            Resultados reales
+            {t("badge")}
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-5">
-            Negocios que ya multiplican sus reseñas con ReseñasYa
+            {t("title")}
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Restaurantes, clínicas, e-commerce y apps que pasaron de tener pocas reseñas
-            a dominar su categoría en Google Maps, Trustpilot y las tiendas de apps.
+            {t("subtitle")}
           </p>
         </div>
       </section>
@@ -158,15 +159,15 @@ export default function CasosExitoPage() {
           <div className="grid grid-cols-3 gap-6 text-center">
             <div>
               <p className="text-3xl font-extrabold text-brand-600">+750</p>
-              <p className="text-sm text-gray-500 mt-1">reseñas conseguidas</p>
+              <p className="text-sm text-gray-500 mt-1">{t("stat1")}</p>
             </div>
             <div>
               <p className="text-3xl font-extrabold text-brand-600">6</p>
-              <p className="text-sm text-gray-500 mt-1">sectores distintos</p>
+              <p className="text-sm text-gray-500 mt-1">{t("stat3")}</p>
             </div>
             <div>
               <p className="text-3xl font-extrabold text-brand-600">4.8★</p>
-              <p className="text-sm text-gray-500 mt-1">media de valoraciones</p>
+              <p className="text-sm text-gray-500 mt-1">{t("stat2")}</p>
             </div>
           </div>
         </div>
@@ -200,15 +201,15 @@ export default function CasosExitoPage() {
               <div className="p-8">
                 <div className="grid md:grid-cols-3 gap-8 mb-8">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">El reto</p>
+                    <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">{t("challenge")}</p>
                     <p className="text-sm text-gray-600 leading-relaxed">{challenge}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">La solución</p>
+                    <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">{t("solution")}</p>
                     <p className="text-sm text-gray-600 leading-relaxed">{solution}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-brand-600 mb-2">El resultado</p>
+                    <p className="text-xs font-bold uppercase tracking-wider text-brand-600 mb-2">{t("result")}</p>
                     <p className="text-sm text-gray-700 font-medium leading-relaxed">{result}</p>
                   </div>
                 </div>
@@ -238,16 +239,16 @@ export default function CasosExitoPage() {
       <section className="py-16 px-6 bg-gradient-to-br from-brand-600 to-brand-700">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-extrabold text-white mb-4">
-            Escribe tu propio caso de éxito
+            {t("ctaTitle")}
           </h2>
           <p className="text-brand-100 text-lg mb-8">
-            Únete a los negocios que ya automatizan su reputación online. Configuración en menos de 1 minuto.
+            {t("ctaDesc")}
           </p>
           <Link
             href="/register"
             className="bg-white text-brand-700 font-bold px-8 py-4 rounded-xl text-lg hover:bg-brand-50 transition inline-block shadow-lg"
           >
-            Empezar gratis →
+            {t("ctaBtn")}
           </Link>
           <p className="text-brand-200 text-sm mt-4">Sin permanencia · Cancela cuando quieras</p>
         </div>

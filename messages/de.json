@@ -113,7 +113,12 @@
       "backToLogin": "← Zurück zur Anmeldung",
       "successTitle": "E-Mail überprüfen",
       "successDesc": "Wenn ein Konto mit dieser E-Mail existiert, erhalten Sie einen Zurücksetzungslink.",
-      "errorDefault": "Fehler beim Senden der E-Mail"
+      "errorDefault": "Fehler beim Senden der E-Mail",
+      "successSpam": "Wenn Sie die E-Mail nicht innerhalb weniger Minuten sehen, überprüfen Sie Ihren Spam-Ordner.",
+      "googleAccountTitle": "Dieses Konto verwendet Google",
+      "googleAccountDesc": "Das Konto {email} ist mit Google verknüpft und hat kein eigenes Passwort, daher kann es nicht zurückgesetzt werden.",
+      "googleAccountDesc2": "Um sich anzumelden, verwenden Sie die Schaltfläche \"Mit Google fortfahren\" auf dem Anmeldebildschirm.",
+      "googleLoginLink": "Zur Anmeldung"
     },
     "newPassword": {
       "title": "Neues Passwort",
@@ -348,6 +353,7 @@
     "expand": "Erweitern",
     "collapse": "Einklappen",
     "using": "Wir verwenden:",
-    "mayActivate": "Dienste, die aktiviert werden könnten:"
+    "mayActivate": "Dienste, die aktiviert werden könnten:",
+    "close": "Schließen"
   }
 }

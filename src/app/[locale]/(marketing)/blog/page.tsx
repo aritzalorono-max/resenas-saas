@@ -2,6 +2,7 @@ import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { blogPosts } from "@/lib/blog-posts";
 import { BookOpen, Clock, Tag } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Blog | ReseñasYa — Consejos para conseguir más reseñas",
@@ -28,7 +29,8 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const t = await getTranslations("blog");
   const [featured, ...rest] = blogPosts;
 
   return (
@@ -41,10 +43,10 @@ export default function BlogPage() {
             Blog ReseñasYa
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
-            Consejos para conseguir más reseñas
+            {t("title")}
           </h1>
           <p className="text-gray-500 text-lg max-w-2xl">
-            Guías prácticas sobre Google Maps, reputación online, SEO local y automatización de reseñas para negocios locales.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -53,7 +55,7 @@ export default function BlogPage() {
           <article className="bg-gradient-to-br from-brand-50 to-white rounded-3xl border border-brand-100 p-8 hover:border-brand-300 transition-all hover:shadow-md">
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <span className="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-100 px-3 py-1 rounded-full">
-                Artículo destacado
+                {t("featured")}
               </span>
               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${categoryColors[featured.category] ?? "bg-gray-100 text-gray-600"}`}>
                 {featured.category}
@@ -64,7 +66,7 @@ export default function BlogPage() {
             </h2>
             <p className="text-gray-600 mb-5 leading-relaxed">{featured.description}</p>
             <div className="flex items-center gap-4 text-xs text-gray-400">
-              <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {featured.readTime} de lectura</span>
+              <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {featured.readTime} {t("readTime")}</span>
               <span>{formatDate(featured.date)}</span>
             </div>
           </article>
@@ -96,13 +98,13 @@ export default function BlogPage() {
 
         {/* CTA */}
         <div className="mt-16 bg-gray-900 rounded-3xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-3">¿Listo para automatizar tus reseñas?</h2>
-          <p className="text-gray-400 mb-6">Pon en práctica todo lo que has leído. Configuración en menos de 1 minuto.</p>
+          <h2 className="text-2xl font-bold text-white mb-3">{t("ctaTitle")}</h2>
+          <p className="text-gray-400 mb-6">{t("ctaDesc")}</p>
           <Link
             href="/register"
             className="bg-brand-600 hover:bg-brand-500 text-white font-bold px-7 py-3.5 rounded-xl transition inline-block"
           >
-            Empezar gratis →
+            {t("ctaBtn")}
           </Link>
         </div>
       </div>

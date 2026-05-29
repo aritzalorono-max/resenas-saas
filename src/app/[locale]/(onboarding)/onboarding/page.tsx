@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ArrowRight, CheckCircle2, Loader2, Check, Building2, Star, MessageCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const PLATFORMS = [
   {
@@ -111,6 +112,7 @@ function StepBar({ current }: { current: 1 | 2 | 3 }) {
 }
 
 export default function OnboardingPage() {
+  const t = useTranslations("onboarding");
   const router = useRouter();
   const [checking, setChecking]         = useState(true);
   const [step, setStep]                 = useState<1 | 2 | 3>(1);
@@ -190,7 +192,7 @@ export default function OnboardingPage() {
                 <Building2 className="w-5 h-5 text-gray-700" strokeWidth={1.75} />
               </div>
               <h1 className="text-xl font-bold text-gray-900 mb-1">
-                ¿Cómo se llama tu negocio?
+                {t("businessName")}
               </h1>
               <p className="text-sm text-gray-500 mb-6">
                 Aparecerá en los mensajes que reciban tus clientes.
@@ -201,7 +203,7 @@ export default function OnboardingPage() {
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && businessName.trim()) setStep(2); }}
-                placeholder="Ej: Cafetería El Sol, Clínica Dental Ruiz…"
+                placeholder={t("businessNamePlaceholder")}
                 autoFocus
                 maxLength={100}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-sm mb-4 bg-gray-50"
@@ -212,7 +214,7 @@ export default function OnboardingPage() {
                 disabled={!businessName.trim()}
                 className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition text-sm"
               >
-                Continuar <ArrowRight className="w-4 h-4" />
+                {t("next")} <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           )}
@@ -272,7 +274,7 @@ export default function OnboardingPage() {
                 >
                   {saving
                     ? <><Loader2 className="w-4 h-4 animate-spin" /> Guardando…</>
-                    : <><ArrowRight className="w-4 h-4" /> Continuar</>
+                    : <><ArrowRight className="w-4 h-4" /> {t("next")}</>
                   }
                 </button>
                 <button
@@ -281,7 +283,7 @@ export default function OnboardingPage() {
                   disabled={saving}
                   className="w-full text-xs text-gray-400 hover:text-gray-600 py-2 transition disabled:opacity-40"
                 >
-                  Añadir el enlace más tarde →
+                  {t("skip")} →
                 </button>
               </div>
             </div>

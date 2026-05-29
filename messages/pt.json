@@ -113,7 +113,12 @@
       "backToLogin": "← Voltar ao login",
       "successTitle": "Verifique o seu email",
       "successDesc": "Se existir uma conta com esse email, receberá um link para redefinir a palavra-passe.",
-      "errorDefault": "Erro ao enviar email"
+      "errorDefault": "Erro ao enviar email",
+      "successSpam": "Se não vir o email em alguns minutos, verifique a pasta de spam.",
+      "googleAccountTitle": "Esta conta usa o Google",
+      "googleAccountDesc": "A conta {email} está vinculada ao Google e não tem uma password própria, pelo que não pode ser redefinida.",
+      "googleAccountDesc2": "Para entrar, use o botão \"Continuar com o Google\" no ecrã de início de sessão.",
+      "googleLoginLink": "Ir para o login"
     },
     "newPassword": {
       "title": "Nova palavra-passe",
@@ -348,6 +353,7 @@
     "expand": "Expandir",
     "collapse": "Recolher",
     "using": "Utilizamos:",
-    "mayActivate": "Serviços que poderão ser ativados:"
+    "mayActivate": "Serviços que poderão ser ativados:",
+    "close": "Fechar"
   }
 }

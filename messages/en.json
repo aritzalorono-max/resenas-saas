@@ -113,7 +113,12 @@
       "backToLogin": "← Back to sign in",
       "successTitle": "Check your email",
       "successDesc": "If an account exists with that email, you'll receive a link to reset your password.",
-      "errorDefault": "Error sending email"
+      "errorDefault": "Error sending email",
+      "successSpam": "If you don't see the email in a few minutes, check your spam folder.",
+      "googleAccountTitle": "This account uses Google",
+      "googleAccountDesc": "The account {email} is linked to Google and doesn't have its own password, so it can't be reset.",
+      "googleAccountDesc2": "To sign in, use the \"Continue with Google\" button on the sign in screen.",
+      "googleLoginLink": "Go to sign in"
     },
     "newPassword": {
       "title": "New password",
@@ -348,6 +353,7 @@
     "expand": "Expand",
     "collapse": "Collapse",
     "using": "We use:",
-    "mayActivate": "Services that may be activated:"
+    "mayActivate": "Services that may be activated:",
+    "close": "Close"
   }
 }

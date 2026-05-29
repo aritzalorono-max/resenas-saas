@@ -5,15 +5,16 @@ import type { ReviewRequest, BusinessStats } from "@/types";
 import { RingChart } from "@/components/ui/RingChart";
 import { GoogleMapsRatingSection, type RatingPoint } from "@/components/ui/RatingChart";
 import { AlertTriangle } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending:              { label: "Pendiente",        color: "bg-amber-100 text-amber-700"   },
-  positive:             { label: "Positiva",         color: "bg-green-100 text-green-700"   },
-  negative:             { label: "Negativa",         color: "bg-red-100 text-red-600"       },
-  neutral:              { label: "Neutral",          color: "bg-gray-100 text-gray-600"     },
-  no_response:          { label: "Sin respuesta",    color: "bg-gray-100 text-gray-500"     },
-  awaiting_screenshot:  { label: "Cap. pendiente",   color: "bg-purple-100 text-purple-700" },
-  rewarded:             { label: "Recompensado",     color: "bg-brand-100 text-brand-700"   },
+const STATUS_COLORS: Record<string, string> = {
+  pending:             "bg-amber-100 text-amber-700",
+  positive:            "bg-green-100 text-green-700",
+  negative:            "bg-red-100 text-red-600",
+  neutral:             "bg-gray-100 text-gray-600",
+  no_response:         "bg-gray-100 text-gray-500",
+  awaiting_screenshot: "bg-purple-100 text-purple-700",
+  rewarded:            "bg-brand-100 text-brand-700",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -43,8 +44,17 @@ async function ChartSection({ businessId, placeId, hasApiKey }: { businessId: st
   return <GoogleMapsRatingSection data={chartData} hasApiKey={hasApiKey} />;
 }
 
-async function RecentSection({ businessId }: { businessId: string }) {
-  if (!businessId) return <RecentList recent={null} />;
+type RecentListProps = {
+  recent: ReviewRequest[] | null;
+  statusLabels: Record<string, { label: string; color: string }>;
+  recentTitle: string;
+  viewAll: string;
+  noRecent: string;
+  noDataLink: string;
+};
+
+async function RecentSection({ businessId, statusLabels, recentTitle, viewAll, noRecent, noDataLink }: { businessId: string; statusLabels: Record<string, { label: string; color: string }>; recentTitle: string; viewAll: string; noRecent: string; noDataLink: string }) {
+  if (!businessId) return <RecentList recent={null} statusLabels={statusLabels} recentTitle={recentTitle} viewAll={viewAll} noRecent={noRecent} noDataLink={noDataLink} />;
 
   const supabase = await createClient();
   const { data: recent } = await supabase
@@ -54,16 +64,16 @@ async function RecentSection({ businessId }: { businessId: string }) {
     .order("created_at", { ascending: false })
     .limit(10);
 
-  return <RecentList recent={(recent ?? null) as ReviewRequest[] | null} />;
+  return <RecentList recent={(recent ?? null) as ReviewRequest[] | null} statusLabels={statusLabels} recentTitle={recentTitle} viewAll={viewAll} noRecent={noRecent} noDataLink={noDataLink} />;
 }
 
-function RecentList({ recent }: { recent: ReviewRequest[] | null }) {
+function RecentList({ recent, statusLabels, recentTitle, viewAll, noRecent, noDataLink }: RecentListProps) {
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
       <div className="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between">
-        <h2 className="font-semibold text-gray-900 text-sm">Últimas solicitudes</h2>
+        <h2 className="font-semibold text-gray-900 text-sm">{recentTitle}</h2>
         <Link href="/resenas" className="text-xs text-brand-600 font-semibold hover:text-brand-700">
-          Ver todas →
+          {viewAll}
         </Link>
       </div>
 
@@ -74,7 +84,7 @@ function RecentList({ recent }: { recent: ReviewRequest[] | null }) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
             </svg>
           </div>
-          <p className="font-semibold text-gray-700 text-sm">Aún no hay solicitudes</p>
+          <p className="font-semibold text-gray-700 text-sm">{noRecent}</p>
           <p className="text-xs text-gray-400 mt-1 mb-4 max-w-xs">
             Cuando envíes tu primera solicitud de reseña aparecerá aquí
           </p>
@@ -82,13 +92,13 @@ function RecentList({ recent }: { recent: ReviewRequest[] | null }) {
             href="/clientes"
             className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition"
           >
-            Enviar primera solicitud →
+            {noDataLink} →
           </Link>
         </div>
       ) : (
         <div className="divide-y divide-gray-50">
           {recent.map((req) => {
-            const s = STATUS_LABELS[req.status] ?? STATUS_LABELS.pending;
+            const s = statusLabels[req.status] ?? statusLabels.pending;
             return (
               <div key={req.id} className="px-4 py-3.5 flex items-start justify-between gap-3 hover:bg-gray-50/50 transition">
                 <div className="min-w-0 flex-1">
@@ -122,6 +132,7 @@ function RecentList({ recent }: { recent: ReviewRequest[] | null }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default async function DashboardPage() {
+  const t = await getTranslations("dashboard");
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -154,11 +165,21 @@ export default async function DashboardPage() {
   const rate      = Number(stats?.positive_rate ?? 0);
   const responded = positives + negatives + neutrals;
 
+  const statusLabels: Record<string, { label: string; color: string }> = {
+    pending:             { label: t("pending"),    color: STATUS_COLORS.pending             },
+    positive:            { label: t("positive"),   color: STATUS_COLORS.positive            },
+    negative:            { label: t("negative"),   color: STATUS_COLORS.negative            },
+    neutral:             { label: t("neutral"),    color: STATUS_COLORS.neutral             },
+    no_response:         { label: t("noResponse"), color: STATUS_COLORS.no_response         },
+    awaiting_screenshot: { label: "Cap. pendiente",color: STATUS_COLORS.awaiting_screenshot },
+    rewarded:            { label: "Recompensado",  color: STATUS_COLORS.rewarded            },
+  };
+
   const bars = [
-    { label: "Positivas",  count: positives, color: "bg-green-500", bg: "bg-green-100" },
-    { label: "Negativas",  count: negatives, color: "bg-red-400",   bg: "bg-red-100"   },
-    { label: "Neutrales",  count: neutrals,  color: "bg-gray-400",  bg: "bg-gray-100"  },
-    { label: "Pendientes", count: pending,   color: "bg-amber-400", bg: "bg-amber-100" },
+    { label: t("positive"), count: positives, color: "bg-green-500", bg: "bg-green-100" },
+    { label: t("negative"), count: negatives, color: "bg-red-400",   bg: "bg-red-100"   },
+    { label: t("neutral"),  count: neutrals,  color: "bg-gray-400",  bg: "bg-gray-100"  },
+    { label: t("pending"),  count: pending,   color: "bg-amber-400", bg: "bg-amber-100" },
   ];
 
   return (
@@ -168,7 +189,7 @@ export default async function DashboardPage() {
         <h1 className="text-xl lg:text-2xl font-bold text-gray-900 leading-tight">
           Bienvenido,<br className="sm:hidden" /> {business?.name ?? ""}
         </h1>
-        <p className="text-gray-400 text-sm mt-1">Resumen de tu actividad de reseñas</p>
+        <p className="text-gray-400 text-sm mt-1">{t("subtitle")}</p>
       </div>
 
       {/* Onboarding — primeros pasos (solo cuando no hay solicitudes enviadas aún) */}
@@ -236,15 +257,14 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         <div className="bg-gradient-to-br from-brand-50 to-white border border-brand-100 rounded-2xl p-4 flex flex-col items-center justify-center gap-1 shadow-card">
           <RingChart rate={rate} />
-          <p className="text-xs text-gray-400 mt-1">tasa positiva</p>
+          <p className="text-xs text-gray-400 mt-1">{t("positiveRate")}</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-card">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Total</p>
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">{t("totalRequests")}</p>
           <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{total}</p>
-          <p className="text-xs text-gray-400 mt-1.5">solicitudes enviadas</p>
         </div>
         <div className="bg-white border border-green-100 rounded-2xl p-4 shadow-card">
-          <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-2">Positivas</p>
+          <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-2">{t("positiveReviews")}</p>
           <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{positives}</p>
           <div className="mt-2 h-1.5 rounded-full bg-green-100 overflow-hidden">
             <div className="h-full rounded-full bg-green-500 transition-all duration-700"
@@ -252,7 +272,7 @@ export default async function DashboardPage() {
           </div>
         </div>
         <div className="bg-white border border-red-50 rounded-2xl p-4 shadow-card">
-          <p className="text-xs font-medium text-red-500 uppercase tracking-wide mb-2">Negativas</p>
+          <p className="text-xs font-medium text-red-500 uppercase tracking-wide mb-2">{t("negative")}</p>
           <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none">{negatives}</p>
           <div className="mt-2 h-1.5 rounded-full bg-red-100 overflow-hidden">
             <div className="h-full rounded-full bg-red-400 transition-all duration-700"
@@ -265,7 +285,7 @@ export default async function DashboardPage() {
       {responded > 0 && (
         <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-6 shadow-card animate-slide-up animation-delay-100">
           <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">
-            Distribución de respuestas
+            {t("sentimentTitle")}
           </h2>
           <div className="space-y-3">
             {bars.filter(b => b.count > 0).map((bar) => {
@@ -342,7 +362,14 @@ export default async function DashboardPage() {
           ))}
         </div>
       }>
-        <RecentSection businessId={businessId} />
+        <RecentSection
+          businessId={businessId}
+          statusLabels={statusLabels}
+          recentTitle={t("recentTitle")}
+          viewAll={t("viewAll")}
+          noRecent={t("noRecent")}
+          noDataLink={t("noDataLink")}
+        />
       </Suspense>
     </div>
   );

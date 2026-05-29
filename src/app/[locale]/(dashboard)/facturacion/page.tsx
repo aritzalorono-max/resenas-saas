@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CreditCard, FileText, Building2, User, Zap, CheckCircle, AlertTriangle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface BillingInfo {
   tipo: "particular" | "empresa";
@@ -70,6 +71,7 @@ const EMPTY: BillingInfo = {
 };
 
 export default function FacturacionPage() {
+  const t = useTranslations("facturacion");
   const searchParams = useSearchParams();
   const [form, setForm]             = useState<BillingInfo>(EMPTY);
   const [payments, setPayments]     = useState<Payment[]>([]);
@@ -211,8 +213,8 @@ export default function FacturacionPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Facturación</h1>
-        <p className="text-gray-500 text-sm mt-1">Gestiona tu plan, suscripción y datos de facturación</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-500 text-sm mt-1">{t("subtitle")}</p>
       </div>
 
       {/* Stripe feedback */}
@@ -233,7 +235,7 @@ export default function FacturacionPage() {
       <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center gap-2 mb-5">
           <Zap className="w-5 h-5 text-brand-600" />
-          <h2 className="font-semibold text-gray-900">Plan actual</h2>
+          <h2 className="font-semibold text-gray-900">{t("currentPlan")}</h2>
         </div>
 
         <div className="flex items-center justify-between mb-6">
@@ -261,7 +263,7 @@ export default function FacturacionPage() {
               disabled={portalLoading}
               className="text-sm font-medium text-brand-600 hover:text-brand-700 border border-brand-200 hover:border-brand-300 px-4 py-2 rounded-lg transition disabled:opacity-60"
             >
-              {portalLoading ? "Abriendo..." : "Gestionar suscripción →"}
+              {portalLoading ? "Abriendo..." : t("manageBtn")}
             </button>
           )}
         </div>

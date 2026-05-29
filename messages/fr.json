@@ -113,7 +113,12 @@
       "backToLogin": "← Retour à la connexion",
       "successTitle": "Vérifiez votre email",
       "successDesc": "Si un compte existe avec cet email, vous recevrez un lien de réinitialisation.",
-      "errorDefault": "Erreur lors de l'envoi de l'email"
+      "errorDefault": "Erreur lors de l'envoi de l'email",
+      "successSpam": "Si vous ne voyez pas l'email dans quelques minutes, vérifiez votre dossier spam.",
+      "googleAccountTitle": "Ce compte utilise Google",
+      "googleAccountDesc": "Le compte {email} est lié à Google et n'a pas de mot de passe propre, il ne peut donc pas être réinitialisé.",
+      "googleAccountDesc2": "Pour vous connecter, utilisez le bouton \"Continuer avec Google\" sur l'écran de connexion.",
+      "googleLoginLink": "Aller à la connexion"
     },
     "newPassword": {
       "title": "Nouveau mot de passe",
@@ -348,6 +353,7 @@
     "expand": "Développer",
     "collapse": "Réduire",
     "using": "Nous utilisons :",
-    "mayActivate": "Services susceptibles d'être activés :"
+    "mayActivate": "Services susceptibles d'être activés :",
+    "close": "Fermer"
   }
 }

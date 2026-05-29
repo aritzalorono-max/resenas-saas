@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import type { ReviewRequest } from "@/types";
 import { Check, ChevronLeft, ChevronRight, MessageSquare, Gift } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
   pending:             { label: "Pendiente",      badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-400"   },
@@ -15,17 +16,6 @@ const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string 
 
 const PAGE_SIZE = 20;
 
-const STATUS_TABS = [
-  { value: "all",                label: "Todas"         },
-  { value: "positive",           label: "Positivas"     },
-  { value: "negative",           label: "Negativas"     },
-  { value: "neutral",            label: "Neutrales"     },
-  { value: "pending",            label: "Pendientes"    },
-  { value: "no_response",        label: "Sin respuesta" },
-  { value: "awaiting_screenshot",label: "Cap. pend."    },
-  { value: "rewarded",           label: "Recompensadas" },
-];
-
 function monthLabel(year: number, month: number): string {
   return new Date(year, month - 1, 1).toLocaleDateString("es-ES", {
     month: "long", year: "numeric",
@@ -37,6 +27,19 @@ export default async function ResenasPage({
 }: {
   searchParams: Promise<{ status?: string; page?: string; month?: string; incentive?: string }>;
 }) {
+  const t               = await getTranslations("resenas");
+
+  const STATUS_TABS = [
+    { value: "all",                label: t("filterAll")        },
+    { value: "positive",           label: t("filterPositive")   },
+    { value: "negative",           label: t("filterNegative")   },
+    { value: "neutral",            label: t("filterNeutral")    },
+    { value: "pending",            label: t("filterPending")    },
+    { value: "no_response",        label: t("filterNoResponse") },
+    { value: "awaiting_screenshot",label: "Cap. pend."          },
+    { value: "rewarded",           label: "Recompensadas"       },
+  ];
+
   const sp              = await searchParams;
   const filterStatus    = sp.status    ?? "all";
   const incentiveFilter = sp.incentive ?? "all";
@@ -152,7 +155,7 @@ export default async function ResenasPage({
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-5">Reseñas y respuestas</h1>
+      <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-5">{t("title")}</h1>
 
       {/* ── Navegación de mes ─────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-4 bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-card">
@@ -192,7 +195,7 @@ export default async function ResenasPage({
           Resumen del mes
         </p>
         {ms.total === 0 ? (
-          <p className="text-sm text-gray-400 italic">Sin solicitudes en este periodo</p>
+          <p className="text-sm text-gray-400 italic">{t("noResults")}</p>
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -202,11 +205,11 @@ export default async function ResenasPage({
               </div>
               <div>
                 <p className="text-2xl font-bold text-green-600">{ms.positive}</p>
-                <p className="text-xs text-gray-400 mt-0.5">Positivas</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t("filterPositive")}</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-red-500">{ms.negative}</p>
-                <p className="text-xs text-gray-400 mt-0.5">Negativas</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t("filterNegative")}</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-brand-600">{ms.rewarded}</p>
@@ -283,7 +286,7 @@ export default async function ResenasPage({
 
       {requests.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-200 px-6 py-16 flex flex-col items-center text-center">
-          <p className="font-semibold text-gray-700">No hay solicitudes</p>
+          <p className="font-semibold text-gray-700">{t("noResults")}</p>
           <p className="text-xs text-gray-400 mt-1">Prueba a cambiar los filtros o navega a otro mes</p>
         </div>
       ) : (
@@ -375,7 +378,7 @@ export default async function ResenasPage({
                   }`}
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  Anterior
+                  {t("prev")}
                 </Link>
                 <Link
                   href={page < totalPages ? href({ page: page + 1 }) : "#"}
@@ -384,7 +387,7 @@ export default async function ResenasPage({
                     page < totalPages ? "text-gray-700 hover:border-brand-300 hover:text-brand-700" : "text-gray-300 pointer-events-none"
                   }`}
                 >
-                  Siguiente
+                  {t("next")}
                   <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>

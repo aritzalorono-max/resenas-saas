@@ -113,7 +113,12 @@
       "backToLogin": "← Torna al login",
       "successTitle": "Controlla la tua email",
       "successDesc": "Se esiste un account con quella email, riceverai un link per reimpostare la password.",
-      "errorDefault": "Errore nell'invio dell'email"
+      "errorDefault": "Errore nell'invio dell'email",
+      "successSpam": "Se non vedi l'email entro qualche minuto, controlla la cartella spam.",
+      "googleAccountTitle": "Questo account usa Google",
+      "googleAccountDesc": "L'account {email} è collegato a Google e non ha una password propria, quindi non può essere reimpostata.",
+      "googleAccountDesc2": "Per accedere, usa il pulsante \"Continua con Google\" nella schermata di accesso.",
+      "googleLoginLink": "Vai al login"
     },
     "newPassword": {
       "title": "Nuova password",
@@ -348,6 +353,7 @@
     "expand": "Espandi",
     "collapse": "Comprimi",
     "using": "Usiamo:",
-    "mayActivate": "Servizi che potrebbero essere attivati:"
+    "mayActivate": "Servizi che potrebbero essere attivati:",
+    "close": "Chiudi"
   }
 }

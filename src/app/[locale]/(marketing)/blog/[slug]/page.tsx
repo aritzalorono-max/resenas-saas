@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { blogPosts, getPostBySlug } from "@/lib/blog-posts";
 import { Clock, ArrowLeft, Tag } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export const revalidate = 86400;
 
@@ -114,6 +115,7 @@ function renderContent(content: string) {
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const t = await getTranslations("blog");
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) notFound();
@@ -139,7 +141,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {/* Back */}
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-brand-600 transition mb-8">
             <ArrowLeft className="w-4 h-4" />
-            Volver al blog
+            {t("backToBlog")}
           </Link>
 
           {/* Header */}
@@ -150,7 +152,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 {post.category}
               </span>
               <span className="flex items-center gap-1 text-xs text-gray-400">
-                <Clock className="w-3.5 h-3.5" /> {post.readTime} de lectura
+                <Clock className="w-3.5 h-3.5" /> {post.readTime} {t("readTime")}
               </span>
               <span className="text-xs text-gray-400">{formatDate(post.date)}</span>
             </div>
@@ -165,17 +167,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {/* CTA inline */}
           <div className="mt-14 bg-gradient-to-br from-brand-600 to-brand-700 rounded-2xl p-8 text-center">
-            <h2 className="text-xl font-bold text-white mb-2">¿Listo para ponerlo en práctica?</h2>
-            <p className="text-brand-100 text-sm mb-5">Automatiza la captación de reseñas en menos de 1 minuto.</p>
+            <h2 className="text-xl font-bold text-white mb-2">{t("ctaTitle")}</h2>
+            <p className="text-brand-100 text-sm mb-5">{t("ctaDesc")}</p>
             <Link href="/register" className="bg-white text-brand-700 font-bold px-6 py-3 rounded-xl hover:bg-brand-50 transition inline-block text-sm">
-              Empezar gratis →
+              {t("ctaBtn")}
             </Link>
           </div>
 
           {/* Related posts */}
           {otherPosts.length > 0 && (
             <div className="mt-14">
-              <h2 className="text-lg font-bold text-gray-900 mb-5">Más artículos</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-5">{t("relatedTitle")}</h2>
               <div className="space-y-4">
                 {otherPosts.map((p) => (
                   <Link key={p.slug} href={`/blog/${p.slug}`} className="block group">

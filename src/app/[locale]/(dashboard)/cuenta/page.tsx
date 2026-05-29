@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { User, Lock, LogOut, Trash2, AlertTriangle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function CuentaPage() {
+  const t = useTranslations("cuenta");
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [provider, setProvider] = useState<string>("email");
@@ -97,8 +99,8 @@ export default function CuentaPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Mi cuenta</h1>
-        <p className="text-gray-500 mt-1">Gestiona tu acceso y datos personales</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-500 mt-1">{t("subtitle")}</p>
       </div>
 
       {/* Información de cuenta */}
@@ -115,7 +117,7 @@ export default function CuentaPage() {
         ) : (
           <div className="space-y-3">
             <div>
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-0.5">Email</p>
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-0.5">{t("email")}</p>
               <p className="text-gray-800 font-medium">{email}</p>
             </div>
             <div>
@@ -152,7 +154,7 @@ export default function CuentaPage() {
             <div className="w-9 h-9 bg-brand-50 rounded-xl flex items-center justify-center">
               <Lock className="w-5 h-5 text-brand-600" />
             </div>
-            <h2 className="font-semibold text-gray-900">Cambiar contraseña</h2>
+            <h2 className="font-semibold text-gray-900">{t("changePassword")}</h2>
           </div>
 
           <form onSubmit={handleChangePassword} className="space-y-4">
@@ -212,7 +214,7 @@ export default function CuentaPage() {
           <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center">
             <LogOut className="w-5 h-5 text-gray-500" />
           </div>
-          <h2 className="font-semibold text-gray-900">Cerrar sesión</h2>
+          <h2 className="font-semibold text-gray-900">{t("logout")}</h2>
         </div>
         <p className="text-sm text-gray-500 mb-4">
           Cierra tu sesión en este dispositivo. Podrás volver a entrar cuando quieras.
@@ -222,7 +224,7 @@ export default function CuentaPage() {
           className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-lg transition"
         >
           <LogOut className="w-4 h-4" />
-          Cerrar sesión
+          {t("logout")}
         </button>
       </div>
 
@@ -232,7 +234,7 @@ export default function CuentaPage() {
           <div className="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
             <Trash2 className="w-5 h-5 text-red-500" />
           </div>
-          <h2 className="font-semibold text-red-700">Eliminar cuenta</h2>
+          <h2 className="font-semibold text-red-700">{t("deleteAccount")}</h2>
         </div>
         <p className="text-sm text-gray-500 mb-4">
           Elimina permanentemente tu cuenta y todos tus datos: negocio, solicitudes y reseñas.

@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useRouter, Link } from "@/i18n/navigation";
 import { GoogleButton } from "@/components/auth/GoogleButton";
+import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
+  const t = useTranslations("auth.login");
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +26,7 @@ export default function LoginPage() {
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Error al iniciar sesión");
+      setError(data.error ?? t("errorDefault"));
       setLoading(false);
       return;
     }
@@ -35,8 +37,8 @@ export default function LoginPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Iniciar sesión</h1>
-      <p className="text-gray-500 mb-6">Accede a tu panel de ReseñasYa</p>
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">{t("title")}</h1>
+      <p className="text-gray-500 mb-6">{t("subtitle")}</p>
 
       <GoogleButton />
 
@@ -45,14 +47,14 @@ export default function LoginPage() {
           <div className="w-full border-t border-gray-200" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-white px-3 text-sm text-gray-400">o continúa con email</span>
+          <span className="bg-white px-3 text-sm text-gray-400">{t("orContinueEmail")}</span>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email
+            {t("email")}
           </label>
           <input
             id="email"
@@ -71,10 +73,10 @@ export default function LoginPage() {
         <div>
           <div className="flex items-center justify-between mb-1">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Contraseña
+              {t("password")}
             </label>
             <Link href="/recuperar" className="text-xs text-brand-600 hover:underline font-medium">
-              ¿Olvidaste tu contraseña?
+              {t("forgotPassword")}
             </Link>
           </div>
           <input
@@ -96,14 +98,14 @@ export default function LoginPage() {
             {error.includes("¿Quieres registrarte?") && (
               <p>
                 <Link href="/register" className="font-semibold underline">
-                  Crear cuenta gratis
+                  {t("registerLink")}
                 </Link>
               </p>
             )}
             {error.includes("¿Olvidaste tu contraseña?") && (
               <p>
                 <Link href="/recuperar" className="font-semibold underline">
-                  Recuperar contraseña
+                  {t("forgotPassword")}
                 </Link>
               </p>
             )}
@@ -115,14 +117,14 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-lg transition"
         >
-          {loading ? "Entrando..." : "Entrar"}
+          {loading ? t("submitting") : t("submit")}
         </button>
       </form>
 
       <p className="text-center text-sm text-gray-500 mt-6">
-        ¿No tienes cuenta?{" "}
+        {t("noAccount")}{" "}
         <Link href="/register" className="text-brand-600 font-medium hover:underline">
-          Regístrate gratis
+          {t("registerLink")}
         </Link>
       </p>
     </div>
