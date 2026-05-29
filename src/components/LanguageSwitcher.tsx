@@ -28,14 +28,19 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   function handleOpen() {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      const dropdownH = routing.locales.length * 36 + 8; // approx height
+      const dropdownH = routing.locales.length * 36 + 8;
+      const dropdownW = 160; // w-40
       const spaceBelow = window.innerHeight - rect.bottom;
       const openUp = spaceBelow < dropdownH && rect.top > dropdownH;
-      setDropdownStyle(
-        openUp
-          ? { bottom: window.innerHeight - rect.top + 4, right: window.innerWidth - rect.right }
-          : { top: rect.bottom + 4, right: window.innerWidth - rect.right }
-      );
+      // Align left edge with button if right-aligned dropdown would clip off screen
+      const hPos: React.CSSProperties =
+        rect.right - dropdownW < 8
+          ? { left: Math.max(8, rect.left) }
+          : { right: window.innerWidth - rect.right };
+      const vPos: React.CSSProperties = openUp
+        ? { bottom: window.innerHeight - rect.top + 4 }
+        : { top: rect.bottom + 4 };
+      setDropdownStyle({ ...hPos, ...vPos });
     }
     setOpen((o) => !o);
   }
