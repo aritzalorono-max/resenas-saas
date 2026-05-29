@@ -24,6 +24,12 @@ function stripLocale(pathname: string): string {
 }
 
 export async function middleware(request: NextRequest) {
+  // API routes must never go through intl middleware — it can redirect them to
+  // locale-prefixed paths (e.g. /en/api/auth/callback) which don't exist.
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    return NextResponse.next();
+  }
+
   const bare = stripLocale(request.nextUrl.pathname);
 
   const isDashboard = DASHBOARD_SEGMENTS.some(
@@ -90,6 +96,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
