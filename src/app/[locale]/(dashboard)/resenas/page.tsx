@@ -2,43 +2,47 @@ import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import type { ReviewRequest } from "@/types";
 import { Check, ChevronLeft, ChevronRight, MessageSquare, Gift } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
-const STATUS_CONFIG: Record<string, { label: string; badge: string; dot: string }> = {
-  pending:             { label: "Pendiente",      badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-400"   },
-  positive:            { label: "Positiva",       badge: "bg-green-100 text-green-700",   dot: "bg-green-500"   },
-  negative:            { label: "Negativa",       badge: "bg-red-100 text-red-600",       dot: "bg-red-400"     },
-  neutral:             { label: "Neutral",        badge: "bg-gray-100 text-gray-600",     dot: "bg-gray-400"    },
-  no_response:         { label: "Sin respuesta",  badge: "bg-gray-100 text-gray-500",     dot: "bg-gray-300"    },
-  awaiting_screenshot: { label: "Cap. pendiente",  badge: "bg-purple-100 text-purple-700", dot: "bg-purple-400"  },
-  rewarded:            { label: "Recompensado",   badge: "bg-brand-100 text-brand-700",   dot: "bg-brand-500"   },
+const STATUS_STYLE: Record<string, { badge: string; dot: string }> = {
+  pending:             { badge: "bg-amber-100 text-amber-700",   dot: "bg-amber-400"   },
+  positive:            { badge: "bg-green-100 text-green-700",   dot: "bg-green-500"   },
+  negative:            { badge: "bg-red-100 text-red-600",       dot: "bg-red-400"     },
+  neutral:             { badge: "bg-gray-100 text-gray-600",     dot: "bg-gray-400"    },
+  no_response:         { badge: "bg-gray-100 text-gray-500",     dot: "bg-gray-300"    },
+  awaiting_screenshot: { badge: "bg-purple-100 text-purple-700", dot: "bg-purple-400"  },
+  rewarded:            { badge: "bg-brand-100 text-brand-700",   dot: "bg-brand-500"   },
 };
 
 const PAGE_SIZE = 20;
-
-function monthLabel(year: number, month: number): string {
-  return new Date(year, month - 1, 1).toLocaleDateString("es-ES", {
-    month: "long", year: "numeric",
-  });
-}
 
 export default async function ResenasPage({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string; page?: string; month?: string; incentive?: string }>;
 }) {
-  const t               = await getTranslations("resenas");
+  const [t, locale] = await Promise.all([getTranslations("resenas"), getLocale()]);
 
   const STATUS_TABS = [
-    { value: "all",                label: t("filterAll")        },
-    { value: "positive",           label: t("filterPositive")   },
-    { value: "negative",           label: t("filterNegative")   },
-    { value: "neutral",            label: t("filterNeutral")    },
-    { value: "pending",            label: t("filterPending")    },
-    { value: "no_response",        label: t("filterNoResponse") },
-    { value: "awaiting_screenshot",label: "Cap. pend."          },
-    { value: "rewarded",           label: "Recompensadas"       },
+    { value: "all",                label: t("filterAll")                   },
+    { value: "positive",           label: t("filterPositive")              },
+    { value: "negative",           label: t("filterNegative")              },
+    { value: "neutral",            label: t("filterNeutral")               },
+    { value: "pending",            label: t("filterPending")               },
+    { value: "no_response",        label: t("filterNoResponse")            },
+    { value: "awaiting_screenshot",label: t("filterAwaitingScreenshot")    },
+    { value: "rewarded",           label: t("filterRewarded")              },
   ];
+
+  const STATUS_LABEL: Record<string, string> = {
+    pending:             t("statusPending"),
+    positive:            t("statusPositive"),
+    negative:            t("statusNegative"),
+    neutral:             t("statusNeutral"),
+    no_response:         t("statusNoResponse"),
+    awaiting_screenshot: t("statusAwaitingScreenshot"),
+    rewarded:            t("statusRewarded"),
+  };
 
   const sp              = await searchParams;
   const filterStatus    = sp.status    ?? "all";
@@ -61,6 +65,10 @@ export default async function ResenasPage({
   const prevMStr     = `${prevD.getUTCFullYear()}-${String(prevD.getUTCMonth() + 1).padStart(2, "0")}`;
   const nextMStr     = `${nextD.getUTCFullYear()}-${String(nextD.getUTCMonth() + 1).padStart(2, "0")}`;
   const isCurrentMonth = selectedMonth === currentMonthStr;
+
+  function monthLabel(y: number, m: number): string {
+    return new Date(y, m - 1, 1).toLocaleDateString(locale, { month: "long", year: "numeric" });
+  }
 
   // ── Supabase ─────────────────────────────────────────────────────────────
   const supabase = await createClient();
@@ -192,7 +200,7 @@ export default async function ResenasPage({
       {/* ── Resumen del mes ───────────────────────────────────────────────── */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 mb-5 shadow-card">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-          Resumen del mes
+          {t("monthSummary")}
         </p>
         {ms.total === 0 ? (
           <p className="text-sm text-gray-400 italic">{t("noResults")}</p>
@@ -201,7 +209,7 @@ export default async function ResenasPage({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
                 <p className="text-2xl font-bold text-gray-900">{ms.total}</p>
-                <p className="text-xs text-gray-400 mt-0.5">Solicitudes</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t("requests")}</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-green-600">{ms.positive}</p>
@@ -213,13 +221,13 @@ export default async function ResenasPage({
               </div>
               <div>
                 <p className="text-2xl font-bold text-brand-600">{ms.rewarded}</p>
-                <p className="text-xs text-gray-400 mt-0.5">Recompensadas</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t("rewarded")}</p>
               </div>
             </div>
             {responded > 0 && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-gray-500">Tasa positiva (respondidas)</span>
+                  <span className="text-xs text-gray-500">{t("positiveRate")}</span>
                   <span className="text-xs font-semibold text-green-600">{positiveRate}%</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
@@ -229,10 +237,10 @@ export default async function ResenasPage({
                   />
                 </div>
                 <div className="mt-2.5 flex gap-3 flex-wrap text-xs">
-                  {ms.positive > 0 && <span className="text-green-600">{ms.positive} positiva{ms.positive !== 1 ? "s" : ""}</span>}
-                  {ms.neutral  > 0 && <span className="text-gray-500">{ms.neutral} neutral{ms.neutral !== 1 ? "es" : ""}</span>}
-                  {ms.negative > 0 && <span className="text-red-500">{ms.negative} negativa{ms.negative !== 1 ? "s" : ""}</span>}
-                  {ms.pending  > 0 && <span className="text-amber-500">{ms.pending} pendiente{ms.pending !== 1 ? "s" : ""}</span>}
+                  {ms.positive > 0 && <span className="text-green-600">{t("statsPositive", { count: ms.positive, s: ms.positive !== 1 ? "s" : "" })}</span>}
+                  {ms.neutral  > 0 && <span className="text-gray-500">{t("statsNeutral",  { count: ms.neutral,  es: ms.neutral  !== 1 ? "es" : "" })}</span>}
+                  {ms.negative > 0 && <span className="text-red-500">{t("statsNegative", { count: ms.negative, s: ms.negative !== 1 ? "s" : "" })}</span>}
+                  {ms.pending  > 0 && <span className="text-amber-500">{t("statsPending", { count: ms.pending,  s: ms.pending  !== 1 ? "s" : "" })}</span>}
                 </div>
               </div>
             )}
@@ -258,11 +266,11 @@ export default async function ResenasPage({
       </div>
 
       <div className="flex items-center gap-2 mb-5 flex-wrap">
-        <span className="text-xs text-gray-400">Incentivo:</span>
+        <span className="text-xs text-gray-400">{t("incentiveLabel")}</span>
         {[
-          { value: "all", label: "Todos"         },
-          { value: "yes", label: "Con incentivo" },
-          { value: "no",  label: "Sin incentivo" },
+          { value: "all", label: t("incentiveAll") },
+          { value: "yes", label: t("incentiveYes") },
+          { value: "no",  label: t("incentiveNo")  },
         ].map((opt) => (
           <Link
             key={opt.value}
@@ -280,21 +288,22 @@ export default async function ResenasPage({
 
       {/* ── Lista ─────────────────────────────────────────────────────────── */}
       <p className="text-xs text-gray-400 mb-4">
-        {total} solicitud{total !== 1 ? "es" : ""}
-        {filterStatus !== "all" ? ` · ${STATUS_TABS.find(t => t.value === filterStatus)?.label ?? ""}` : ""}
+        {t("requestsCount", { count: total, s: total !== 1 ? "s" : "", es: total !== 1 ? "es" : "", n: total !== 1 ? "n" : "", e: total !== 1 ? "e" : "" })}
+        {filterStatus !== "all" ? ` · ${STATUS_TABS.find(tab => tab.value === filterStatus)?.label ?? ""}` : ""}
       </p>
 
       {requests.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-200 px-6 py-16 flex flex-col items-center text-center">
           <p className="font-semibold text-gray-700">{t("noResults")}</p>
-          <p className="text-xs text-gray-400 mt-1">Prueba a cambiar los filtros o navega a otro mes</p>
+          <p className="text-xs text-gray-400 mt-1">{t("noResultsHint")}</p>
         </div>
       ) : (
         <>
           <div className="space-y-3">
             {requests.map((req) => {
-              const config = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.pending;
-              const sentDate = new Date(req.created_at).toLocaleDateString("es-ES", {
+              const style = STATUS_STYLE[req.status] ?? STATUS_STYLE.pending;
+              const label = STATUS_LABEL[req.status] ?? t("statusPending");
+              const sentDate = new Date(req.created_at).toLocaleDateString(locale, {
                 day: "numeric", month: "short",
               });
 
@@ -313,9 +322,9 @@ export default async function ResenasPage({
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1.5 shrink-0">
-                      <span className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${config.badge}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
-                        {config.label}
+                      <span className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${style.badge}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+                        {label}
                       </span>
                       {req.discount_code && (
                         <span className="text-xs text-brand-600 flex items-center gap-1">
@@ -332,7 +341,7 @@ export default async function ResenasPage({
                       &ldquo;{req.customer_response}&rdquo;
                     </p>
                   ) : (
-                    <p className="text-gray-300 text-xs italic mt-2">Sin respuesta todavía</p>
+                    <p className="text-gray-300 text-xs italic mt-2">{t("noResponseYet")}</p>
                   )}
 
                   {/* Pie */}
@@ -341,7 +350,7 @@ export default async function ResenasPage({
                       {req.responded_at && (
                         <span className="text-xs text-green-600 flex items-center gap-1">
                           <Check className="w-3 h-3" strokeWidth={2.5} />
-                          Respondió
+                          {t("responded")}
                         </span>
                       )}
                       {req.sentiment_score != null && (
@@ -355,7 +364,7 @@ export default async function ResenasPage({
                       className="flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
-                      Ver conversación
+                      {t("viewConversation")}
                     </Link>
                   </div>
                 </div>
@@ -367,7 +376,7 @@ export default async function ResenasPage({
           {totalPages > 1 && (
             <div className="mt-6 flex flex-col sm:flex-row items-center gap-3 sm:justify-between">
               <p className="text-sm text-gray-500 order-2 sm:order-1">
-                Pág. {page}/{totalPages} · {total} solicitudes
+                {t("pageInfo", { page, total: totalPages, count: total })}
               </p>
               <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
                 <Link
