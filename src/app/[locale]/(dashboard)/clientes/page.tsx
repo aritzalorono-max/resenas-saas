@@ -94,7 +94,7 @@ async function sendWithRetry(
   } catch (err) {
     clearTimeout(tid);
     if (err instanceof DOMException && err.name === "AbortError") {
-      throw new Error("La solicitud tardó demasiado. Comprueba tu conexión e inténtalo de nuevo.");
+      throw Object.assign(new Error("timeout"), { code: "TIMEOUT" });
     }
     throw err;
   }
@@ -129,19 +129,22 @@ function normalizePhone(raw: string, dialCode: string): string {
   return `${dialCode}${s.replace(/^0+/, "")}`;
 }
 
-function validateBulkRow(name: string, phone: string) {
+function validateBulkRow(
+  name: string,
+  phone: string,
+  errors: { emptyName: string; tooLong: string; invalidPhone: string }
+) {
   const nameError = !name.trim()
-    ? "Nombre vacío"
+    ? errors.emptyName
     : name.trim().length > 100
-    ? "Nombre demasiado largo"
+    ? errors.tooLong
     : null;
   const digits = phone.replace(/\D/g, "");
-  const phoneError = digits.length < 6 ? "Teléfono inválido" : null;
+  const phoneError = digits.length < 6 ? errors.invalidPhone : null;
   return { nameError, phoneError };
 }
 
 // Remove diacritics and lowercase for locale-insensitive header matching
-// (e.g. "Teléfono" → "telefono", "Nombre" → "nombre")
 function stripDiacritics(s: string): string {
   return s.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").trim();
 }
@@ -150,7 +153,11 @@ function findCol(headers: string[], keywords: string[]): number {
   return headers.findIndex((h) => keywords.includes(stripDiacritics(h)));
 }
 
-async function parseFileToRows(file: File, dialCode: string): Promise<BulkRow[]> {
+async function parseFileToRows(
+  file: File,
+  dialCode: string,
+  validateFn: (name: string, phone: string) => { nameError: string | null; phoneError: string | null }
+): Promise<BulkRow[]> {
   let pairs: [string, string][] = [];
 
   if (file.name.toLowerCase().endsWith(".csv") || file.name.toLowerCase().endsWith(".txt")) {
@@ -189,7 +196,7 @@ async function parseFileToRows(file: File, dialCode: string): Promise<BulkRow[]>
     .filter(([n, p]) => n || p)
     .map(([n, p], idx) => {
       const phone = normalizePhone(p, dialCode);
-      const { nameError, phoneError } = validateBulkRow(n.trim(), phone);
+      const { nameError, phoneError } = validateFn(n.trim(), phone);
       return { id: idx, name: n.trim(), rawPhone: p, phone, nameError, phoneError };
     });
 }
@@ -216,7 +223,7 @@ export default function ClientesPage() {
       setBizSummary({
         businessName: biz.name ?? "",
         welcomeMessage: biz.welcome_message ?? DEFAULT_WELCOME_MESSAGE,
-        platformName: active?.name ?? (biz.google_maps_url ? "Plataforma configurada" : "Sin configurar"),
+        platformName: active?.name ?? (biz.google_maps_url ? t("platformConfigured") : t("notConfigured")),
         platformUrl: biz.google_maps_url,
         incentiveEnabled: biz.incentive_enabled ?? false,
         incentiveDescription: biz.incentive_description ?? null,
@@ -226,7 +233,17 @@ export default function ClientesPage() {
       });
     }
     loadBiz();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const validationErrors = {
+    emptyName: t("validateNameEmpty"),
+    tooLong: t("validateNameTooLong"),
+    invalidPhone: t("validatePhoneInvalid"),
+  };
+
+  const validateRow = (name: string, phone: string) =>
+    validateBulkRow(name, phone, validationErrors);
 
   // Shared
   const [mode, setMode] = useState<"manual" | "bulk">("manual");
@@ -276,12 +293,11 @@ export default function ClientesPage() {
     localStorage.setItem(STORAGE_KEY, c.code);
     setDropdownOpen(false);
     setSearch("");
-    // Re-normalize bulk phones when country changes
     if (bulkRows.length) {
       setBulkRows((rows) =>
         rows.map((r) => {
           const phone = normalizePhone(r.rawPhone, c.dial);
-          const { nameError, phoneError } = validateBulkRow(r.name, phone);
+          const { nameError, phoneError } = validateRow(r.name, phone);
           return { ...r, phone, nameError, phoneError };
         })
       );
@@ -300,10 +316,10 @@ export default function ClientesPage() {
     setError("");
     setSuccess(false);
 
-    if (!form.customer_name.trim()) { setError("El nombre del cliente es obligatorio"); return; }
-    if (form.customer_name.trim().length > 100) { setError("El nombre no puede superar los 100 caracteres"); return; }
+    if (!form.customer_name.trim()) { setError(t("errorNameRequired")); return; }
+    if (form.customer_name.trim().length > 100) { setError(t("errorNameTooLong")); return; }
     const digits = form.customer_phone.replace(/\D/g, "");
-    if (!digits || digits.length < 6) { setError("Introduce un número de teléfono válido"); return; }
+    if (!digits || digits.length < 6) { setError(t("errorPhoneInvalid")); return; }
 
     setLoading(true);
     setRetrying(false);
@@ -313,12 +329,12 @@ export default function ClientesPage() {
     try {
       const res = await sendWithRetry({ customer_name: form.customer_name.trim(), customer_phone: fullPhone });
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? "Error al enviar la solicitud"); return; }
+      if (!res.ok) { setError(data.error ?? t("errorSend")); return; }
       setSuccess(true);
       setForm({ customer_name: "", customer_phone: "" });
     } catch (err) {
-      const msg = err instanceof Error && err.message ? err.message : "Error de conexión. Comprueba tu conexión a internet e inténtalo de nuevo.";
-      setError(msg);
+      const isTimeout = err instanceof Error && (err as { code?: string }).code === "TIMEOUT";
+      setError(isTimeout ? t("errorTimeout") : t("errorConnection"));
     } finally {
       clearTimeout(retryTimer);
       setLoading(false);
@@ -335,27 +351,27 @@ export default function ClientesPage() {
     setBulkFileName(file.name);
 
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      setBulkParseError(`El archivo es demasiado grande. El tamaño máximo es ${MAX_FILE_SIZE_MB} MB.`);
+      setBulkParseError(t("errorFileTooLarge", { max: MAX_FILE_SIZE_MB }));
       return;
     }
 
     try {
-      const rows = await parseFileToRows(file, country.dial);
+      const rows = await parseFileToRows(file, country.dial, validateRow);
       if (!rows.length) {
-        setBulkParseError("No se encontraron filas con datos en el archivo.");
+        setBulkParseError(t("errorFileEmpty"));
         setBulkRows([]);
         return;
       }
       if (rows.length > MAX_BULK_ROWS) {
-        setBulkParseError(`El archivo contiene ${rows.length} filas. El máximo por importación es ${MAX_BULK_ROWS}. Divide el archivo en partes más pequeñas.`);
+        setBulkParseError(t("errorFileTooManyRows", { rows: rows.length, max: MAX_BULK_ROWS }));
         setBulkRows([]);
         return;
       }
       setBulkRows(rows);
     } catch (err) {
-      setBulkParseError("No se pudo leer el archivo. Comprueba que sea un Excel (.xlsx) o CSV (.csv) válido.");
+      setBulkParseError(t("errorFileRead"));
       setBulkRows([]);
-      console.error("Error al leer el archivo de carga masiva:", err);
+      console.error("Bulk file read error:", err);
     }
   }
 
@@ -387,8 +403,8 @@ export default function ClientesPage() {
           result.errors.push({ name: row.name, reason: data.error ?? `Error ${res.status}` });
         }
       } catch (err) {
-        const msg = err instanceof Error && err.message ? err.message : "Error de conexión";
-        result.errors.push({ name: row.name, reason: msg });
+        const isTimeout = err instanceof Error && (err as { code?: string }).code === "TIMEOUT";
+        result.errors.push({ name: row.name, reason: isTimeout ? t("errorTimeout") : t("errorConnection") });
       }
       setSendProgress(i + 1);
       if (i < valid.length - 1) await new Promise((r) => setTimeout(r, SEND_DELAY_MS));
@@ -420,7 +436,7 @@ export default function ClientesPage() {
               mode === m ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            {m === "manual" ? "Un contacto" : t("bulkBtn")}
+            {m === "manual" ? t("manualBtn") : t("bulkBtn")}
           </button>
         ))}
       </div>
@@ -452,7 +468,7 @@ export default function ClientesPage() {
                   className="flex-1 border border-gray-300 text-gray-700 font-semibold
                              py-3.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition text-base"
                 >
-                  Ver reseñas
+                  {t("viewReviews")}
                 </button>
               </div>
             </div>
@@ -514,13 +530,13 @@ export default function ClientesPage() {
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Buscar país o prefijo..."
+                            placeholder={t("searchCountry")}
                             className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-brand-400"
                           />
                         </div>
                         <div className="max-h-56 overflow-y-auto">
                           {filteredCountries.length === 0 ? (
-                            <p className="text-sm text-gray-400 text-center py-4">Sin resultados</p>
+                            <p className="text-sm text-gray-400 text-center py-4">{t("noResults")}</p>
                           ) : (
                             filteredCountries.map((c) => (
                               <button
@@ -556,7 +572,7 @@ export default function ClientesPage() {
                   />
                 </div>
                 <p className="text-xs text-gray-400 mt-1.5">
-                  Escribe solo el número local, sin el {country.dial} ni el 0 inicial
+                  {t("phoneHint", { dial: country.dial })}
                 </p>
               </div>
 
@@ -569,7 +585,7 @@ export default function ClientesPage() {
                 </div>
               )}
 
-              {/* Vista previa del mensaje */}
+              {/* Message preview */}
               {bizSummary && (
                 <div className="border border-gray-200 rounded-xl overflow-hidden">
                   <button
@@ -591,8 +607,11 @@ export default function ClientesPage() {
                           .replace(/\{negocio\}/g, bizSummary.businessName || "tu negocio")}
                       </div>
                       <p className="text-xs text-gray-400 mt-2">
-                        Este es el primer mensaje que recibirá por WhatsApp. Puedes editarlo en{" "}
-                        <a href="/configuracion" className="text-brand-600 hover:underline font-medium">Ajustes</a>.
+                        {t.rich("previewFooter", {
+                          a: (chunks) => (
+                            <a href="/configuracion" className="text-brand-600 hover:underline font-medium">{chunks}</a>
+                          ),
+                        })}
                       </p>
                     </div>
                   )}
@@ -600,7 +619,7 @@ export default function ClientesPage() {
               )}
 
               <p className="text-xs text-gray-400 leading-relaxed">
-                Al enviar confirmas que el cliente ha dado su consentimiento para recibir mensajes de WhatsApp conforme al RGPD y la LSSICE.
+                {t("gdprConsent")}
               </p>
 
               <button
@@ -616,7 +635,7 @@ export default function ClientesPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                     </svg>
-                    {retrying ? "Reintentando envío..." : t("submitting")}
+                    {retrying ? t("retrying") : t("submitting")}
                   </>
                 ) : (
                   <>
@@ -651,8 +670,8 @@ export default function ClientesPage() {
               <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Upload className="w-6 h-6 text-gray-400" strokeWidth={1.75} />
               </div>
-              <p className="font-semibold text-gray-700 mb-1">Arrastra tu archivo aquí</p>
-              <p className="text-sm text-gray-400 mb-4">Compatible con Excel (.xlsx) y CSV (.csv)</p>
+              <p className="font-semibold text-gray-700 mb-1">{t("dropZoneTitle")}</p>
+              <p className="text-sm text-gray-400 mb-4">{t("dropZoneDesc")}</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -666,11 +685,11 @@ export default function ClientesPage() {
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 font-medium transition"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
-                  Descargar plantilla
+                  {t("downloadTemplate")}
                 </a>
               </div>
               <p className="text-xs text-gray-400 mt-4">
-                La plantilla debe tener dos columnas: <strong>Nombre</strong> y <strong>Telefono</strong>
+                {t("templateHint")}
               </p>
               <input
                 ref={fileInputRef}
@@ -692,13 +711,13 @@ export default function ClientesPage() {
                   <FileSpreadsheet className="w-4 h-4 text-brand-600 shrink-0" strokeWidth={1.75} />
                   <span className="text-sm font-medium text-gray-700 truncate">{bulkFileName}</span>
                   {bulkRows.length > 0 && (
-                    <span className="text-xs text-gray-400 shrink-0">· {bulkRows.length} filas</span>
+                    <span className="text-xs text-gray-400 shrink-0">{t("bulkRowsCount", { count: bulkRows.length })}</span>
                   )}
                 </div>
                 <button
                   onClick={clearBulkFile}
                   className="text-gray-400 hover:text-gray-600 transition p-1 rounded-lg hover:bg-gray-100"
-                  aria-label="Quitar archivo"
+                  aria-label={t("removeFile")}
                 >
                   <X className="w-4 h-4" strokeWidth={2} />
                 </button>
@@ -715,12 +734,12 @@ export default function ClientesPage() {
                   <div className="flex items-center gap-4 px-4 py-2.5 border-b border-gray-100 text-xs font-medium">
                     <span className="flex items-center gap-1 text-green-600">
                       <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2} />
-                      {validCount} válidos
+                      {t("bulkValid", { count: validCount })}
                     </span>
                     {invalidCount > 0 && (
                       <span className="flex items-center gap-1 text-red-500">
                         <AlertCircle className="w-3.5 h-3.5" strokeWidth={2} />
-                        {invalidCount} con error
+                        {t("bulkInvalidCount", { count: invalidCount })}
                       </span>
                     )}
                   </div>
@@ -731,8 +750,8 @@ export default function ClientesPage() {
                       <thead className="sticky top-0 bg-gray-50 border-b border-gray-100">
                         <tr>
                           <th className="text-left px-4 py-2 text-gray-400 font-medium w-8">#</th>
-                          <th className="text-left px-4 py-2 text-gray-500 font-medium">Nombre</th>
-                          <th className="text-left px-4 py-2 text-gray-500 font-medium">Teléfono</th>
+                          <th className="text-left px-4 py-2 text-gray-500 font-medium">{t("colName")}</th>
+                          <th className="text-left px-4 py-2 text-gray-500 font-medium">{t("colPhone")}</th>
                           <th className="px-4 py-2 w-6"></th>
                         </tr>
                       </thead>
@@ -744,7 +763,7 @@ export default function ClientesPage() {
                               <td className="px-4 py-2 text-gray-300">{row.id + 1}</td>
                               <td className="px-4 py-2">
                                 <span className={row.nameError ? "text-red-600" : "text-gray-700"}>
-                                  {row.name || <span className="italic text-gray-300">vacío</span>}
+                                  {row.name || <span className="italic text-gray-300">{t("emptyCell")}</span>}
                                 </span>
                                 {row.nameError && (
                                   <span className="block text-red-400 text-[10px]">{row.nameError}</span>
@@ -752,7 +771,7 @@ export default function ClientesPage() {
                               </td>
                               <td className="px-4 py-2 font-mono">
                                 <span className={row.phoneError ? "text-red-600" : "text-gray-600"}>
-                                  {row.phone || <span className="italic text-gray-300 font-sans">vacío</span>}
+                                  {row.phone || <span className="italic text-gray-300 font-sans">{t("emptyCell")}</span>}
                                 </span>
                                 {row.phoneError && (
                                   <span className="block text-red-400 text-[10px] font-sans">{row.phoneError}</span>
@@ -778,7 +797,7 @@ export default function ClientesPage() {
           {/* Country prefix selector */}
           {bulkRows.length > 0 && sendStatus === "idle" && (
             <div className="bg-white rounded-2xl border border-gray-200 px-4 py-3 shadow-card flex items-center gap-3">
-              <span className="text-xs text-gray-500 font-medium shrink-0">Prefijo por defecto:</span>
+              <span className="text-xs text-gray-500 font-medium shrink-0">{t("defaultPrefix")}</span>
               <select
                 value={country.code}
                 onChange={(e) => {
@@ -793,7 +812,7 @@ export default function ClientesPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-gray-400 hidden sm:block">Solo aplica a números sin prefijo</p>
+              <p className="text-xs text-gray-400 hidden sm:block">{t("prefixHint")}</p>
             </div>
           )}
 
@@ -803,7 +822,7 @@ export default function ClientesPage() {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-brand-600" strokeWidth={2} />
-                  Enviando {sendProgress} de {validCount}...
+                  {t("sendingProgress", { current: sendProgress, total: validCount })}
                 </span>
                 <span className="text-xs text-gray-400 tabular-nums">
                   {Math.round((sendProgress / validCount) * 100)}%
@@ -815,7 +834,7 @@ export default function ClientesPage() {
                   style={{ width: `${(sendProgress / validCount) * 100}%` }}
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-2">No cierres esta página mientras se envían los mensajes</p>
+              <p className="text-xs text-gray-400 mt-2">{t("sendingWarning")}</p>
             </div>
           )}
 
@@ -825,12 +844,12 @@ export default function ClientesPage() {
               <div className="px-4 py-4 border-b border-gray-100 flex items-center gap-5 text-sm font-medium">
                 <span className="flex items-center gap-1.5 text-green-600">
                   <CheckCircle2 className="w-4 h-4" strokeWidth={2} />
-                  {sendResult.success} enviados
+                  {t("resultSent", { count: sendResult.success })}
                 </span>
                 {sendResult.errors.length > 0 && (
                   <span className="flex items-center gap-1.5 text-red-500">
                     <AlertCircle className="w-4 h-4" strokeWidth={2} />
-                    {sendResult.errors.length} con error
+                    {t("bulkInvalidCount", { count: sendResult.errors.length })}
                   </span>
                 )}
               </div>
@@ -848,13 +867,13 @@ export default function ClientesPage() {
                   onClick={clearBulkFile}
                   className="flex-1 border border-gray-300 text-gray-700 text-sm font-semibold py-2.5 rounded-xl hover:bg-gray-100 transition"
                 >
-                  Importar otro archivo
+                  {t("importAnother")}
                 </button>
                 <button
                   onClick={() => router.push("/resenas")}
                   className="flex-1 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-2.5 rounded-xl transition"
                 >
-                  Ver reseñas →
+                  {t("viewReviewsArrow")}
                 </button>
               </div>
             </div>
@@ -864,7 +883,7 @@ export default function ClientesPage() {
           {bulkRows.length > 0 && sendStatus === "idle" && validCount > 0 && (
             <>
               <p className="text-xs text-gray-400 leading-relaxed px-1">
-                Al enviar confirmas que todos los contactos han dado su consentimiento para recibir mensajes de WhatsApp conforme al RGPD y la LSSICE. Eres responsable de disponer de esa autorización.
+                {t("gdprConsentBulk")}
               </p>
               <button
                 onClick={handleBulkSend}
@@ -872,10 +891,10 @@ export default function ClientesPage() {
                            transition text-base flex items-center justify-center gap-2 shadow-md shadow-brand-200"
               >
                 <Upload className="w-5 h-5" strokeWidth={2} />
-                Enviar {validCount} WhatsApp{validCount !== 1 ? "s" : ""}
+                {t("bulkSendBtn", { count: validCount })}
                 {invalidCount > 0 && (
                   <span className="text-brand-200 font-normal text-sm ml-1">
-                    ({invalidCount} omitidos)
+                    {t("bulkSkipped", { count: invalidCount })}
                   </span>
                 )}
               </button>
@@ -887,17 +906,17 @@ export default function ClientesPage() {
       {/* Active config summary */}
       {bizSummary && (
         <div className="mt-5 bg-white border border-gray-200 rounded-2xl p-4 space-y-2.5">
-          <h3 className="font-semibold text-gray-800 text-sm">Perfil activo</h3>
+          <h3 className="font-semibold text-gray-800 text-sm">{t("activeConfig")}</h3>
           <div className="space-y-2">
 
             {/* Platform */}
             <div className="flex items-start gap-2.5">
               <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" strokeWidth={1.75} />
               <div className="text-sm">
-                <span className="text-gray-500">Plataforma: </span>
+                <span className="text-gray-500">{t("platformLabel")}: </span>
                 {bizSummary.platformUrl
                   ? <span className="font-medium text-gray-900">{bizSummary.platformName}</span>
-                  : <a href="/configuracion" className="text-amber-600 font-medium hover:underline">Sin configurar — ve a Ajustes →</a>}
+                  : <a href="/configuracion" className="text-amber-600 font-medium hover:underline">{t("notConfigured")}</a>}
               </div>
             </div>
 
@@ -905,10 +924,10 @@ export default function ClientesPage() {
             <div className="flex items-start gap-2.5">
               <Gift className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" strokeWidth={1.75} />
               <div className="text-sm">
-                <span className="text-gray-500">Incentivo: </span>
+                <span className="text-gray-500">{t("incentiveLabel")}: </span>
                 {bizSummary.incentiveEnabled && bizSummary.incentiveDescription
                   ? <span className="font-medium text-gray-900">{bizSummary.incentiveDescription}</span>
-                  : <span className="text-gray-400">Desactivado</span>}
+                  : <span className="text-gray-400">{t("incentiveOff")}</span>}
               </div>
             </div>
 
@@ -917,11 +936,11 @@ export default function ClientesPage() {
               <div className="flex items-start gap-2.5">
                 <Clock className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" strokeWidth={1.75} />
                 <div className="text-sm">
-                  <span className="text-gray-500">Se anuncia: </span>
+                  <span className="text-gray-500">{t("timingLabel")}: </span>
                   <span className="font-medium text-gray-900">
                     {bizSummary.incentiveTiming === "initial"
-                      ? "En el primer mensaje"
-                      : "Tras respuesta positiva"}
+                      ? t("timingInitial")
+                      : t("timingAfterPositive")}
                   </span>
                 </div>
               </div>
@@ -932,14 +951,14 @@ export default function ClientesPage() {
               <div className="flex items-start gap-2.5">
                 <Tag className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" strokeWidth={1.75} />
                 <div className="text-sm">
-                  <span className="text-gray-500">Código: </span>
+                  <span className="text-gray-500">{t("codeLabel")}: </span>
                   {bizSummary.codeType === "fixed" && bizSummary.fixedCode
                     ? <span className="font-mono font-semibold text-gray-900 bg-gray-100 px-1.5 py-0.5 rounded">{bizSummary.fixedCode}</span>
                     : bizSummary.codeType === "fixed"
-                    ? <span className="text-gray-400">Sin código</span>
+                    ? <span className="text-gray-400">{t("codeNone")}</span>
                     : bizSummary.codeType === "random"
-                    ? <span className="font-medium text-gray-900">Aleatorio por cliente</span>
-                    : <span className="font-medium text-gray-900">Pool de códigos</span>}
+                    ? <span className="font-medium text-gray-900">{t("codeRandom")}</span>
+                    : <span className="font-medium text-gray-900">{t("codePool")}</span>}
                 </div>
               </div>
             )}
@@ -949,12 +968,12 @@ export default function ClientesPage() {
 
       {/* How it works */}
       <div className="mt-5 bg-blue-50 border border-blue-100 rounded-2xl p-4">
-        <h3 className="font-semibold text-blue-900 mb-2 text-sm">¿Cómo funciona?</h3>
+        <h3 className="font-semibold text-blue-900 mb-2 text-sm">{t("howTitle")}</h3>
         <ol className="text-sm text-blue-800 space-y-1.5 list-decimal list-inside">
-          <li>Introduces el nombre y teléfono del cliente</li>
-          <li>Le llega un WhatsApp pidiendo su opinión</li>
-          <li>Si es positiva, la IA le anima a dejar reseña en tu plataforma de reseñas</li>
-          <li>Si es negativa, le responde con empatía sin enviarle al enlace</li>
+          <li>{t("howStep1")}</li>
+          <li>{t("howStep2")}</li>
+          <li>{t("howStep3")}</li>
+          <li>{t("howStep4")}</li>
         </ol>
       </div>
     </div>
