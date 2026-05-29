@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getTranslations } from "next-intl/server";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { ConversationTabs } from "@/components/landing/ConversationTabs";
@@ -297,6 +298,7 @@ export default async function LandingPage() {
               <Link href="/login" className="text-gray-500 hover:text-gray-900 text-sm font-medium hidden sm:block">
                 {nav("login")}
               </Link>
+              <LanguageSwitcher />
               <Link
                 href="/register"
                 className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
