@@ -27,6 +27,8 @@ export default function CuentaPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
+  const confirmWord = t("deleteConfirmWord");
+
   useEffect(() => {
     async function load() {
       const supabase = createClient();
@@ -47,11 +49,11 @@ export default function CuentaPage() {
     setPasswordSuccess("");
 
     if (newPassword.length < 8) {
-      setPasswordError("La contraseña debe tener al menos 8 caracteres");
+      setPasswordError(t("errorPasswordShort"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError("Las contraseñas no coinciden");
+      setPasswordError(t("errorPasswordMatch"));
       return;
     }
 
@@ -63,7 +65,7 @@ export default function CuentaPage() {
     if (error) {
       setPasswordError(error.message);
     } else {
-      setPasswordSuccess("Contraseña actualizada correctamente");
+      setPasswordSuccess(t("passwordUpdated"));
       setNewPassword("");
       setConfirmPassword("");
     }
@@ -77,14 +79,14 @@ export default function CuentaPage() {
   }
 
   async function handleDeleteAccount() {
-    if (deleteConfirm !== "ELIMINAR") return;
+    if (deleteConfirm !== confirmWord) return;
     setDeleteLoading(true);
     setDeleteError("");
 
     const res = await fetch("/api/account/delete", { method: "DELETE" });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setDeleteError(body.error ?? "Error al eliminar la cuenta");
+      setDeleteError(body.error ?? t("errorDeleteAccount"));
       setDeleteLoading(false);
       return;
     }
@@ -103,13 +105,13 @@ export default function CuentaPage() {
         <p className="text-gray-500 mt-1">{t("subtitle")}</p>
       </div>
 
-      {/* Información de cuenta */}
+      {/* Access information */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 bg-brand-50 rounded-xl flex items-center justify-center">
             <User className="w-5 h-5 text-brand-600" />
           </div>
-          <h2 className="font-semibold text-gray-900">Información de acceso</h2>
+          <h2 className="font-semibold text-gray-900">{t("accessInfo")}</h2>
         </div>
 
         {loadingUser ? (
@@ -121,7 +123,7 @@ export default function CuentaPage() {
               <p className="text-gray-800 font-medium">{email}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-0.5">Método de acceso</p>
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-0.5">{t("accessMethod")}</p>
               <span className={`inline-flex items-center gap-1.5 text-sm font-medium px-2.5 py-1 rounded-lg ${
                 isOAuth ? "bg-blue-50 text-blue-700" : "bg-gray-100 text-gray-700"
               }`}>
@@ -138,7 +140,7 @@ export default function CuentaPage() {
                 ) : (
                   <>
                     <Lock className="w-3.5 h-3.5" />
-                    Email y contraseña
+                    {t("emailPassword")}
                   </>
                 )}
               </span>
@@ -147,7 +149,7 @@ export default function CuentaPage() {
         )}
       </div>
 
-      {/* Cambiar contraseña (solo usuarios email) */}
+      {/* Change password (email users only) */}
       {!isOAuth && !loadingUser && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-5">
@@ -160,7 +162,7 @@ export default function CuentaPage() {
           <form onSubmit={handleChangePassword} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nueva contraseña
+                {t("newPassword")}
               </label>
               <input
                 type="password"
@@ -168,13 +170,13 @@ export default function CuentaPage() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
                 minLength={8}
-                placeholder="Mínimo 8 caracteres"
+                placeholder={t("newPasswordPlaceholder")}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirmar nueva contraseña
+                {t("confirmPasswordLabel")}
               </label>
               <input
                 type="password"
@@ -202,13 +204,13 @@ export default function CuentaPage() {
               disabled={passwordLoading}
               className="bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-lg transition"
             >
-              {passwordLoading ? "Actualizando..." : "Actualizar contraseña"}
+              {passwordLoading ? t("updatingPassword") : t("updatePassword")}
             </button>
           </form>
         </div>
       )}
 
-      {/* Cerrar sesión */}
+      {/* Sign out */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center">
@@ -216,9 +218,7 @@ export default function CuentaPage() {
           </div>
           <h2 className="font-semibold text-gray-900">{t("logout")}</h2>
         </div>
-        <p className="text-sm text-gray-500 mb-4">
-          Cierra tu sesión en este dispositivo. Podrás volver a entrar cuando quieras.
-        </p>
+        <p className="text-sm text-gray-500 mb-4">{t("logoutDesc")}</p>
         <button
           onClick={() => setShowLogoutModal(true)}
           className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-lg transition"
@@ -228,7 +228,7 @@ export default function CuentaPage() {
         </button>
       </div>
 
-      {/* Zona de peligro */}
+      {/* Delete account */}
       <div className="bg-white rounded-2xl shadow-sm border border-red-100 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
@@ -236,20 +236,17 @@ export default function CuentaPage() {
           </div>
           <h2 className="font-semibold text-red-700">{t("deleteAccount")}</h2>
         </div>
-        <p className="text-sm text-gray-500 mb-4">
-          Elimina permanentemente tu cuenta y todos tus datos: negocio, solicitudes y reseñas.
-          Esta acción no se puede deshacer.
-        </p>
+        <p className="text-sm text-gray-500 mb-4">{t("deleteDesc")}</p>
         <button
           onClick={() => setShowDeleteModal(true)}
           className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 font-medium px-5 py-2.5 rounded-lg transition border border-red-200"
         >
           <Trash2 className="w-4 h-4" />
-          Eliminar mi cuenta
+          {t("deleteBtn")}
         </button>
       </div>
 
-      {/* Modal cerrar sesión */}
+      {/* Sign-out modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div
@@ -262,31 +259,29 @@ export default function CuentaPage() {
               <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
                 <LogOut className="w-5 h-5 text-gray-600" aria-hidden="true" />
               </div>
-              <h3 id="logout-modal-title" className="text-lg font-bold text-gray-900">¿Cerrar sesión?</h3>
+              <h3 id="logout-modal-title" className="text-lg font-bold text-gray-900">{t("logoutModalTitle")}</h3>
             </div>
-            <p className="text-sm text-gray-500 mb-6">
-              Se cerrará tu sesión en este dispositivo. Podrás volver a entrar cuando quieras.
-            </p>
+            <p className="text-sm text-gray-500 mb-6">{t("logoutModalDesc")}</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}
                 className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 rounded-lg transition"
               >
-                Cancelar
+                {t("cancel")}
               </button>
               <button
                 onClick={handleLogout}
                 disabled={logoutLoading}
                 className="flex-1 bg-gray-800 hover:bg-gray-900 disabled:opacity-60 text-white font-semibold py-2.5 rounded-lg transition"
               >
-                {logoutLoading ? "Saliendo..." : "Cerrar sesión"}
+                {logoutLoading ? t("loggingOut") : t("logoutConfirm")}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal eliminar cuenta */}
+      {/* Delete account modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div
@@ -299,22 +294,23 @@ export default function CuentaPage() {
               <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
               </div>
-              <h3 id="delete-modal-title" className="text-lg font-bold text-gray-900">¿Eliminar cuenta?</h3>
+              <h3 id="delete-modal-title" className="text-lg font-bold text-gray-900">{t("deleteModalTitle")}</h3>
             </div>
 
             <p className="text-sm text-gray-600 mb-4">
-              Se eliminarán permanentemente tu cuenta, tu negocio y todas las solicitudes
-              de reseña. Esta acción <strong>no se puede deshacer</strong>.
+              {t.rich("deleteModalDesc", { strong: (c) => <strong key="dmd">{c}</strong> })}
             </p>
 
             <p className="text-sm text-gray-700 mb-2 font-medium">
-              Escribe <span className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-red-700">ELIMINAR</span> para confirmar:
+              {t.rich("deleteConfirmLabel", {
+                code: (c) => <span key="dcl" className="font-mono bg-gray-100 px-1.5 py-0.5 rounded text-red-700">{c}</span>,
+              })}
             </p>
             <input
               type="text"
               value={deleteConfirm}
               onChange={(e) => setDeleteConfirm(e.target.value)}
-              placeholder="ELIMINAR"
+              placeholder={confirmWord}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent mb-4 font-mono"
             />
 
@@ -329,14 +325,14 @@ export default function CuentaPage() {
                 onClick={() => { setShowDeleteModal(false); setDeleteConfirm(""); setDeleteError(""); }}
                 className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 rounded-lg transition"
               >
-                Cancelar
+                {t("cancel")}
               </button>
               <button
                 onClick={handleDeleteAccount}
-                disabled={deleteConfirm !== "ELIMINAR" || deleteLoading}
+                disabled={deleteConfirm !== confirmWord || deleteLoading}
                 className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition"
               >
-                {deleteLoading ? "Eliminando..." : "Eliminar cuenta"}
+                {deleteLoading ? t("deleting") : t("deleteAccountBtn")}
               </button>
             </div>
           </div>
