@@ -36,15 +36,14 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
         onClick={() => setOpen((o) => !o)}
         disabled={isPending}
         aria-label={t("languageSwitcher")}
-        className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition rounded-lg px-2.5 py-1.5 hover:bg-gray-100 ${
+        className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition rounded-lg border border-gray-200 hover:border-gray-300 px-2.5 py-1.5 hover:bg-gray-50 ${
           isPending ? "opacity-50" : ""
         }`}
       >
         <Globe className="w-4 h-4 shrink-0" />
-        {!compact && (
-          <span className="hidden sm:inline">{LOCALE_LABELS[locale] ?? locale.toUpperCase()}</span>
-        )}
-        <span className="sm:hidden text-xs uppercase">{locale}</span>
+        <span className={compact ? "text-xs uppercase" : "text-xs font-semibold uppercase"}>
+          {locale}
+        </span>
       </button>
 
       {open && (
