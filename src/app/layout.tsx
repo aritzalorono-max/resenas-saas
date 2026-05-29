@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { CookieBanner } from "@/components/cookies/CookieBanner";
 import { ConditionalScripts } from "@/components/cookies/ConditionalScripts";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -74,7 +73,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={inter.className}>
         {children}
-        <CookieBanner />
         <ConditionalScripts />
         <Analytics />
         <SpeedInsights />
