@@ -328,7 +328,8 @@
     "validatePhoneInvalid": "Téléphone invalide",
     "platformConfigured": "Plateforme configurée",
     "previewNameFallback": "le client",
-    "previewBizFallback": "votre entreprise"
+    "previewBizFallback": "votre entreprise",
+    "welcomeMessageDefault": "Bonjour {nombre} ! Je suis de l'équipe de {negocio}. Comment s'est passée votre expérience avec nous aujourd'hui ? Votre avis nous aide à nous améliorer 😊 (Répondez STOP pour vous désabonner)"
   },
   "resenas": {
     "title": "Avis",

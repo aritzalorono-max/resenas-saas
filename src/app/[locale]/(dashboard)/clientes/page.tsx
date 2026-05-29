@@ -602,7 +602,7 @@ export default function ClientesPage() {
                   {previewOpen && (
                     <div className="px-4 pb-4 pt-1 border-t border-gray-100 bg-[#f0f2f5]">
                       <div className="bg-[#dcf8c6] rounded-xl rounded-tl-none px-3.5 py-2.5 text-sm text-gray-800 whitespace-pre-wrap mt-3 shadow-sm max-w-[85%]">
-                        {(bizSummary.welcomeMessage || DEFAULT_WELCOME_MESSAGE)
+                        {(bizSummary.welcomeMessage || t("welcomeMessageDefault"))
                           .replace(/\{nombre\}/g, form.customer_name.trim() || t("previewNameFallback"))
                           .replace(/\{negocio\}/g, bizSummary.businessName || t("previewBizFallback"))}
                       </div>

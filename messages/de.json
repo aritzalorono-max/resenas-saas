@@ -328,7 +328,8 @@
     "validatePhoneInvalid": "Ungültige Telefonnummer",
     "platformConfigured": "Plattform konfiguriert",
     "previewNameFallback": "der Kunde",
-    "previewBizFallback": "Ihr Unternehmen"
+    "previewBizFallback": "Ihr Unternehmen",
+    "welcomeMessageDefault": "Hallo {nombre}! Ich bin vom Team von {negocio}. Wie war Ihre Erfahrung mit uns heute? Ihr Feedback hilft uns zu verbessern 😊 (Antworten Sie STOP zum Abbestellen)"
   },
   "resenas": {
     "title": "Bewertungen",
