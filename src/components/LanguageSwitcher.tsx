@@ -28,10 +28,14 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   function handleOpen() {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      setDropdownStyle({
-        top: rect.bottom + 4,
-        right: window.innerWidth - rect.right,
-      });
+      const dropdownH = routing.locales.length * 36 + 8; // approx height
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUp = spaceBelow < dropdownH && rect.top > dropdownH;
+      setDropdownStyle(
+        openUp
+          ? { bottom: window.innerHeight - rect.top + 4, right: window.innerWidth - rect.right }
+          : { top: rect.bottom + 4, right: window.innerWidth - rect.right }
+      );
     }
     setOpen((o) => !o);
   }
