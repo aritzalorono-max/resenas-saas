@@ -3,20 +3,22 @@ import { redirect } from "next/navigation";
 import { getBusinessByUserId } from "@/lib/business";
 import { PosterClient } from "./PosterClient";
 import QRCode from "qrcode";
+import { getTranslations } from "next-intl/server";
 
 export default async function CartelPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const business = await getBusinessByUserId(supabase, user.id);
+  const [business, t] = await Promise.all([
+    getBusinessByUserId(supabase, user.id),
+    getTranslations("cartel"),
+  ]);
 
   if (!business) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <p className="text-gray-500 text-sm">
-          Primero completa la configuración de tu negocio.
-        </p>
+        <p className="text-gray-500 text-sm">{t("noBusinessMsg")}</p>
       </div>
     );
   }
