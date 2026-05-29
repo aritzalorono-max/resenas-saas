@@ -326,7 +326,9 @@
     "validateNameEmpty": "Nome vuoto",
     "validateNameTooLong": "Nome troppo lungo",
     "validatePhoneInvalid": "Telefono non valido",
-    "platformConfigured": "Piattaforma configurata"
+    "platformConfigured": "Piattaforma configurata",
+    "previewNameFallback": "il cliente",
+    "previewBizFallback": "la tua attività"
   },
   "resenas": {
     "title": "Recensioni",

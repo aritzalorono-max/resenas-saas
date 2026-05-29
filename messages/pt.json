@@ -326,7 +326,9 @@
     "validateNameEmpty": "Nome vazio",
     "validateNameTooLong": "Nome demasiado longo",
     "validatePhoneInvalid": "Telefone inválido",
-    "platformConfigured": "Plataforma configurada"
+    "platformConfigured": "Plataforma configurada",
+    "previewNameFallback": "o cliente",
+    "previewBizFallback": "o seu negócio"
   },
   "resenas": {
     "title": "Avaliações",
