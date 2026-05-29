@@ -462,16 +462,16 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                   <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">{footer("product")}</p>
                   <ul className="space-y-2">
                     <li><a href="#precios" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("pricing")}</a></li>
-                    <li><a href="#sectores" className="text-sm text-gray-500 hover:text-gray-800 transition">Sectores</a></li>
+                    <li><a href="#sectores" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("sectors")}</a></li>
                     <li><Link href="/casos-exito" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("successCases")}</Link></li>
                     <li><Link href="/blog" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("blog")}</Link></li>
                     <li><Link href="/faq" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("faq")}</Link></li>
-                    <li><Link href="/register" className="text-sm text-gray-500 hover:text-gray-800 transition">Crear cuenta</Link></li>
+                    <li><Link href="/register" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("register")}</Link></li>
                     <li><Link href="/login" className="text-sm text-gray-500 hover:text-gray-800 transition">{nav("login")}</Link></li>
                   </ul>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">Soporte</p>
+                  <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">{footer("support")}</p>
                   <ul className="space-y-2">
                     <li><Link href="/contacto" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("contact")}</Link></li>
                     <li>

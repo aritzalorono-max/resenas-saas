@@ -18,7 +18,10 @@
     "faq": "FAQ",
     "contact": "Contatto",
     "rights": "Tutti i diritti riservati.",
-    "tagline": "Automatizza le tue recensioni con IA e WhatsApp."
+    "tagline": "Automatizza le tue recensioni con IA e WhatsApp.",
+    "sectors": "Settori",
+    "support": "Supporto",
+    "register": "Crea account"
   },
   "home": {
     "badge": "Automatizza le tue recensioni — su qualsiasi piattaforma",
@@ -89,7 +92,33 @@
     "sectorEcommerce": "E-commerce",
     "sectorApps": "App mobile",
     "sectorGyms": "Palestre & sport",
-    "sectorAcademies": "Accademie & formazione"
+    "sectorAcademies": "Accademie & formazione",
+    "convPositiveHeader": "Cliente soddisfatto · Google Maps",
+    "convPositiveMsg1": "Ciao Maria! Sono il team del Caffè del Sole. Com'è stata la tua esperienza oggi? 😊",
+    "convPositiveMsg2": "Molto buona! Il caffè era delizioso e il personale super gentile 😍",
+    "convPositiveMsg3": "Che bello, Maria! 🙌 Ti andrebbe di condividere la tua esperienza su Google Maps? 👉 maps.google.com/...",
+    "convPositiveFooter": "✓ Cliente indirizzato alla piattaforma di recensioni",
+    "convNegativeHeader": "Cliente insoddisfatto · senza link pubblico",
+    "convNegativeMsg1": "Ciao Carlos! Sono il team del Caffè del Sole. Com'è stata la tua esperienza oggi? 😊",
+    "convNegativeMsg2": "Onestamente non molto bene, hanno impiegato troppo e il mio ordine è arrivato freddo...",
+    "convNegativeMsg3": "Grazie per la tua onestà, Carlos. Siamo dispiaciuti che non fosse all'altezza delle aspettative 😔 Il tuo feedback ci aiuta a migliorare. Speriamo di rivederti presto! 🙏",
+    "convNegativeFooter": "✓ Feedback ricevuto in privato, nessun danno alla reputazione",
+    "convIncentiveHeader": "Incentivo · codice verificato dall'IA",
+    "convIncentiveMsg1": "Ciao Sara! Sono di Style Barbershop. Com'è stata la tua visita? 😊",
+    "convIncentiveMsg2": "Ottimo! Molto contenta del taglio 🥰",
+    "convIncentiveMsg3": "Che bello Sara! 🌟 Lascia una recensione 5★ e inviaci lo screenshot → 20% di sconto sulla tua prossima visita. 👉 maps.google.com/...",
+    "convIncentiveMsg4": "📸 Ecco lo screenshot!",
+    "convIncentiveMsg5": "✅ Verificato! Il tuo 20% di sconto è riservato. A presto! 🎉",
+    "convIncentiveFooter": "✓ L'IA verifica le 5★ prima di inviare la ricompensa",
+    "convEcomHeader": "E-commerce · il cliente scrive per primo",
+    "convEcomMsg1": "📸 Ecco la mia recensione 5★ su Google!",
+    "convEcomVerifying": "IA in fase di verifica della recensione…",
+    "convEcomConfirmed": "Recensione 5★ confermata!",
+    "convEcomReward": "Ecco il tuo regalo come promesso:",
+    "convEcomCodeLabel": "CODICE SCONTO",
+    "convEcomCodeDesc": "25% di sconto · Valido 30 giorni",
+    "convEcomMsg2": "Wow, così veloce! 😍 Grazie mille 🙌",
+    "convEcomFooter": "✓ < 5 secondi dallo screenshot al codice"
   },
   "auth": {
     "login": {
@@ -309,7 +338,8 @@
     "result": "Il risultato",
     "ctaTitle": "Vuoi essere la prossima storia di successo?",
     "ctaDesc": "Inizia gratis oggi e ottieni le tue prime recensioni questa settimana.",
-    "ctaBtn": "Crea account gratuito →"
+    "ctaBtn": "Crea account gratuito →",
+    "noContract": "Senza vincoli · Cancella quando vuoi"
   },
   "precios": {
     "title": "Prezzi semplici e trasparenti",

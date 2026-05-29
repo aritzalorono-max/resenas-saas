@@ -18,7 +18,10 @@
     "faq": "FAQ",
     "contact": "Contacto",
     "rights": "Todos los derechos reservados.",
-    "tagline": "Automatiza tus reseñas con IA y WhatsApp."
+    "tagline": "Automatiza tus reseñas con IA y WhatsApp.",
+    "sectors": "Sectores",
+    "support": "Soporte",
+    "register": "Crear cuenta"
   },
   "home": {
     "badge": "Automatiza tus reseñas — en cualquier plataforma",
@@ -89,7 +92,33 @@
     "sectorEcommerce": "E-commerce",
     "sectorApps": "Apps móviles",
     "sectorGyms": "Gimnasios y deporte",
-    "sectorAcademies": "Academias y formación"
+    "sectorAcademies": "Academias y formación",
+    "convPositiveHeader": "Cliente satisfecho · Google Maps",
+    "convPositiveMsg1": "¡Hola María! Soy el equipo de Cafetería El Sol. ¿Cómo fue tu experiencia hoy? 😊",
+    "convPositiveMsg2": "¡Muy buena! El café riquísimo y el personal súper amable 😍",
+    "convPositiveMsg3": "¡Qué alegría, María! 🙌 ¿Te animarías a dejar tu opinión en Google Maps? 👉 maps.google.com/...",
+    "convPositiveFooter": "✓ Cliente dirigido a la plataforma de reseñas",
+    "convNegativeHeader": "Cliente insatisfecho · sin enlace público",
+    "convNegativeMsg1": "¡Hola Carlos! Soy el equipo de Cafetería El Sol. ¿Cómo fue tu experiencia hoy? 😊",
+    "convNegativeMsg2": "La verdad no muy bien, tardaron mucho y el pedido llegó frío...",
+    "convNegativeMsg3": "Gracias por tu honestidad, Carlos. Lamentamos que no fuera lo esperado 😔 Tu opinión nos ayuda a mejorar. ¡Esperamos verte pronto! 🙏",
+    "convNegativeFooter": "✓ Feedback recibido en privado, sin daño a la reputación",
+    "convIncentiveHeader": "Incentivo · código verificado por IA",
+    "convIncentiveMsg1": "¡Hola Sara! Soy Barbería Styles. ¿Cómo fue tu visita? 😊",
+    "convIncentiveMsg2": "¡Genial! Muy contenta con el corte 🥰",
+    "convIncentiveMsg3": "¡Genial Sara! 🌟 Deja una reseña de 5★ y envíanos captura → 20% dto. en tu próxima visita. 👉 maps.google.com/...",
+    "convIncentiveMsg4": "📸 ¡Aquí la captura!",
+    "convIncentiveMsg5": "✅ ¡Verificado! Tu 20% de descuento está reservado. ¡Hasta pronto! 🎉",
+    "convIncentiveFooter": "✓ La IA verifica las 5★ antes de enviar la recompensa",
+    "convEcomHeader": "E-commerce · el cliente escribe primero",
+    "convEcomMsg1": "📸 ¡Aquí mi reseña de 5★ en Google!",
+    "convEcomVerifying": "IA verificando la reseña…",
+    "convEcomConfirmed": "¡Reseña de 5★ confirmada!",
+    "convEcomReward": "Aquí tu regalo como prometimos:",
+    "convEcomCodeLabel": "CÓDIGO DE DESCUENTO",
+    "convEcomCodeDesc": "25% dto. · Válido 30 días",
+    "convEcomMsg2": "¡Wow, qué rápido! 😍 Muchas gracias 🙌",
+    "convEcomFooter": "✓ < 5 segundos desde la captura hasta el código"
   },
   "auth": {
     "login": {
@@ -309,7 +338,8 @@
     "result": "El resultado",
     "ctaTitle": "¿Quieres ser el próximo caso de éxito?",
     "ctaDesc": "Empieza gratis hoy y consigue tus primeras reseñas esta semana.",
-    "ctaBtn": "Crear cuenta gratis →"
+    "ctaBtn": "Crear cuenta gratis →",
+    "noContract": "Sin permanencia · Cancela cuando quieras"
   },
   "precios": {
     "title": "Precios simples y transparentes",

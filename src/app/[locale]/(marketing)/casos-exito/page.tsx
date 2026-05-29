@@ -250,7 +250,7 @@ export default async function CasosExitoPage() {
           >
             {t("ctaBtn")}
           </Link>
-          <p className="text-brand-200 text-sm mt-4">Sin permanencia · Cancela cuando quieras</p>
+          <p className="text-brand-200 text-sm mt-4">{t("noContract")}</p>
         </div>
       </section>
     </>
