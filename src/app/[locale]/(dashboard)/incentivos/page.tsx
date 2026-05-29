@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations, useLocale } from "next-intl";
 import {
   Gift, Upload, RefreshCw,
   CheckCircle, Clock, Shuffle, ListOrdered,
@@ -18,13 +19,10 @@ interface Stats {
   rewarded: number;
 }
 
-const STATUS_LABEL: Record<string, { label: string; color: string }> = {
-  available: { label: "Disponible", color: "bg-green-100 text-green-700" },
-  used:      { label: "Enviado",    color: "bg-blue-100 text-blue-700"  },
-  expired:   { label: "Expirado",   color: "bg-gray-100 text-gray-500"  },
-};
-
 export default function IncentivosPage() {
+  const t      = useTranslations("incentivos");
+  const locale = useLocale();
+
   const [businessId, setBusinessId]           = useState<string | null>(null);
   const [businessName, setBusinessName]       = useState("");
   const [platformName, setPlatformName]       = useState("Google Maps");
@@ -65,14 +63,11 @@ export default function IncentivosPage() {
     setTiming((biz.incentive_timing as IncentiveTiming) ?? "initial");
     setCodeType(biz.incentive_code_type ?? "fixed");
     setFixedCode(biz.incentive_fixed_code ?? "");
-    // Always start collapsed regardless of saved type
 
-    // Determine active platform name
     const links: { name: string; url: string }[] = biz.review_links ?? [];
     const active = links.find((l) => l.url === biz.google_maps_url);
     setPlatformName(active?.name ?? "Google Maps");
 
-    // Codes list and rewarded count are independent — run in parallel
     const [{ data: codesData }, { count: rewarded }] = await Promise.all([
       supabase
         .from("discount_codes")
@@ -135,14 +130,20 @@ export default function IncentivosPage() {
     const body = await res.json().catch(() => ({}));
 
     if (res.ok) {
-      setUploadResult(`${body.inserted} códigos nuevos añadidos (${body.total} en el archivo)`);
+      setUploadResult(t("uploadSuccess", { inserted: body.inserted, total: body.total }));
       await load(businessId ?? undefined);
     } else {
-      setUploadError(body.error ?? "Error al subir el archivo");
+      setUploadError(body.error ?? t("uploadError"));
     }
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
+
+  const statusLabel: Record<string, { label: string; color: string }> = {
+    available: { label: t("statusAvailable"), color: "bg-green-100 text-green-700" },
+    used:      { label: t("statusUsed"),      color: "bg-blue-100 text-blue-700"   },
+    expired:   { label: t("statusExpired"),   color: "bg-gray-100 text-gray-500"   },
+  };
 
   const filteredCodes = filter === "all" ? codes : codes.filter((c) => c.status === filter);
 
@@ -163,19 +164,17 @@ export default function IncentivosPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Códigos de descuento</h1>
-        <p className="text-gray-500 mt-1">
-          Envía códigos de descuento como incentivo para conseguir más reseñas
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+        <p className="text-gray-500 mt-1">{t("subtitle")}</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "Total emitidos",  value: stats.total,     icon: Ticket,      color: "text-brand-600 bg-brand-50" },
-          { label: "Disponibles",     value: stats.available,  icon: CheckCircle, color: "text-green-600 bg-green-50" },
-          { label: "Enviados",        value: stats.used,       icon: Clock,       color: "text-blue-600 bg-blue-50"   },
-          { label: "Reseñas logradas",value: stats.rewarded,   icon: Gift,        color: "text-amber-600 bg-amber-50" },
+          { label: t("statTotal"),     value: stats.total,     icon: Ticket,      color: "text-brand-600 bg-brand-50" },
+          { label: t("statAvailable"), value: stats.available,  icon: CheckCircle, color: "text-green-600 bg-green-50" },
+          { label: t("statSent"),      value: stats.used,       icon: Clock,       color: "text-blue-600 bg-blue-50"   },
+          { label: t("statRewarded"),  value: stats.rewarded,   icon: Gift,        color: "text-amber-600 bg-amber-50" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${color}`}>
@@ -190,21 +189,17 @@ export default function IncentivosPage() {
       {/* ── Incentivo ── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
         <div>
-          <h2 className="font-semibold text-gray-900">Incentivo por reseña</h2>
-          <p className="text-sm text-gray-400 mt-0.5">
-            Cuando esté activo, el mensaje de WhatsApp incluirá automáticamente la oferta de recompensa
-          </p>
+          <h2 className="font-semibold text-gray-900">{t("incentiveSectionTitle")}</h2>
+          <p className="text-sm text-gray-400 mt-0.5">{t("incentiveSectionDesc")}</p>
         </div>
 
         {/* Legal disclaimer */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-800 leading-relaxed">
-          <p className="font-semibold mb-1">Aviso de responsabilidad</p>
+          <p className="font-semibold mb-1">{t("disclaimerTitle")}</p>
           <p>
-            Algunas plataformas de reseñas (como Google Maps) tienen políticas propias sobre incentivos y solicitudes
-            selectivas. <strong>Eres el único responsable</strong> de asegurarte de que el uso de esta función cumple
-            con dichas políticas. ReseñasYa no asume ninguna responsabilidad por sanciones, eliminaciones de reseñas
-            u otras consecuencias derivadas de su uso. Consulta los Términos de Servicio de cada plataforma antes
-            de activarlo.
+            {t.rich("disclaimerText", {
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
         </div>
 
@@ -220,34 +215,32 @@ export default function IncentivosPage() {
           </span>
           <div>
             <p className={`font-semibold text-sm ${incentiveEnabled ? "text-brand-700" : "text-gray-700"}`}>
-              {incentiveEnabled ? "Incentivo activado" : "Incentivo desactivado"}
+              {incentiveEnabled ? t("incentiveEnabled") : t("incentiveDisabled")}
             </p>
             <p className="text-xs text-gray-500 mt-0.5">
-              {incentiveEnabled
-                ? "El cliente recibirá la oferta de recompensa si deja una reseña"
-                : "Actívalo para ofrecer una recompensa a cambio de una reseña"}
+              {incentiveEnabled ? t("incentiveEnabledDesc") : t("incentiveDisabledDesc")}
             </p>
           </div>
         </button>
 
         {incentiveEnabled && (
           <div className="space-y-4">
-            {/* Cuándo avisar */}
+            {/* Timing */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                ¿Cuándo avisar del incentivo?
+                {t("timingLabel")}
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {([
                   {
                     value: "initial" as IncentiveTiming,
-                    title: "En el primer mensaje",
-                    desc: "El cliente ve la oferta desde el principio, antes de responder.",
+                    title: t("timingInitialTitle"),
+                    desc:  t("timingInitialDesc"),
                   },
                   {
                     value: "after_positive" as IncentiveTiming,
-                    title: "Tras respuesta positiva",
-                    desc: "Solo se ofrece si el cliente ya ha expresado una opinión buena.",
+                    title: t("timingAfterPositiveTitle"),
+                    desc:  t("timingAfterPositiveDesc"),
                   },
                 ] as { value: IncentiveTiming; title: string; desc: string }[]).map(({ value, title, desc }) => (
                   <button
@@ -263,10 +256,10 @@ export default function IncentivosPage() {
               </div>
             </div>
 
-            {/* Qué ofreces */}
+            {/* What you offer */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                ¿Qué ofreces a cambio? *
+                {t("whatOfferLabel")}
               </label>
               <input
                 type="text"
@@ -274,17 +267,15 @@ export default function IncentivosPage() {
                 onChange={(e) => setIncentiveDescription(e.target.value)}
                 maxLength={200}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
-                placeholder="Ej: un código descuento del 25%"
+                placeholder={t("whatOfferPlaceholder")}
               />
-              <p className="text-xs text-gray-400 mt-1">
-                Este texto se añade automáticamente al final del primer mensaje de WhatsApp.
-              </p>
+              <p className="text-xs text-gray-400 mt-1">{t("whatOfferHint")}</p>
             </div>
 
-            {/* Código fijo + botón opciones avanzadas */}
+            {/* Fixed code + advanced toggle */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Código de descuento
+                {t("discountCodeLabel")}
               </label>
               <div className="flex gap-2 items-center">
                 <input
@@ -294,7 +285,7 @@ export default function IncentivosPage() {
                   disabled={codeType !== "fixed"}
                   maxLength={50}
                   className="flex-1 max-w-xs px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition font-mono tracking-widest uppercase disabled:bg-gray-50 disabled:text-gray-400"
-                  placeholder="Ej: BIENVENIDA26"
+                  placeholder="BIENVENIDA26"
                 />
                 <button
                   type="button"
@@ -306,24 +297,22 @@ export default function IncentivosPage() {
                   className="flex items-center gap-1.5 text-sm text-brand-600 hover:text-brand-800 font-medium whitespace-nowrap"
                 >
                   <ChevronDown className={`w-4 h-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
-                  {advancedOpen ? "Ocultar opciones" : "Más opciones"}
+                  {advancedOpen ? t("hideOptions") : t("moreOptions")}
                 </button>
               </div>
               {codeType === "fixed" && (
-                <p className="text-xs text-gray-400 mt-1">
-                  Se enviará el mismo código a todos los clientes. Déjalo vacío para no enviar código.
-                </p>
+                <p className="text-xs text-gray-400 mt-1">{t("fixedCodeHint")}</p>
               )}
             </div>
 
-            {/* Opciones avanzadas */}
+            {/* Advanced options */}
             {advancedOpen && (
               <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Opciones avanzadas</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t("advancedOptions")}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
-                    { value: "random" as IncentiveCodeType, icon: Shuffle, title: "Aleatorio", desc: "Código único por cliente, generado automáticamente." },
-                    { value: "pool"   as IncentiveCodeType, icon: ListOrdered, title: "Pool de códigos", desc: "Lista propia de códigos. Cada uno se usa una sola vez." },
+                    { value: "random" as IncentiveCodeType, icon: Shuffle,      title: t("codeTypeRandom"), desc: t("codeTypeRandomDesc") },
+                    { value: "pool"   as IncentiveCodeType, icon: ListOrdered,  title: t("codeTypePool"),   desc: t("codeTypePoolDesc")   },
                   ].map(({ value, icon: Icon, title, desc }) => (
                     <button
                       key={value}
@@ -340,11 +329,11 @@ export default function IncentivosPage() {
                   ))}
                 </div>
 
-                {/* Upload para pool */}
+                {/* Upload for pool */}
                 {codeType === "pool" && (
                   <div className="pt-1">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm text-gray-600">Sube un Excel (.xlsx) o CSV con un código por fila</p>
+                      <p className="text-sm text-gray-600">{t("uploadHint")}</p>
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
@@ -352,7 +341,7 @@ export default function IncentivosPage() {
                         className="flex items-center gap-2 bg-white border border-gray-300 hover:border-gray-400 text-gray-700 font-medium px-3 py-2 rounded-lg transition text-sm disabled:opacity-60"
                       >
                         {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                        {uploading ? "Subiendo..." : "Subir archivo"}
+                        {uploading ? t("uploading") : t("uploadBtn")}
                       </button>
                       <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleFileUpload} />
                     </div>
@@ -371,77 +360,77 @@ export default function IncentivosPage() {
           </div>
         )}
 
-        {/* Botón guardar */}
+        {/* Save button */}
         <div className="flex items-center gap-3 pt-1">
           <button
             onClick={saveSettings}
             disabled={savingSettings}
             className="bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold px-5 py-2.5 rounded-lg transition text-sm"
           >
-            {savingSettings ? "Guardando..." : "Guardar cambios"}
+            {savingSettings ? t("saving") : t("saveChanges")}
           </button>
           {settingsSuccess && (
             <span className="text-sm text-green-600 font-medium flex items-center gap-1.5">
-              <CheckCircle className="w-4 h-4" /> Guardado
+              <CheckCircle className="w-4 h-4" /> {t("saved")}
             </span>
           )}
         </div>
 
-        {/* Vista previa: flujo completo de conversación */}
+        {/* Conversation preview */}
         {incentiveEnabled && incentiveDescription && (() => {
           const previewCode =
             codeType === "fixed" ? (fixedCode.trim() || null) :
             codeType === "random" ? "A3K8Z2QP" :
-            "TU-CÓDIGO";
+            "YOUR-CODE";
 
           const msgClass = "text-sm text-gray-800 leading-relaxed";
-          const biz = businessName || "tu negocio";
+          const biz = businessName || "your business";
 
           return (
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Ejemplo de conversación</p>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t("previewTitle")}</p>
 
-              {/* Mensaje 1: inicial del negocio */}
+              {/* Step 1 */}
               <div className="flex flex-col gap-1">
-                <p className="text-xs text-gray-400 ml-1">1. Mensaje inicial (lo envías tú)</p>
+                <p className="text-xs text-gray-400 ml-1">{t("previewStep1")}</p>
                 <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                   <p className={`${msgClass} whitespace-pre-wrap`}>
                     {timing === "initial"
-                      ? `¡Hola María! ¿Cómo fue tu experiencia en ${biz}? Si nos puntúas 5 estrellas y nos envías una captura recibirás: ${incentiveDescription} 🎁 ¿Nos cuentas cómo te fue?`
-                      : `¡Hola María! ¿Cómo fue tu experiencia en ${biz}?`}
+                      ? t("previewInitialMsg", { biz, incentive: incentiveDescription })
+                      : t("previewInitialMsgSimple", { biz })}
                   </p>
                 </div>
               </div>
 
-              {/* Respuesta cliente */}
+              {/* Step 2 */}
               <div className="flex flex-col gap-1">
-                <p className="text-xs text-gray-400 ml-1">2. El cliente responde</p>
+                <p className="text-xs text-gray-400 ml-1">{t("previewStep2")}</p>
                 <div className="bg-white border border-gray-200 rounded-2xl rounded-tr-sm px-4 py-3 max-w-xs">
-                  <p className="text-sm text-gray-700 italic">Muy bien, todo perfecto 😊</p>
+                  <p className="text-sm text-gray-700 italic">{t("previewCustomerMsg")}</p>
                 </div>
               </div>
 
-              {/* Mensaje 3: seguimiento automático */}
+              {/* Step 3 */}
               <div className="flex flex-col gap-1">
-                <p className="text-xs text-gray-400 ml-1">3. Respuesta automática (opinión positiva)</p>
+                <p className="text-xs text-gray-400 ml-1">{t("previewStep3")}</p>
                 <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                   <p className={`${msgClass} whitespace-pre-wrap`}>
                     {timing === "initial"
-                      ? `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${biz}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\nCuando la publiques, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`
-                      : `¡Qué alegría saber eso, María! 🙌 Nos encanta que hayas tenido una gran experiencia en ${biz}.\n\n¿Te animarías a dejarnos una reseña de 5 ⭐ en ${platformName}?\n\n👉 [enlace a ${platformName}]\n\nY como agradecimiento por tu tiempo, tu regalo: ${incentiveDescription} 🎁\n\nCuando publiques tu reseña de 5 estrellas, mándanos una captura de pantalla y te lo enviamos enseguida. ¡Muchas gracias! 💚`}
+                      ? t("previewFollowUpInitial", { biz, platform: platformName })
+                      : t("previewFollowUpAfterPositive", { biz, platform: platformName, incentive: incentiveDescription })}
                   </p>
                 </div>
               </div>
 
-              {/* Mensaje 4: tras recibir captura */}
+              {/* Step 4 */}
               <div className="flex flex-col gap-1">
-                <p className="text-xs text-gray-400 ml-1">4. Cliente envía captura → confirmación automática</p>
+                <p className="text-xs text-gray-400 ml-1">{t("previewStep4")}</p>
                 <div className="bg-[#dcf8c6] rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs self-end ml-auto">
                   <p className={`${msgClass} whitespace-pre-wrap`}>
-                    {`¡Muchísimas gracias, María! 🎉 Hemos comprobado tu reseña de 5 ⭐ en ${platformName}.\n\nComo prometimos, aquí tienes tu regalo: `}
+                    {t("previewConfirmationPrefix", { platform: platformName })}
                     <strong>{incentiveDescription}</strong>
-                    {previewCode && <>{" — código "}<strong className="bg-white/60 px-1 rounded">{previewCode}</strong></>}
-                    {` 🎁\n\n¡Gracias por confiar en ${biz}! 💚`}
+                    {previewCode && <>{t("previewCodeInfix")}<strong className="bg-white/60 px-1 rounded">{previewCode}</strong></>}
+                    {t("previewConfirmationSuffix", { biz })}
                   </p>
                 </div>
               </div>
@@ -454,7 +443,7 @@ export default function IncentivosPage() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h2 className="font-semibold text-gray-900">
-            Códigos {codes.length > 0 && <span className="text-gray-400 font-normal text-sm ml-1">({codes.length})</span>}
+            {t("codesTitle")} {codes.length > 0 && <span className="text-gray-400 font-normal text-sm ml-1">({codes.length})</span>}
           </h2>
 
           {/* Filter */}
@@ -464,10 +453,10 @@ export default function IncentivosPage() {
               onChange={(e) => setFilter(e.target.value as FilterStatus)}
               className="appearance-none bg-gray-50 border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-brand-300"
             >
-              <option value="all">Todos</option>
-              <option value="available">Disponibles</option>
-              <option value="used">Enviados</option>
-              <option value="expired">Expirados</option>
+              <option value="all">{t("filterAll")}</option>
+              <option value="available">{t("filterAvailable")}</option>
+              <option value="used">{t("filterUsed")}</option>
+              <option value="expired">{t("filterExpired")}</option>
             </select>
             <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
           </div>
@@ -479,9 +468,9 @@ export default function IncentivosPage() {
             <p className="text-sm">
               {codes.length === 0
                 ? codeType === "pool"
-                  ? "Aún no has subido ningún código. Sube un archivo para empezar."
-                  : "Los códigos aleatorios aparecerán aquí cuando se envíen a clientes."
-                : "No hay códigos con este filtro."}
+                  ? t("emptyPool")
+                  : t("emptyRandom")
+                : t("emptyFilter")}
             </p>
           </div>
         ) : (
@@ -489,10 +478,10 @@ export default function IncentivosPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wide">
-                  <th className="text-left px-5 py-3 font-medium">Código</th>
-                  <th className="text-left px-5 py-3 font-medium hidden sm:table-cell">Tipo</th>
-                  <th className="text-left px-5 py-3 font-medium">Estado</th>
-                  <th className="text-left px-5 py-3 font-medium hidden md:table-cell">Enviado</th>
+                  <th className="text-left px-5 py-3 font-medium">{t("colCode")}</th>
+                  <th className="text-left px-5 py-3 font-medium hidden sm:table-cell">{t("colType")}</th>
+                  <th className="text-left px-5 py-3 font-medium">{t("colStatus")}</th>
+                  <th className="text-left px-5 py-3 font-medium hidden md:table-cell">{t("colSent")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -507,17 +496,17 @@ export default function IncentivosPage() {
                           ? "bg-purple-50 text-purple-700"
                           : "bg-amber-50 text-amber-700"
                       }`}>
-                        {code.type === "random" ? "Aleatorio" : "Pool"}
+                        {code.type === "random" ? t("codeTypeBadgeRandom") : t("codeTypeBadgePool")}
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_LABEL[code.status]?.color ?? ""}`}>
-                        {STATUS_LABEL[code.status]?.label ?? code.status}
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusLabel[code.status]?.color ?? ""}`}>
+                        {statusLabel[code.status]?.label ?? code.status}
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-gray-400 hidden md:table-cell">
                       {code.used_at
-                        ? new Date(code.used_at).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })
+                        ? new Date(code.used_at).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })
                         : "—"}
                     </td>
                   </tr>
