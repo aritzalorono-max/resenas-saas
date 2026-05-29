@@ -316,7 +316,7 @@ export default async function LandingPage() {
             </div>
             <h1 className="text-3xl xs:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
               {t.rich("heroTitle", {
-                stars: () => <span className="text-brand-600">5★</span>,
+                stars: (chunks) => <span className="text-brand-600">{chunks}</span>,
               })}
             </h1>
 
