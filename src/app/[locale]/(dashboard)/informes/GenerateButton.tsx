@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function GenerateButton({ hasReport }: { hasReport: boolean }) {
+  const t = useTranslations("informes");
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState<string | null>(null);
   const router                = useRouter();
@@ -16,11 +18,11 @@ export function GenerateButton({ hasReport }: { hasReport: boolean }) {
       const res = await fetch("/api/generate-report", { method: "POST" });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? "Error generando informe");
+        throw new Error(body.error ?? t("errorGenerating"));
       }
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido");
+      setError(err instanceof Error ? err.message : t("errorUnknown"));
     } finally {
       setLoading(false);
     }
@@ -36,17 +38,13 @@ export function GenerateButton({ hasReport }: { hasReport: boolean }) {
                    transition-all active:scale-[0.98] shadow-sm"
       >
         <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-        {loading
-          ? "Analizando…"
-          : hasReport
-            ? "Regenerar informe"
-            : "Generar informe"}
+        {loading ? t("analyzing") : hasReport ? t("regenerate") : t("generate")}
       </button>
       {error && (
         <p className="text-xs text-red-500">{error}</p>
       )}
       {loading && (
-        <p className="text-xs text-gray-400">Analizando conversaciones con IA… puede tardar ~30 s</p>
+        <p className="text-xs text-gray-400">{t("analyzingNote")}</p>
       )}
     </div>
   );
