@@ -64,7 +64,7 @@ export function CaseStudiesCarousel() {
         className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-6 px-6
                    [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {caseStudies.map(({ Icon, sector, name, before, after, stats }) => (
+        {caseStudies.map(({ Icon, sector, name, challenge, result, stats }) => (
           <div
             data-card
             key={name}
@@ -89,11 +89,11 @@ export function CaseStudiesCarousel() {
             <div className="grid grid-cols-2 gap-0 divide-x divide-gray-100">
               <div className="p-4">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">{t("casesBeforeLabel")}</p>
-                <p className="text-xs text-gray-600 leading-relaxed">{before}</p>
+                <p className="text-xs text-gray-600 leading-relaxed">{challenge}</p>
               </div>
               <div className="p-4 bg-brand-50/40">
                 <p className="text-[10px] font-bold text-brand-600 uppercase tracking-wide mb-1.5">{t("casesAfterLabel")}</p>
-                <p className="text-xs text-gray-700 leading-relaxed font-medium">{after}</p>
+                <p className="text-xs text-gray-700 leading-relaxed font-medium">{result}</p>
               </div>
             </div>
 
