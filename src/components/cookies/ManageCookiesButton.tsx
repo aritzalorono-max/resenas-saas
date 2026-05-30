@@ -5,8 +5,10 @@ import { Settings2 } from "lucide-react";
 import { CookieSettingsModal } from "./CookieSettingsModal";
 import { useCookieConsent } from "@/hooks/useCookieConsent";
 import { REJECT_ALL } from "@/lib/cookie-consent";
+import { useTranslations } from "next-intl";
 
 export function ManageCookiesButton() {
+  const t = useTranslations("cookieBanner");
   const [open, setOpen] = useState(false);
   const { consent, acceptAll, saveCustom } = useCookieConsent();
 
@@ -17,7 +19,7 @@ export function ManageCookiesButton() {
         className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition underline underline-offset-2"
       >
         <Settings2 className="w-3.5 h-3.5" />
-        Gestionar cookies
+        {t("manageCookies")}
       </button>
 
       {open && (

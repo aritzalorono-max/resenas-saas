@@ -1,218 +1,208 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 
-export const metadata: Metadata = {
-  title: "Política de Cookies | ReseñasYa",
-  description: "Información sobre el uso de cookies en ReseñasYa conforme a la normativa europea.",
-  alternates: { canonical: "/cookies" },
-  robots: { index: false },
-};
+const COMPANY = "Buy & Click, SL";
+const EMAIL   = "contacto.resenasya@gmail.com";
 
-const LAST_UPDATED = "16 de mayo de 2026";
-const COMPANY      = "Buy & Click, SL";
-const EMAIL        = "contacto.resenasya@gmail.com";
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("cookies");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDesc"),
+    alternates: { canonical: "/cookies" },
+    robots: { index: false },
+  };
+}
 
-export default function CookiesPage() {
+export default async function CookiesPage() {
+  const t = await getTranslations("cookies");
+
+  const necessaryCookies = [
+    {
+      name: "sb-access-token",
+      provider: "Supabase",
+      purpose: t("c_sbAccess_purpose"),
+      type: t("c_sbAccess_type"),
+      duration: t("c_sbAccess_duration"),
+      consentRequired: false,
+      active: true,
+    },
+    {
+      name: "sb-refresh-token",
+      provider: "Supabase",
+      purpose: t("c_sbRefresh_purpose"),
+      type: t("c_sbRefresh_type"),
+      duration: t("c_sbRefresh_duration"),
+      consentRequired: false,
+      active: true,
+    },
+    {
+      name: "__Host-next-auth.csrf-token",
+      provider: "Next.js",
+      purpose: t("c_csrf_purpose"),
+      type: t("c_csrf_type"),
+      duration: t("c_csrf_duration"),
+      consentRequired: false,
+      active: true,
+    },
+    {
+      name: "ry_cookie_consent",
+      provider: "ReseñasYa (localStorage)",
+      purpose: t("c_ryConsent_purpose"),
+      type: t("c_ryConsent_type"),
+      duration: t("c_ryConsent_duration"),
+      consentRequired: false,
+      active: true,
+    },
+    {
+      name: "resenas_ya_country",
+      provider: "ReseñasYa (localStorage)",
+      purpose: t("c_ryCountry_purpose"),
+      type: t("c_ryCountry_type"),
+      duration: t("c_ryCountry_duration"),
+      consentRequired: false,
+      active: true,
+    },
+  ];
+
+  const analyticsCookies = [
+    {
+      name: "_ga, _ga_*",
+      provider: "Google Analytics 4",
+      purpose: t("c_ga_purpose"),
+      type: t("c_ga_type"),
+      duration: t("c_ga_duration"),
+      consentRequired: true,
+      active: false,
+    },
+    {
+      name: "va_*",
+      provider: "Vercel Analytics",
+      purpose: t("c_va_purpose"),
+      type: t("c_va_type"),
+      duration: t("c_va_duration"),
+      consentRequired: true,
+      active: false,
+    },
+  ];
+
+  const marketingCookies = [
+    {
+      name: "_fbp, _fbc",
+      provider: "Meta Pixel (Facebook / Instagram)",
+      purpose: t("c_fbp_purpose"),
+      type: t("c_fbp_type"),
+      duration: t("c_fbp_duration"),
+      consentRequired: true,
+      active: false,
+    },
+    {
+      name: "li_sugr, bcookie",
+      provider: "LinkedIn Insight Tag",
+      purpose: t("c_li_purpose"),
+      type: t("c_li_type"),
+      duration: t("c_li_duration"),
+      consentRequired: true,
+      active: false,
+    },
+    {
+      name: "_gcl_au, _gcl_aw",
+      provider: "Google Ads",
+      purpose: t("c_gcl_purpose"),
+      type: t("c_gcl_type"),
+      duration: t("c_gcl_duration"),
+      consentRequired: true,
+      active: false,
+    },
+  ];
+
+  const tableHeaders = [
+    t("thName"), t("thProvider"), t("thPurpose"),
+    t("thType"), t("thDuration"), t("thConsent"), t("thStatus"),
+  ];
+
+  const consentLabels = {
+    required: t("consentRequired"),
+    notRequired: t("consentNotRequired"),
+  };
+
+  const statusLabels = {
+    active: t("statusActive"),
+    pending: t("statusPending"),
+  };
+
   return (
     <article>
       <header className="mb-10 pb-6 border-b border-gray-100">
-        <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Documento legal</p>
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Política de Cookies</h1>
-        <p className="text-sm text-gray-400">Última actualización: {LAST_UPDATED}</p>
+        <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">{t("legalDoc")}</p>
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{t("pageTitle")}</h1>
+        <p className="text-sm text-gray-400">{t("lastUpdatedLabel")} {t("lastUpdatedDate")}</p>
 
-        {/* Manage preferences inline */}
         <div className="mt-4 inline-flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-          <span className="text-sm text-gray-500">¿Quieres revisar o cambiar tus preferencias?</span>
+          <span className="text-sm text-gray-500">{t("managePrefsPrompt")}</span>
           <ManageCookiesButton />
         </div>
       </header>
 
-      <Section title="1. ¿Qué son las cookies?">
+      <Section title={t("s1Title")}>
+        <p>{t("s1p1")}</p>
         <p>
-          Una cookie es un pequeño archivo de texto que un sitio web guarda en tu navegador cuando lo visitas.
-          Las cookies permiten que el sitio web recuerde tus acciones y preferencias (como el inicio de sesión,
-          el idioma o el tamaño de fuente) durante un período de tiempo, de modo que no tengas que volver a
-          introducirlos cada vez que visites el sitio o navegues de una página a otra.
-        </p>
-        <p>
-          En cumplimiento del artículo 22.2 de la Ley 34/2002 de Servicios de la Sociedad de la Información
-          (LSSICE), del Reglamento (UE) 2016/679 (RGPD) y de la Directiva 2009/136/CE (Directiva ePrivacy),
-          {" "}{COMPANY} te informa sobre el uso de cookies en la plataforma <strong>ReseñasYa</strong>.
+          {t.rich("s1p2", {
+            company: () => COMPANY,
+            strong: (c) => <strong key="s1p2strong">{c}</strong>,
+          })}
         </p>
       </Section>
 
-      <Section title="2. Tipos de cookies que utilizamos">
-        <SubTitle>2.1 Cookies estrictamente necesarias</SubTitle>
-        <p>
-          Son imprescindibles para el funcionamiento de la plataforma. Sin ellas, servicios como la autenticación
-          o la seguridad de sesión no serían posibles. <strong>No requieren consentimiento</strong> previo conforme
-          a la normativa aplicable y no pueden desactivarse.
-        </p>
-        <CookieTable cookies={[
-          {
-            name: "sb-access-token",
-            provider: "Supabase",
-            purpose: "Gestión de la sesión autenticada del usuario en la plataforma.",
-            type: "Primera parte",
-            duration: "Sesión / 1 hora",
-            consent: "No requerido",
-            active: true,
-          },
-          {
-            name: "sb-refresh-token",
-            provider: "Supabase",
-            purpose: "Renovación automática de la sesión del usuario.",
-            type: "Primera parte",
-            duration: "30 días",
-            consent: "No requerido",
-            active: true,
-          },
-          {
-            name: "__Host-next-auth.csrf-token",
-            provider: "Next.js",
-            purpose: "Protección contra ataques CSRF (Cross-Site Request Forgery).",
-            type: "Primera parte",
-            duration: "Sesión",
-            consent: "No requerido",
-            active: true,
-          },
-          {
-            name: "ry_cookie_consent",
-            provider: "ReseñasYa (localStorage)",
-            purpose: "Almacena tus preferencias de consentimiento de cookies para no pedírtelas en cada visita.",
-            type: "Primera parte (localStorage)",
-            duration: "Hasta que se actualice la política",
-            consent: "No requerido",
-            active: true,
-          },
-          {
-            name: "resenas_ya_country",
-            provider: "ReseñasYa (localStorage)",
-            purpose: "Recuerda el prefijo de país seleccionado en el selector de teléfono.",
-            type: "Primera parte (localStorage)",
-            duration: "Persistente hasta borrado manual",
-            consent: "No requerido",
-            active: true,
-          },
-        ]} />
+      <Section title={t("s2Title")}>
+        <SubTitle>{t("s2_1Title")}</SubTitle>
+        <p>{t("s2_1p1")}</p>
+        <CookieTable cookies={necessaryCookies} headers={tableHeaders} consentLabels={consentLabels} statusLabels={statusLabels} />
 
-        <SubTitle>2.2 Cookies analíticas</SubTitle>
-        <p>
-          Nos ayudan a entender cómo se usa la plataforma para poder mejorarla. Los datos se tratan
-          de forma agregada y anónima. <strong>Solo se activan con tu consentimiento expreso.</strong>
-        </p>
-        <p>
-          <em>Actualmente estas cookies no están activas.</em> Se activarán en una futura actualización
-          de la plataforma, momento en el que se informará mediante el banner de consentimiento.
-        </p>
-        <CookieTable cookies={[
-          {
-            name: "_ga, _ga_*",
-            provider: "Google Analytics 4",
-            purpose: "Mide el comportamiento de navegación de forma anónima para mejorar la experiencia de usuario.",
-            type: "Tercera parte",
-            duration: "2 años",
-            consent: "Requerido",
-            active: false,
-          },
-          {
-            name: "va_*",
-            provider: "Vercel Analytics",
-            purpose: "Analítica de rendimiento web sin cookies de seguimiento entre sitios.",
-            type: "Primera parte",
-            duration: "Sesión",
-            consent: "Requerido",
-            active: false,
-          },
-        ]} />
+        <SubTitle>{t("s2_2Title")}</SubTitle>
+        <p>{t("s2_2p1")}</p>
+        <p><em>{t("s2_2p2")}</em></p>
+        <CookieTable cookies={analyticsCookies} headers={tableHeaders} consentLabels={consentLabels} statusLabels={statusLabels} />
 
-        <SubTitle>2.3 Cookies de marketing y redes sociales</SubTitle>
-        <p>
-          Permiten mostrar publicidad relevante y medir el rendimiento de campañas en plataformas sociales.
-          <strong> Solo se activan con tu consentimiento expreso.</strong>
-        </p>
-        <p>
-          <em>Actualmente estas cookies no están activas.</em> Se activarán en una futura actualización.
-        </p>
-        <CookieTable cookies={[
-          {
-            name: "_fbp, _fbc",
-            provider: "Meta Pixel (Facebook / Instagram)",
-            purpose: "Seguimiento de conversiones y remarketing en plataformas de Meta.",
-            type: "Tercera parte",
-            duration: "90 días",
-            consent: "Requerido",
-            active: false,
-          },
-          {
-            name: "li_sugr, bcookie",
-            provider: "LinkedIn Insight Tag",
-            purpose: "Conversiones y audiencias en LinkedIn.",
-            type: "Tercera parte",
-            duration: "6 meses – 2 años",
-            consent: "Requerido",
-            active: false,
-          },
-          {
-            name: "_gcl_au, _gcl_aw",
-            provider: "Google Ads",
-            purpose: "Medición de conversiones de campañas de Google.",
-            type: "Tercera parte",
-            duration: "90 días",
-            consent: "Requerido",
-            active: false,
-          },
-        ]} />
+        <SubTitle>{t("s2_3Title")}</SubTitle>
+        <p>{t("s2_3p1")}</p>
+        <p><em>{t("s2_3p2")}</em></p>
+        <CookieTable cookies={marketingCookies} headers={tableHeaders} consentLabels={consentLabels} statusLabels={statusLabels} />
       </Section>
 
-      <Section title="3. Servicios de terceros sin cookies de navegador">
-        <p>
-          Los siguientes servicios forman parte de nuestra plataforma pero funcionan exclusivamente en el
-          servidor y <strong>no instalan cookies en tu navegador</strong>:
-        </p>
+      <Section title={t("s3Title")}>
+        <p>{t("s3p1")}</p>
         <ul>
-          <li><strong>Twilio WhatsApp Business</strong> — Envío y recepción de mensajes WhatsApp a clientes.</li>
-          <li><strong>Anthropic Claude</strong> — Análisis de sentimiento de respuestas de clientes mediante IA.</li>
-          <li><strong>Supabase PostgreSQL</strong> — Base de datos. Las credenciales de sesión se gestionan mediante las cookies de primera parte descritas arriba.</li>
+          <li>{t("s3l1")}</li>
+          <li>{t("s3l2")}</li>
+          <li>{t("s3l3")}</li>
         </ul>
         <p>
-          Si accedes a enlaces externos presentes en la plataforma (como tu perfil de Google Maps),
-          los sitios de destino pueden establecer sus propias cookies conforme a sus políticas.
-          {COMPANY} no controla ni es responsable de dichas cookies.
+          {t.rich("s3p2", { company: () => COMPANY })}
         </p>
       </Section>
 
-      <Section title="4. Base legal para el uso de cookies">
+      <Section title={t("s4Title")}>
         <ul>
           <li>
-            <strong>Necesidad técnica / interés legítimo:</strong> las cookies estrictamente necesarias
-            para el funcionamiento del servicio (autenticación, seguridad) no requieren consentimiento
-            previo (artículo 22.2 LSSICE a contrario sensu).
+            <strong>{t("s4l1Title")}</strong>{" "}{t("s4l1Desc")}
           </li>
           <li>
-            <strong>Consentimiento expreso (artículo 6.1.a RGPD):</strong> las cookies analíticas y de
-            marketing requieren tu consentimiento previo, libre, informado y específico. Puedes retirar
-            tu consentimiento en cualquier momento desde el panel de preferencias.
+            <strong>{t("s4l2Title")}</strong>{" "}{t("s4l2Desc")}
           </li>
         </ul>
       </Section>
 
-      <Section title="5. Cómo gestionar tus preferencias">
-        <p>
-          Puedes revisar o cambiar tus preferencias en cualquier momento usando el botón de la parte
-          superior de esta página o desde el pie de página de la plataforma.
-        </p>
-        <p>
-          También puedes gestionar, bloquear o eliminar las cookies a través de la configuración de tu
-          navegador. Ten en cuenta que desactivar las cookies necesarias puede impedir el correcto
-          funcionamiento de la plataforma.
-        </p>
+      <Section title={t("s5Title")}>
+        <p>{t("s5p1")}</p>
+        <p>{t("s5p2")}</p>
         <div className="grid sm:grid-cols-2 gap-3 mt-2 not-prose">
           {[
             { browser: "Google Chrome",   url: "https://support.google.com/chrome/answer/95647" },
-            { browser: "Mozilla Firefox", url: "https://support.mozilla.org/es/kb/habilitar-y-deshabilitar-cookies-sitios-web" },
-            { browser: "Apple Safari",    url: "https://support.apple.com/es-es/guide/safari/sfri11471/mac" },
-            { browser: "Microsoft Edge",  url: "https://support.microsoft.com/es-es/microsoft-edge/eliminar-las-cookies-en-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" },
+            { browser: "Mozilla Firefox", url: "https://support.mozilla.org/kb/enable-and-disable-cookies-website-preferences" },
+            { browser: "Apple Safari",    url: "https://support.apple.com/guide/safari/sfri11471/mac" },
+            { browser: "Microsoft Edge",  url: "https://support.microsoft.com/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" },
           ].map(({ browser, url }) => (
             <a
               key={browser}
@@ -230,16 +220,11 @@ export default function CookiesPage() {
         </div>
       </Section>
 
-      <Section title="6. Actualización de esta política">
+      <Section title={t("s6Title")}>
+        <p>{t.rich("s6p1", { company: () => COMPANY })}</p>
         <p>
-          {COMPANY} puede actualizar esta Política de Cookies cuando sea necesario, por ejemplo al incorporar
-          nuevas funcionalidades que requieran el uso de cookies adicionales o al contratar nuevos servicios.
-          Las actualizaciones sustanciales se comunicarán mediante el banner de consentimiento y, en su caso,
-          por correo electrónico.
-        </p>
-        <p>
-          Para cualquier consulta sobre cookies o privacidad, contacta con nosotros en:{" "}
-          <a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a>.
+          {t("s6p2")}{" "}
+          <a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a>
         </p>
       </Section>
     </article>
@@ -247,7 +232,7 @@ export default function CookiesPage() {
 }
 
 // ---------------------------------------------------------------------------
-// Componentes de presentación
+// Presentation components
 // ---------------------------------------------------------------------------
 
 interface Cookie {
@@ -256,17 +241,32 @@ interface Cookie {
   purpose: string;
   type: string;
   duration: string;
-  consent: string;
+  consentRequired: boolean;
   active: boolean;
 }
 
-function CookieTable({ cookies }: { cookies: Cookie[] }) {
+interface Labels {
+  required: string;
+  notRequired: string;
+}
+
+interface StatusLabels {
+  active: string;
+  pending: string;
+}
+
+function CookieTable({ cookies, headers, consentLabels, statusLabels }: {
+  cookies: Cookie[];
+  headers: string[];
+  consentLabels: Labels;
+  statusLabels: StatusLabels;
+}) {
   return (
     <div className="overflow-x-auto mt-3 mb-4">
       <table className="w-full text-xs border-collapse min-w-[640px]">
         <thead>
           <tr className="bg-gray-50">
-            {["Nombre", "Proveedor", "Finalidad", "Tipo", "Duración", "Consentimiento", "Estado"].map((h) => (
+            {headers.map((h) => (
               <th key={h} className="text-left p-2.5 border border-gray-200 font-semibold text-gray-700">{h}</th>
             ))}
           </tr>
@@ -281,16 +281,16 @@ function CookieTable({ cookies }: { cookies: Cookie[] }) {
               <td className="p-2.5 border border-gray-200 text-gray-600 whitespace-nowrap">{c.duration}</td>
               <td className="p-2.5 border border-gray-200 whitespace-nowrap">
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  c.consent === "No requerido" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                  c.consentRequired ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"
                 }`}>
-                  {c.consent}
+                  {c.consentRequired ? consentLabels.required : consentLabels.notRequired}
                 </span>
               </td>
               <td className="p-2.5 border border-gray-200 whitespace-nowrap">
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                   c.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"
                 }`}>
-                  {c.active ? "Activa" : "Pendiente"}
+                  {c.active ? statusLabels.active : statusLabels.pending}
                 </span>
               </td>
             </tr>

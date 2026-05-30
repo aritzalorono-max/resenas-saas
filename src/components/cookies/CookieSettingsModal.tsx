@@ -14,6 +14,7 @@ interface Props {
 
 export function CookieSettingsModal({ initialPrefs, onSave, onAcceptAll, onClose }: Props) {
   const t = useTranslations("cookieBanner");
+  const tc = useTranslations("cookieCategories");
   const [prefs, setPrefs] = useState<ConsentPreferences>(initialPrefs);
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -60,7 +61,7 @@ export function CookieSettingsModal({ initialPrefs, onSave, onAcceptAll, onClose
                     aria-expanded={isOpen}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm text-gray-900">{cat.label}</span>
+                      <span className="font-semibold text-sm text-gray-900">{tc(`${cat.id}Label`)}</span>
                       {cat.required && (
                         <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
                           {t("alwaysActive")}
@@ -68,7 +69,7 @@ export function CookieSettingsModal({ initialPrefs, onSave, onAcceptAll, onClose
                       )}
                     </div>
                     <p className="text-xs text-gray-400 mt-0.5 leading-snug pr-2 line-clamp-2">
-                      {cat.description}
+                      {tc(`${cat.id}Desc`)}
                     </p>
                   </button>
 
@@ -95,7 +96,7 @@ export function CookieSettingsModal({ initialPrefs, onSave, onAcceptAll, onClose
 
                 {isOpen && (
                   <div className="px-4 pb-4 border-t border-gray-100 pt-3">
-                    <p className="text-xs text-gray-500 leading-relaxed mb-2">{cat.description}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed mb-2">{tc(`${cat.id}Desc`)}</p>
                     <div>
                       <p className="text-xs font-semibold text-gray-600 mb-1.5">
                         {cat.required ? t("using") : t("mayActivate")}
