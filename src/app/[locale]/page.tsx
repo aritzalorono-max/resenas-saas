@@ -349,7 +349,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                 {t("casesTitle")}
               </div>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Resultados reales de negocios reales
+                {t("casesHeading")}
               </h2>
               <p className="text-gray-500 text-lg max-w-2xl mx-auto">
                 {t("casesDesc")}

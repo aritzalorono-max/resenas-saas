@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Star, TrendingUp, Quote, ChevronLeft, ChevronRight } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { getTestimonials, type TestimonialItem } from "@/lib/testimonials-data";
 
 function platformBadgeClass(type: TestimonialItem["platformType"]) {
@@ -17,6 +17,7 @@ function platformBadgeClass(type: TestimonialItem["platformType"]) {
 }
 
 export function TestimonialsCarousel() {
+  const t = useTranslations("home");
   const locale = useLocale();
   const testimonials = getTestimonials(locale);
 
@@ -44,7 +45,7 @@ export function TestimonialsCarousel() {
       <button
         onClick={() => scroll("left")}
         disabled={!canPrev}
-        aria-label="Previous"
+        aria-label={t("prevLabel")}
         className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 z-10
                    w-10 h-10 rounded-full bg-white border-2 border-gray-200 shadow-md
                    flex items-center justify-center text-gray-700
@@ -57,7 +58,7 @@ export function TestimonialsCarousel() {
       <button
         onClick={() => scroll("right")}
         disabled={!canNext}
-        aria-label="Next"
+        aria-label={t("nextLabel")}
         className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 z-10
                    w-10 h-10 rounded-full bg-white border-2 border-gray-200 shadow-md
                    flex items-center justify-center text-gray-700

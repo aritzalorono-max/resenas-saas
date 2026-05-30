@@ -118,7 +118,10 @@
     "convEcomCodeLabel": "CÓDIGO DE DESCUENTO",
     "convEcomCodeDesc": "25% dto. · Válido 30 días",
     "convEcomMsg2": "¡Wow, qué rápido! 😍 Muchas gracias 🙌",
-    "convEcomFooter": "✓ < 5 segundos desde la captura hasta el código"
+    "convEcomFooter": "✓ < 5 segundos desde la captura hasta el código",
+    "casesHeading": "Resultados reales de negocios reales",
+    "prevLabel": "Anterior",
+    "nextLabel": "Siguiente"
   },
   "auth": {
     "login": {
