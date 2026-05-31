@@ -333,11 +333,10 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                Más que pedir reseñas — gestiona toda tu reputación
+                {t("reputationTitle")}
               </h2>
               <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-                Con la integración de Google Business Profile tienes el control total
-                de lo que dicen de ti en Google Maps.
+                {t("reputationSubtitle")}
               </p>
             </div>
 
@@ -355,17 +354,12 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                     </svg>
                   </div>
                   <div>
-                    <span className="text-xs font-bold text-brand-600 uppercase tracking-wider">IA</span>
-                    <h3 className="text-xl font-bold text-gray-900 mt-0.5">
-                      Responde a cada reseña automáticamente
-                    </h3>
+                    <span className="text-xs font-bold text-brand-600 uppercase tracking-wider">{t("replyCardBadge")}</span>
+                    <h3 className="text-xl font-bold text-gray-900 mt-0.5">{t("replyCardTitle")}</h3>
                   </div>
                 </div>
 
-                <p className="text-gray-500 leading-relaxed">
-                  Claude genera respuestas personalizadas adaptadas al tono de tu negocio.
-                  Mantén una presencia activa en Google sin dedicar tiempo manual.
-                </p>
+                <p className="text-gray-500 leading-relaxed">{t("replyCardDesc")}</p>
 
                 <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                   <div>
@@ -376,21 +370,13 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                     <p className="text-xs text-gray-600">&quot;Increíble servicio, volveré sin duda.&quot;</p>
                   </div>
                   <div className="border-l-2 border-brand-300 pl-3">
-                    <p className="text-xs font-semibold text-brand-700 mb-0.5">
-                      Respuesta del propietario · generada con IA
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      ¡Muchas gracias, María! Nos alegra mucho que hayas disfrutado. Te esperamos pronto 😊
-                    </p>
+                    <p className="text-xs font-semibold text-brand-700 mb-0.5">{t("replyExampleLabel")}</p>
+                    <p className="text-xs text-gray-600">{t("replyExampleResponse")}</p>
                   </div>
                 </div>
 
                 <ul className="space-y-2.5">
-                  {[
-                    "Respuestas personalizadas en segundos",
-                    "Tono adaptado a tu negocio (tuteo, formal, juvenil)",
-                    "Mejora el posicionamiento en Google Maps",
-                  ].map((item) => (
+                  {([t("replyFeature1"), t("replyFeature2"), t("replyFeature3")] as string[]).map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
                       <span className="w-4 h-4 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">✓</span>
                       {item}
@@ -411,17 +397,12 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                     </svg>
                   </div>
                   <div>
-                    <span className="text-xs font-bold text-red-500 uppercase tracking-wider">Protección</span>
-                    <h3 className="text-xl font-bold text-gray-900 mt-0.5">
-                      Elimina reseñas falsas o injustas
-                    </h3>
+                    <span className="text-xs font-bold text-red-500 uppercase tracking-wider">{t("removeCardBadge")}</span>
+                    <h3 className="text-xl font-bold text-gray-900 mt-0.5">{t("removeCardTitle")}</h3>
                   </div>
                 </div>
 
-                <p className="text-gray-500 leading-relaxed">
-                  Detectamos qué reseñas negativas incumplen las políticas de Google.
-                  Con un solo clic puedes solicitar su eliminación oficial directamente desde el panel.
-                </p>
+                <p className="text-gray-500 leading-relaxed">{t("removeCardDesc")}</p>
 
                 <div className="bg-red-50 rounded-xl p-4 space-y-3 border border-red-100">
                   <div>
@@ -433,21 +414,17 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="bg-red-100 text-red-600 text-xs font-semibold px-2.5 py-1 rounded-full">
-                      ⚠ Posible incumplimiento
+                      {t("removeExampleBadge")}
                     </span>
-                    <span className="text-xs text-gray-400">Sin detalles · Contenido genérico</span>
+                    <span className="text-xs text-gray-400">{t("removeExampleMeta")}</span>
                   </div>
                   <div className="w-full bg-red-500 text-white text-xs font-semibold py-2 rounded-lg text-center">
-                    Solicitar eliminación a Google →
+                    {t("removeBtn")}
                   </div>
                 </div>
 
                 <ul className="space-y-2.5">
-                  {[
-                    "Análisis automático contra políticas de Google",
-                    "Solicitud de eliminación en 1 clic",
-                    "Seguimiento del estado de cada solicitud",
-                  ].map((item) => (
+                  {([t("removeFeature1"), t("removeFeature2"), t("removeFeature3")] as string[]).map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
                       <span className="w-4 h-4 rounded-full bg-red-100 text-red-500 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">✓</span>
                       {item}
