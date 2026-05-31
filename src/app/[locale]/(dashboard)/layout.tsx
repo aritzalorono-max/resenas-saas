@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
-import type { ComponentProps } from "react";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { BottomNav } from "@/components/layout/BottomNav";
@@ -43,16 +42,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const t = await getTranslations("common");
 
-  type NavHref = ComponentProps<typeof Link>["href"];
-  const navItems: Array<{ href: NavHref; label: string; Icon: React.ComponentType<{ className?: string; size?: number; strokeWidth?: number }> }> = [
-    { href: "/dashboard",     label: t("home"),            Icon: Home        },
-    { href: "/clientes",      label: t("sendRequest"),      Icon: Send        },
-    { href: "/resenas",       label: t("reviews"),          Icon: Star        },
-    { href: "/informes",      label: t("reports"),          Icon: BarChart2   },
-    { href: "/incentivos",    label: t("incentives"),       Icon: Gift        },
-    { href: "/configuracion", label: t("businessProfile"),  Icon: Settings    },
-    { href: "/cartel",        label: t("qrPoster"),         Icon: Printer     },
-    { href: "/facturacion",   label: t("billing"),          Icon: CreditCard  },
+  const navItems = [
+    { href: "/dashboard"     as const, label: t("home"),           Icon: Home        },
+    { href: "/clientes"      as const, label: t("sendRequest"),    Icon: Send        },
+    { href: "/resenas"       as const, label: t("reviews"),        Icon: Star        },
+    { href: "/informes"      as const, label: t("reports"),        Icon: BarChart2   },
+    { href: "/incentivos"    as const, label: t("incentives"),     Icon: Gift        },
+    { href: "/configuracion" as const, label: t("businessProfile"),Icon: Settings    },
+    { href: "/cartel"        as const, label: t("qrPoster"),       Icon: Printer     },
+    { href: "/facturacion"   as const, label: t("billing"),        Icon: CreditCard  },
   ];
 
   return (
