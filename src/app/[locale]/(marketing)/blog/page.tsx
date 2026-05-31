@@ -35,9 +35,8 @@ const categoryColors: Record<string, string> = {
   "Stratégie": "bg-purple-50 text-purple-700",
   "Réputation": "bg-red-50 text-red-700",
   "Légal": "bg-gray-100 text-gray-700",
-  // DE
+  // DE (Reputation same as EN, already covered above)
   "Strategie": "bg-purple-50 text-purple-700",
-  "Reputation": "bg-red-50 text-red-700",
   "Lokales SEO": "bg-green-50 text-green-700",
   "Rechtliches": "bg-gray-100 text-gray-700",
   // IT
