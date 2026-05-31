@@ -62,11 +62,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
   }
 
-  const { reviewerName, reviewText, rating, businessName, tone } = body;
+  const reviewerName = typeof body.reviewerName === "string" ? body.reviewerName.trim().slice(0, 200) : undefined;
+  const reviewText   = typeof body.reviewText   === "string" ? body.reviewText.trim().slice(0, 4096)  : undefined;
+  const businessName = typeof body.businessName === "string" ? body.businessName.trim().slice(0, 200)  : "";
+  const tone         = typeof body.tone         === "string" ? body.tone : undefined;
+  const ratingRaw    = body.rating;
+  const rating       = typeof ratingRaw === "number" ? ratingRaw : Number(ratingRaw);
 
-  if (!rating || !businessName) {
+  if (!businessName || !Number.isFinite(rating) || rating < 1 || rating > 5) {
     return NextResponse.json(
-      { error: "Se requieren rating y businessName" },
+      { error: "Se requieren rating (1–5) y businessName" },
       { status: 400 }
     );
   }

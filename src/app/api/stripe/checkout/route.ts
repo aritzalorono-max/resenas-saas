@@ -19,8 +19,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
     }
 
-    const { plan } = await req.json() as { plan: PlanKey };
-    if (!PLANS[plan]) {
+    const reqBody = await req.json().catch(() => ({}));
+    const plan = String(reqBody?.plan ?? "").trim() as PlanKey;
+    if (!plan || !PLANS[plan]) {
       return NextResponse.json({ error: "Plan no válido" }, { status: 400 });
     }
 
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     if (!business) {
       const { data: created } = await service
         .from("businesses")
-        .insert({ user_id: user.id, name: user.email ?? "Mi negocio", welcome_message: "" })
+        .insert({ user_id: user.id, name: (user.email ?? "Mi negocio").slice(0, 200), welcome_message: "" })
         .select("id, name, stripe_customer_id, stripe_subscription_id, subscription_status")
         .single();
       business = created;

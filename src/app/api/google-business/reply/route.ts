@@ -37,11 +37,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
   }
 
-  const { reviewName, replyText } = body;
+  const reviewName = typeof body.reviewName === "string" ? body.reviewName.trim() : "";
+  const replyText  = typeof body.replyText  === "string" ? body.replyText.trim()  : "";
 
   if (!reviewName || !replyText) {
     return NextResponse.json(
       { error: "Se requieren reviewName y replyText" },
+      { status: 400 }
+    );
+  }
+
+  // Google Business replies are capped at 4096 characters
+  if (replyText.length > 4096) {
+    return NextResponse.json(
+      { error: "La respuesta no puede superar los 4096 caracteres" },
       { status: 400 }
     );
   }

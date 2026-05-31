@@ -85,9 +85,12 @@ export async function POST(request: NextRequest) {
     // Validate welcome_message length
     const safeWelcome = String(welcome_message ?? "").trim().slice(0, WELCOME_MESSAGE_MAX) || DEFAULT_WELCOME_MESSAGE;
 
-    // Validate review_links URLs
+    // Validate review_links URLs (max 10 platforms)
     const rawLinks: ReviewPlatformLink[] = [];
     if (Array.isArray(review_links)) {
+      if (review_links.length > 10) {
+        return NextResponse.json({ error: "Máximo 10 plataformas de reseñas" }, { status: 400 });
+      }
       for (const link of review_links) {
         if (typeof link !== "object" || !link) continue;
         const urlResult = validateUrl(link.url);
@@ -113,9 +116,10 @@ export async function POST(request: NextRequest) {
       whatsapp_language: safeLanguage,
       whatsapp_mode: safeMode,
       reminder_max_count: [0, 1, 2].includes(Number(reminder_max_count)) ? Number(reminder_max_count) : 2,
-      own_twilio_account_sid: safeMode === "own" ? (String(own_twilio_account_sid ?? "").trim() || null) : null,
-      own_twilio_auth_token:  safeMode === "own" ? (String(own_twilio_auth_token ?? "").trim() || null) : null,
-      own_twilio_whatsapp_number: safeMode === "own" ? (String(own_twilio_whatsapp_number ?? "").trim() || null) : null,
+      // Twilio SIDs are max 34 chars (AC + 32 hex); tokens are 32 chars; numbers max 20 chars in E.164
+      own_twilio_account_sid:     safeMode === "own" ? (String(own_twilio_account_sid     ?? "").trim().slice(0, 64)  || null) : null,
+      own_twilio_auth_token:      safeMode === "own" ? (String(own_twilio_auth_token      ?? "").trim().slice(0, 64)  || null) : null,
+      own_twilio_whatsapp_number: safeMode === "own" ? (String(own_twilio_whatsapp_number ?? "").trim().slice(0, 30)  || null) : null,
     };
 
     // Check whether the row already exists

@@ -62,13 +62,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
   }
 
-  const { reviewName, reviewerName, reviewText, rating, flagReason } = body;
+  const reviewName   = typeof body.reviewName   === "string" ? body.reviewName.trim().slice(0, 500)   : "";
+  const reviewerName = typeof body.reviewerName === "string" ? body.reviewerName.trim().slice(0, 200)  : undefined;
+  const reviewText   = typeof body.reviewText   === "string" ? body.reviewText.trim().slice(0, 4096)   : undefined;
+  const flagReason   = typeof body.flagReason   === "string" ? body.flagReason.trim().slice(0, 1000)   : "";
+  const ratingRaw    = body.rating;
+  const rating       = typeof ratingRaw === "number" ? ratingRaw : (ratingRaw !== undefined ? Number(ratingRaw) : undefined);
 
   if (!reviewName || !flagReason) {
     return NextResponse.json(
       { error: "Se requieren reviewName y flagReason" },
       { status: 400 }
     );
+  }
+
+  if (rating !== undefined && (!Number.isFinite(rating) || rating < 1 || rating > 5)) {
+    return NextResponse.json({ error: "El rating debe estar entre 1 y 5" }, { status: 400 });
   }
 
   // Get business info

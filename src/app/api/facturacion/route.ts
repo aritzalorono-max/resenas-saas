@@ -23,16 +23,22 @@ export async function POST(request: NextRequest) {
 
     const safeTipo = ["particular", "empresa"].includes(tipo) ? tipo : "particular";
 
+    const rawEmail = String(email_facturacion ?? "").trim();
+    const safeEmail = rawEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)
+      ? rawEmail.slice(0, 200)
+      : null;
+
     const payload = {
       user_id: user.id,
       tipo: safeTipo,
       nombre: String(nombre ?? "").trim().slice(0, 200),
-      nif: String(nif ?? "").trim().slice(0, 20),
+      // Allow alphanumeric, hyphens, and dots (covers ES NIF/NIE and EU VAT formats)
+      nif: String(nif ?? "").trim().replace(/[^A-Z0-9\-\.]/gi, "").slice(0, 20),
       direccion: String(direccion ?? "").trim().slice(0, 300),
       ciudad: String(ciudad ?? "").trim().slice(0, 100),
-      codigo_postal: String(codigo_postal ?? "").trim().slice(0, 10),
+      codigo_postal: String(codigo_postal ?? "").trim().replace(/[^A-Z0-9\- ]/gi, "").slice(0, 10),
       pais: String(pais ?? "España").trim().slice(0, 100) || "España",
-      email_facturacion: String(email_facturacion ?? "").trim().slice(0, 200) || null,
+      email_facturacion: safeEmail,
       updated_at: new Date().toISOString(),
     };
 

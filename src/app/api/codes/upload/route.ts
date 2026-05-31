@@ -46,10 +46,16 @@ export async function POST(request: Request) {
     const ws = wb.Sheets[wb.SheetNames[0]];
     const rows = xlsx.utils.sheet_to_json<string[]>(ws, { header: 1 });
 
+    const HEADER_WORDS = new Set(["CÓDIGO", "CODIGOS", "CODE", "CODES", "COUPON", "COUPONS"]);
     codes = rows
       .flat()
       .map((v) => String(v ?? "").trim().toUpperCase())
-      .filter((v) => v.length > 0 && v !== "CÓDIGO" && v !== "CODE" && v !== "CODES" && v !== "CODIGOS");
+      .filter((v) => {
+        if (v.length === 0 || HEADER_WORDS.has(v)) return false;
+        if (v.length > 100) return false;
+        // Only allow alphanumeric characters plus hyphens and underscores
+        return /^[A-Z0-9_\-]+$/.test(v);
+      });
   } catch {
     return NextResponse.json({ error: "No se pudo leer el archivo. Asegúrate de que sea .xlsx, .xls o .csv" }, { status: 400 });
   }

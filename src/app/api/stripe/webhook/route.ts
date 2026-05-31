@@ -12,9 +12,11 @@ async function updateSubscription(
   sub: any
 ) {
   const businessId = sub.metadata?.business_id;
-  if (!businessId) return;
+  if (!businessId || typeof businessId !== "string") return;
 
-  const plan = (sub.metadata?.plan ?? "free") as string;
+  const VALID_PLANS = ["free", "starter", "pro"];
+  const rawPlan = sub.metadata?.plan;
+  const plan = typeof rawPlan === "string" && VALID_PLANS.includes(rawPlan) ? rawPlan : "free";
   const status = sub.status;
   const periodEnd = sub.current_period_end ?? sub.items?.data?.[0]?.current_period_end ?? null;
 
