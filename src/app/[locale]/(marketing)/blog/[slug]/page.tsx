@@ -1,20 +1,14 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBlogPosts, getPostBySlug } from "@/lib/blog-posts-data";
+import { getBlogPosts, getPostBySlug, getStaticBlogParams } from "@/lib/blog-posts-data";
 import { Clock, ArrowLeft, Tag } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 
 export const revalidate = 86400;
 
 export function generateStaticParams() {
-  return [
-    "como-conseguir-mas-resenas-google-maps",
-    "por-que-clientes-no-dejan-resenas-whatsapp",
-    "gestionar-resenas-negativas",
-    "algoritmo-google-maps-reputacion-local",
-    "legal-pedir-resenas-whatsapp-rgpd",
-  ].map((slug) => ({ slug }));
+  return getStaticBlogParams();
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
-import { getBlogPosts } from "@/lib/blog-posts-data";
+import { getStaticBlogParams } from "@/lib/blog-posts-data";
 import { localizedPath } from "@/lib/localized-paths";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
 const LOCALES = ["es", "en", "fr", "de", "it", "pt"] as const;
 const DEFAULT_LOCALE = "es";
 
-function sitemapUrl(locale: string, internalPath: string): string {
-  const ext = localizedPath(internalPath, locale);
+function sitemapUrl(locale: string, path: string): string {
+  const ext = localizedPath(path, locale);
   const prefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
   return `${APP_URL}${prefix}${ext}`;
 }
@@ -38,13 +38,37 @@ function entry(
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const blogEntries = getBlogPosts("es").flatMap((post) =>
-    entry(`/blog/${post.slug}`, {
-      lastModified: new Date(post.date),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    })
-  );
+  // getStaticBlogParams returns LOCALES.flatMap(locale => POSTS) — ordered locale-first
+  // So for 5 posts and 6 locales: indices 0-4 = es, 5-9 = en, 10-14 = fr, etc.
+  const allParams = getStaticBlogParams();
+  const postCount = allParams.filter((p) => p.locale === DEFAULT_LOCALE).length;
+
+  const blogEntries: MetadataRoute.Sitemap[number][] = [];
+  for (let i = 0; i < postCount; i++) {
+    // Build slug-by-locale map for this post
+    const alts: Record<string, string> = {};
+    LOCALES.forEach((locale, li) => {
+      const param = allParams[li * postCount + i];
+      if (param) {
+        const prefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
+        alts[locale] = `${APP_URL}${prefix}/blog/${param.slug}`;
+      }
+    });
+    alts["x-default"] = alts[DEFAULT_LOCALE];
+
+    LOCALES.forEach((locale, li) => {
+      const param = allParams[li * postCount + i];
+      if (!param) return;
+      const prefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
+      blogEntries.push({
+        url: `${APP_URL}${prefix}/blog/${param.slug}`,
+        lastModified: new Date("2026-05-28"),
+        changeFrequency: "monthly",
+        priority: locale === DEFAULT_LOCALE ? 0.7 : 0.63,
+        alternates: { languages: alts },
+      });
+    });
+  }
 
   return [
     ...entry("/", { changeFrequency: "weekly", priority: 1 }),

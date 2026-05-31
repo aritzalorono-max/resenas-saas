@@ -1964,10 +1964,65 @@ Em caso de inspeção da CNPD, deve poder demonstrar a base em que tratou os dad
   },
 ];
 
+// Locale-specific URL slugs for each blog post (keyed by the internal ES slug)
+const BLOG_SLUGS: Record<string, Partial<Record<string, string>>> = {
+  "como-conseguir-mas-resenas-google-maps": {
+    es: "como-conseguir-mas-resenas-google-maps",
+    en: "how-to-get-more-google-maps-reviews",
+    fr: "comment-obtenir-plus-avis-google-maps",
+    de: "mehr-google-maps-bewertungen-bekommen",
+    it: "come-ottenere-piu-recensioni-google-maps",
+    pt: "como-obter-mais-avaliacoes-google-maps",
+  },
+  "por-que-clientes-no-dejan-resenas-whatsapp": {
+    es: "por-que-clientes-no-dejan-resenas-whatsapp",
+    en: "why-customers-dont-leave-whatsapp-reviews",
+    fr: "pourquoi-clients-ne-laissent-pas-avis-whatsapp",
+    de: "warum-kunden-keine-bewertungen-per-whatsapp-hinterlassen",
+    it: "perche-i-clienti-non-lasciano-recensioni-whatsapp",
+    pt: "por-que-clientes-nao-deixam-avaliacoes-whatsapp",
+  },
+  "gestionar-resenas-negativas": {
+    es: "gestionar-resenas-negativas",
+    en: "how-to-handle-negative-reviews",
+    fr: "comment-gerer-les-avis-negatifs",
+    de: "negative-bewertungen-richtig-handhaben",
+    it: "come-gestire-recensioni-negative",
+    pt: "como-gerir-avaliacoes-negativas",
+  },
+  "algoritmo-google-maps-reputacion-local": {
+    es: "algoritmo-google-maps-reputacion-local",
+    en: "google-maps-algorithm-local-seo-reputation",
+    fr: "algorithme-google-maps-referencement-local",
+    de: "google-maps-algorithmus-lokale-seo",
+    it: "algoritmo-google-maps-seo-locale",
+    pt: "algoritmo-google-maps-seo-local",
+  },
+  "legal-pedir-resenas-whatsapp-rgpd": {
+    es: "legal-pedir-resenas-whatsapp-rgpd",
+    en: "legal-asking-reviews-whatsapp-gdpr",
+    fr: "legal-demander-avis-whatsapp-rgpd",
+    de: "recht-bewertungen-per-whatsapp-anfragen-dsgvo",
+    it: "legale-chiedere-recensioni-whatsapp-gdpr",
+    pt: "legal-pedir-avaliacoes-whatsapp-rgpd",
+  },
+};
+
+function getLocalSlug(internalSlug: string, locale: string): string {
+  return BLOG_SLUGS[internalSlug]?.[locale] ?? internalSlug;
+}
+
+function getInternalSlug(localSlug: string, locale: string): string | undefined {
+  for (const [internal, map] of Object.entries(BLOG_SLUGS)) {
+    if (map[locale] === localSlug || internal === localSlug) return internal;
+  }
+  return undefined;
+}
+
 export function getBlogPosts(locale: string): Array<{ slug: string; date: string } & BlogPostLocale> {
   const lang = BLOG_POSTS[0]?.locales[locale] ? locale : "en";
   return BLOG_POSTS.map((post) => ({
-    slug: post.slug,
+    slug: getLocalSlug(post.slug, locale),
     date: post.date,
     ...(post.locales[lang] ?? post.locales["en"] ?? post.locales["es"]!),
   }));
@@ -1977,12 +2032,24 @@ export function getPostBySlug(
   slug: string,
   locale: string
 ): ({ slug: string; date: string } & BlogPostLocale) | undefined {
-  const post = BLOG_POSTS.find((p) => p.slug === slug);
+  const internalSlug = getInternalSlug(slug, locale);
+  if (!internalSlug) return undefined;
+  const post = BLOG_POSTS.find((p) => p.slug === internalSlug);
   if (!post) return undefined;
   const lang = post.locales[locale] ? locale : "en";
   return {
-    slug: post.slug,
+    slug: getLocalSlug(internalSlug, locale),
     date: post.date,
     ...(post.locales[lang] ?? post.locales["es"]!),
   };
+}
+
+export function getStaticBlogParams(): Array<{ locale: string; slug: string }> {
+  const LOCALES = ["es", "en", "fr", "de", "it", "pt"] as const;
+  return LOCALES.flatMap((locale) =>
+    BLOG_POSTS.map((post) => ({
+      locale,
+      slug: getLocalSlug(post.slug, locale),
+    }))
+  );
 }
