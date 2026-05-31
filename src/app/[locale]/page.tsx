@@ -328,6 +328,138 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           </div>
         </section>
 
+        {/* Gestión de reputación: respuestas automáticas + eliminar negativas */}
+        <section className="py-12 lg:py-24 px-6 bg-gray-50">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                Más que pedir reseñas — gestiona toda tu reputación
+              </h2>
+              <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+                Con la integración de Google Business Profile tienes el control total
+                de lo que dicen de ti en Google Maps.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+
+              {/* Card 1: Respuestas automáticas */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-8 flex flex-col gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-brand-50 rounded-2xl flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"
+                      strokeLinejoin="round" className="text-brand-600">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                      <path d="m10 7-3 3 3 3"/><path d="M17 13h-6"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-brand-600 uppercase tracking-wider">IA</span>
+                    <h3 className="text-xl font-bold text-gray-900 mt-0.5">
+                      Responde a cada reseña automáticamente
+                    </h3>
+                  </div>
+                </div>
+
+                <p className="text-gray-500 leading-relaxed">
+                  Claude genera respuestas personalizadas adaptadas al tono de tu negocio.
+                  Mantén una presencia activa en Google sin dedicar tiempo manual.
+                </p>
+
+                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-yellow-400 text-xs">★★★★★</span>
+                      <span className="text-xs font-semibold text-gray-900">María G.</span>
+                    </div>
+                    <p className="text-xs text-gray-600">&quot;Increíble servicio, volveré sin duda.&quot;</p>
+                  </div>
+                  <div className="border-l-2 border-brand-300 pl-3">
+                    <p className="text-xs font-semibold text-brand-700 mb-0.5">
+                      Respuesta del propietario · generada con IA
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      ¡Muchas gracias, María! Nos alegra mucho que hayas disfrutado. Te esperamos pronto 😊
+                    </p>
+                  </div>
+                </div>
+
+                <ul className="space-y-2.5">
+                  {[
+                    "Respuestas personalizadas en segundos",
+                    "Tono adaptado a tu negocio (tuteo, formal, juvenil)",
+                    "Mejora el posicionamiento en Google Maps",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
+                      <span className="w-4 h-4 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Card 2: Eliminar reseñas negativas */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-8 flex flex-col gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"
+                      strokeLinejoin="round" className="text-red-500">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                      <path d="m14.5 9-5 5"/><path d="m9.5 9 5 5"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-red-500 uppercase tracking-wider">Protección</span>
+                    <h3 className="text-xl font-bold text-gray-900 mt-0.5">
+                      Elimina reseñas falsas o injustas
+                    </h3>
+                  </div>
+                </div>
+
+                <p className="text-gray-500 leading-relaxed">
+                  Detectamos qué reseñas negativas incumplen las políticas de Google.
+                  Con un solo clic puedes solicitar su eliminación oficial directamente desde el panel.
+                </p>
+
+                <div className="bg-red-50 rounded-xl p-4 space-y-3 border border-red-100">
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-red-400 text-xs">★☆☆☆☆</span>
+                      <span className="text-xs font-semibold text-gray-900">Usuario anónimo</span>
+                    </div>
+                    <p className="text-xs text-gray-600">&quot;Pésimo. No recomiendo a nadie.&quot;</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="bg-red-100 text-red-600 text-xs font-semibold px-2.5 py-1 rounded-full">
+                      ⚠ Posible incumplimiento
+                    </span>
+                    <span className="text-xs text-gray-400">Sin detalles · Contenido genérico</span>
+                  </div>
+                  <div className="w-full bg-red-500 text-white text-xs font-semibold py-2 rounded-lg text-center">
+                    Solicitar eliminación a Google →
+                  </div>
+                </div>
+
+                <ul className="space-y-2.5">
+                  {[
+                    "Análisis automático contra políticas de Google",
+                    "Solicitud de eliminación en 1 clic",
+                    "Seguimiento del estado de cada solicitud",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
+                      <span className="w-4 h-4 rounded-full bg-red-100 text-red-500 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
         {/* Testimonials */}
         <section className="py-12 lg:py-24 px-6 bg-white" id="opiniones">
           <div className="max-w-6xl mx-auto">
