@@ -44,11 +44,11 @@ export default async function CasosExitoPage() {
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-3 gap-6 text-center">
             <div>
-              <p className="text-3xl font-extrabold text-brand-600">+12.400</p>
+              <p className="text-3xl font-extrabold text-brand-600">+1.200.000</p>
               <p className="text-sm text-gray-500 mt-1">{t("stat1")}</p>
             </div>
             <div>
-              <p className="text-3xl font-extrabold text-brand-600">+340</p>
+              <p className="text-3xl font-extrabold text-brand-600">+5.800</p>
               <p className="text-sm text-gray-500 mt-1">{t("stat3")}</p>
             </div>
             <div>
