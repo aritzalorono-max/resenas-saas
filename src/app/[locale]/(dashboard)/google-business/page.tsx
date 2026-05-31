@@ -926,6 +926,7 @@ export default function GoogleBusinessPage() {
   const [analysis, setAnalysis] = useState<ReviewAnalysis | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
   const [connected, setConnected] = useState(false);
+  const [loadingBusiness, setLoadingBusiness] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [reviewsError, setReviewsError] = useState("");
@@ -969,6 +970,8 @@ export default function GoogleBusinessPage() {
         }
       } catch {
         // silent
+      } finally {
+        setLoadingBusiness(false);
       }
     }
     loadBusiness();
@@ -1094,6 +1097,14 @@ export default function GoogleBusinessPage() {
       </div>
 
       {/* Tab content */}
+      {loadingBusiness ? (
+        <div className="flex items-center justify-center py-16 gap-3">
+          <Loader2 size={20} className="animate-spin text-brand-600" />
+        </div>
+      ) : !connected ? (
+        <ConnectPrompt onConnect={handleConnect} t={t} />
+      ) : (
+        <>
       {tab === "profile" && (
         <ProfileTab
           business={business}
@@ -1129,6 +1140,8 @@ export default function GoogleBusinessPage() {
           error={reviewsError}
           t={t}
         />
+      )}
+        </>
       )}
     </div>
   );
