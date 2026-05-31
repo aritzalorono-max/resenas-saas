@@ -313,6 +313,8 @@
     "dropZoneDesc": "Compatible avec Excel (.xlsx) et CSV (.csv)",
     "downloadTemplate": "Télécharger le modèle",
     "templateHint": "Le modèle doit avoir deux colonnes : Nom et Téléphone",
+    "crmNote": "Vous utilisez un CRM, ERP ou souhaitez intégrer votre système de gestion ?",
+    "crmContact": "Contactez-nous et nous le connectons.",
     "bulkRowsCount": "· {count} lignes",
     "removeFile": "Supprimer le fichier",
     "bulkValid": "{count} valides",

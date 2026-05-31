@@ -375,6 +375,17 @@ export default function ClientesPage() {
     }
   }
 
+  function downloadTemplate() {
+    const csv = "Nombre,Telefono\nCarlos García,+34612345678\nLaura Martínez,+34623456789";
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "plantilla-resenasya.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function clearBulkFile() {
     setBulkRows([]);
     setBulkFileName("");
@@ -679,17 +690,25 @@ export default function ClientesPage() {
                 >
                   {t("bulkBtn")}
                 </button>
-                <a
-                  href="/plantilla-resenasya.csv"
-                  download
+                <button
+                  onClick={downloadTemplate}
                   className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 font-medium transition"
                 >
                   <Download className="w-4 h-4" strokeWidth={1.75} />
                   {t("downloadTemplate")}
-                </a>
+                </button>
               </div>
               <p className="text-xs text-gray-400 mt-4">
                 {t("templateHint")}
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                {t("crmNote")}{" "}
+                <a
+                  href="mailto:contacto.resenasya@gmail.com"
+                  className="underline hover:text-gray-600 transition"
+                >
+                  {t("crmContact")}
+                </a>
               </p>
               <input
                 ref={fileInputRef}

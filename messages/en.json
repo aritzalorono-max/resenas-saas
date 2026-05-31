@@ -313,6 +313,8 @@
     "dropZoneDesc": "Supports Excel (.xlsx) and CSV (.csv)",
     "downloadTemplate": "Download template",
     "templateHint": "The template must have two columns: Name and Phone",
+    "crmNote": "Do you use a CRM, ERP or want to integrate your management system?",
+    "crmContact": "Contact us and we'll connect it.",
     "bulkRowsCount": "· {count} rows",
     "removeFile": "Remove file",
     "bulkValid": "{count} valid",

@@ -313,6 +313,8 @@
     "dropZoneDesc": "Unterstützt Excel (.xlsx) und CSV (.csv)",
     "downloadTemplate": "Vorlage herunterladen",
     "templateHint": "Die Vorlage muss zwei Spalten haben: Name und Telefon",
+    "crmNote": "Nutzen Sie ein CRM, ERP oder möchten Sie Ihr System integrieren?",
+    "crmContact": "Kontaktieren Sie uns und wir verbinden es.",
     "bulkRowsCount": "· {count} Zeilen",
     "removeFile": "Datei entfernen",
     "bulkValid": "{count} gültig",

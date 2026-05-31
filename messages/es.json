@@ -313,6 +313,8 @@
     "dropZoneDesc": "Compatible con Excel (.xlsx) y CSV (.csv)",
     "downloadTemplate": "Descargar plantilla",
     "templateHint": "La plantilla debe tener dos columnas: Nombre y Telefono",
+    "crmNote": "¿Usas un CRM, ERP o quieres integrar tu sistema de gestión?",
+    "crmContact": "Contáctanos y lo conectamos.",
     "bulkRowsCount": "· {count} filas",
     "removeFile": "Quitar archivo",
     "bulkValid": "{count} válidos",
