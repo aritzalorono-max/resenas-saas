@@ -49,6 +49,19 @@ export const routing = defineRouting({
     "/register": "/register",
     "/recuperar": "/recuperar",
     "/nueva-contrasena": "/nueva-contrasena",
+    // Dashboard (same path for all locales)
+    "/dashboard": "/dashboard",
+    "/clientes": "/clientes",
+    "/resenas": "/resenas",
+    "/resenas/[id]": "/resenas/[id]",
+    "/configuracion": "/configuracion",
+    "/cuenta": "/cuenta",
+    "/cartel": "/cartel",
+    "/incentivos": "/incentivos",
+    "/informes": "/informes",
+    "/facturacion": "/facturacion",
+    "/onboarding": "/onboarding",
+    "/admin": "/admin",
   },
 });
 
