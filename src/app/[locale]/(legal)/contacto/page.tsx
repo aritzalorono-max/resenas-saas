@@ -34,11 +34,12 @@ export default function ContactoPage() {
 
     try {
       const topicLabel = TOPICS.find(tp => tp.value === form.asunto)?.label ?? form.asunto;
-      const subject = encodeURIComponent(`[${topicLabel}] ${form.nombre}`);
-      const body    = encodeURIComponent(
-        `${t("nameLabel")}: ${form.nombre}\n${t("emailLabel")}: ${form.email}\n${t("subjectLabel")}: ${topicLabel}\n\n${form.mensaje}`
-      );
-      window.location.href = `mailto:${EMAIL_SOPORTE}?subject=${subject}&body=${body}`;
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, asunto: topicLabel }),
+      });
+      if (!res.ok) throw new Error();
       setSent(true);
     } catch {
       setError(`${t("errorMailClient")} ${EMAIL_SOPORTE}`);
