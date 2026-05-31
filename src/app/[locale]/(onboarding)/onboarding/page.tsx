@@ -10,46 +10,47 @@ import { useTranslations } from "next-intl";
 const PLATFORMS = [
   {
     name: "Google Maps",
+    hintKey: "hintGoogleMaps",
     icon: (
       <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
       </svg>
     ),
     placeholder: "https://g.page/r/Cxxxxxxxx/review",
-    hint: 'Google Maps → tu negocio → "Reseñas" → "Obtener más reseñas" → copia el enlace',
   },
   {
     name: "Trustpilot",
+    hintKey: "hintTrustpilot",
     icon: (
       <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
         <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
       </svg>
     ),
     placeholder: "https://www.trustpilot.com/evaluate/tu-negocio.com",
-    hint: "Inicia sesión en Trustpilot → copia el enlace de tu página de reseñas",
   },
   {
     name: "TripAdvisor",
+    hintKey: "hintTripAdvisor",
     icon: (
       <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
         <path d="M12 3C7.03 3 2.88 6.54 2.04 11.25L2 12c0 5.52 4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
       </svg>
     ),
     placeholder: "https://www.tripadvisor.es/...",
-    hint: "Copia la URL de tu establecimiento en TripAdvisor",
   },
   {
     name: "App Store",
+    hintKey: "hintAppStore",
     icon: (
       <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
         <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
       </svg>
     ),
     placeholder: "https://apps.apple.com/app/idXXXXXXXXXX",
-    hint: "Copia el enlace directo a tu app en App Store",
   },
   {
     name: "Otra",
+    hintKey: "hintOther",
     icon: (
       <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
@@ -57,7 +58,6 @@ const PLATFORMS = [
       </svg>
     ),
     placeholder: "https://...",
-    hint: "Copia el enlace donde quieres que los clientes dejen su reseña",
   },
 ] as const;
 
@@ -74,11 +74,11 @@ function Logo() {
   );
 }
 
-function StepBar({ current }: { current: 1 | 2 | 3 }) {
+function StepBar({ current, labels }: { current: 1 | 2 | 3; labels: [string, string, string] }) {
   const steps = [
-    { n: 1, label: "Tu negocio" },
-    { n: 2, label: "Reseñas" },
-    { n: 3, label: "¡Listo!" },
+    { n: 1, label: labels[0] },
+    { n: 2, label: labels[1] },
+    { n: 3, label: labels[2] },
   ];
   return (
     <div className="flex items-center justify-center mb-10">
@@ -161,7 +161,7 @@ export default function OnboardingPage() {
       }
       setStep(3);
     } catch {
-      setError("Error de conexión. Inténtalo de nuevo.");
+      setError(t("connectionError"));
     } finally {
       setSaving(false);
     }
@@ -175,6 +175,8 @@ export default function OnboardingPage() {
     );
   }
 
+  const platformLabel = (p: Platform) => p.name === "Otra" ? t("platformOther") : p.name;
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="flex items-center justify-center pt-8 pb-2 px-4">
@@ -183,9 +185,9 @@ export default function OnboardingPage() {
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 pb-16 pt-6">
         <div className="w-full max-w-sm">
-          <StepBar current={step} />
+          <StepBar current={step} labels={[t("step1Label"), t("step2Label"), t("step3Label")]} />
 
-          {/* ── Paso 1: Nombre ── */}
+          {/* ── Step 1: Business name ── */}
           {step === 1 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
               <div className="w-11 h-11 bg-gray-100 rounded-xl flex items-center justify-center mb-5">
@@ -195,7 +197,7 @@ export default function OnboardingPage() {
                 {t("businessName")}
               </h1>
               <p className="text-sm text-gray-500 mb-6">
-                Aparecerá en los mensajes que reciban tus clientes.
+                {t("step1Subtitle")}
               </p>
 
               <input
@@ -219,17 +221,17 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ── Paso 2: Enlace ── */}
+          {/* ── Step 2: Review platform link ── */}
           {step === 2 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7">
               <div className="w-11 h-11 bg-gray-100 rounded-xl flex items-center justify-center mb-5">
                 <Star className="w-5 h-5 text-gray-700" strokeWidth={1.75} />
               </div>
               <h1 className="text-xl font-bold text-gray-900 mb-1">
-                ¿Dónde quieres las reseñas?
+                {t("step2Title")}
               </h1>
               <p className="text-sm text-gray-500 mb-5">
-                Los clientes satisfechos irán aquí a dejar su opinión.
+                {t("step2Subtitle")}
               </p>
 
               <div className="flex flex-wrap gap-1.5 mb-2">
@@ -244,12 +246,12 @@ export default function OnboardingPage() {
                         : "bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-gray-700"
                       }`}
                   >
-                    {p.icon} {p.name}
+                    {p.icon} {platformLabel(p)}
                   </button>
                 ))}
               </div>
               <p className="text-xs text-gray-400 mb-4">
-                Empieza con una. Podrás añadir más plataformas en Configuración.
+                {t("platformsHint")}
               </p>
 
               <input
@@ -261,7 +263,7 @@ export default function OnboardingPage() {
                 autoFocus
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-sm mb-1.5 bg-gray-50"
               />
-              <p className="text-xs text-gray-400 mb-5 leading-relaxed">{platform.hint}</p>
+              <p className="text-xs text-gray-400 mb-5 leading-relaxed">{t(platform.hintKey)}</p>
 
               {error && (
                 <div className="bg-red-50 border border-red-100 text-red-600 text-xs rounded-lg px-3 py-2.5 mb-4">
@@ -276,7 +278,7 @@ export default function OnboardingPage() {
                   className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition text-sm"
                 >
                   {saving
-                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Guardando…</>
+                    ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}</>
                     : <><ArrowRight className="w-4 h-4" /> {t("next")}</>
                   }
                 </button>
@@ -292,27 +294,21 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ── Paso 3: ¡Listo! ── */}
+          {/* ── Step 3: Done ── */}
           {step === 3 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-7 text-center">
               <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
                 <CheckCircle2 className="w-7 h-7 text-green-600" strokeWidth={1.75} />
               </div>
               <h1 className="text-xl font-bold text-gray-900 mb-1.5">
-                ¡Todo listo!
+                {t("step3Title")}
               </h1>
               <p className="text-sm text-gray-500 mb-6">
-                Ya puedes enviar tu primer WhatsApp a un cliente. La IA analizará
-                la respuesta y redirigirá a los satisfechos a dejar una reseña
-                {reviewUrl ? ` en ${platform.name}` : ""}.
+                {t("step3Subtitle")}{reviewUrl ? t("step3InPlatform", { platform: platformLabel(platform) }) : ""}
               </p>
 
               <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left space-y-3">
-                {[
-                  "Introduces el nombre y teléfono de un cliente",
-                  "El cliente recibe un WhatsApp preguntando por su experiencia",
-                  "La IA redirige a los satisfechos a dejar reseña",
-                ].map((text, i) => (
+                {([t("step3How1"), t("step3How2"), t("step3How3")] as string[]).map((text, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <div className="w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                       {i + 1}
@@ -325,8 +321,7 @@ export default function OnboardingPage() {
               {!reviewUrl && (
                 <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mb-5 text-left">
                   <p className="text-xs text-amber-700 leading-relaxed">
-                    <strong>Recuerda añadir el enlace de reseñas</strong> en Ajustes para que los
-                    clientes satisfechos puedan dejar su valoración.
+                    {t("step3NoUrlWarning")}
                   </p>
                 </div>
               )}
@@ -337,13 +332,13 @@ export default function OnboardingPage() {
                   className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 rounded-xl transition text-sm"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  Enviar primer WhatsApp
+                  {t("sendFirstWhatsApp")}
                 </Link>
                 <Link
                   href="/dashboard"
                   className="block text-xs text-gray-400 hover:text-gray-600 py-2 transition"
                 >
-                  Ver el panel →
+                  {t("viewDashboard")}
                 </Link>
               </div>
             </div>
