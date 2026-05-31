@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
-  Home, Send, Star, BarChart2, Settings,
-  Printer, Gift, CreditCard, MapPin, ChevronDown, Flag, UserCircle, User,
+  Home, Send, Star, BarChart2, Settings, MessageSquare,
+  Gift, CreditCard, MapPin, ChevronDown, Flag, UserCircle, User,
+  Users, Store, TrendingUp, Briefcase, QrCode,
 } from "lucide-react";
 
 type Item = { href: string; labelKey: string; Icon: React.ElementType; tab?: string };
@@ -23,12 +24,12 @@ const NAV: Entry[] = [
     group: {
       id: "clients",
       labelKey: "clientsGroup",
-      Icon: Send,
+      Icon: Users,
       defaultOpen: true,
       items: [
-        { href: "/clientes",  labelKey: "sendRequest", Icon: Send      },
-        { href: "/resenas",   labelKey: "reviews",     Icon: Star      },
-        { href: "/informes",  labelKey: "reports",     Icon: BarChart2 },
+        { href: "/clientes",  labelKey: "sendRequest", Icon: Send           },
+        { href: "/resenas",   labelKey: "reviews",     Icon: MessageSquare  },
+        { href: "/informes",  labelKey: "reports",     Icon: BarChart2      },
       ],
     },
   },
@@ -40,10 +41,10 @@ const NAV: Entry[] = [
       Icon: MapPin,
       defaultOpen: false,
       items: [
-        { href: "/google-business", labelKey: "gbProfile",  Icon: MapPin,    tab: "profile"  },
-        { href: "/google-business", labelKey: "gbReviews",  Icon: Star,      tab: "reviews"  },
-        { href: "/google-business", labelKey: "gbAnalysis", Icon: BarChart2, tab: "analysis" },
-        { href: "/google-business", labelKey: "gbFlagged",  Icon: Flag,      tab: "flagged"  },
+        { href: "/google-business", labelKey: "gbProfile",  Icon: Store,      tab: "profile"  },
+        { href: "/google-business", labelKey: "gbReviews",  Icon: Star,       tab: "reviews"  },
+        { href: "/google-business", labelKey: "gbAnalysis", Icon: TrendingUp, tab: "analysis" },
+        { href: "/google-business", labelKey: "gbFlagged",  Icon: Flag,       tab: "flagged"  },
       ],
     },
   },
@@ -55,9 +56,9 @@ const NAV: Entry[] = [
       Icon: Settings,
       defaultOpen: false,
       items: [
-        { href: "/configuracion", labelKey: "businessProfile", Icon: Settings },
-        { href: "/incentivos",    labelKey: "incentives",      Icon: Gift     },
-        { href: "/cartel",        labelKey: "qrPoster",        Icon: Printer  },
+        { href: "/configuracion", labelKey: "businessProfile", Icon: Briefcase },
+        { href: "/incentivos",    labelKey: "incentives",      Icon: Gift      },
+        { href: "/cartel",        labelKey: "qrPoster",        Icon: QrCode    },
       ],
     },
   },
