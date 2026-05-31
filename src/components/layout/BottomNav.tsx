@@ -2,18 +2,18 @@
 
 import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { Home, Send, Star, BarChart2, Settings } from "lucide-react";
+import { Home, Send, Star, BarChart2, Settings, MapPin } from "lucide-react";
 
 export function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations("common");
 
   const navItems = [
-    { href: "/dashboard",     label: t("home"),           Icon: Home      },
-    { href: "/clientes",      label: t("sendRequest"),    Icon: Send      },
-    { href: "/resenas",       label: t("reviews"),        Icon: Star      },
-    { href: "/informes",      label: t("reports"),        Icon: BarChart2 },
-    { href: "/configuracion", label: t("businessProfile"), Icon: Settings  },
+    { href: "/dashboard",        label: t("home"),            Icon: Home      },
+    { href: "/clientes",         label: t("sendRequest"),     Icon: Send      },
+    { href: "/resenas",          label: t("reviews"),         Icon: Star      },
+    { href: "/google-business",  label: "Google",             Icon: MapPin    },
+    { href: "/configuracion",    label: t("businessProfile"), Icon: Settings  },
   ];
 
   return (
