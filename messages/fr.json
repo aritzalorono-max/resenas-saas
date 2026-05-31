@@ -786,6 +786,10 @@
     "languageSwitcher": "Langue",
     "googleBusiness": "Google Business",
     "googleShort": "Google",
+    "gbProfile": "Profil",
+    "gbReviews": "Avis",
+    "gbAnalysis": "Analyse",
+    "gbFlagged": "Signalés",
     "clientsGroup": "Clients",
     "configGroup": "Paramètres",
     "more": "Plus"

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   MapPin,
@@ -907,8 +908,20 @@ function FlaggedTab({
 // ---------------------------------------------------------------------------
 
 export default function GoogleBusinessPage() {
-  const t = useTranslations("googleBusiness");
-  const [tab, setTab] = useState<"profile" | "reviews" | "analysis" | "flagged">("profile");
+  const t            = useTranslations("googleBusiness");
+  const searchParams = useSearchParams();
+  const router       = useRouter();
+  const tab = useMemo(() => {
+    const v = searchParams.get("tab");
+    if (v === "reviews" || v === "analysis" || v === "flagged") return v;
+    return "profile" as const;
+  }, [searchParams]);
+
+  function setTab(next: "profile" | "reviews" | "analysis" | "flagged") {
+    if (next === "profile") router.replace("/google-business");
+    else router.replace(`/google-business?tab=${next}`);
+  }
+
   const [reviews, setReviews] = useState<GoogleReview[]>([]);
   const [analysis, setAnalysis] = useState<ReviewAnalysis | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
