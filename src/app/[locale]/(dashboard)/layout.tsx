@@ -49,7 +49,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/informes",      label: t("reports"),          Icon: BarChart2   },
     { href: "/incentivos",    label: t("incentives"),       Icon: Gift        },
     { href: "/configuracion", label: t("businessProfile"),  Icon: Settings    },
-    { href: "/google-business", label: "Google Business",     Icon: MapPin      },
+    { href: "/google-business", label: t("googleBusiness"),   Icon: MapPin      },
     { href: "/cartel",        label: t("qrPoster"),         Icon: Printer     },
     { href: "/facturacion",   label: t("billing"),          Icon: CreditCard  },
   ];

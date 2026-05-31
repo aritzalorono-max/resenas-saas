@@ -12,7 +12,7 @@ export function BottomNav() {
     { href: "/dashboard",        label: t("home"),            Icon: Home      },
     { href: "/clientes",         label: t("sendRequest"),     Icon: Send      },
     { href: "/resenas",          label: t("reviews"),         Icon: Star      },
-    { href: "/google-business",  label: "Google",             Icon: MapPin    },
+    { href: "/google-business",  label: t("googleShort"),     Icon: MapPin    },
     { href: "/configuracion",    label: t("businessProfile"), Icon: Settings  },
   ];
 

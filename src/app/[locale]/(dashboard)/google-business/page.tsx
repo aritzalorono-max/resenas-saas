@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import {
   MapPin,
   Star,
@@ -102,7 +103,7 @@ function TabButton({
   );
 }
 
-function CopyButton({ text }: { text: string }) {
+function CopyButton({ text, copyLabel, copiedLabel }: { text: string; copyLabel: string; copiedLabel: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <button
@@ -114,13 +115,13 @@ function CopyButton({ text }: { text: string }) {
       className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
     >
       {copied ? <Check size={12} className="text-green-600" /> : <Copy size={12} />}
-      {copied ? "Copiado" : "Copiar"}
+      {copied ? copiedLabel : copyLabel}
     </button>
   );
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("es-ES", {
+  return new Date(iso).toLocaleDateString(undefined, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -131,28 +132,27 @@ function formatDate(iso: string): string {
 // Connect prompt
 // ---------------------------------------------------------------------------
 
-function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
+function ConnectPrompt({ onConnect, t }: { onConnect: () => void; t: ReturnType<typeof useTranslations> }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
       <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
         <MapPin size={32} className="text-blue-600" />
       </div>
       <h2 className="text-xl font-bold text-gray-900 mb-2">
-        Conecta tu perfil de Google Business
+        {t("connectTitle")}
       </h2>
       <p className="text-gray-500 max-w-md mb-8">
-        Vincula tu cuenta de Google Business Profile para gestionar tus reseñas,
-        responder con IA y obtener análisis detallados de tu reputación online.
+        {t("connectDesc")}
       </p>
       <button
         onClick={onConnect}
         className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
       >
         <MapPin size={18} />
-        Conectar Google Business
+        {t("connectBtn")}
       </button>
       <p className="mt-4 text-xs text-gray-400">
-        Necesitas ser propietario o gestor del perfil de Google Business.
+        {t("connectNote")}
       </p>
     </div>
   );
@@ -168,15 +168,17 @@ function ProfileTab({
   loadingAnalysis,
   onConnect,
   connected,
+  t,
 }: {
   business: Business | null;
   analysis: ReviewAnalysis | null;
   loadingAnalysis: boolean;
   onConnect: () => void;
   connected: boolean;
+  t: ReturnType<typeof useTranslations>;
 }) {
   if (!connected) {
-    return <ConnectPrompt onConnect={onConnect} />;
+    return <ConnectPrompt onConnect={onConnect} t={t} />;
   }
 
   return (
@@ -188,7 +190,7 @@ function ProfileTab({
             <h2 className="text-lg font-bold text-gray-900">{business?.name}</h2>
             <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
               <CheckCircle2 size={14} className="text-green-500" />
-              Perfil de Google Business conectado
+              {t("profileConnected")}
             </p>
           </div>
           {analysis && (
@@ -200,7 +202,7 @@ function ProfileTab({
                 </span>
               </div>
               <p className="text-xs text-gray-500 mt-0.5">
-                {analysis.reviewCount} {analysis.reviewCount === 1 ? "reseña" : "reseñas"}
+                {analysis.reviewCount} {analysis.reviewCount === 1 ? t("reviewSingular") : t("reviewPlural")}
               </p>
             </div>
           )}
@@ -211,7 +213,7 @@ function ProfileTab({
       {loadingAnalysis ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center gap-3">
           <Loader2 size={20} className="animate-spin text-brand-600" />
-          <span className="text-sm text-gray-600">Analizando reseñas con IA...</span>
+          <span className="text-sm text-gray-600">{t("loadingAnalysis")}</span>
         </div>
       ) : analysis ? (
         <>
@@ -219,18 +221,18 @@ function ProfileTab({
           <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp size={18} className="text-brand-600" />
-              <h3 className="font-semibold text-gray-900">Análisis de reputación</h3>
+              <h3 className="font-semibold text-gray-900">{t("reputationTitle")}</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-xl p-4">
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                  Sentimiento general
+                  {t("sentimentLabel")}
                 </p>
                 <p className="text-sm font-semibold text-gray-900">{analysis.overallSentiment}</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-4">
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                  Tendencia
+                  {t("trendLabel")}
                 </p>
                 <p className="text-sm font-semibold text-gray-900">{analysis.ratingTrend}</p>
               </div>
@@ -241,7 +243,7 @@ function ProfileTab({
           <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <Info size={18} className="text-brand-600" />
-              <h3 className="font-semibold text-gray-900">Sugerencias para mejorar tu perfil</h3>
+              <h3 className="font-semibold text-gray-900">{t("suggestionsTitle")}</h3>
             </div>
             <ul className="space-y-3">
               {analysis.profileSuggestions.map((s, i) => (
@@ -264,7 +266,7 @@ function ProfileTab({
           className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors"
         >
           <Link2 size={14} />
-          Reconectar cuenta de Google
+          {t("reconnect")}
         </button>
       </div>
     </div>
@@ -282,6 +284,7 @@ function ReviewCard({
   onReplyPublished,
   onFlagged,
   showFlagButton = true,
+  t,
 }: {
   review: GoogleReview;
   businessName: string;
@@ -289,6 +292,7 @@ function ReviewCard({
   onReplyPublished: (reviewName: string) => void;
   onFlagged: (reviewName: string) => void;
   showFlagButton?: boolean;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [suggestion, setSuggestion] = useState("");
@@ -300,7 +304,6 @@ function ReviewCard({
   const [flagReason, setFlagReason] = useState("");
   const [loadingFlag, setLoadingFlag] = useState(false);
   const [flagResult, setFlagResult] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   async function handleSuggest() {
     setLoadingSuggest(true);
@@ -323,7 +326,7 @@ function ReviewCard({
       setEditedReply(data.suggestion ?? "");
       setExpanded(true);
     } catch {
-      setPublishError("Error al generar la sugerencia. Inténtalo de nuevo.");
+      setPublishError(t("errorSuggest"));
     } finally {
       setLoadingSuggest(false);
     }
@@ -344,14 +347,14 @@ function ReviewCard({
       });
       if (!res.ok) {
         const data = await res.json();
-        setPublishError(data.error ?? "Error al publicar");
+        setPublishError(data.error ?? t("errorPublish"));
       } else {
         onReplyPublished(review.name);
         setExpanded(false);
         setSuggestion("");
       }
     } catch {
-      setPublishError("Error de red. Inténtalo de nuevo.");
+      setPublishError(t("errorNetwork"));
     } finally {
       setLoadingPublish(false);
     }
@@ -376,7 +379,7 @@ function ReviewCard({
       setFlagResult(data.complaintText ?? "");
       onFlagged(review.name);
     } catch {
-      setFlagResult("Error al generar el correo de reclamación.");
+      setFlagResult(t("errorComplaint"));
     } finally {
       setLoadingFlag(false);
     }
@@ -412,13 +415,13 @@ function ReviewCard({
           {review.replied && (
             <span className="flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 px-2.5 py-1 rounded-full">
               <CheckCircle2 size={12} />
-              Respondida
+              {t("replied")}
             </span>
           )}
           {review.flagged && (
             <span className="flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 px-2.5 py-1 rounded-full">
               <Flag size={12} />
-              Marcada
+              {t("flagged")}
             </span>
           )}
         </div>
@@ -433,7 +436,7 @@ function ReviewCard({
               onClick={() => setExpanded(!expanded)}
               className="ml-1 text-brand-600 hover:text-brand-700 text-xs font-medium"
             >
-              {expanded ? "Ver menos" : "Ver más"}
+              {expanded ? t("seeLess") : t("seeMore")}
             </button>
           )}
         </p>
@@ -442,7 +445,7 @@ function ReviewCard({
       {/* Existing reply */}
       {review.reviewReply && (
         <div className="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100">
-          <p className="text-xs font-medium text-gray-500 mb-1">Tu respuesta:</p>
+          <p className="text-xs font-medium text-gray-500 mb-1">{t("yourReply")}</p>
           <p className="text-sm text-gray-700">{review.reviewReply.comment}</p>
         </div>
       )}
@@ -460,7 +463,7 @@ function ReviewCard({
             ) : (
               <MessageSquare size={12} />
             )}
-            Sugerir respuesta
+            {t("suggestReply")}
           </button>
           {showFlagButton && !review.flagged && (
             <button
@@ -468,7 +471,7 @@ function ReviewCard({
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
             >
               <Flag size={12} />
-              Marcar como problemática
+              {t("markProblematic")}
             </button>
           )}
         </div>
@@ -477,7 +480,7 @@ function ReviewCard({
       {/* Suggestion editor */}
       {suggestion && (
         <div className="mt-4 space-y-3">
-          <p className="text-xs font-medium text-gray-500">Respuesta sugerida (puedes editarla):</p>
+          <p className="text-xs font-medium text-gray-500">{t("suggestedReply")}</p>
           <textarea
             value={editedReply}
             onChange={(e) => setEditedReply(e.target.value)}
@@ -501,13 +504,13 @@ function ReviewCard({
               ) : (
                 <CheckCircle2 size={14} />
               )}
-              Publicar respuesta
+              {t("publishReply")}
             </button>
             <button
               onClick={() => { setSuggestion(""); setEditedReply(""); }}
               className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              Cancelar
+              {t("cancel")}
             </button>
           </div>
         </div>
@@ -516,11 +519,11 @@ function ReviewCard({
       {/* Flag modal */}
       {showFlagModal && !flagResult && (
         <div className="mt-4 bg-red-50 rounded-xl p-4 border border-red-100 space-y-3">
-          <p className="text-xs font-semibold text-red-700">¿Por qué es problemática esta reseña?</p>
+          <p className="text-xs font-semibold text-red-700">{t("flagModalTitle")}</p>
           <textarea
             value={flagReason}
             onChange={(e) => setFlagReason(e.target.value)}
-            placeholder="Ej: Reseña falsa de un competidor, contiene información personal, lenguaje ofensivo..."
+            placeholder={t("flagPlaceholder")}
             rows={3}
             className="w-full text-sm border border-red-200 rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-red-300 bg-white"
           />
@@ -535,13 +538,13 @@ function ReviewCard({
               ) : (
                 <Flag size={14} />
               )}
-              Generar reclamación
+              {t("generateComplaint")}
             </button>
             <button
               onClick={() => setShowFlagModal(false)}
               className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              Cancelar
+              {t("cancel")}
             </button>
           </div>
         </div>
@@ -551,8 +554,8 @@ function ReviewCard({
       {flagResult && (
         <div className="mt-4 bg-red-50 rounded-xl p-4 border border-red-100 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-red-700">Correo de reclamación generado:</p>
-            <CopyButton text={flagResult} />
+            <p className="text-xs font-semibold text-red-700">{t("complaintGenerated")}</p>
+            <CopyButton text={flagResult} copyLabel={t("copy")} copiedLabel={t("copied")} />
           </div>
           <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans leading-relaxed bg-white rounded-lg p-3 border border-red-100">
             {flagResult}
@@ -562,7 +565,7 @@ function ReviewCard({
             className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors w-fit"
           >
             <Mail size={14} />
-            Abrir en email
+            {t("openEmail")}
           </a>
         </div>
       )}
@@ -582,6 +585,7 @@ function ReviewsTab({
   tone,
   onReplyPublished,
   onFlagged,
+  t,
 }: {
   reviews: GoogleReview[];
   loading: boolean;
@@ -590,6 +594,7 @@ function ReviewsTab({
   tone: string;
   onReplyPublished: (name: string) => void;
   onFlagged: (name: string) => void;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const [starFilter, setStarFilter] = useState<"all" | "1-2" | "3" | "4-5">("all");
 
@@ -604,7 +609,7 @@ function ReviewsTab({
     return (
       <div className="flex items-center justify-center py-16 gap-3">
         <Loader2 size={20} className="animate-spin text-brand-600" />
-        <span className="text-sm text-gray-600">Cargando reseñas...</span>
+        <span className="text-sm text-gray-600">{t("loadingReviews")}</span>
       </div>
     );
   }
@@ -622,7 +627,7 @@ function ReviewsTab({
     <div className="space-y-5">
       {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-medium text-gray-500 mr-1">Filtrar:</span>
+        <span className="text-xs font-medium text-gray-500 mr-1">{t("filterLabel")}</span>
         {(["all", "1-2", "3", "4-5"] as const).map((f) => (
           <button
             key={f}
@@ -633,18 +638,18 @@ function ReviewsTab({
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
           >
-            {f === "all" ? "Todas" : f === "1-2" ? "1-2 ★" : f === "3" ? "3 ★" : "4-5 ★"}
+            {f === "all" ? t("filterAll") : f === "1-2" ? "1-2 ★" : f === "3" ? "3 ★" : "4-5 ★"}
           </button>
         ))}
         <span className="text-xs text-gray-400 ml-2">
-          {filtered.length} {filtered.length === 1 ? "reseña" : "reseñas"}
+          {filtered.length} {filtered.length === 1 ? t("reviewSingular") : t("reviewPlural")}
         </span>
       </div>
 
       {filtered.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
           <Star size={32} className="mx-auto mb-3 opacity-40" />
-          <p className="text-sm">No hay reseñas con este filtro</p>
+          <p className="text-sm">{t("noReviewsFilter")}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -656,6 +661,7 @@ function ReviewsTab({
               tone={tone}
               onReplyPublished={onReplyPublished}
               onFlagged={onFlagged}
+              t={t}
             />
           ))}
         </div>
@@ -671,15 +677,17 @@ function ReviewsTab({
 function AnalysisTab({
   analysis,
   loading,
+  t,
 }: {
   analysis: ReviewAnalysis | null;
   loading: boolean;
+  t: ReturnType<typeof useTranslations>;
 }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16 gap-3">
         <Loader2 size={20} className="animate-spin text-brand-600" />
-        <span className="text-sm text-gray-600">Analizando opiniones con IA...</span>
+        <span className="text-sm text-gray-600">{t("loadingAnalysisTab")}</span>
       </div>
     );
   }
@@ -688,7 +696,7 @@ function AnalysisTab({
     return (
       <div className="text-center py-12 text-gray-400">
         <TrendingUp size={32} className="mx-auto mb-3 opacity-40" />
-        <p className="text-sm">No hay análisis disponible</p>
+        <p className="text-sm">{t("noAnalysis")}</p>
       </div>
     );
   }
@@ -702,16 +710,16 @@ function AnalysisTab({
             {analysis.averageRating.toFixed(1)}
           </p>
           <StarDisplay rating={Math.round(analysis.averageRating)} />
-          <p className="text-xs text-gray-500 mt-1">Valoración media</p>
+          <p className="text-xs text-gray-500 mt-1">{t("avgRating")}</p>
         </div>
         <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm text-center">
           <p className="text-3xl font-bold text-gray-900">{analysis.reviewCount}</p>
-          <p className="text-sm text-gray-600 mt-1">Reseñas totales</p>
-          <p className="text-xs text-gray-500 mt-0.5">analizadas</p>
+          <p className="text-sm text-gray-600 mt-1">{t("totalReviews")}</p>
+          <p className="text-xs text-gray-500 mt-0.5">{t("analyzed")}</p>
         </div>
         <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm text-center">
           <p className="text-lg font-bold text-gray-900 mt-1">{analysis.overallSentiment}</p>
-          <p className="text-xs text-gray-500 mt-1">Sentimiento general</p>
+          <p className="text-xs text-gray-500 mt-1">{t("overallSentiment")}</p>
         </div>
       </div>
 
@@ -719,7 +727,7 @@ function AnalysisTab({
       <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp size={16} className="text-brand-600" />
-          <h3 className="text-sm font-semibold text-gray-900">Tendencia</h3>
+          <h3 className="text-sm font-semibold text-gray-900">{t("trend")}</h3>
         </div>
         <p className="text-sm text-gray-700">{analysis.ratingTrend}</p>
       </div>
@@ -728,7 +736,7 @@ function AnalysisTab({
       <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
           <ThumbsUp size={16} className="text-green-600" />
-          <h3 className="text-sm font-semibold text-gray-900">Lo que más valoran tus clientes</h3>
+          <h3 className="text-sm font-semibold text-gray-900">{t("praisesTitle")}</h3>
         </div>
         <div className="flex flex-wrap gap-2">
           {analysis.topPraises.map((p, i) => (
@@ -743,7 +751,7 @@ function AnalysisTab({
       <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
           <ThumbsDown size={16} className="text-red-600" />
-          <h3 className="text-sm font-semibold text-gray-900">Áreas de mejora mencionadas</h3>
+          <h3 className="text-sm font-semibold text-gray-900">{t("complaintsTitle")}</h3>
         </div>
         <div className="flex flex-wrap gap-2">
           {analysis.topComplaints.map((c, i) => (
@@ -765,10 +773,12 @@ function FlaggedTab({
   reviews,
   loading,
   error,
+  t,
 }: {
   reviews: GoogleReview[];
   loading: boolean;
   error: string;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const flagged = reviews.filter((r) => r.flagged);
   const [expandedFlag, setExpandedFlag] = useState<string | null>(null);
@@ -778,7 +788,7 @@ function FlaggedTab({
     return (
       <div className="flex items-center justify-center py-16 gap-3">
         <Loader2 size={20} className="animate-spin text-brand-600" />
-        <span className="text-sm text-gray-600">Cargando...</span>
+        <span className="text-sm text-gray-600">{t("loadingFlagged")}</span>
       </div>
     );
   }
@@ -796,9 +806,9 @@ function FlaggedTab({
     return (
       <div className="text-center py-12 text-gray-400">
         <Flag size={32} className="mx-auto mb-3 opacity-40" />
-        <p className="text-sm">No hay reseñas marcadas como problemáticas</p>
+        <p className="text-sm">{t("noFlagged")}</p>
         <p className="text-xs mt-1">
-          Desde la pestaña &ldquo;Reseñas&rdquo; puedes marcar reseñas problemáticas.
+          {t("noFlaggedHint")}
         </p>
       </div>
     );
@@ -830,10 +840,10 @@ function FlaggedTab({
               }`}
             >
               {review.flagStatus === "resolved"
-                ? "Resuelta"
+                ? t("statusResolved")
                 : review.flagStatus === "sent"
-                ? "Email enviado"
-                : "Pendiente"}
+                ? t("statusSent")
+                : t("statusPending")}
             </span>
           </div>
 
@@ -850,7 +860,7 @@ function FlaggedTab({
             className="flex items-center gap-1.5 text-xs font-medium text-red-600 hover:text-red-700"
           >
             <Mail size={12} />
-            Ver correo de reclamación
+            {t("viewComplaintEmail")}
             {expandedFlag === review.name ? (
               <ChevronUp size={12} />
             ) : (
@@ -861,7 +871,7 @@ function FlaggedTab({
           {expandedFlag === review.name && (
             <div className="mt-3 space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-500">Enviar a: business-support@google.com</p>
+                <p className="text-xs text-gray-500">{t("sendTo")}</p>
                 <button
                   onClick={async () => {
                     // We don't have the email text here, but user can re-generate from reviews tab
@@ -882,7 +892,7 @@ function FlaggedTab({
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors w-fit"
               >
                 <ExternalLink size={11} />
-                Abrir en Gmail
+                {t("openGmail")}
               </a>
             </div>
           )}
@@ -897,6 +907,7 @@ function FlaggedTab({
 // ---------------------------------------------------------------------------
 
 export default function GoogleBusinessPage() {
+  const t = useTranslations("googleBusiness");
   const [tab, setTab] = useState<"profile" | "reviews" | "analysis" | "flagged">("profile");
   const [reviews, setReviews] = useState<GoogleReview[]>([]);
   const [analysis, setAnalysis] = useState<ReviewAnalysis | null>(null);
@@ -913,14 +924,15 @@ export default function GoogleBusinessPage() {
     const err = params.get("error");
     if (err) {
       const msgs: Record<string, string> = {
-        oauth_cancelled: "Has cancelado la conexión con Google.",
-        missing_params: "Error en el proceso de autorización.",
-        invalid_state: "Error de seguridad. Inténtalo de nuevo.",
-        token_exchange: "Error al intercambiar el token con Google.",
-        db_save: "Error al guardar la configuración.",
+        oauth_cancelled: t("errOauthCancelled"),
+        missing_params: t("errMissingParams"),
+        invalid_state: t("errInvalidState"),
+        token_exchange: t("errTokenExchange"),
+        db_save: t("errDbSave"),
       };
-      setUrlError(msgs[err] ?? "Error desconocido al conectar con Google.");
+      setUrlError(msgs[err] ?? t("errUnknown"));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load business info
@@ -959,15 +971,16 @@ export default function GoogleBusinessPage() {
       const data = await res.json();
       if (data.connected === false) {
         setConnected(false);
-        setReviewsError(data.error ?? "Google Business desconectado");
+        setReviewsError(data.error ?? t("errDisconnected"));
       } else if (data.reviews) {
         setReviews(data.reviews);
       }
     } catch {
-      setReviewsError("Error al cargar las reseñas");
+      setReviewsError(t("errLoadReviews"));
     } finally {
       setLoadingReviews(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected]);
 
   const loadAnalysis = useCallback(async () => {
@@ -1025,10 +1038,10 @@ export default function GoogleBusinessPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
             <MapPin size={22} className="text-brand-600" />
-            Google Business
+            {t("pageTitle")}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Gestiona tu perfil y reseñas de Google Business Profile
+            {t("pageSubtitle")}
           </p>
         </div>
         {connected && (
@@ -1038,7 +1051,7 @@ export default function GoogleBusinessPage() {
             className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors disabled:opacity-60"
           >
             <RefreshCw size={14} className={loadingReviews ? "animate-spin" : ""} />
-            Actualizar
+            {t("refresh")}
           </button>
         )}
       </div>
@@ -1054,16 +1067,16 @@ export default function GoogleBusinessPage() {
       {/* Tabs */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl overflow-x-auto">
         <TabButton active={tab === "profile"} onClick={() => setTab("profile")}>
-          Perfil
+          {t("tabProfile")}
         </TabButton>
         <TabButton active={tab === "reviews"} onClick={() => setTab("reviews")}>
-          Reseñas{unrepliedCount > 0 && ` (${unrepliedCount})`}
+          {t("tabReviews")}{unrepliedCount > 0 && ` (${unrepliedCount})`}
         </TabButton>
         <TabButton active={tab === "analysis"} onClick={() => setTab("analysis")}>
-          Análisis
+          {t("tabAnalysis")}
         </TabButton>
         <TabButton active={tab === "flagged"} onClick={() => setTab("flagged")}>
-          Problemáticas{flaggedCount > 0 && ` (${flaggedCount})`}
+          {t("tabFlagged")}{flaggedCount > 0 && ` (${flaggedCount})`}
         </TabButton>
       </div>
 
@@ -1075,6 +1088,7 @@ export default function GoogleBusinessPage() {
           loadingAnalysis={loadingAnalysis}
           onConnect={handleConnect}
           connected={connected}
+          t={t}
         />
       )}
 
@@ -1087,11 +1101,12 @@ export default function GoogleBusinessPage() {
           tone={business?.tone ?? "tuteo"}
           onReplyPublished={handleReplyPublished}
           onFlagged={handleFlagged}
+          t={t}
         />
       )}
 
       {tab === "analysis" && (
-        <AnalysisTab analysis={analysis} loading={loadingAnalysis} />
+        <AnalysisTab analysis={analysis} loading={loadingAnalysis} t={t} />
       )}
 
       {tab === "flagged" && (
@@ -1099,6 +1114,7 @@ export default function GoogleBusinessPage() {
           reviews={reviews}
           loading={loadingReviews}
           error={reviewsError}
+          t={t}
         />
       )}
     </div>
