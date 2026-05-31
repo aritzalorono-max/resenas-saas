@@ -17,7 +17,7 @@ function alternates(internalPath: string): Record<string, string> {
   for (const locale of LOCALES) {
     alts[locale] = sitemapUrl(locale, internalPath);
   }
-  alts["x-default"] = localePath(DEFAULT_LOCALE, internalPath);
+  alts["x-default"] = sitemapUrl(DEFAULT_LOCALE, internalPath);
   return alts;
 }
 
