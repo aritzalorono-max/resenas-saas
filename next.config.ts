@@ -85,6 +85,38 @@ const nextConfig: NextConfig = {
       { source: "/pt/contacto",    destination: "/pt/contacto",          permanent: true },
       { source: "/pt/privacidad",  destination: "/pt/privacidade",       permanent: true },
       { source: "/pt/terminos",    destination: "/pt/termos",            permanent: true },
+
+      // Blog: redirect Spanish slugs to locale-specific slugs
+      // EN
+      { source: "/en/blog/como-conseguir-mas-resenas-google-maps",        destination: "/en/blog/how-to-get-more-google-maps-reviews",                   permanent: true },
+      { source: "/en/blog/por-que-clientes-no-dejan-resenas-whatsapp",    destination: "/en/blog/why-customers-dont-leave-whatsapp-reviews",             permanent: true },
+      { source: "/en/blog/gestionar-resenas-negativas",                    destination: "/en/blog/how-to-handle-negative-reviews",                        permanent: true },
+      { source: "/en/blog/algoritmo-google-maps-reputacion-local",        destination: "/en/blog/google-maps-algorithm-local-seo-reputation",            permanent: true },
+      { source: "/en/blog/legal-pedir-resenas-whatsapp-rgpd",             destination: "/en/blog/legal-asking-reviews-whatsapp-gdpr",                    permanent: true },
+      // FR
+      { source: "/fr/blog/como-conseguir-mas-resenas-google-maps",        destination: "/fr/blog/comment-obtenir-plus-avis-google-maps",                 permanent: true },
+      { source: "/fr/blog/por-que-clientes-no-dejan-resenas-whatsapp",    destination: "/fr/blog/pourquoi-clients-ne-laissent-pas-avis-whatsapp",        permanent: true },
+      { source: "/fr/blog/gestionar-resenas-negativas",                    destination: "/fr/blog/comment-gerer-les-avis-negatifs",                       permanent: true },
+      { source: "/fr/blog/algoritmo-google-maps-reputacion-local",        destination: "/fr/blog/algorithme-google-maps-referencement-local",            permanent: true },
+      { source: "/fr/blog/legal-pedir-resenas-whatsapp-rgpd",             destination: "/fr/blog/legal-demander-avis-whatsapp-rgpd",                     permanent: true },
+      // DE
+      { source: "/de/blog/como-conseguir-mas-resenas-google-maps",        destination: "/de/blog/mehr-google-maps-bewertungen-bekommen",                 permanent: true },
+      { source: "/de/blog/por-que-clientes-no-dejan-resenas-whatsapp",    destination: "/de/blog/warum-kunden-keine-bewertungen-per-whatsapp-hinterlassen", permanent: true },
+      { source: "/de/blog/gestionar-resenas-negativas",                    destination: "/de/blog/negative-bewertungen-richtig-handhaben",                permanent: true },
+      { source: "/de/blog/algoritmo-google-maps-reputacion-local",        destination: "/de/blog/google-maps-algorithmus-lokale-seo",                    permanent: true },
+      { source: "/de/blog/legal-pedir-resenas-whatsapp-rgpd",             destination: "/de/blog/recht-bewertungen-per-whatsapp-anfragen-dsgvo",         permanent: true },
+      // IT
+      { source: "/it/blog/como-conseguir-mas-resenas-google-maps",        destination: "/it/blog/come-ottenere-piu-recensioni-google-maps",              permanent: true },
+      { source: "/it/blog/por-que-clientes-no-dejan-resenas-whatsapp",    destination: "/it/blog/perche-i-clienti-non-lasciano-recensioni-whatsapp",     permanent: true },
+      { source: "/it/blog/gestionar-resenas-negativas",                    destination: "/it/blog/come-gestire-recensioni-negative",                      permanent: true },
+      { source: "/it/blog/algoritmo-google-maps-reputacion-local",        destination: "/it/blog/algoritmo-google-maps-seo-locale",                      permanent: true },
+      { source: "/it/blog/legal-pedir-resenas-whatsapp-rgpd",             destination: "/it/blog/legale-chiedere-recensioni-whatsapp-gdpr",              permanent: true },
+      // PT
+      { source: "/pt/blog/como-conseguir-mas-resenas-google-maps",        destination: "/pt/blog/como-obter-mais-avaliacoes-google-maps",                permanent: true },
+      { source: "/pt/blog/por-que-clientes-no-dejan-resenas-whatsapp",    destination: "/pt/blog/por-que-clientes-nao-deixam-avaliacoes-whatsapp",       permanent: true },
+      { source: "/pt/blog/gestionar-resenas-negativas",                    destination: "/pt/blog/como-gerir-avaliacoes-negativas",                       permanent: true },
+      { source: "/pt/blog/algoritmo-google-maps-reputacion-local",        destination: "/pt/blog/algoritmo-google-maps-seo-local",                       permanent: true },
+      { source: "/pt/blog/legal-pedir-resenas-whatsapp-rgpd",             destination: "/pt/blog/legal-pedir-avaliacoes-whatsapp-rgpd",                  permanent: true },
     ];
   },
 
