@@ -18,31 +18,31 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
-    template: "%s | ReseñasYa",
+    default: "ResenasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
+    template: "%s | ResenasYa",
   },
   description:
     "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot.",
-  authors: [{ name: "ReseñasYa" }],
-  creator: "ReseñasYa",
-  publisher: "ReseñasYa",
+  authors: [{ name: "ResenasYa" }],
+  creator: "ResenasYa",
+  publisher: "ResenasYa",
   manifest: "/manifest.json",
   alternates: { canonical: APP_URL },
   openGraph: {
     type: "website",
     locale: "es_ES",
     url: APP_URL,
-    siteName: "ReseñasYa",
-    title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
+    siteName: "ResenasYa",
+    title: "ResenasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
     description:
       "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ReseñasYa — Más reseñas de 5★ automáticamente por WhatsApp",
+    title: "ResenasYa — Más reseñas de 5★ automáticamente por WhatsApp",
     description: "IA + WhatsApp para conseguir más reseñas en Google Maps, App Store, Play Store o Trustpilot.",
   },
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "ReseñasYa" },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "ResenasYa" },
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
 };

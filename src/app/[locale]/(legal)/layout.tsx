@@ -17,7 +17,7 @@ export default async function LegalLayout({ children }: { children: React.ReactN
             <div className="w-7 h-7 bg-gray-900 rounded-md flex items-center justify-center shrink-0">
               <span className="text-[10px] font-extrabold text-white tracking-tight leading-none select-none">RY</span>
             </div>
-            <span className="text-base font-bold text-gray-900">ReseñasYa</span>
+            <span className="text-base font-bold text-gray-900">ResenasYa</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/#precios" className="text-gray-500 hover:text-gray-900 text-sm font-medium hidden sm:block">
@@ -49,7 +49,7 @@ export default async function LegalLayout({ children }: { children: React.ReactN
                 <div className="w-7 h-7 bg-gray-900 rounded-md flex items-center justify-center shrink-0">
                   <span className="text-[10px] font-extrabold text-white tracking-tight leading-none select-none">RY</span>
                 </div>
-                <span className="font-bold text-gray-800">ReseñasYa</span>
+                <span className="font-bold text-gray-800">ResenasYa</span>
               </div>
               <p className="text-xs text-gray-500 leading-relaxed mb-4">{t("footer.tagline")}</p>
             </div>
@@ -88,7 +88,7 @@ export default async function LegalLayout({ children }: { children: React.ReactN
 
           <div className="border-t border-gray-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-gray-400">
-              © {new Date().getFullYear()} ReseñasYa S.L. {t("footer.rights")}
+              © {new Date().getFullYear()} ResenasYa S.L. {t("footer.rights")}
             </p>
             <div className="flex flex-wrap gap-4 text-xs text-gray-400 items-center">
               <Link href={localizedPath("/privacidad", locale)} className="hover:text-gray-600 transition">{t("footer.privacy")}</Link>

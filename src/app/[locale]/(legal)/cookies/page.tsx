@@ -48,7 +48,7 @@ export default async function CookiesPage() {
     },
     {
       name: "ry_cookie_consent",
-      provider: "ReseñasYa (localStorage)",
+      provider: "ResenasYa (localStorage)",
       purpose: t("c_ryConsent_purpose"),
       type: t("c_ryConsent_type"),
       duration: t("c_ryConsent_duration"),
@@ -57,7 +57,7 @@ export default async function CookiesPage() {
     },
     {
       name: "resenas_ya_country",
-      provider: "ReseñasYa (localStorage)",
+      provider: "ResenasYa (localStorage)",
       purpose: t("c_ryCountry_purpose"),
       type: t("c_ryCountry_type"),
       duration: t("c_ryCountry_duration"),

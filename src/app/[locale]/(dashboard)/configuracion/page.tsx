@@ -253,7 +253,7 @@ export default function ConfiguracionPage() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.error("[ReseñasYa] Error de red al guardar:", err);
+      console.error("[ResenasYa] Error de red al guardar:", err);
       setError(t("errorNetwork"));
     } finally {
       setSaving(false);

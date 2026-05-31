@@ -7,12 +7,12 @@ import { getTranslations, getLocale } from "next-intl/server";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("blog");
   return {
-    title: `${t("title")} | ReseñasYa`,
+    title: `${t("title")} | ResenasYa`,
     description: t("subtitle"),
     alternates: { canonical: "/blog" },
     robots: { index: true, follow: true },
     openGraph: {
-      title: `${t("title")} | ReseñasYa`,
+      title: `${t("title")} | ResenasYa`,
       description: t("subtitle"),
       url: "/blog",
       type: "website",

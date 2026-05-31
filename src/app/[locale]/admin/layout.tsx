@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 
-export const metadata = { title: "Backoffice · ReseñasYa" };
+export const metadata = { title: "Backoffice · ResenasYa" };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -26,7 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="w-6 h-6 bg-red-600 rounded flex items-center justify-center shrink-0">
             <span className="text-[9px] font-black text-white">AD</span>
           </div>
-          <span className="font-bold text-white text-sm tracking-tight">ReseñasYa · Backoffice</span>
+          <span className="font-bold text-white text-sm tracking-tight">ResenasYa · Backoffice</span>
         </div>
         <div className="flex items-center gap-5">
           <span className="text-gray-600 text-xs hidden sm:block">{user.email}</span>

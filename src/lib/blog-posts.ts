@@ -65,7 +65,7 @@ Si la respuesta es negativa o neutra, responde con empatía e intenta resolver e
 - Evitas reseñas negativas que podrían no haberse publicado.
 - Generas una segunda oportunidad de mejorar la experiencia antes de que llegue a Google.
 
-Esto es exactamente lo que hace ReseñasYa con su análisis de sentimiento por IA.
+Esto es exactamente lo que hace ResenasYa con su análisis de sentimiento por IA.
 
 ### 5. Automatiza el proceso para que sea escalable
 
@@ -156,7 +156,7 @@ Las peticiones automáticas de Google en Maps («¿Has visitado X? Deja una rese
 3. **Si la respuesta es positiva**, entonces envía el enlace a Google Maps con un mensaje entusiasta.
 4. **Si la respuesta es negativa**, responde con empatía y gestiona el problema en privado.
 
-Este proceso, que es exactamente lo que automatiza ReseñasYa, convierte entre el 25% y el 40% de los clientes contactados en nuevas reseñas positivas.
+Este proceso, que es exactamente lo que automatiza ResenasYa, convierte entre el 25% y el 40% de los clientes contactados en nuevas reseñas positivas.
 
 ## Qué decirles
 
@@ -248,7 +248,7 @@ Por eso la captación activa de reseñas positivas no es solo una estrategia de 
 
 La mejor estrategia es detectar la insatisfacción antes de que llegue a Google.
 
-El proceso que usa ReseñasYa:
+El proceso que usa ResenasYa:
 1. Se envía un WhatsApp al cliente preguntando por su experiencia.
 2. Si la respuesta expresa insatisfacción, la IA responde con empatía e invita al diálogo privado.
 3. Solo los clientes con respuestas positivas reciben el enlace a Google Maps.

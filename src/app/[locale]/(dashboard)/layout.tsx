@@ -16,7 +16,7 @@ function Logo() {
       <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center shrink-0">
         <span className="text-[11px] font-extrabold text-white tracking-tight leading-none select-none">RY</span>
       </div>
-      <span className="text-base font-bold text-gray-900 tracking-tight">ReseñasYa</span>
+      <span className="text-base font-bold text-gray-900 tracking-tight">ResenasYa</span>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * Plantillas de mensajes de WhatsApp para ReseñasYa.
+ * Plantillas de mensajes de WhatsApp para ResenasYa.
  *
  * Variables disponibles en las plantillas:
  *   {nombre}    → nombre del cliente

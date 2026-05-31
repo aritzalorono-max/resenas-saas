@@ -12,7 +12,7 @@ export default function DashboardError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("[ReseñasYa] Error en el dashboard:", error);
+    console.error("[ResenasYa] Error en el dashboard:", error);
   }, [error]);
 
   return (

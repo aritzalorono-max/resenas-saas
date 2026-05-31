@@ -14,8 +14,8 @@ export interface TermsContent {
 
 const CONTENT: Record<string, TermsContent> = {
   es: {
-    metaTitle: "Términos y Condiciones | ReseñasYa",
-    metaDesc: "Condiciones generales de uso del servicio ReseñasYa.",
+    metaTitle: "Términos y Condiciones | ResenasYa",
+    metaDesc: "Condiciones generales de uso del servicio ResenasYa.",
     legalDoc: "Documento legal",
     pageTitle: "Términos y Condiciones de Uso",
     lastUpdatedDate: "28 de mayo de 2026",
@@ -23,7 +23,7 @@ const CONTENT: Record<string, TermsContent> = {
       {
         title: "2. Descripción del servicio",
         content: [
-          "ReseñasYa es una plataforma SaaS (Software as a Service) que permite a negocios locales automatizar la captación de reseñas en Google Maps y otras plataformas mediante el envío de mensajes de WhatsApp a sus clientes. El servicio incluye:",
+          "ResenasYa es una plataforma SaaS (Software as a Service) que permite a negocios locales automatizar la captación de reseñas en Google Maps y otras plataformas mediante el envío de mensajes de WhatsApp a sus clientes. El servicio incluye:",
           "• Envío de mensajes de WhatsApp personalizados a clientes a través de la API de Twilio.",
           "• Análisis automático del sentimiento de las respuestas de los clientes mediante inteligencia artificial (Claude AI de Anthropic).",
           "• Generación automática de mensajes de seguimiento mediante inteligencia artificial, sin revisión humana previa al envío.",
@@ -83,7 +83,7 @@ const CONTENT: Record<string, TermsContent> = {
       {
         title: "7. Plataformas de reseñas de terceros: exención de responsabilidad",
         content: [
-          "La Plataforma facilita el enlace a perfiles de reseñas en Google Maps, Trustpilot, App Store, Google Play, Yelp y otras plataformas de terceros. Buy & Click, SL no tiene ninguna relación comercial, afiliación ni acuerdo con dichas plataformas en el contexto del uso de ReseñasYa.",
+          "La Plataforma facilita el enlace a perfiles de reseñas en Google Maps, Trustpilot, App Store, Google Play, Yelp y otras plataformas de terceros. Buy & Click, SL no tiene ninguna relación comercial, afiliación ni acuerdo con dichas plataformas en el contexto del uso de ResenasYa.",
           "• Buy & Click, SL no es responsable de las decisiones de Google Maps, Trustpilot ni de ninguna otra plataforma de reseñas. Esto incluye: eliminación de reseñas, suspensión o penalización de perfiles de negocio, cambios en los algoritmos de posicionamiento o modificaciones en las políticas de uso.",
           "• Buy & Click, SL no es responsable de los problemas técnicos de las plataformas de terceros. Caídas del servicio, errores en la carga de perfiles o problemas con los enlaces de reseñas son responsabilidad exclusiva de dichas plataformas.",
           "• El usuario es responsable de cumplir con las políticas de cada plataforma de reseñas. La solicitud selectiva de reseñas y el sistema de incentivos pueden estar sujetos a las políticas de contenido de cada plataforma.",
@@ -181,8 +181,8 @@ const CONTENT: Record<string, TermsContent> = {
   },
 
   en: {
-    metaTitle: "Terms and Conditions | ReseñasYa",
-    metaDesc: "General terms and conditions of use of the ReseñasYa service.",
+    metaTitle: "Terms and Conditions | ResenasYa",
+    metaDesc: "General terms and conditions of use of the ResenasYa service.",
     legalDoc: "Legal document",
     pageTitle: "Terms and Conditions of Use",
     lastUpdatedDate: "May 28, 2026",
@@ -190,7 +190,7 @@ const CONTENT: Record<string, TermsContent> = {
       {
         title: "2. Service description",
         content: [
-          "ReseñasYa is a SaaS (Software as a Service) platform that enables local businesses to automate the collection of reviews on Google Maps and other platforms by sending WhatsApp messages to their customers. The service includes:",
+          "ResenasYa is a SaaS (Software as a Service) platform that enables local businesses to automate the collection of reviews on Google Maps and other platforms by sending WhatsApp messages to their customers. The service includes:",
           "• Sending personalised WhatsApp messages to customers via the Twilio API.",
           "• Automatic sentiment analysis of customer responses using artificial intelligence (Claude AI by Anthropic).",
           "• Automatic generation of follow-up messages by artificial intelligence, without prior human review before sending.",
@@ -250,7 +250,7 @@ const CONTENT: Record<string, TermsContent> = {
       {
         title: "7. Third-party review platforms: disclaimer of liability",
         content: [
-          "The Platform facilitates links to review profiles on Google Maps, Trustpilot, App Store, Google Play, Yelp and other third-party platforms. Buy & Click, SL has no commercial relationship, affiliation or agreement with those platforms in the context of using ReseñasYa.",
+          "The Platform facilitates links to review profiles on Google Maps, Trustpilot, App Store, Google Play, Yelp and other third-party platforms. Buy & Click, SL has no commercial relationship, affiliation or agreement with those platforms in the context of using ResenasYa.",
           "• Buy & Click, SL is not responsible for decisions made by Google Maps, Trustpilot or any other review platform. This includes: removal of reviews, suspension or penalisation of business profiles, changes to ranking algorithms or modifications to usage policies.",
           "• Buy & Click, SL is not responsible for technical issues on third-party platforms. Service outages, profile loading errors or review link problems are the exclusive responsibility of those platforms.",
           "• The user is responsible for complying with the policies of each review platform. Selective review requests and the incentive system may be subject to each platform's content policies.",
@@ -348,8 +348,8 @@ const CONTENT: Record<string, TermsContent> = {
   },
 
   fr: {
-    metaTitle: "Conditions Générales d'Utilisation | ReseñasYa",
-    metaDesc: "Conditions générales d'utilisation du service ReseñasYa.",
+    metaTitle: "Conditions Générales d'Utilisation | ResenasYa",
+    metaDesc: "Conditions générales d'utilisation du service ResenasYa.",
     legalDoc: "Document légal",
     pageTitle: "Conditions Générales d'Utilisation",
     lastUpdatedDate: "28 mai 2026",
@@ -357,7 +357,7 @@ const CONTENT: Record<string, TermsContent> = {
       {
         title: "2. Description du service",
         content: [
-          "ReseñasYa est une plateforme SaaS (Software as a Service) qui permet aux commerces locaux d'automatiser la collecte d'avis sur Google Maps et d'autres plateformes en envoyant des messages WhatsApp à leurs clients. Le service comprend :",
+          "ResenasYa est une plateforme SaaS (Software as a Service) qui permet aux commerces locaux d'automatiser la collecte d'avis sur Google Maps et d'autres plateformes en envoyant des messages WhatsApp à leurs clients. Le service comprend :",
           "• Envoi de messages WhatsApp personnalisés aux clients via l'API Twilio.",
           "• Analyse automatique du sentiment des réponses des clients par intelligence artificielle (Claude AI d'Anthropic).",
           "• Génération automatique de messages de suivi par intelligence artificielle, sans révision humaine préalable à l'envoi.",
@@ -507,8 +507,8 @@ const CONTENT: Record<string, TermsContent> = {
   },
 
   de: {
-    metaTitle: "Allgemeine Geschäftsbedingungen | ReseñasYa",
-    metaDesc: "Allgemeine Geschäftsbedingungen des ReseñasYa-Dienstes.",
+    metaTitle: "Allgemeine Geschäftsbedingungen | ResenasYa",
+    metaDesc: "Allgemeine Geschäftsbedingungen des ResenasYa-Dienstes.",
     legalDoc: "Rechtliches Dokument",
     pageTitle: "Allgemeine Geschäftsbedingungen",
     lastUpdatedDate: "28. Mai 2026",
@@ -516,7 +516,7 @@ const CONTENT: Record<string, TermsContent> = {
       {
         title: "2. Dienstbeschreibung",
         content: [
-          "ReseñasYa ist eine SaaS-Plattform (Software as a Service), die es lokalen Unternehmen ermöglicht, die Sammlung von Bewertungen auf Google Maps und anderen Plattformen durch den Versand von WhatsApp-Nachrichten an ihre Kunden zu automatisieren. Der Dienst umfasst:",
+          "ResenasYa ist eine SaaS-Plattform (Software as a Service), die es lokalen Unternehmen ermöglicht, die Sammlung von Bewertungen auf Google Maps und anderen Plattformen durch den Versand von WhatsApp-Nachrichten an ihre Kunden zu automatisieren. Der Dienst umfasst:",
           "• Versand personalisierter WhatsApp-Nachrichten an Kunden über die Twilio API.",
           "• Automatische Stimmungsanalyse von Kundenantworten mittels künstlicher Intelligenz (Claude AI von Anthropic).",
           "• Automatische Erstellung von Follow-up-Nachrichten durch KI, ohne vorherige menschliche Überprüfung.",
@@ -666,8 +666,8 @@ const CONTENT: Record<string, TermsContent> = {
   },
 
   it: {
-    metaTitle: "Termini e Condizioni | ReseñasYa",
-    metaDesc: "Condizioni generali di utilizzo del servizio ReseñasYa.",
+    metaTitle: "Termini e Condizioni | ResenasYa",
+    metaDesc: "Condizioni generali di utilizzo del servizio ResenasYa.",
     legalDoc: "Documento legale",
     pageTitle: "Termini e Condizioni d'Uso",
     lastUpdatedDate: "28 maggio 2026",
@@ -675,7 +675,7 @@ const CONTENT: Record<string, TermsContent> = {
       {
         title: "2. Descrizione del servizio",
         content: [
-          "ReseñasYa è una piattaforma SaaS (Software as a Service) che consente alle attività locali di automatizzare la raccolta di recensioni su Google Maps e altre piattaforme inviando messaggi WhatsApp ai propri clienti. Il servizio include:",
+          "ResenasYa è una piattaforma SaaS (Software as a Service) che consente alle attività locali di automatizzare la raccolta di recensioni su Google Maps e altre piattaforme inviando messaggi WhatsApp ai propri clienti. Il servizio include:",
           "• Invio di messaggi WhatsApp personalizzati ai clienti tramite l'API Twilio.",
           "• Analisi automatica del sentiment delle risposte dei clienti tramite intelligenza artificiale (Claude AI di Anthropic).",
           "• Generazione automatica di messaggi di follow-up tramite intelligenza artificiale, senza revisione umana prima dell'invio.",
@@ -825,8 +825,8 @@ const CONTENT: Record<string, TermsContent> = {
   },
 
   pt: {
-    metaTitle: "Termos e Condições | ReseñasYa",
-    metaDesc: "Condições gerais de utilização do serviço ReseñasYa.",
+    metaTitle: "Termos e Condições | ResenasYa",
+    metaDesc: "Condições gerais de utilização do serviço ResenasYa.",
     legalDoc: "Documento legal",
     pageTitle: "Termos e Condições de Utilização",
     lastUpdatedDate: "28 de maio de 2026",
@@ -834,7 +834,7 @@ const CONTENT: Record<string, TermsContent> = {
       {
         title: "2. Descrição do serviço",
         content: [
-          "ReseñasYa é uma plataforma SaaS (Software as a Service) que permite a negócios locais automatizar a captação de avaliações no Google Maps e outras plataformas através do envio de mensagens WhatsApp aos seus clientes. O serviço inclui:",
+          "ResenasYa é uma plataforma SaaS (Software as a Service) que permite a negócios locais automatizar a captação de avaliações no Google Maps e outras plataformas através do envio de mensagens WhatsApp aos seus clientes. O serviço inclui:",
           "• Envio de mensagens WhatsApp personalizadas a clientes através da API Twilio.",
           "• Análise automática do sentimento das respostas dos clientes mediante inteligência artificial (Claude AI da Anthropic).",
           "• Geração automática de mensagens de acompanhamento mediante inteligência artificial, sem revisão humana prévia ao envio.",

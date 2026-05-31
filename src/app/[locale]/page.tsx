@@ -30,12 +30,12 @@ import {
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
+  title: "ResenasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
   description: "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
   alternates: { canonical: "/" },
   openGraph: {
     url: "/",
-    title: "ReseñasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
+    title: "ResenasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
     description: "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
   },
 };
@@ -47,7 +47,7 @@ const schemaOrg = {
   "@graph": [
     {
       "@type": "SoftwareApplication",
-      name: "ReseñasYa",
+      name: "ResenasYa",
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
       offers: {
@@ -75,7 +75,7 @@ const schemaOrg = {
           name: "¿Cómo conseguir más reseñas en Google Maps para un restaurante?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Con ReseñasYa puedes enviar un WhatsApp automático a cada cliente tras su visita pidiéndole su opinión. Si la experiencia fue positiva, la IA les anima a dejar reseña en Google Maps con el enlace directo a tu ficha. Si fue negativa, responde con empatía sin dirigirles al perfil público.",
+            text: "Con ResenasYa puedes enviar un WhatsApp automático a cada cliente tras su visita pidiéndole su opinión. Si la experiencia fue positiva, la IA les anima a dejar reseña en Google Maps con el enlace directo a tu ficha. Si fue negativa, responde con empatía sin dirigirles al perfil público.",
           },
         },
         {
@@ -83,7 +83,7 @@ const schemaOrg = {
           name: "¿Funciona para peluquerías y centros de estética?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Sí. ReseñasYa está diseñado para cualquier negocio local. Muchas peluquerías y centros de estética lo usan para pedir opinión al cliente justo cuando termina el servicio, aprovechando el momento de máxima satisfacción.",
+            text: "Sí. ResenasYa está diseñado para cualquier negocio local. Muchas peluquerías y centros de estética lo usan para pedir opinión al cliente justo cuando termina el servicio, aprovechando el momento de máxima satisfacción.",
           },
         },
         {
@@ -91,7 +91,7 @@ const schemaOrg = {
           name: "¿Qué necesito para empezar?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Solo necesitas una cuenta de Twilio (WhatsApp Business Sandbox gratuita para empezar), el enlace de Google Maps de tu negocio y registrarte en ReseñasYa. La configuración completa lleva menos de 5 minutos.",
+            text: "Solo necesitas una cuenta de Twilio (WhatsApp Business Sandbox gratuita para empezar), el enlace de Google Maps de tu negocio y registrarte en ResenasYa. La configuración completa lleva menos de 5 minutos.",
           },
         },
         {
@@ -123,14 +123,14 @@ const schemaOrg = {
           name: "¿Se puede usar para conseguir reseñas en App Store y Play Store?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Sí. ReseñasYa funciona para cualquier plataforma de reseñas: Google Maps, App Store (Apple) y Play Store (Google). Los desarrolladores de apps lo usan para pedir valoraciones a sus usuarios activos por WhatsApp. Solo tienes que configurar el enlace de tu app en lugar del de Google Maps.",
+            text: "Sí. ResenasYa funciona para cualquier plataforma de reseñas: Google Maps, App Store (Apple) y Play Store (Google). Los desarrolladores de apps lo usan para pedir valoraciones a sus usuarios activos por WhatsApp. Solo tienes que configurar el enlace de tu app en lugar del de Google Maps.",
           },
         },
       ],
     },
     {
       "@type": "Organization",
-      name: "ReseñasYa",
+      name: "ResenasYa",
       legalName: "Buy & Click, SL",
       url: process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com",
       logo: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com"}/icon.svg`,
@@ -216,7 +216,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
               <div className="w-7 h-7 bg-gray-900 rounded-md flex items-center justify-center shrink-0">
                 <span className="text-[10px] font-extrabold text-white tracking-tight leading-none select-none">RY</span>
               </div>
-              <span className="text-base font-bold text-gray-900">ReseñasYa</span>
+              <span className="text-base font-bold text-gray-900">ResenasYa</span>
             </Link>
             <div className="flex items-center gap-4">
               <a href="#precios" className="text-gray-500 hover:text-gray-900 text-sm font-medium hidden sm:block">
@@ -304,7 +304,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                 <div className="relative w-full rounded-2xl overflow-hidden shadow-xl aspect-video">
                   <iframe
                     src="https://www.youtube.com/embed/Hu52ipdFzjk"
-                    title="Demostración ReseñasYa"
+                    title="Demostración ResenasYa"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="absolute inset-0 w-full h-full"
@@ -448,7 +448,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                   <div className="w-7 h-7 bg-gray-900 rounded-md flex items-center justify-center shrink-0">
                     <span className="text-[10px] font-extrabold text-white tracking-tight leading-none select-none">RY</span>
                   </div>
-                  <span className="font-bold text-gray-800">ReseñasYa</span>
+                  <span className="font-bold text-gray-800">ResenasYa</span>
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed mb-4">
                   {footer("tagline")}
@@ -494,7 +494,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             {/* Bottom bar */}
             <div className="border-t border-gray-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-xs text-gray-500">
-                © {new Date().getFullYear()} ReseñasYa S.L. {footer("rights")}
+                © {new Date().getFullYear()} ResenasYa S.L. {footer("rights")}
               </p>
               <div className="flex flex-wrap gap-4 text-xs text-gray-500 items-center">
                 <Link href={localizedPath("/privacidad", locale)} className="hover:text-gray-600 transition">{footer("privacy")}</Link>

@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const post = getPostBySlug(slug, locale);
   if (!post) return {};
   return {
-    title: `${post.title} | ReseñasYa Blog`,
+    title: `${post.title} | ResenasYa Blog`,
     description: post.description,
     alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
@@ -159,8 +159,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    author: { "@type": "Organization", name: "ReseñasYa" },
-    publisher: { "@type": "Organization", name: "ReseñasYa", url: "https://resenasya.com" },
+    author: { "@type": "Organization", name: "ResenasYa" },
+    publisher: { "@type": "Organization", name: "ResenasYa", url: "https://resenasya.com" },
   };
 
   return (

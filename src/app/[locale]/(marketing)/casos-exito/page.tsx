@@ -5,13 +5,13 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { getCaseStudies } from "@/lib/case-studies-data";
 
 export const metadata: Metadata = {
-  title: "Casos de éxito | ReseñasYa",
-  description: "Descubre cómo restaurantes, clínicas, gimnasios y e-commerce han multiplicado sus reseñas en Google Maps, Trustpilot y App Store con ReseñasYa.",
+  title: "Casos de éxito | ResenasYa",
+  description: "Descubre cómo restaurantes, clínicas, gimnasios y e-commerce han multiplicado sus reseñas en Google Maps, Trustpilot y App Store con ResenasYa.",
   alternates: { canonical: "/casos-exito" },
   robots: { index: true, follow: true },
   openGraph: {
-    title: "Casos de éxito | ReseñasYa",
-    description: "Descubre cómo restaurantes, clínicas, gimnasios y e-commerce han multiplicado sus reseñas en Google Maps, Trustpilot y App Store con ReseñasYa.",
+    title: "Casos de éxito | ResenasYa",
+    description: "Descubre cómo restaurantes, clínicas, gimnasios y e-commerce han multiplicado sus reseñas en Google Maps, Trustpilot y App Store con ResenasYa.",
     url: "/casos-exito",
     type: "website",
   },

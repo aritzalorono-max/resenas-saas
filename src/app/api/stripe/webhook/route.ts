@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
               currency: invoice.currency,
               plan: sub.metadata?.plan ?? "starter",
               status: "paid",
-              description: `Suscripción ${sub.metadata?.plan ?? ""} — ReseñasYa`,
+              description: `Suscripción ${sub.metadata?.plan ?? ""} — ResenasYa`,
               invoice_url: invoice.hosted_invoice_url ?? null,
               period_start: invoice.period_start ? new Date(invoice.period_start * 1000).toISOString() : null,
               period_end:   invoice.period_end   ? new Date(invoice.period_end   * 1000).toISOString() : null,
