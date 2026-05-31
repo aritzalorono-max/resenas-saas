@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { getStripe, PLANS, type PlanKey } from "@/lib/stripe";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
@@ -9,6 +10,13 @@ export async function POST(req: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
+    // 5 checkout session creations per minute per user
+    const rateSvc = await createServiceClient();
+    const rl = await checkGeneralRateLimit(rateSvc, `stripe-checkout:${user.id}`, 1, 5);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
     }
 
     const { plan } = await req.json() as { plan: PlanKey };

@@ -25,6 +25,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Email inválido" }, { status: 400 });
   }
 
+  // Per-email limit prevents enumerating all registered emails via password reset
+  const emailRl = await checkGeneralRateLimit(serviceClient, `recover:email:${email.toLowerCase()}`, 60, 3);
+  if (!emailRl.allowed) {
+    return NextResponse.json(
+      { error: "Demasiados intentos. Espera unos minutos e inténtalo de nuevo." },
+      { status: 429 }
+    );
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 

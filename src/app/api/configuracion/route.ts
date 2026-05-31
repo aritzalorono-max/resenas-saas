@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 import { validateUrl } from "@/lib/validation";
 import { extractPlaceIdFromUrl } from "@/lib/google-places";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 import type { ReviewPlatformLink, BusinessTone, WhatsAppLanguage, WhatsAppMode } from "@/types";
 
@@ -46,6 +47,13 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await authClient.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
+    // 10 config saves per minute per user
+    const rateSvc = await createServiceClient();
+    const rl = await checkGeneralRateLimit(rateSvc, `configuracion:${user.id}`, 1, 10);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
     }
 
     const body = await request.json();

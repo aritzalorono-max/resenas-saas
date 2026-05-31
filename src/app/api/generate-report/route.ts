@@ -1,6 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { logger } from "@/lib/logger";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import type {
   ReportTheme,
   ReportImprovementIdea,
@@ -216,6 +217,13 @@ export async function POST(req: Request): Promise<Response> {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+  // 2 AI reports per 10 minutes per user — Claude Sonnet calls are expensive
+  const serviceClient = await createServiceClient();
+  const rl = await checkGeneralRateLimit(serviceClient, `generate-report:${user.id}`, 10, 2);
+  if (!rl.allowed) {
+    return Response.json({ error: "Demasiadas solicitudes. Espera unos minutos antes de generar otro informe." }, { status: 429 });
+  }
 
   const body   = await req.json().catch(() => ({}));
   const locale = (typeof body?.locale === "string" && LANGUAGE_NAME[body.locale])

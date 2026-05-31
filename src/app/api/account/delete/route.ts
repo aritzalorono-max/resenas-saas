@@ -1,4 +1,5 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
 
 export async function DELETE() {
@@ -10,6 +11,12 @@ export async function DELETE() {
   }
 
   const service = await createServiceClient();
+
+  // 3 attempts per day — irreversible action, hard cap to prevent abuse
+  const rl = await checkGeneralRateLimit(service, `account-delete:${user.id}`, 1440, 3);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Demasiados intentos. Por favor, contacta con soporte." }, { status: 429 });
+  }
 
   // Borrar datos del negocio (review_requests caerán por FK cascade)
   await service.from("businesses").delete().eq("user_id", user.id);

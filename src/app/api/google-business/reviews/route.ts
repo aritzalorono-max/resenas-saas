@@ -13,6 +13,7 @@ import {
   starRatingToNumber,
 } from "@/lib/google-business";
 import { logger } from "@/lib/logger";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
 
 async function getValidAccessToken(business: {
@@ -63,6 +64,13 @@ export async function GET() {
 
   if (authError || !user) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  // 5 Google API fetches per minute per user — avoids exhausting OAuth quota
+  const rateSvc = await createServiceClient();
+  const rl = await checkGeneralRateLimit(rateSvc, `gb-reviews:${user.id}`, 1, 5);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
   }
 
   const { data: business, error: bizError } = await supabase

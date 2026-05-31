@@ -9,6 +9,7 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { replyToReview, refreshAccessToken } from "@/lib/google-business";
 import { logger } from "@/lib/logger";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -20,6 +21,13 @@ export async function POST(request: Request) {
 
   if (authError || !user) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  // 10 review replies per minute per user
+  const rateSvc = await createServiceClient();
+  const rl = await checkGeneralRateLimit(rateSvc, `gb-reply:${user.id}`, 1, 10);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
   }
 
   let body: { reviewName?: string; replyText?: string };

@@ -12,6 +12,7 @@ import {
   starRatingToNumber,
 } from "@/lib/google-business";
 import { logger } from "@/lib/logger";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -44,6 +45,13 @@ export async function GET() {
 
   if (authError || !user) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  // 2 full analyses per 10 minutes per user (fetches Google API + runs Claude)
+  const serviceClient = await createServiceClient();
+  const rl = await checkGeneralRateLimit(serviceClient, `gb-analyze:${user.id}`, 10, 2);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Demasiadas solicitudes. Espera unos minutos." }, { status: 429 });
   }
 
   const { data: business, error: bizError } = await supabase

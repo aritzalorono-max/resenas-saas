@@ -1,6 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { getBusinessByUserId } from "@/lib/business";
 import { uploadPoolCodes } from "@/lib/discount-codes";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import * as xlsx from "xlsx";
@@ -11,6 +12,13 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
+  // 3 file uploads per minute per user (files can contain up to 5 000 rows each)
+  const rateSvc = await createServiceClient();
+  const rl = await checkGeneralRateLimit(rateSvc, `codes-upload:${user.id}`, 1, 3);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Demasiadas subidas. Espera un momento." }, { status: 429 });
   }
 
   const business = await getBusinessByUserId(supabase, user.id);

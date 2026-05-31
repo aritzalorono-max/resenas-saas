@@ -8,8 +8,9 @@
  * Returns: { complaintText: string }
  */
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -39,6 +40,13 @@ export async function POST(request: Request) {
 
   if (authError || !user) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  // 5 flag+AI complaint generations per minute per user
+  const serviceClient = await createServiceClient();
+  const rl = await checkGeneralRateLimit(serviceClient, `gb-flag:${user.id}`, 1, 5);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
   }
 
   let body: {
