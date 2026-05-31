@@ -85,7 +85,8 @@ export async function GET() {
         })
         .eq("id", business.id);
     } catch (err) {
-      logger.warn("[GoogleBusiness] Error al renovar token para análisis", err);
+      logger.error("[GoogleBusiness] Error al renovar token para análisis", err);
+      return NextResponse.json({ error: "Token expirado, reconecta Google Business" }, { status: 401 });
     }
   }
 

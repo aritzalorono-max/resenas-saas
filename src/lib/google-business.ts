@@ -109,7 +109,7 @@ export async function exchangeCode(code: string): Promise<GoogleTokenResponse> {
     throw new Error(`Google token exchange failed: ${res.status} ${body}`);
   }
 
-  return res.json() as Promise<GoogleTokenResponse>;
+  return await res.json() as GoogleTokenResponse;
 }
 
 /**

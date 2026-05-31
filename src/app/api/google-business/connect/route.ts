@@ -9,6 +9,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getAuthUrl } from "@/lib/google-business";
 import { logger } from "@/lib/logger";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import crypto from "crypto";
 
 export async function GET(): Promise<never> {
   const supabase = await createClient();
@@ -22,10 +24,18 @@ export async function GET(): Promise<never> {
     redirect("/login");
   }
 
-  // Encode userId in state so the callback can look up the business
-  const state = Buffer.from(user.id).toString("base64");
-  const authUrl = getAuthUrl(state);
+  // Generate a random nonce as state — userId is stored server-side in a cookie
+  const nonce = crypto.randomBytes(32).toString("hex");
+  const cookieStore = await cookies();
+  cookieStore.set("__gb_oauth_state", JSON.stringify({ nonce, userId: user.id }), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 600, // 10 minutes
+    path: "/",
+  });
 
+  const authUrl = getAuthUrl(nonce);
   logger.info("[GoogleBusiness] Redirigiendo a Google OAuth", { userId: user.id });
   redirect(authUrl);
 }

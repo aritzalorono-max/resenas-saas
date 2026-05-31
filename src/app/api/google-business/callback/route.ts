@@ -14,6 +14,7 @@ import {
 } from "@/lib/google-business";
 import { logger } from "@/lib/logger";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest): Promise<never> {
@@ -32,14 +33,29 @@ export async function GET(request: NextRequest): Promise<never> {
     redirect("/google-business?error=missing_params");
   }
 
-  // Decode userId from state
-  let userId: string;
-  try {
-    userId = Buffer.from(state, "base64").toString("utf8");
-  } catch {
-    logger.error("[GoogleBusiness] state inválido en callback");
+  // Validate state against server-side cookie to prevent CSRF
+  const cookieStore = await cookies();
+  const stored = cookieStore.get("__gb_oauth_state");
+  if (!stored) {
+    logger.warn("[GoogleBusiness] Cookie de estado OAuth no encontrada");
     redirect("/google-business?error=invalid_state");
   }
+
+  let oauthData: { nonce: string; userId: string };
+  try {
+    oauthData = JSON.parse(stored.value);
+  } catch {
+    logger.error("[GoogleBusiness] Cookie de estado OAuth inválida");
+    redirect("/google-business?error=invalid_state");
+  }
+
+  if (oauthData.nonce !== state) {
+    logger.warn("[GoogleBusiness] State no coincide — posible CSRF");
+    redirect("/google-business?error=invalid_state");
+  }
+
+  cookieStore.delete("__gb_oauth_state");
+  const userId = oauthData.userId;
 
   // Exchange code for tokens
   let tokens: Awaited<ReturnType<typeof exchangeCode>>;
