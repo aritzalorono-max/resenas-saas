@@ -1078,7 +1078,7 @@ export default function GoogleBusinessPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl overflow-x-auto">
+      <div className="lg:hidden flex gap-1 p-1 bg-gray-100 rounded-xl overflow-x-auto">
         <TabButton active={tab === "profile"} onClick={() => setTab("profile")}>
           {t("tabProfile")}
         </TabButton>
