@@ -766,7 +766,10 @@
     "billing": "Billing",
     "languageSwitcher": "Language",
     "googleBusiness": "Google Business",
-    "googleShort": "Google"
+    "googleShort": "Google",
+    "clientsGroup": "Clients",
+    "configGroup": "Settings",
+    "more": "More"
   },
   "cookieBanner": {
     "title": "We use cookies",
