@@ -1,52 +1,13 @@
 import type { MetadataRoute } from "next";
 import { getBlogPosts } from "@/lib/blog-posts-data";
+import { localizedPath } from "@/lib/localized-paths";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
 const LOCALES = ["es", "en", "fr", "de", "it", "pt"] as const;
 const DEFAULT_LOCALE = "es";
 
-// Locale-specific external paths for routes that differ across languages
-const LOCALIZED_PATHS: Record<string, Partial<Record<string, string>>> = {
-  "/casos-exito": {
-    es: "/casos-exito",
-    en: "/case-studies",
-    fr: "/cas-clients",
-    de: "/erfolgsgeschichten",
-    it: "/casi-di-successo",
-    pt: "/casos-de-sucesso",
-  },
-  "/contacto": {
-    es: "/contacto",
-    en: "/contact",
-    fr: "/contact",
-    de: "/kontakt",
-    it: "/contatto",
-    pt: "/contacto",
-  },
-  "/privacidad": {
-    es: "/privacidad",
-    en: "/privacy",
-    fr: "/confidentialite",
-    de: "/datenschutz",
-    it: "/privacy",
-    pt: "/privacidade",
-  },
-  "/terminos": {
-    es: "/terminos",
-    en: "/terms",
-    fr: "/conditions",
-    de: "/agb",
-    it: "/termini",
-    pt: "/termos",
-  },
-};
-
-function externalPath(locale: string, internalPath: string): string {
-  return LOCALIZED_PATHS[internalPath]?.[locale] ?? internalPath;
-}
-
-function localePath(locale: string, internalPath: string): string {
-  const ext = externalPath(locale, internalPath);
+function sitemapUrl(locale: string, internalPath: string): string {
+  const ext = localizedPath(internalPath, locale);
   const prefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
   return `${APP_URL}${prefix}${ext}`;
 }
@@ -54,7 +15,7 @@ function localePath(locale: string, internalPath: string): string {
 function alternates(internalPath: string): Record<string, string> {
   const alts: Record<string, string> = {};
   for (const locale of LOCALES) {
-    alts[locale] = localePath(locale, internalPath);
+    alts[locale] = sitemapUrl(locale, internalPath);
   }
   alts["x-default"] = localePath(DEFAULT_LOCALE, internalPath);
   return alts;
@@ -68,7 +29,7 @@ function entry(
 ): MetadataRoute.Sitemap[number][] {
   const { lastModified = new Date("2026-05-29"), changeFrequency = "monthly", priority = 0.7 } = opts;
   return LOCALES.map((locale) => ({
-    url: localePath(locale, internalPath),
+    url: sitemapUrl(locale, internalPath),
     lastModified,
     changeFrequency,
     priority: locale === DEFAULT_LOCALE ? priority : priority * 0.9,

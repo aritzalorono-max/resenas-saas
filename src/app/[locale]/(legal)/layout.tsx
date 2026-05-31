@@ -1,10 +1,12 @@
 import { Link } from "@/i18n/navigation";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { localizedPath } from "@/lib/localized-paths";
 
 export default async function LegalLayout({ children }: { children: React.ReactNode }) {
   const t = await getTranslations();
+  const locale = await getLocale();
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -57,7 +59,7 @@ export default async function LegalLayout({ children }: { children: React.ReactN
                 <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">{t("footer.product")}</p>
                 <ul className="space-y-2">
                   <li><Link href="/#precios" className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.pricing")}</Link></li>
-                  <li><Link href="/casos-exito" className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.successCases")}</Link></li>
+                  <li><Link href={localizedPath("/casos-exito", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.successCases")}</Link></li>
                   <li><Link href="/blog" className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.blog")}</Link></li>
                   <li><Link href="/faq" className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.faq")}</Link></li>
                 </ul>
@@ -65,7 +67,7 @@ export default async function LegalLayout({ children }: { children: React.ReactN
               <div>
                 <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">{t("footer.support")}</p>
                 <ul className="space-y-2">
-                  <li><Link href="/contacto" className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.contact")}</Link></li>
+                  <li><Link href={localizedPath("/contacto", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.contact")}</Link></li>
                   <li>
                     <a href="mailto:contacto.resenasya@gmail.com" className="text-sm text-gray-500 hover:text-gray-800 transition">
                       contacto.resenasya@gmail.com
@@ -76,8 +78,8 @@ export default async function LegalLayout({ children }: { children: React.ReactN
               <div>
                 <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">{t("footer.legal")}</p>
                 <ul className="space-y-2">
-                  <li><Link href="/terminos" className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.terms")}</Link></li>
-                  <li><Link href="/privacidad" className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.privacy")}</Link></li>
+                  <li><Link href={localizedPath("/terminos", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.terms")}</Link></li>
+                  <li><Link href={localizedPath("/privacidad", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.privacy")}</Link></li>
                   <li><Link href="/cookies" className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.cookies")}</Link></li>
                 </ul>
               </div>
@@ -89,8 +91,8 @@ export default async function LegalLayout({ children }: { children: React.ReactN
               © {new Date().getFullYear()} ReseñasYa S.L. {t("footer.rights")}
             </p>
             <div className="flex flex-wrap gap-4 text-xs text-gray-400 items-center">
-              <Link href="/privacidad" className="hover:text-gray-600 transition">{t("footer.privacy")}</Link>
-              <Link href="/terminos" className="hover:text-gray-600 transition">{t("footer.terms")}</Link>
+              <Link href={localizedPath("/privacidad", locale)} className="hover:text-gray-600 transition">{t("footer.privacy")}</Link>
+              <Link href={localizedPath("/terminos", locale)} className="hover:text-gray-600 transition">{t("footer.terms")}</Link>
               <Link href="/cookies" className="hover:text-gray-600 transition">{t("footer.cookies")}</Link>
               <ManageCookiesButton />
             </div>

@@ -2,6 +2,7 @@ import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getTranslations } from "next-intl/server";
+import { localizedPath } from "@/lib/localized-paths";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { ConversationTabs } from "@/components/landing/ConversationTabs";
 import { PricingPlans } from "@/components/landing/PricingPlans";
@@ -360,7 +361,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
             <div className="text-center mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href="/casos-exito"
+                href={localizedPath("/casos-exito", locale)}
                 className="border-2 border-brand-600 text-brand-700 font-bold px-7 py-3.5 rounded-xl text-base hover:bg-brand-50 transition inline-block"
               >
                 {t("casesBtn")}
@@ -461,7 +462,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                   <ul className="space-y-2">
                     <li><a href="#precios" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("pricing")}</a></li>
                     <li><a href="#sectores" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("sectors")}</a></li>
-                    <li><Link href="/casos-exito" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("successCases")}</Link></li>
+                    <li><Link href={localizedPath("/casos-exito", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("successCases")}</Link></li>
                     <li><Link href="/blog" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("blog")}</Link></li>
                     <li><Link href="/faq" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("faq")}</Link></li>
                     <li><Link href="/register" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("register")}</Link></li>
@@ -471,7 +472,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                 <div>
                   <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">{footer("support")}</p>
                   <ul className="space-y-2">
-                    <li><Link href="/contacto" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("contact")}</Link></li>
+                    <li><Link href={localizedPath("/contacto", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("contact")}</Link></li>
                     <li>
                       <a href="mailto:contacto.resenasya@gmail.com" className="text-sm text-gray-500 hover:text-gray-800 transition">
                         contacto.resenasya@gmail.com
@@ -482,8 +483,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                 <div>
                   <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">{footer("legal")}</p>
                   <ul className="space-y-2">
-                    <li><Link href="/terminos" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("terms")}</Link></li>
-                    <li><Link href="/privacidad" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("privacy")}</Link></li>
+                    <li><Link href={localizedPath("/terminos", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("terms")}</Link></li>
+                    <li><Link href={localizedPath("/privacidad", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("privacy")}</Link></li>
                     <li><Link href="/cookies" className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("cookies")}</Link></li>
                   </ul>
                 </div>
@@ -496,8 +497,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                 © {new Date().getFullYear()} ReseñasYa S.L. {footer("rights")}
               </p>
               <div className="flex flex-wrap gap-4 text-xs text-gray-500 items-center">
-                <Link href="/privacidad" className="hover:text-gray-600 transition">{footer("privacy")}</Link>
-                <Link href="/terminos" className="hover:text-gray-600 transition">{footer("terms")}</Link>
+                <Link href={localizedPath("/privacidad", locale)} className="hover:text-gray-600 transition">{footer("privacy")}</Link>
+                <Link href={localizedPath("/terminos", locale)} className="hover:text-gray-600 transition">{footer("terms")}</Link>
                 <Link href="/cookies" className="hover:text-gray-600 transition">{footer("cookies")}</Link>
                 <ManageCookiesButton />
               </div>

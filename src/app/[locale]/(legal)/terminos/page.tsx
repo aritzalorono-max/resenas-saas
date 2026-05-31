@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { localizedPath } from "@/lib/localized-paths";
 import { getTermsContent } from "@/lib/terms-content";
 
 const COMPANY  = "Buy & Click, SL";
@@ -110,12 +111,12 @@ export default async function TerminosPage() {
                           "17. Contacto"
       }>
         <p>
-          {locale === "es" ? <>Para cualquier consulta relacionada con estas Condiciones, puedes contactarnos en:{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> o a través de{" "}<Link href="/contacto" className="text-brand-600 hover:underline">nuestro formulario de contacto</Link>.</> :
-           locale === "en" ? <>For any queries related to these Conditions, you can contact us at:{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> or via{" "}<Link href="/contacto" className="text-brand-600 hover:underline">our contact form</Link>.</> :
-           locale === "fr" ? <>Pour toute question relative aux présentes Conditions, vous pouvez nous contacter à :{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> ou via{" "}<Link href="/contacto" className="text-brand-600 hover:underline">notre formulaire de contact</Link>.</> :
-           locale === "de" ? <>Bei Fragen zu diesen Bedingungen können Sie uns unter{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> oder über{" "}<Link href="/contacto" className="text-brand-600 hover:underline">unser Kontaktformular</Link> erreichen.</> :
-           locale === "it" ? <>Per qualsiasi domanda relativa alle presenti Condizioni, potete contattarci a:{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> o tramite{" "}<Link href="/contacto" className="text-brand-600 hover:underline">il nostro modulo di contatto</Link>.</> :
-                             <>Para qualquer questão relacionada com as presentes Condições, pode contactar-nos em:{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> ou através do{" "}<Link href="/contacto" className="text-brand-600 hover:underline">nosso formulário de contacto</Link>.</>
+          {locale === "es" ? <>Para cualquier consulta relacionada con estas Condiciones, puedes contactarnos en:{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> o a través de{" "}<Link href={localizedPath("/contacto", locale)} className="text-brand-600 hover:underline">nuestro formulario de contacto</Link>.</> :
+           locale === "en" ? <>For any queries related to these Conditions, you can contact us at:{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> or via{" "}<Link href={localizedPath("/contacto", locale)} className="text-brand-600 hover:underline">our contact form</Link>.</> :
+           locale === "fr" ? <>Pour toute question relative aux présentes Conditions, vous pouvez nous contacter à :{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> ou via{" "}<Link href={localizedPath("/contacto", locale)} className="text-brand-600 hover:underline">notre formulaire de contact</Link>.</> :
+           locale === "de" ? <>Bei Fragen zu diesen Bedingungen können Sie uns unter{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> oder über{" "}<Link href={localizedPath("/contacto", locale)} className="text-brand-600 hover:underline">unser Kontaktformular</Link> erreichen.</> :
+           locale === "it" ? <>Per qualsiasi domanda relativa alle presenti Condizioni, potete contattarci a:{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> o tramite{" "}<Link href={localizedPath("/contacto", locale)} className="text-brand-600 hover:underline">il nostro modulo di contatto</Link>.</> :
+                             <>Para qualquer questão relacionada com as presentes Condições, pode contactar-nos em:{" "}<a href={`mailto:${EMAIL}`} className="text-brand-600 hover:underline">{EMAIL}</a> ou através do{" "}<Link href={localizedPath("/contacto", locale)} className="text-brand-600 hover:underline">nosso formulário de contacto</Link>.</>
           }
         </p>
       </Section>
