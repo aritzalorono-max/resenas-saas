@@ -58,13 +58,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         <div className="p-4 border-t border-gray-100 space-y-2">
           <p className="text-xs text-gray-400 truncate px-1">{user.email}</p>
-          <Link
-            href="/cuenta"
-            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition font-medium"
-          >
-            <UserCircle className="w-4 h-4 shrink-0" />
-            {t("myAccount")}
-          </Link>
           {isAdmin && (
             <Link
               href="/admin"
