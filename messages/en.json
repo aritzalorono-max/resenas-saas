@@ -780,6 +780,7 @@
     "import": "Import",
     "logout": "Sign out",
     "myAccount": "My account",
+    "accountProfile": "My profile",
     "backoffice": "Backoffice",
     "home": "Home",
     "sendRequest": "Send request",

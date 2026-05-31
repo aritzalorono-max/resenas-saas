@@ -6,7 +6,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
   Home, Send, Star, BarChart2, Settings,
-  Printer, Gift, CreditCard, MapPin, ChevronDown, Flag,
+  Printer, Gift, CreditCard, MapPin, ChevronDown, Flag, UserCircle, User,
 } from "lucide-react";
 
 type Item = { href: string; labelKey: string; Icon: React.ElementType; tab?: string };
@@ -66,11 +66,11 @@ const NAV: Entry[] = [
     group: {
       id: "account",
       labelKey: "myAccount",
-      Icon: CreditCard,
+      Icon: UserCircle,
       defaultOpen: false,
       items: [
-        { href: "/cuenta",      labelKey: "myAccount", Icon: CreditCard },
-        { href: "/facturacion", labelKey: "billing",   Icon: CreditCard },
+        { href: "/cuenta",      labelKey: "accountProfile", Icon: User       },
+        { href: "/facturacion", labelKey: "billing",        Icon: CreditCard },
       ],
     },
   },
