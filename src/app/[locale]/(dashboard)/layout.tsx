@@ -43,14 +43,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const t = await getTranslations("common");
 
   const navItems = [
-    { href: "/dashboard"     as const, label: t("home"),           Icon: Home        },
-    { href: "/clientes"      as const, label: t("sendRequest"),    Icon: Send        },
-    { href: "/resenas"       as const, label: t("reviews"),        Icon: Star        },
-    { href: "/informes"      as const, label: t("reports"),        Icon: BarChart2   },
-    { href: "/incentivos"    as const, label: t("incentives"),     Icon: Gift        },
-    { href: "/configuracion" as const, label: t("businessProfile"),Icon: Settings    },
-    { href: "/cartel"        as const, label: t("qrPoster"),       Icon: Printer     },
-    { href: "/facturacion"   as const, label: t("billing"),        Icon: CreditCard  },
+    { href: "/dashboard",     label: t("home"),            Icon: Home        },
+    { href: "/clientes",      label: t("sendRequest"),      Icon: Send        },
+    { href: "/resenas",       label: t("reviews"),          Icon: Star        },
+    { href: "/informes",      label: t("reports"),          Icon: BarChart2   },
+    { href: "/incentivos",    label: t("incentives"),       Icon: Gift        },
+    { href: "/configuracion", label: t("businessProfile"),  Icon: Settings    },
+    { href: "/cartel",        label: t("qrPoster"),         Icon: Printer     },
+    { href: "/facturacion",   label: t("billing"),          Icon: CreditCard  },
   ];
 
   return (

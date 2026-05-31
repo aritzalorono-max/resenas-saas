@@ -57,6 +57,36 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
   },
 
+  async rewrites() {
+    return [
+      // EN
+      { source: "/en/privacy",       destination: "/en/privacidad" },
+      { source: "/en/terms",         destination: "/en/terminos" },
+      { source: "/en/contact",       destination: "/en/contacto" },
+      { source: "/en/case-studies",  destination: "/en/casos-exito" },
+      // FR
+      { source: "/fr/confidentialite", destination: "/fr/privacidad" },
+      { source: "/fr/conditions",      destination: "/fr/terminos" },
+      { source: "/fr/contact",         destination: "/fr/contacto" },
+      { source: "/fr/cas-clients",     destination: "/fr/casos-exito" },
+      // DE
+      { source: "/de/datenschutz",         destination: "/de/privacidad" },
+      { source: "/de/agb",                 destination: "/de/terminos" },
+      { source: "/de/kontakt",             destination: "/de/contacto" },
+      { source: "/de/erfolgsgeschichten",  destination: "/de/casos-exito" },
+      // IT
+      { source: "/it/privacy",           destination: "/it/privacidad" },
+      { source: "/it/termini",           destination: "/it/terminos" },
+      { source: "/it/contatto",          destination: "/it/contacto" },
+      { source: "/it/casi-di-successo",  destination: "/it/casos-exito" },
+      // PT
+      { source: "/pt/privacidade",       destination: "/pt/privacidad" },
+      { source: "/pt/termos",            destination: "/pt/terminos" },
+      { source: "/pt/contacto",          destination: "/pt/contacto" },
+      { source: "/pt/casos-de-sucesso",  destination: "/pt/casos-exito" },
+    ];
+  },
+
   async headers() {
     return [
       {
