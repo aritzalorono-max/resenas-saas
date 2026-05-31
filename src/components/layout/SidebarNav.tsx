@@ -1,0 +1,196 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Link, usePathname } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import {
+  Home, Send, Star, BarChart2, Settings,
+  Printer, Gift, CreditCard, MapPin, ChevronDown,
+} from "lucide-react";
+
+type Item = { href: string; labelKey: string; Icon: React.ElementType };
+type Group = { id: string; labelKey: string; Icon: React.ElementType; items: Item[]; defaultOpen: boolean };
+type Entry = { type: "item"; href: string; labelKey: string; Icon: React.ElementType }
+           | { type: "group"; group: Group };
+
+const STORAGE_KEY = "ry_sidebar_open";
+
+const NAV: Entry[] = [
+  { type: "item", href: "/dashboard", labelKey: "home", Icon: Home },
+  {
+    type: "group",
+    group: {
+      id: "clients",
+      labelKey: "clientsGroup",
+      Icon: Send,
+      defaultOpen: true,
+      items: [
+        { href: "/clientes",  labelKey: "sendRequest", Icon: Send     },
+        { href: "/resenas",   labelKey: "reviews",     Icon: Star     },
+        { href: "/informes",  labelKey: "reports",     Icon: BarChart2 },
+      ],
+    },
+  },
+  { type: "item", href: "/google-business", labelKey: "googleBusiness", Icon: MapPin },
+  {
+    type: "group",
+    group: {
+      id: "config",
+      labelKey: "configGroup",
+      Icon: Settings,
+      defaultOpen: false,
+      items: [
+        { href: "/configuracion", labelKey: "businessProfile", Icon: Settings },
+        { href: "/incentivos",    labelKey: "incentives",      Icon: Gift     },
+        { href: "/cartel",        labelKey: "qrPoster",        Icon: Printer  },
+      ],
+    },
+  },
+  {
+    type: "group",
+    group: {
+      id: "account",
+      labelKey: "myAccount",
+      Icon: CreditCard,
+      defaultOpen: false,
+      items: [
+        { href: "/cuenta",      labelKey: "myAccount", Icon: CreditCard },
+        { href: "/facturacion", labelKey: "billing",   Icon: CreditCard },
+      ],
+    },
+  },
+];
+
+function groupContains(group: Group, pathname: string) {
+  return group.items.some((i) => pathname === i.href || pathname.startsWith(i.href + "/"));
+}
+
+function savedOpen(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}"); } catch { return {}; }
+}
+
+export function SidebarNav() {
+  const pathname  = usePathname();
+  const t         = useTranslations("common");
+
+  const [open, setOpen] = useState<Record<string, boolean>>(() => {
+    const groups: Record<string, boolean> = {};
+    NAV.forEach((e) => {
+      if (e.type === "group") {
+        groups[e.group.id] = e.group.defaultOpen;
+      }
+    });
+    return groups;
+  });
+
+  // On mount: restore localStorage + auto-open active group
+  useEffect(() => {
+    const saved = savedOpen();
+    setOpen((prev) => {
+      const next = { ...prev };
+      NAV.forEach((e) => {
+        if (e.type !== "group") return;
+        const g = e.group;
+        if (groupContains(g, pathname)) {
+          next[g.id] = true; // always open active group
+        } else if (g.id in saved) {
+          next[g.id] = saved[g.id];
+        }
+      });
+      return next;
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-open group when navigating to a child
+  useEffect(() => {
+    NAV.forEach((e) => {
+      if (e.type === "group" && groupContains(e.group, pathname)) {
+        setOpen((prev) => ({ ...prev, [e.group.id]: true }));
+      }
+    });
+  }, [pathname]);
+
+  function toggle(id: string) {
+    setOpen((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+
+  function isActive(href: string) {
+    return pathname === href || pathname.startsWith(href + "/");
+  }
+
+  return (
+    <nav className="flex-1 p-3 overflow-y-auto space-y-0.5">
+      {NAV.map((entry, i) => {
+        if (entry.type === "item") {
+          const active = isActive(entry.href);
+          return (
+            <Link
+              key={entry.href}
+              href={entry.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
+                ${active
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }`}
+            >
+              <entry.Icon size={18} strokeWidth={active ? 2 : 1.75} className="shrink-0" />
+              {t(entry.labelKey as Parameters<typeof t>[0])}
+            </Link>
+          );
+        }
+
+        const { group } = entry;
+        const isOpen    = open[group.id] ?? group.defaultOpen;
+        const hasActive = groupContains(group, pathname);
+
+        return (
+          <div key={group.id}>
+            <button
+              onClick={() => toggle(group.id)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
+                ${hasActive
+                  ? "text-gray-900 bg-gray-50"
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                }`}
+            >
+              <group.Icon size={18} strokeWidth={1.75} className="shrink-0" />
+              <span className="flex-1 text-left">{t(group.labelKey as Parameters<typeof t>[0])}</span>
+              <ChevronDown
+                size={15}
+                className={`shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {isOpen && (
+              <div className="mt-0.5 ml-3 pl-4 border-l border-gray-100 space-y-0.5">
+                {group.items.map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition
+                        ${active
+                          ? "bg-gray-900 text-white"
+                          : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                        }`}
+                    >
+                      <item.Icon size={16} strokeWidth={active ? 2 : 1.75} className="shrink-0" />
+                      {t(item.labelKey as Parameters<typeof t>[0])}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </nav>
+  );
+}

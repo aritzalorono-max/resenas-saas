@@ -3,12 +3,10 @@ import { Link } from "@/i18n/navigation";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { SidebarNav } from "@/components/layout/SidebarNav";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getTranslations } from "next-intl/server";
-import {
-  Home, Send, Star, Settings, Printer, UserCircle,
-  Gift, BarChart2, CreditCard, ShieldCheck, MapPin,
-} from "lucide-react";
+import { UserCircle, ShieldCheck } from "lucide-react";
 
 function Logo() {
   return (
@@ -42,18 +40,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const t = await getTranslations("common");
 
-  const navItems = [
-    { href: "/dashboard",     label: t("home"),            Icon: Home        },
-    { href: "/clientes",      label: t("sendRequest"),      Icon: Send        },
-    { href: "/resenas",       label: t("reviews"),          Icon: Star        },
-    { href: "/informes",      label: t("reports"),          Icon: BarChart2   },
-    { href: "/incentivos",    label: t("incentives"),       Icon: Gift        },
-    { href: "/configuracion", label: t("businessProfile"),  Icon: Settings    },
-    { href: "/google-business", label: t("googleBusiness"),   Icon: MapPin      },
-    { href: "/cartel",        label: t("qrPoster"),         Icon: Printer     },
-    { href: "/facturacion",   label: t("billing"),          Icon: CreditCard  },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50 flex">
 
@@ -68,19 +54,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           )}
         </div>
 
-        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {navItems.map(({ href, label, Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600
-                         hover:bg-gray-50 hover:text-gray-900 transition font-medium text-sm"
-            >
-              <Icon className="w-4.5 h-4.5 shrink-0" size={18} strokeWidth={1.75} />
-              {label}
-            </Link>
-          ))}
-        </nav>
+        <SidebarNav />
 
         <div className="p-4 border-t border-gray-100 space-y-2">
           <p className="text-xs text-gray-400 truncate px-1">{user.email}</p>
