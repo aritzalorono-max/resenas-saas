@@ -1170,5 +1170,11 @@
     "beforeWritingTitle": "Bevor Sie uns schreiben",
     "beforeWritingDesc": "Vielleicht finden Sie die Antwort in unserem Bereich häufig gestellter Fragen:",
     "viewFaq": "Häufig gestellte Fragen ansehen →"
+  },
+  "error": {
+    "title": "Etwas ist schiefgelaufen",
+    "body": "Diese Seite konnte nicht geladen werden. Es könnte ein vorübergehendes Verbindungs- oder Serverproblem sein.",
+    "retry": "Nochmal versuchen",
+    "back": "Zurück zur Startseite"
   }
 }

@@ -1170,5 +1170,11 @@
     "beforeWritingTitle": "Antes de escribirnos",
     "beforeWritingDesc": "Quizás encuentres la respuesta en nuestra sección de preguntas frecuentes:",
     "viewFaq": "Ver preguntas frecuentes →"
+  },
+  "error": {
+    "title": "Algo ha fallado",
+    "body": "No se pudo cargar esta página. Puede ser un problema temporal de conexión o del servidor.",
+    "retry": "Reintentar",
+    "back": "Volver al inicio"
   }
 }

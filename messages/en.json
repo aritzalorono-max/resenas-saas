@@ -1170,5 +1170,11 @@
     "beforeWritingTitle": "Before writing to us",
     "beforeWritingDesc": "You may find the answer in our frequently asked questions section:",
     "viewFaq": "View frequently asked questions →"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "body": "This page could not be loaded. It may be a temporary connection or server issue.",
+    "retry": "Try again",
+    "back": "Back to home"
   }
 }
