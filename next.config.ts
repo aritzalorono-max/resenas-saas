@@ -57,8 +57,40 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
   },
 
+  async redirects() {
+    return [
+      // Redirect internal Spanish paths to locale-specific URLs (permanent)
+      // EN
+      { source: "/en/casos-exito", destination: "/en/case-studies",  permanent: true },
+      { source: "/en/contacto",    destination: "/en/contact",        permanent: true },
+      { source: "/en/privacidad",  destination: "/en/privacy",        permanent: true },
+      { source: "/en/terminos",    destination: "/en/terms",          permanent: true },
+      // FR
+      { source: "/fr/casos-exito", destination: "/fr/cas-clients",      permanent: true },
+      { source: "/fr/contacto",    destination: "/fr/contact",           permanent: true },
+      { source: "/fr/privacidad",  destination: "/fr/confidentialite",   permanent: true },
+      { source: "/fr/terminos",    destination: "/fr/conditions",        permanent: true },
+      // DE
+      { source: "/de/casos-exito", destination: "/de/erfolgsgeschichten", permanent: true },
+      { source: "/de/contacto",    destination: "/de/kontakt",            permanent: true },
+      { source: "/de/privacidad",  destination: "/de/datenschutz",        permanent: true },
+      { source: "/de/terminos",    destination: "/de/agb",               permanent: true },
+      // IT
+      { source: "/it/casos-exito", destination: "/it/casi-di-successo", permanent: true },
+      { source: "/it/contacto",    destination: "/it/contatto",          permanent: true },
+      { source: "/it/privacidad",  destination: "/it/privacy",           permanent: true },
+      { source: "/it/terminos",    destination: "/it/termini",           permanent: true },
+      // PT
+      { source: "/pt/casos-exito", destination: "/pt/casos-de-sucesso", permanent: true },
+      { source: "/pt/contacto",    destination: "/pt/contacto",          permanent: true },
+      { source: "/pt/privacidad",  destination: "/pt/privacidade",       permanent: true },
+      { source: "/pt/terminos",    destination: "/pt/termos",            permanent: true },
+    ];
+  },
+
   async rewrites() {
     return [
+      // Serve localized URLs from the internal Spanish page paths
       // EN
       { source: "/en/privacy",       destination: "/en/privacidad" },
       { source: "/en/terms",         destination: "/en/terminos" },
