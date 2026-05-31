@@ -3,6 +3,8 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
+const isDev = process.env.NODE_ENV === "development";
+
 /** Cabeceras de seguridad aplicadas a todas las respuestas HTTP */
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -15,7 +17,8 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // unsafe-eval needed by Next.js dev; unsafe-inline for RSC
+      // unsafe-eval only in dev (Next.js HMR requires it); removed in production
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self'",

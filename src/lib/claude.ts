@@ -6,6 +6,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { logger } from "@/lib/logger";
 import type { SentimentResult, ScreenshotResult } from "@/types";
 
 const anthropic = new Anthropic({
@@ -118,7 +119,12 @@ export async function analyzeScreenshot(mediaUrl: string): Promise<ScreenshotRes
   const rawText =
     response.content[0].type === "text" ? response.content[0].text : "";
   const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
-  return JSON.parse(cleaned) as ScreenshotResult;
+  try {
+    return JSON.parse(cleaned) as ScreenshotResult;
+  } catch (err) {
+    logger.error("analyzeScreenshot: respuesta de Claude no es JSON válido", err);
+    throw new Error("No se pudo analizar la respuesta de la IA");
+  }
 }
 
 const CONVERSATIONAL_SYSTEM_PROMPT = `Eres el Asistente de ResenasYa, una IA diseñada para recoger feedback de clientes de negocios locales.
@@ -150,8 +156,11 @@ export async function generateConversationalResponse(
       ? "Usa un tono muy informal y desenfadado (tuteo juvenil)."
       : "Usa el tuteo (tono informal amigable).";
 
+  // Strip newlines and control characters from businessName before interpolating
+  // into the system prompt to prevent prompt injection via a crafted business name.
+  const safeName = businessName.replace(/[\n\r\t\x00-\x1F\x7F]/g, " ").trim().slice(0, 200);
   const systemPrompt =
-    CONVERSATIONAL_SYSTEM_PROMPT.replace(/{negocio}/g, businessName) +
+    CONVERSATIONAL_SYSTEM_PROMPT.replace(/{negocio}/g, safeName) +
     `\n\nTono: ${toneInstruction}`;
 
   const response = await anthropic.messages.create({
@@ -189,6 +198,10 @@ export async function analyzeSentiment(
     response.content[0].type === "text" ? response.content[0].text : "";
 
   const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
-  const result = JSON.parse(cleaned) as SentimentResult;
-  return result;
+  try {
+    return JSON.parse(cleaned) as SentimentResult;
+  } catch (err) {
+    logger.error("analyzeSentiment: respuesta de Claude no es JSON válido", err);
+    throw new Error("No se pudo analizar el sentimiento de la respuesta");
+  }
 }

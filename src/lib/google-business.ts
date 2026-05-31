@@ -7,7 +7,7 @@
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-const REDIRECT_URI = "https://resenasya.com/api/google-business/callback";
+const REDIRECT_URI = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com"}/api/google-business/callback`;
 
 const SCOPES = ["https://www.googleapis.com/auth/business.manage"].join(" ");
 

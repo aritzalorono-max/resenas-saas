@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getBusinessByUserId } from "@/lib/business";
 import { uploadPoolCodes } from "@/lib/discount-codes";
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import * as xlsx from "xlsx";
 
 export async function POST(request: Request) {
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
     const inserted = await uploadPoolCodes(supabase, business.id, codes);
     return NextResponse.json({ success: true, inserted, total: codes.length });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    logger.error("Error al subir códigos de descuento", err);
+    return NextResponse.json({ error: "Error al procesar los códigos. Por favor, inténtalo de nuevo." }, { status: 500 });
   }
 }

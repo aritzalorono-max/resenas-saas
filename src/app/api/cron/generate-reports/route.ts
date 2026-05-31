@@ -43,14 +43,21 @@ function computeFrequencyRecommendation(requestDates: string[], positiveRate: nu
 async function analyzeWithClaude(reviews: Array<{ customer_response: string; status: string }>, businessName: string): Promise<{ positive_themes: ReportTheme[]; negative_themes: ReportTheme[]; improvement_ideas: ReportImprovementIdea[] }> {
   const anthropic  = new Anthropic();
   const reviewLines = reviews.map((r, i) => `[${i + 1}] (${r.status}): "${r.customer_response}"`).join("\n");
+  // Sanitize businessName to prevent prompt injection via control characters or newlines
+  const safeName = businessName.replace(/[\n\r\t\x00-\x1F\x7F]/g, " ").trim().slice(0, 200);
   const response   = await anthropic.messages.create({
     model: "claude-sonnet-4-6", max_tokens: 2500,
-    messages: [{ role: "user", content: `Analiza el feedback de clientes de "${businessName}" y devuelve SOLO JSON:\n\n${reviewLines}\n\n{"positive_themes":[{"theme":"","count":0,"examples":[]}],"negative_themes":[{"theme":"","count":0,"examples":[]}],"improvement_ideas":[{"title":"","description":"","based_on_count":0,"example_comments":[]}]}` }],
+    messages: [{ role: "user", content: `Analiza el feedback de clientes de "${safeName}" y devuelve SOLO JSON:\n\n${reviewLines}\n\n{"positive_themes":[{"theme":"","count":0,"examples":[]}],"negative_themes":[{"theme":"","count":0,"examples":[]}],"improvement_ideas":[{"title":"","description":"","based_on_count":0,"example_comments":[]}]}` }],
   });
   const content = response.content[0];
   if (content.type !== "text") throw new Error("Non-text response");
   const jsonStr = content.text.trim().replace(/^```json?\s*/i, "").replace(/```\s*$/, "");
-  return JSON.parse(jsonStr);
+  try {
+    return JSON.parse(jsonStr);
+  } catch (err) {
+    logger.error("analyzeWithClaude: respuesta de Claude no es JSON válido", err);
+    throw new Error("No se pudo analizar la respuesta de la IA");
+  }
 }
 
 async function generateForBusiness(
@@ -119,9 +126,9 @@ async function generateForBusiness(
 
 export async function GET(request: Request): Promise<Response> {
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) return new Response("Unauthorized", { status: 401 });
+  const auth = request.headers.get("authorization");
+  if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
+    return new Response("Unauthorized", { status: 401 });
   }
 
   const supabase     = await createServiceClient();

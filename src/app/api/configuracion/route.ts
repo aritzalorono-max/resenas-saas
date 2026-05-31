@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
         .eq("user_id", user.id);
       if (error) {
         logger.error("Error al actualizar configuración", error);
-        return NextResponse.json({ error: `Error al guardar: ${error.message} (${error.code})` }, { status: 500 });
+        return NextResponse.json({ error: "Error al guardar la configuración. Por favor, inténtalo de nuevo." }, { status: 500 });
       }
       businessId = existing.id;
     } else {
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
         .maybeSingle();
       if (error) {
         logger.error("Error al crear negocio", error);
-        return NextResponse.json({ error: `Error al guardar: ${error.message} (${error.code})` }, { status: 500 });
+        return NextResponse.json({ error: "Error al guardar la configuración. Por favor, inténtalo de nuevo." }, { status: 500 });
       }
       businessId = inserted?.id;
     }
