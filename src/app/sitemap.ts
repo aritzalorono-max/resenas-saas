@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { blogPosts } from "@/lib/blog-posts";
+import { getBlogPosts } from "@/lib/blog-posts-data";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
 const LOCALES = ["es", "en", "fr", "de", "it", "pt"] as const;
@@ -37,7 +37,7 @@ function entry(
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const blogEntries = blogPosts.flatMap((post) =>
+  const blogEntries = getBlogPosts("es").flatMap((post) =>
     entry(`/blog/${post.slug}`, {
       lastModified: new Date(post.date),
       changeFrequency: "monthly",

@@ -1,19 +1,26 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { blogPosts, getPostBySlug } from "@/lib/blog-posts";
+import { getBlogPosts, getPostBySlug } from "@/lib/blog-posts-data";
 import { Clock, ArrowLeft, Tag } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
 export const revalidate = 86400;
 
 export function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }));
+  return [
+    "como-conseguir-mas-resenas-google-maps",
+    "por-que-clientes-no-dejan-resenas-whatsapp",
+    "gestionar-resenas-negativas",
+    "algoritmo-google-maps-reputacion-local",
+    "legal-pedir-resenas-whatsapp-rgpd",
+  ].map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const locale = await getLocale();
+  const post = getPostBySlug(slug, locale);
   if (!post) return {};
   return {
     title: `${post.title} | ReseñasYa Blog`,
@@ -34,10 +41,38 @@ const categoryColors: Record<string, string> = {
   "Reputación": "bg-red-50 text-red-700",
   "SEO Local": "bg-green-50 text-green-700",
   "Legal": "bg-gray-100 text-gray-700",
+  "Strategy": "bg-purple-50 text-purple-700",
+  "Reputation": "bg-red-50 text-red-700",
+  "Local SEO": "bg-green-50 text-green-700",
+  "Stratégie": "bg-purple-50 text-purple-700",
+  "Réputation": "bg-red-50 text-red-700",
+  "Légal": "bg-gray-100 text-gray-700",
+  "Strategie": "bg-purple-50 text-purple-700",
+  "Lokales SEO": "bg-green-50 text-green-700",
+  "Rechtliches": "bg-gray-100 text-gray-700",
+  "Strategia": "bg-purple-50 text-purple-700",
+  "Reputazione": "bg-red-50 text-red-700",
+  "SEO Locale": "bg-green-50 text-green-700",
+  "Legale": "bg-gray-100 text-gray-700",
+  "Estratégia": "bg-purple-50 text-purple-700",
+  "Reputação": "bg-red-50 text-red-700",
 };
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+const localeToDateFormat: Record<string, string> = {
+  es: "es-ES",
+  en: "en-GB",
+  fr: "fr-FR",
+  de: "de-DE",
+  it: "it-IT",
+  pt: "pt-PT",
+};
+
+function formatDate(dateStr: string, locale: string) {
+  return new Date(dateStr).toLocaleDateString(localeToDateFormat[locale] ?? "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 function renderContent(content: string) {
@@ -116,11 +151,13 @@ function renderContent(content: string) {
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = await getTranslations("blog");
+  const locale = await getLocale();
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = getPostBySlug(slug, locale);
   if (!post) notFound();
 
-  const otherPosts = blogPosts.filter((p) => p.slug !== slug).slice(0, 3);
+  const allPosts = getBlogPosts(locale);
+  const otherPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -154,7 +191,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <span className="flex items-center gap-1 text-xs text-gray-400">
                 <Clock className="w-3.5 h-3.5" /> {post.readTime} {t("readTime")}
               </span>
-              <span className="text-xs text-gray-400">{formatDate(post.date)}</span>
+              <span className="text-xs text-gray-400">{formatDate(post.date, locale)}</span>
             </div>
             <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">{post.title}</h1>
             <p className="text-lg text-gray-500 leading-relaxed border-l-4 border-brand-200 pl-4">{post.description}</p>
