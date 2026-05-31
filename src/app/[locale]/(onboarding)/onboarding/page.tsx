@@ -232,7 +232,7 @@ export default function OnboardingPage() {
                 Los clientes satisfechos irán aquí a dejar su opinión.
               </p>
 
-              <div className="flex flex-wrap gap-1.5 mb-4">
+              <div className="flex flex-wrap gap-1.5 mb-2">
                 {PLATFORMS.map((p) => (
                   <button
                     key={p.name}
@@ -248,6 +248,9 @@ export default function OnboardingPage() {
                   </button>
                 ))}
               </div>
+              <p className="text-xs text-gray-400 mb-4">
+                Empieza con una. Podrás añadir más plataformas en Configuración.
+              </p>
 
               <input
                 type="url"
