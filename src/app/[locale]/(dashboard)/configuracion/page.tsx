@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
-import type { Business, BusinessTone, ReviewPlatformLink, WhatsAppMode } from "@/types";
+import type { Business, BusinessTone, ReviewPlatformLink, WhatsAppLanguage, WhatsAppMode } from "@/types";
 import { useTranslations } from "next-intl";
 
 const PLATFORMS: { name: string; placeholder: string }[] = [
@@ -55,6 +55,7 @@ export default function ConfiguracionPage() {
     otherPlatforms: [] as ReviewPlatformLink[],
     welcome_message: "",
     tone: "tuteo" as BusinessTone,
+    whatsapp_language: "es" as WhatsAppLanguage,
   });
   const [whatsappMode, setWhatsappMode]         = useState<WhatsAppMode>("shared");
   const [reminderMaxCount, setReminderMaxCount] = useState<0 | 1 | 2>(2);
@@ -126,6 +127,7 @@ export default function ConfiguracionPage() {
             otherPlatforms: others,
             welcome_message: businessData.welcome_message ?? DEFAULT_WELCOME_MESSAGE,
             tone: businessData.tone ?? "tuteo",
+            whatsapp_language: (businessData.whatsapp_language as WhatsAppLanguage) ?? "es",
           });
         }
       } catch {
@@ -227,6 +229,7 @@ export default function ConfiguracionPage() {
           review_links,
           welcome_message: form.welcome_message,
           tone: form.tone,
+          whatsapp_language: form.whatsapp_language,
           whatsapp_mode: whatsappMode,
           reminder_max_count: reminderMaxCount,
           own_twilio_account_sid: ownAccountSid,
@@ -543,6 +546,40 @@ export default function ConfiguracionPage() {
               })}
             </div>
           )}
+        </div>
+
+        {/* ── WhatsApp message language ── */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+          <div>
+            <h2 className="font-semibold text-gray-900 text-lg">{t("whatsappLanguageTitle")}</h2>
+            <p className="text-sm text-gray-400 mt-0.5">{t("whatsappLanguageDesc")}</p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {([
+              { value: "es", label: t("langEs"), flag: "🇪🇸" },
+              { value: "en", label: t("langEn"), flag: "🇬🇧" },
+              { value: "fr", label: t("langFr"), flag: "🇫🇷" },
+              { value: "de", label: t("langDe"), flag: "🇩🇪" },
+              { value: "it", label: t("langIt"), flag: "🇮🇹" },
+              { value: "pt", label: t("langPt"), flag: "🇵🇹" },
+            ] as { value: WhatsAppLanguage; label: string; flag: string }[]).map((opt) => {
+              const selected = form.whatsapp_language === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setForm((p) => ({ ...p, whatsapp_language: opt.value }))}
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition ${
+                    selected ? "border-brand-500 bg-brand-50 text-brand-700" : "border-gray-200 hover:border-gray-300 text-gray-700"
+                  }`}
+                >
+                  <span className="text-base leading-none">{opt.flag}</span>
+                  <span>{opt.label}</span>
+                  {selected && <span className="ml-auto w-2 h-2 rounded-full bg-brand-500 shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* ── Welcome message ── */}

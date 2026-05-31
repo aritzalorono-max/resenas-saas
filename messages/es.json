@@ -504,7 +504,15 @@
     "toneUstedExample": "¿Se animaría a dejarnos una reseña...?",
     "toneJuvenilLabel": "Muy informal",
     "toneJuvenilSublabel": "Desenfadado y cercano",
-    "toneJuvenilExample": "¿Nos echas una mano dejando una reseña...?"
+    "toneJuvenilExample": "¿Nos echas una mano dejando una reseña...?",
+    "whatsappLanguageTitle": "Idioma de los mensajes de WhatsApp",
+    "whatsappLanguageDesc": "Idioma que se usará para los mensajes automáticos de seguimiento enviados a tus clientes.",
+    "langEs": "Español",
+    "langEn": "Inglés",
+    "langFr": "Francés",
+    "langDe": "Alemán",
+    "langIt": "Italiano",
+    "langPt": "Portugués"
   },
   "facturacion": {
     "title": "Facturación",

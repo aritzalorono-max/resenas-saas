@@ -504,7 +504,15 @@
     "toneUstedExample": "Teria a gentileza de nos deixar uma avaliação...?",
     "toneJuvenilLabel": "Muito casual",
     "toneJuvenilSublabel": "Descontraído e amigável",
-    "toneJuvenilExample": "Podes ajudar-nos deixando uma avaliação...?"
+    "toneJuvenilExample": "Podes ajudar-nos deixando uma avaliação...?",
+    "whatsappLanguageTitle": "Idioma das mensagens WhatsApp",
+    "whatsappLanguageDesc": "Idioma utilizado para as mensagens de acompanhamento automáticas enviadas aos seus clientes.",
+    "langEs": "Espanhol",
+    "langEn": "Inglês",
+    "langFr": "Francês",
+    "langDe": "Alemão",
+    "langIt": "Italiano",
+    "langPt": "Português"
   },
   "facturacion": {
     "title": "Faturação",

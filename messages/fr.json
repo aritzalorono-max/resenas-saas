@@ -504,7 +504,15 @@
     "toneUstedExample": "Auriez-vous l'amabilité de nous laisser un avis... ?",
     "toneJuvenilLabel": "Très décontracté",
     "toneJuvenilSublabel": "Détendu et sympathique",
-    "toneJuvenilExample": "Tu peux nous aider en laissant un avis... ?"
+    "toneJuvenilExample": "Tu peux nous aider en laissant un avis... ?",
+    "whatsappLanguageTitle": "Langue des messages WhatsApp",
+    "whatsappLanguageDesc": "Langue utilisée pour les messages de suivi automatiques envoyés à vos clients.",
+    "langEs": "Espagnol",
+    "langEn": "Anglais",
+    "langFr": "Français",
+    "langDe": "Allemand",
+    "langIt": "Italien",
+    "langPt": "Portugais"
   },
   "facturacion": {
     "title": "Facturation",

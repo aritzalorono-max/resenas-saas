@@ -180,6 +180,7 @@ export async function POST(request: Request): Promise<Response> {
     if (screenshotRequest) {
       logger.info(`Solicitud awaiting_screenshot encontrada: ${screenshotRequest.id}`);
       const { businesses: business } = screenshotRequest;
+      const language = business.whatsapp_language ?? "es";
       const tone = business.tone ?? "tuteo";
       const incentiveDescription = business.incentive_description ?? "";
       const screenshotActiveLink = business.review_links?.find((l) => l.url === business.google_maps_url);
@@ -213,7 +214,8 @@ export async function POST(request: Request): Promise<Response> {
           incentiveDescription,
           tone,
           activePlatformName,
-          screenshotRequest.discount_code
+          screenshotRequest.discount_code,
+          language
         );
 
         try {
@@ -227,7 +229,7 @@ export async function POST(request: Request): Promise<Response> {
           logger.error("Error al enviar el mensaje de recompensa", twilioError);
         }
       } else {
-        const retryMsg = buildScreenshotRetryMessage(screenshotRequest.customer_name, tone);
+        const retryMsg = buildScreenshotRetryMessage(screenshotRequest.customer_name, tone, language);
 
         try {
           await screenshotClient.messages.create({
@@ -284,7 +286,8 @@ export async function POST(request: Request): Promise<Response> {
       conversationResponse = buildConversationClosingMessage(
         activeRequest.customer_name,
         activeBusiness.name,
-        activeBusiness.tone ?? "tuteo"
+        activeBusiness.tone ?? "tuteo",
+        activeBusiness.whatsapp_language ?? "es"
       );
       logger.info(`Enviando mensaje de cierre (turno ${MAX_CONVERSATION_TURNS}/${MAX_CONVERSATION_TURNS}) a ${maskPhone(activeRequest.customer_phone)}`);
     } else {
@@ -380,6 +383,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // ── 6. Construir y enviar mensaje de seguimiento ──────────────────────────
+  const language = business.whatsapp_language ?? "es";
   const followUpMessage = buildFollowUpMessage({
     customerName:         reviewRequest.customer_name,
     businessName:         business.name,
@@ -390,6 +394,7 @@ export async function POST(request: Request): Promise<Response> {
     incentiveEnabled:     business.incentive_enabled,
     incentiveDescription: business.incentive_description,
     discountCode:         assignedCode,
+    language,
   });
 
   const { client: followUpClient, fromNumber: followUpFrom } = getTwilioSender(business);

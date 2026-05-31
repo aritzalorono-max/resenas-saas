@@ -4,10 +4,11 @@ import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 import { validateUrl } from "@/lib/validation";
 import { extractPlaceIdFromUrl } from "@/lib/google-places";
 import { logger } from "@/lib/logger";
-import type { ReviewPlatformLink, BusinessTone, WhatsAppMode } from "@/types";
+import type { ReviewPlatformLink, BusinessTone, WhatsAppLanguage, WhatsAppMode } from "@/types";
 
 const VALID_TONES: BusinessTone[] = ["tuteo", "usted", "juvenil"];
 const VALID_WHATSAPP_MODES: WhatsAppMode[] = ["shared", "own", "dedicated"];
+const VALID_LANGUAGES: WhatsAppLanguage[] = ["es", "en", "fr", "de", "it", "pt"];
 const WELCOME_MESSAGE_MAX = 1000;
 
 function generateShortCode(): string {
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
       review_links,
       welcome_message,
       tone,
+      whatsapp_language,
       whatsapp_mode,
       reminder_max_count,
       own_twilio_account_sid,
@@ -65,6 +67,9 @@ export async function POST(request: NextRequest) {
 
     // Validate tone
     const safeTone: BusinessTone = VALID_TONES.includes(tone) ? tone : "tuteo";
+
+    // Validate whatsapp_language
+    const safeLanguage: WhatsAppLanguage = VALID_LANGUAGES.includes(whatsapp_language) ? whatsapp_language : "es";
 
     // Validate whatsapp_mode
     const safeMode: WhatsAppMode = VALID_WHATSAPP_MODES.includes(whatsapp_mode) ? whatsapp_mode : "shared";
@@ -97,6 +102,7 @@ export async function POST(request: NextRequest) {
       review_links: rawLinks,
       welcome_message: safeWelcome,
       tone: safeTone,
+      whatsapp_language: safeLanguage,
       whatsapp_mode: safeMode,
       reminder_max_count: [0, 1, 2].includes(Number(reminder_max_count)) ? Number(reminder_max_count) : 2,
       own_twilio_account_sid: safeMode === "own" ? (String(own_twilio_account_sid ?? "").trim() || null) : null,

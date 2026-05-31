@@ -504,7 +504,15 @@
     "toneUstedExample": "Wären Sie so freundlich, uns eine Bewertung zu hinterlassen...?",
     "toneJuvenilLabel": "Sehr locker",
     "toneJuvenilSublabel": "Entspannt und freundlich",
-    "toneJuvenilExample": "Könntest du uns mit einer Bewertung helfen...?"
+    "toneJuvenilExample": "Könntest du uns mit einer Bewertung helfen...?",
+    "whatsappLanguageTitle": "Sprache der WhatsApp-Nachrichten",
+    "whatsappLanguageDesc": "Sprache, die für automatische Follow-up-Nachrichten an Ihre Kunden verwendet wird.",
+    "langEs": "Spanisch",
+    "langEn": "Englisch",
+    "langFr": "Französisch",
+    "langDe": "Deutsch",
+    "langIt": "Italienisch",
+    "langPt": "Portugiesisch"
   },
   "facturacion": {
     "title": "Abrechnung",

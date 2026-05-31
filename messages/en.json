@@ -504,7 +504,15 @@
     "toneUstedExample": "Would you be kind enough to leave us a review...?",
     "toneJuvenilLabel": "Very casual",
     "toneJuvenilSublabel": "Relaxed and friendly",
-    "toneJuvenilExample": "Could you help us out by leaving a review...?"
+    "toneJuvenilExample": "Could you help us out by leaving a review...?",
+    "whatsappLanguageTitle": "WhatsApp message language",
+    "whatsappLanguageDesc": "Language used for automatic follow-up messages sent to your customers.",
+    "langEs": "Spanish",
+    "langEn": "English",
+    "langFr": "French",
+    "langDe": "German",
+    "langIt": "Italian",
+    "langPt": "Portuguese"
   },
   "facturacion": {
     "title": "Billing",
