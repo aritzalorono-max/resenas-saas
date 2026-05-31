@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
+import type { ComponentProps } from "react";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { BottomNav } from "@/components/layout/BottomNav";
@@ -42,7 +43,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const t = await getTranslations("common");
 
-  const navItems = [
+  type NavHref = ComponentProps<typeof Link>["href"];
+  const navItems: Array<{ href: NavHref; label: string; Icon: React.ComponentType<{ className?: string; size?: number; strokeWidth?: number }> }> = [
     { href: "/dashboard",     label: t("home"),            Icon: Home        },
     { href: "/clientes",      label: t("sendRequest"),      Icon: Send        },
     { href: "/resenas",       label: t("reviews"),          Icon: Star        },
