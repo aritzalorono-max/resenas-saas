@@ -365,9 +365,9 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                   <div>
                     <div className="flex items-center gap-1.5 mb-1">
                       <span className="text-yellow-400 text-xs">★★★★★</span>
-                      <span className="text-xs font-semibold text-gray-900">María G.</span>
+                      <span className="text-xs font-semibold text-gray-900">{t("replyExampleName")}</span>
                     </div>
-                    <p className="text-xs text-gray-600">&quot;Increíble servicio, volveré sin duda.&quot;</p>
+                    <p className="text-xs text-gray-600">{t("replyExampleReview")}</p>
                   </div>
                   <div className="border-l-2 border-brand-300 pl-3">
                     <p className="text-xs font-semibold text-brand-700 mb-0.5">{t("replyExampleLabel")}</p>
@@ -408,9 +408,9 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                   <div>
                     <div className="flex items-center gap-1.5 mb-1">
                       <span className="text-red-400 text-xs">★☆☆☆☆</span>
-                      <span className="text-xs font-semibold text-gray-900">Usuario anónimo</span>
+                      <span className="text-xs font-semibold text-gray-900">{t("removeExampleName")}</span>
                     </div>
-                    <p className="text-xs text-gray-600">&quot;Pésimo. No recomiendo a nadie.&quot;</p>
+                    <p className="text-xs text-gray-600">{t("removeExampleReview")}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="bg-red-100 text-red-600 text-xs font-semibold px-2.5 py-1 rounded-full">
