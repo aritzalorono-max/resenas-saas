@@ -1014,7 +1014,10 @@
     "c_li_duration": "6 months – 2 years",
     "c_gcl_purpose": "Measuring conversion performance for Google campaigns.",
     "c_gcl_type": "Third party",
-    "c_gcl_duration": "90 days"
+    "c_gcl_duration": "90 days",
+    "c_gbOauthState_purpose": "CSRF protection during the Google Business OAuth flow. Automatically deleted after authentication is complete.",
+    "c_gbOauthState_type": "First party",
+    "c_gbOauthState_duration": "10 minutes (session)"
   },
   "cookieCategories": {
     "necessaryLabel": "Strictly necessary",
@@ -1138,7 +1141,9 @@
     "s12p2": "In the event of a security breach affecting personal data, {company} will notify the AEPD within a maximum of 72 hours and, where appropriate, the affected data subjects.",
     "s13Title": "13. Changes to this policy",
     "s13p1": "{company} reserves the right to update this Privacy Policy to adapt it to regulatory, case-law or service changes. Substantial modifications will be communicated to registered users at least 15 days in advance by email or prominent notice on the platform.",
-    "s13p2": "For any privacy queries, contact us at:"
+    "s13p2": "For any privacy queries, contact us at:",
+    "s9_r5s": "Google Business Profile API (review management)",
+    "s7_2l3": "When the user connects their Google Business Profile account, OAuth access tokens are stored encrypted in the database to maintain the active connection."
   },
   "contact": {
     "eyebrow": "Let's talk",

@@ -94,7 +94,7 @@ export const COOKIE_CATEGORIES: (RequiredCategory | CookieCategory)[] = [
     label: "Estrictamente necesarias",
     description:
       "Imprescindibles para el funcionamiento de la plataforma. Sin ellas, no es posible iniciar sesión ni garantizar la seguridad de tu cuenta.",
-    examples: ["Sesión de usuario (Supabase)", "Protección CSRF", "Preferencias de consentimiento"],
+    examples: ["Sesión de usuario (Supabase)", "Protección CSRF", "Preferencias de consentimiento", "OAuth state Google Business (__gb_oauth_state)"],
     required: true,
   },
   {

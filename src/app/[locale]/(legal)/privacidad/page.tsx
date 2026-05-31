@@ -98,6 +98,7 @@ export default async function PrivacidadPage() {
           <li>{t.rich("s7_2l0", { strong, company: COMPANY })}</li>
           <li>{t("s7_2l1")}</li>
           <li>{t("s7_2l2")}</li>
+          <li>{t.rich("s7_2l3", { strong })}</li>
         </ul>
       </Section>
 
@@ -131,7 +132,7 @@ export default async function PrivacidadPage() {
             </tr>
           </thead>
           <tbody>
-            {(["Supabase, Inc.", "Twilio Inc.", "Anthropic, PBC", "Vercel Inc.", "Stripe, Inc."] as const).map((prov, i) => (
+            {(["Supabase, Inc.", "Twilio Inc.", "Anthropic, PBC", "Vercel Inc.", "Stripe, Inc.", "Google LLC"] as const).map((prov, i) => (
               <tr key={prov} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
                 <td className="p-3 border border-gray-200 text-gray-600 font-medium">{prov}</td>
                 <td className="p-3 border border-gray-200 text-gray-600">{t(`s9_r${i}s` as Parameters<typeof t>[0])}</td>

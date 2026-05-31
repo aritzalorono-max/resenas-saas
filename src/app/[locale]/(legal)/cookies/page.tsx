@@ -64,6 +64,15 @@ export default async function CookiesPage() {
       consentRequired: false,
       active: true,
     },
+    {
+      name: "__gb_oauth_state",
+      provider: "ResenasYa",
+      purpose: t("c_gbOauthState_purpose"),
+      type: t("c_gbOauthState_type"),
+      duration: t("c_gbOauthState_duration"),
+      consentRequired: false,
+      active: true,
+    },
   ];
 
   const analyticsCookies = [

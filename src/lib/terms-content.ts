@@ -31,6 +31,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Panel de gestión con estadísticas y métricas de satisfacción de clientes.",
           "• Personalización del tono y los mensajes de comunicación con clientes.",
           "• Sistema de incentivos opcional (plan Pro) para fomentar la publicación de reseñas.",
+          "• Gestión del perfil de Google Business Profile mediante conexión OAuth (lectura de reseñas, publicación de respuestas en nombre del negocio, análisis de opiniones con IA).",
         ],
       },
       {
@@ -100,6 +101,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Stripe: proveedor del servicio de procesamiento de pagos y gestión de suscripciones. Los datos de tarjeta son gestionados directamente por Stripe.",
           "• Vercel: proveedor de la infraestructura de hospedaje y despliegue de la aplicación.",
           "• Google Maps / Google Business Profile: plataforma de reseñas de terceros.",
+          "• Google LLC (Google Business Profile API): servicio de gestión de reseñas y perfil de negocio en Google.",
           "Buy & Click, SL no garantiza la disponibilidad continuada de los servicios de terceros y no será responsable por interrupciones, cambios o cese de dichos servicios.",
         ],
       },
@@ -136,6 +138,18 @@ const CONTENT: Record<string, TermsContent> = {
           "• El incumplimiento por parte del usuario de sus obligaciones legales en materia de protección de datos.",
           "• Sanciones, penalizaciones o eliminación de reseñas adoptadas por plataformas de terceros como consecuencia del uso por parte del usuario de la Plataforma.",
           "La responsabilidad máxima de Buy & Click, SL frente al usuario no superará el importe total abonado durante los tres (3) meses anteriores al evento que origine la reclamación.",
+        ],
+      },
+      {
+        title: "12. Google Business Profile",
+        content: [
+          "El usuario puede, de forma opcional, conectar su cuenta de Google Business Profile a la Plataforma mediante autenticación OAuth. Al hacerlo, autoriza expresamente a ResenasYa a:",
+          "• Acceder a las reseñas de su perfil de Google Business Profile.",
+          "• Publicar respuestas a reseñas en nombre del negocio.",
+          "• Analizar los patrones y contenido de las reseñas mediante inteligencia artificial.",
+          "El usuario es el único responsable del contenido de las respuestas publicadas a través de la Plataforma en Google Business Profile. ResenasYa actúa únicamente como intermediario técnico y no es responsable del contenido de dichas respuestas ni de las consecuencias que puedan derivarse de su publicación.",
+          "El usuario puede desconectar su cuenta de Google en cualquier momento desde la sección de Configuración de la Plataforma. La desconexión revocará el acceso de ResenasYa a los datos de Google Business Profile del usuario.",
+          "El uso de la API de Google Business Profile está sujeto a las Condiciones de Servicio de Google. Buy & Click, SL no garantiza la disponibilidad continuada de esta funcionalidad, que depende de la disponibilidad de la API de Google.",
         ],
       },
       {
@@ -198,6 +212,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Management dashboard with customer satisfaction statistics and metrics.",
           "• Personalisation of tone and customer communication messages.",
           "• Optional incentive system (Pro plan) to encourage the publication of reviews.",
+          "• Google Business Profile management via OAuth connection (reading reviews, publishing replies on behalf of the business, AI-powered opinion analysis).",
         ],
       },
       {
@@ -267,6 +282,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Stripe: provider of the payment processing and subscription management service. Card data is managed directly by Stripe.",
           "• Vercel: provider of the application hosting and deployment infrastructure.",
           "• Google Maps / Google Business Profile: third-party review platform.",
+          "• Google LLC (Google Business Profile API): review and business profile management service on Google.",
           "Buy & Click, SL does not guarantee the continued availability of third-party services and will not be liable for interruptions, changes or cessation of those services.",
         ],
       },
@@ -303,6 +319,18 @@ const CONTENT: Record<string, TermsContent> = {
           "• The user's failure to comply with their legal data protection obligations.",
           "• Penalties, sanctions or removal of reviews adopted by third-party platforms as a result of the user's use of the Platform.",
           "The maximum liability of Buy & Click, SL to the user shall not exceed the total amount paid during the three (3) months prior to the event giving rise to the claim.",
+        ],
+      },
+      {
+        title: "12. Google Business Profile",
+        content: [
+          "The user may optionally connect their Google Business Profile account to the Platform via OAuth authentication. By doing so, they expressly authorise ResenasYa to:",
+          "• Access the reviews on their Google Business Profile.",
+          "• Publish replies to reviews on behalf of the business.",
+          "• Analyse review patterns and content using artificial intelligence.",
+          "The user is solely responsible for the content of replies published through the Platform on Google Business Profile. ResenasYa acts solely as a technical intermediary and is not responsible for the content of those replies or any consequences arising from their publication.",
+          "The user may disconnect their Google account at any time from the Settings section of the Platform. Disconnecting will revoke ResenasYa's access to the user's Google Business Profile data.",
+          "Use of the Google Business Profile API is subject to Google's Terms of Service. Buy & Click, SL does not guarantee the continued availability of this feature, which depends on the availability of Google's API.",
         ],
       },
       {
@@ -365,6 +393,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Tableau de bord de gestion avec statistiques et métriques de satisfaction client.",
           "• Personnalisation du ton et des messages de communication avec les clients.",
           "• Système d'incitations optionnel (plan Pro) pour encourager la publication d'avis.",
+          "• Gestion du profil Google Business Profile via connexion OAuth (lecture des avis, publication de réponses au nom de l'établissement, analyse des opinions par IA).",
         ],
       },
       {
@@ -434,6 +463,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Stripe : fournisseur du service de traitement des paiements et de gestion des abonnements.",
           "• Vercel : fournisseur de l'infrastructure d'hébergement et de déploiement.",
           "• Google Maps / Google Business Profile : plateforme d'avis tiers.",
+          "• Google LLC (API Google Business Profile) : service de gestion des avis et du profil d'établissement sur Google.",
           "Buy & Click, SL ne garantit pas la disponibilité continue des services tiers.",
         ],
       },
@@ -469,6 +499,18 @@ const CONTENT: Record<string, TermsContent> = {
           "• Les problèmes techniques ou décisions des plateformes d'avis tierces.",
           "• Le non-respect par l'utilisateur de ses obligations légales en matière de protection des données.",
           "La responsabilité maximale de Buy & Click, SL ne dépassera pas le montant total payé au cours des trois (3) mois précédant l'événement à l'origine de la réclamation.",
+        ],
+      },
+      {
+        title: "12. Google Business Profile",
+        content: [
+          "L'utilisateur peut, de façon optionnelle, connecter son compte Google Business Profile à la Plateforme via l'authentification OAuth. Ce faisant, il autorise expressément ResenasYa à :",
+          "• Accéder aux avis de son profil Google Business Profile.",
+          "• Publier des réponses aux avis au nom de l'établissement.",
+          "• Analyser les tendances et le contenu des avis par intelligence artificielle.",
+          "L'utilisateur est seul responsable du contenu des réponses publiées via la Plateforme sur Google Business Profile. ResenasYa agit uniquement comme intermédiaire technique et n'est pas responsable du contenu de ces réponses ni des conséquences pouvant en découler.",
+          "L'utilisateur peut déconnecter son compte Google à tout moment depuis la section Paramètres de la Plateforme. La déconnexion révoque l'accès de ResenasYa aux données Google Business Profile de l'utilisateur.",
+          "L'utilisation de l'API Google Business Profile est soumise aux Conditions d'utilisation de Google. Buy & Click, SL ne garantit pas la disponibilité continue de cette fonctionnalité, qui dépend de la disponibilité de l'API de Google.",
         ],
       },
       {
@@ -524,6 +566,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Verwaltungsdashboard mit Statistiken und Kundenzufriedenheitsmetriken.",
           "• Personalisierung von Ton und Kommunikationsnachrichten.",
           "• Optionales Anreizsystem (Pro-Plan) zur Förderung der Veröffentlichung von Bewertungen.",
+          "• Verwaltung des Google Business Profile über OAuth-Verbindung (Lesen von Bewertungen, Veröffentlichen von Antworten im Namen des Unternehmens, KI-gestützte Meinungsanalyse).",
         ],
       },
       {
@@ -593,6 +636,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Stripe: Anbieter der Zahlungsabwicklung.",
           "• Vercel: Anbieter der Hosting-Infrastruktur.",
           "• Google Maps / Google Business Profile: Drittanbieter-Bewertungsplattform.",
+          "• Google LLC (Google Business Profile API): Dienst zur Verwaltung von Bewertungen und Unternehmensprofilen bei Google.",
           "Buy & Click, SL garantiert nicht die kontinuierliche Verfügbarkeit von Drittanbieterdiensten.",
         ],
       },
@@ -628,6 +672,18 @@ const CONTENT: Record<string, TermsContent> = {
           "• Technische Probleme oder Maßnahmen von Drittanbieter-Bewertungsplattformen.",
           "• Die Nichteinhaltung von Datenschutzverpflichtungen durch den Nutzer.",
           "Die maximale Haftung von Buy & Click, SL übersteigt nicht den in den drei (3) Monaten vor dem schadenauslösenden Ereignis gezahlten Gesamtbetrag.",
+        ],
+      },
+      {
+        title: "12. Google Business Profile",
+        content: [
+          "Der Nutzer kann optional sein Google Business Profile-Konto über OAuth-Authentifizierung mit der Plattform verbinden. Durch die Verbindung erteilt er ResenasYa ausdrücklich die Genehmigung:",
+          "• Auf die Bewertungen seines Google Business Profile zuzugreifen.",
+          "• Antworten auf Bewertungen im Namen des Unternehmens zu veröffentlichen.",
+          "• Bewertungsmuster und -inhalte mittels künstlicher Intelligenz zu analysieren.",
+          "Der Nutzer ist allein verantwortlich für den Inhalt der über die Plattform auf Google Business Profile veröffentlichten Antworten. ResenasYa fungiert ausschließlich als technischer Vermittler und übernimmt keine Verantwortung für den Inhalt dieser Antworten oder die daraus resultierenden Folgen.",
+          "Der Nutzer kann sein Google-Konto jederzeit über den Bereich Einstellungen der Plattform trennen. Durch die Trennung wird der Zugriff von ResenasYa auf die Google Business Profile-Daten des Nutzers widerrufen.",
+          "Die Nutzung der Google Business Profile API unterliegt den Nutzungsbedingungen von Google. Buy & Click, SL garantiert nicht die kontinuierliche Verfügbarkeit dieser Funktion, die von der Verfügbarkeit der Google API abhängt.",
         ],
       },
       {
@@ -683,6 +739,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Dashboard di gestione con statistiche e metriche di soddisfazione dei clienti.",
           "• Personalizzazione del tono e dei messaggi di comunicazione.",
           "• Sistema di incentivi opzionale (piano Pro) per incoraggiare la pubblicazione di recensioni.",
+          "• Gestione del profilo Google Business Profile tramite connessione OAuth (lettura delle recensioni, pubblicazione di risposte per conto dell'attività, analisi delle opinioni con IA).",
         ],
       },
       {
@@ -752,6 +809,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Stripe: fornitore del servizio di elaborazione dei pagamenti.",
           "• Vercel: fornitore dell'infrastruttura di hosting.",
           "• Google Maps / Google Business Profile: piattaforma di recensioni di terze parti.",
+          "• Google LLC (API Google Business Profile): servizio di gestione delle recensioni e del profilo aziendale su Google.",
           "Buy & Click, SL non garantisce la disponibilità continua dei servizi di terze parti.",
         ],
       },
@@ -787,6 +845,18 @@ const CONTENT: Record<string, TermsContent> = {
           "• Problemi tecnici o decisioni delle piattaforme di recensioni di terze parti.",
           "• Il mancato rispetto da parte dell'utente degli obblighi legali in materia di protezione dei dati.",
           "La responsabilità massima di Buy & Click, SL non supererà l'importo totale pagato nei tre (3) mesi precedenti all'evento che ha dato origine al reclamo.",
+        ],
+      },
+      {
+        title: "12. Google Business Profile",
+        content: [
+          "L'utente può, facoltativamente, collegare il proprio account Google Business Profile alla Piattaforma tramite autenticazione OAuth. Così facendo, autorizza espressamente ResenasYa a:",
+          "• Accedere alle recensioni del suo profilo Google Business Profile.",
+          "• Pubblicare risposte alle recensioni per conto dell'attività.",
+          "• Analizzare i pattern e il contenuto delle recensioni tramite intelligenza artificiale.",
+          "L'utente è il solo responsabile del contenuto delle risposte pubblicate tramite la Piattaforma su Google Business Profile. ResenasYa agisce esclusivamente come intermediario tecnico e non è responsabile del contenuto di tali risposte né delle conseguenze che possono derivarne.",
+          "L'utente può disconnettere il proprio account Google in qualsiasi momento dalla sezione Impostazioni della Piattaforma. La disconnessione revocherà l'accesso di ResenasYa ai dati Google Business Profile dell'utente.",
+          "L'utilizzo dell'API Google Business Profile è soggetto alle Condizioni di Servizio di Google. Buy & Click, SL non garantisce la disponibilità continua di questa funzionalità, che dipende dalla disponibilità dell'API di Google.",
         ],
       },
       {
@@ -842,6 +912,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Painel de gestão com estatísticas e métricas de satisfação dos clientes.",
           "• Personalização do tom e das mensagens de comunicação.",
           "• Sistema de incentivos opcional (plano Pro) para encorajar a publicação de avaliações.",
+          "• Gestão do perfil do Google Business Profile mediante ligação OAuth (leitura de avaliações, publicação de respostas em nome do negócio, análise de opiniões com IA).",
         ],
       },
       {
@@ -911,6 +982,7 @@ const CONTENT: Record<string, TermsContent> = {
           "• Stripe: fornecedor do serviço de processamento de pagamentos.",
           "• Vercel: fornecedor da infraestrutura de alojamento.",
           "• Google Maps / Google Business Profile: plataforma de avaliações de terceiros.",
+          "• Google LLC (API Google Business Profile): serviço de gestão de avaliações e perfil de negócio no Google.",
           "A Buy & Click, SL não garante a disponibilidade contínua dos serviços de terceiros.",
         ],
       },
@@ -946,6 +1018,18 @@ const CONTENT: Record<string, TermsContent> = {
           "• Problemas técnicos ou decisões de plataformas de avaliações de terceiros.",
           "• O incumprimento por parte do utilizador das suas obrigações legais em matéria de proteção de dados.",
           "A responsabilidade máxima da Buy & Click, SL não excederá o montante total pago nos três (3) meses anteriores ao evento que originou a reclamação.",
+        ],
+      },
+      {
+        title: "12. Google Business Profile",
+        content: [
+          "O utilizador pode, de forma opcional, ligar a sua conta do Google Business Profile à Plataforma através de autenticação OAuth. Ao fazê-lo, autoriza expressamente o ResenasYa a:",
+          "• Aceder às avaliações do seu perfil do Google Business Profile.",
+          "• Publicar respostas a avaliações em nome do negócio.",
+          "• Analisar os padrões e o conteúdo das avaliações mediante inteligência artificial.",
+          "O utilizador é o único responsável pelo conteúdo das respostas publicadas através da Plataforma no Google Business Profile. O ResenasYa atua exclusivamente como intermediário técnico e não é responsável pelo conteúdo dessas respostas nem pelas consequências que possam resultar da sua publicação.",
+          "O utilizador pode desligar a sua conta do Google em qualquer momento na secção de Definições da Plataforma. A desconexão revogará o acesso do ResenasYa aos dados do Google Business Profile do utilizador.",
+          "A utilização da API do Google Business Profile está sujeita aos Termos de Serviço do Google. A Buy & Click, SL não garante a disponibilidade contínua desta funcionalidade, que depende da disponibilidade da API do Google.",
         ],
       },
       {
