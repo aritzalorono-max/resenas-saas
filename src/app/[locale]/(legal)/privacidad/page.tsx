@@ -18,7 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PrivacidadPage() {
   const t = await getTranslations("privacy");
   const strong = (c: React.ReactNode) => <strong>{c}</strong>;
-  const company = () => COMPANY;
 
   return (
     <article>
@@ -51,16 +50,16 @@ export default async function PrivacidadPage() {
       </Section>
 
       <Section title={t("s2Title")}>
-        <p>{t.rich("s2p1", { strong, company, appUrl: () => APP_URL })}</p>
+        <p>{t.rich("s2p1", { strong, company: COMPANY, appUrl: APP_URL })}</p>
       </Section>
 
       <Section title={t("s3Title")}>
-        <p>{t.rich("s3p1", { company })}</p>
-        <p>{t.rich("s3p2", { company })}</p>
+        <p>{t("s3p1", { company: COMPANY })}</p>
+        <p>{t("s3p2", { company: COMPANY })}</p>
       </Section>
 
       <Section title={t("s4Title")}>
-        <p>{t.rich("s4p1", { company })}</p>
+        <p>{t("s4p1", { company: COMPANY })}</p>
         <p>{t("s4p2")}</p>
       </Section>
 
@@ -91,12 +90,12 @@ export default async function PrivacidadPage() {
           <li>{t.rich("s7_1l0", { strong })}</li>
           <li>{t.rich("s7_1l1", { strong })}</li>
           <li>{t.rich("s7_1l2", { strong })}</li>
-          <li>{t.rich("s7_1l3", { strong, company })}</li>
+          <li>{t.rich("s7_1l3", { strong, company: COMPANY })}</li>
         </ul>
         <SubTitle>{t("s7_2Title")}</SubTitle>
         <p>{t("s7_2intro")}</p>
         <ul>
-          <li>{t.rich("s7_2l0", { strong, company })}</li>
+          <li>{t.rich("s7_2l0", { strong, company: COMPANY })}</li>
           <li>{t("s7_2l1")}</li>
           <li>{t("s7_2l2")}</li>
         </ul>
@@ -122,7 +121,7 @@ export default async function PrivacidadPage() {
       </Section>
 
       <Section title={t("s9Title")}>
-        <p>{t.rich("s9intro", { company })}</p>
+        <p>{t("s9intro", { company: COMPANY })}</p>
         <table className="w-full text-sm border-collapse mt-2">
           <thead>
             <tr className="bg-gray-50">
@@ -166,17 +165,17 @@ export default async function PrivacidadPage() {
       </Section>
 
       <Section title={t("s12Title")}>
-        <p>{t.rich("s12intro", { company })}</p>
+        <p>{t("s12intro", { company: COMPANY })}</p>
         <ul>
           {([0,1,2,3,4,5] as const).map((i) => (
             <li key={i}>{t(`s12l${i}` as Parameters<typeof t>[0])}</li>
           ))}
         </ul>
-        <p>{t.rich("s12p2", { company })}</p>
+        <p>{t("s12p2", { company: COMPANY })}</p>
       </Section>
 
       <Section title={t("s13Title")}>
-        <p>{t.rich("s13p1", { company })}</p>
+        <p>{t("s13p1", { company: COMPANY })}</p>
         <p>
           {t("s13p2")}{" "}
           <a href={`mailto:${EMAIL_LEGAL}`} className="text-brand-600 hover:underline">{EMAIL_LEGAL}</a>.
