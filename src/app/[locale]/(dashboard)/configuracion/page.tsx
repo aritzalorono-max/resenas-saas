@@ -711,7 +711,6 @@ export default function ConfiguracionPage() {
                 <div>
                   <p className="font-semibold text-sm text-gray-900">{t("sharedTitle")}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{t("sharedDesc")}</p>
-                  <p className="text-xs font-mono text-gray-400 mt-1">+1 415 523 8886 (sandbox Twilio)</p>
                 </div>
               </div>
             </button>
