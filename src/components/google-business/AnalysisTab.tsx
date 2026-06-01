@@ -15,8 +15,8 @@ export function AnalysisTab({
 }) {
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16 gap-3">
-        <Loader2 size={20} className="animate-spin text-brand-600" />
+      <div role="status" aria-live="polite" className="flex items-center justify-center py-16 gap-3">
+        <Loader2 size={20} className="animate-spin text-brand-600" aria-hidden="true" />
         <span className="text-sm text-gray-600">{t("loadingAnalysisTab")}</span>
       </div>
     );

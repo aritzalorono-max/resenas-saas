@@ -94,7 +94,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
                   loc === locale ? "text-brand-700 font-semibold bg-brand-50" : "text-gray-700"
                 }`}
               >
-                <span className="text-xs w-6 uppercase font-mono text-gray-400">{loc}</span>
+                <span className="text-xs w-6 uppercase font-mono text-gray-500">{loc}</span>
                 {LOCALE_LABELS[loc]}
               </button>
             ))}

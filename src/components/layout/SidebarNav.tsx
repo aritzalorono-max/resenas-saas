@@ -154,7 +154,7 @@ export function SidebarNav() {
   }
 
   return (
-    <nav className="flex-1 p-3 overflow-y-auto space-y-0.5">
+    <nav aria-label="Navegación principal" className="flex-1 p-3 overflow-y-auto space-y-0.5">
       {NAV.map((entry) => {
         if (entry.type === "item") {
           const active = isNavItemActive(entry.href);
@@ -182,6 +182,7 @@ export function SidebarNav() {
           <div key={group.id}>
             <button
               onClick={() => toggle(group.id)}
+              aria-expanded={isOpen}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
                 ${hasActive
                   ? "text-gray-900 bg-gray-50"

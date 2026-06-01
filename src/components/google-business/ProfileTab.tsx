@@ -54,8 +54,8 @@ export function ProfileTab({
 
       {/* AI Analysis */}
       {loadingAnalysis ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center gap-3">
-          <Loader2 size={20} className="animate-spin text-brand-600" />
+        <div role="status" aria-live="polite" className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex items-center gap-3">
+          <Loader2 size={20} className="animate-spin text-brand-600" aria-hidden="true" />
           <span className="text-sm text-gray-600">{t("loadingAnalysis")}</span>
         </div>
       ) : analysis ? (

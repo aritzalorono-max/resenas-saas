@@ -37,7 +37,7 @@ export function BottomNav() {
 
   return (
     <>
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200
+      <nav aria-label="Navegación móvil" className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200
                       flex items-stretch safe-bottom">
         {primaryNavItems.map(({ href, labelKey, Icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + "/");
@@ -79,9 +79,10 @@ export function BottomNav() {
               <span className="text-sm font-semibold text-gray-700">{t("more")}</span>
               <button
                 onClick={() => setOpen(false)}
+                aria-label="Cerrar menú"
                 className="p-1 text-gray-400 hover:text-gray-600 transition"
               >
-                <X size={20} />
+                <X size={20} aria-hidden="true" />
               </button>
             </div>
 

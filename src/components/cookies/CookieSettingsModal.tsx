@@ -89,7 +89,7 @@ export function CookieSettingsModal({ initialPrefs, onSave, onAcceptAll, onClose
                     >
                       {isEnabled
                         ? <ToggleRight className={`w-9 h-9 ${cat.required ? "text-green-400" : "text-brand-600"}`} />
-                        : <ToggleLeft  className="w-9 h-9 text-gray-300" />}
+                        : <ToggleLeft  className="w-9 h-9 text-gray-400" />}
                     </button>
                   </div>
                 </div>

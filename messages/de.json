@@ -760,6 +760,7 @@
     "backHome": "← Zurück zur Startseite"
   },
   "common": {
+    "skipToContent": "Zum Hauptinhalt springen",
     "loading": "Laden...",
     "error": "Ein Fehler ist aufgetreten",
     "retry": "Erneut versuchen",

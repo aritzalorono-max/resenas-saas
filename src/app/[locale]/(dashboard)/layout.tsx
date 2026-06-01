@@ -42,6 +42,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      {/* Skip-to-content — visible only on keyboard focus */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:bg-white focus:text-gray-900 focus:rounded-xl focus:shadow-lg focus:border focus:border-gray-200 focus:text-sm focus:font-medium"
+      >
+        {t("skipToContent")}
+      </a>
 
       {/* ── Sidebar (solo desktop lg+) ─────────────────────────────────────── */}
       <aside className="hidden lg:flex w-64 bg-white border-r border-gray-100 flex-col fixed h-full shadow-sm">
@@ -93,7 +100,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+        <main id="main-content" className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
           {children}
         </main>
       </div>

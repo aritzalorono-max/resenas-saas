@@ -16,7 +16,7 @@ export function ManageCookiesButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition underline underline-offset-2"
+        className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 transition underline underline-offset-2"
       >
         <Settings2 className="w-3.5 h-3.5" />
         {t("manageCookies")}

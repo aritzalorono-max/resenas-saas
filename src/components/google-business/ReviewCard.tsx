@@ -171,6 +171,7 @@ export function ReviewCard({
           {review.comment.length > 180 && (
             <button
               onClick={() => setExpanded(!expanded)}
+              aria-expanded={expanded}
               className="ml-1 text-brand-600 hover:text-brand-700 text-xs font-medium"
             >
               {expanded ? t("seeLess") : t("seeMore")}
@@ -222,6 +223,7 @@ export function ReviewCard({
             value={editedReply}
             onChange={(e) => setEditedReply(e.target.value)}
             rows={4}
+            aria-label={t("suggestedReply")}
             className="w-full text-sm border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
           />
           {publishError && (
@@ -262,6 +264,7 @@ export function ReviewCard({
             onChange={(e) => setFlagReason(e.target.value)}
             placeholder={t("flagPlaceholder")}
             rows={3}
+            aria-label={t("flagModalTitle")}
             className="w-full text-sm border border-red-200 rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-red-300 bg-white"
           />
           <div className="flex items-center gap-2">

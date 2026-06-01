@@ -50,7 +50,7 @@ export function FlaggedTab({
 
   if (flagged.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-400">
+      <div className="text-center py-12 text-gray-500">
         <Flag size={32} className="mx-auto mb-3 opacity-40" />
         <p className="text-sm">{t("noFlagged")}</p>
         <p className="text-xs mt-1">
@@ -75,7 +75,7 @@ export function FlaggedTab({
                 </p>
                 <StarDisplay rating={review.starRatingNum} size={12} />
               </div>
-              <p className="text-xs text-gray-400 mt-0.5">{formatDate(review.createTime)}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{formatDate(review.createTime)}</p>
             </div>
             <span className={`text-xs font-medium px-2.5 py-1 rounded-full
               ${review.flagStatus === "resolved"

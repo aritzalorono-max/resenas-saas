@@ -232,7 +232,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
       <div className="min-h-screen bg-white overflow-x-hidden">
         {/* Navbar */}
-        <nav className="border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur z-50">
+        <nav aria-label="Navegación principal" className="border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur z-50">
           <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="w-7 h-7 bg-gray-900 rounded-md flex items-center justify-center shrink-0">
@@ -261,6 +261,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           </div>
         </nav>
 
+        <main id="main-content">
         {/* Hero */}
         <section className="bg-gradient-to-b from-brand-50 via-white to-white py-20 lg:py-28 px-6">
           <div className="max-w-4xl mx-auto text-center">
@@ -570,6 +571,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
         </section>
 
         {/* Footer */}
+        </main>
         <footer className="border-t border-gray-100 bg-gray-50 py-12 px-6">
           <div className="max-w-6xl mx-auto">
             {/* Top row */}
