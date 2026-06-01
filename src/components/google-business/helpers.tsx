@@ -45,7 +45,17 @@ export function CopyButton({ text, copyLabel, copiedLabel }: { text: string; cop
   return (
     <button
       onClick={async () => {
-        await navigator.clipboard.writeText(text);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          const el = document.createElement("textarea");
+          el.value = text;
+          el.style.cssText = "position:fixed;opacity:0";
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand("copy");
+          document.body.removeChild(el);
+        }
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }}

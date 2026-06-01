@@ -11,6 +11,13 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Firefox scrollbar styling */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
+
+  /* Chrome / Safari / Edge scrollbar styling */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;

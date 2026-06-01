@@ -44,16 +44,20 @@ export function getStoredConsent(): StoredConsent | null {
 }
 
 export function saveConsent(prefs: ConsentPreferences): void {
-  const consent: StoredConsent = {
-    ...prefs,
-    version: CONSENT_VERSION,
-    timestamp: new Date().toISOString(),
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
+  try {
+    const consent: StoredConsent = {
+      ...prefs,
+      version: CONSENT_VERSION,
+      timestamp: new Date().toISOString(),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
+  } catch { /* Safari private mode blocks localStorage */ }
 }
 
 export function clearConsent(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch { /* Safari private mode blocks localStorage */ }
 }
 
 /**

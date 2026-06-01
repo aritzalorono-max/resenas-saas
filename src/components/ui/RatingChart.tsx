@@ -172,8 +172,8 @@ export function GoogleMapsRatingSection({
   const [loading, setLoading] = useState(false);
   const [msg,     setMsg]     = useState<string | null>(null);
 
-  const latest       = data.at(-1);
-  const oldest       = data.at(0);
+  const latest       = data[data.length - 1];
+  const oldest       = data[0];
   const diff         = latest && oldest ? +(latest.rating - oldest.rating).toFixed(1) : null;
   const reviewsDiff  = latest?.review_count != null && oldest?.review_count != null
     ? latest.review_count - oldest.review_count : null;
