@@ -22,6 +22,10 @@ import { PLAN_MONTHLY_REMINDER_LIMITS } from "@/lib/constants";
 export const runtime  = "nodejs";
 export const maxDuration = 60;
 
+function maskPhone(phone: string): string {
+  return phone.length > 4 ? `****${phone.slice(-4)}` : "****";
+}
+
 const MAX_REMINDERS   = 2;
 // Horas desde created_at en que se envía cada recordatorio
 const REMINDER_HOURS  = [24, 72] as const;
@@ -67,7 +71,7 @@ export async function GET(request: Request) {
 
   if (error) {
     logger.error("Cron recordatorios: error consultando solicitudes", error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 
   if (!requests?.length) {
@@ -145,10 +149,10 @@ export async function GET(request: Request) {
         })
         .eq("id", req.id);
 
-      logger.info(`Recordatorio ${req.reminder_count + 1} enviado a ${req.customer_name} (${req.customer_phone})`);
+      logger.info(`Recordatorio ${req.reminder_count + 1} enviado a ${req.customer_name} (${maskPhone(req.customer_phone)})`);
       sent++;
     } catch (err) {
-      logger.error(`Error enviando recordatorio a ${req.customer_phone}`, err);
+      logger.error(`Error enviando recordatorio a ${maskPhone(req.customer_phone)}`, err);
       skipped++;
     }
   }

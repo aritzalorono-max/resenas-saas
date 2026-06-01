@@ -501,6 +501,8 @@
     "ownWhatsappNumberLabel": "Votre numéro WhatsApp",
     "showToken": "Afficher",
     "hideToken": "Masquer",
+    "tokenSavedPlaceholder": "Token enregistré — saisissez-en un nouveau pour le remplacer",
+    "tokenSavedHint": "Vous avez déjà un token enregistré. Laissez vide pour le conserver.",
     "setupGuideTitle": "📋 Comment connecter votre numéro — guide étape par étape",
     "setupStep1": "<strong>Créez un compte Twilio</strong> — twilio.com (gratuit pour commencer).",
     "setupStep2": "<strong>Activez WhatsApp Business</strong> — dans Twilio Console allez dans <em>Messaging → Senders → WhatsApp Senders</em> et cliquez sur <em>«Add Sender»</em>.",

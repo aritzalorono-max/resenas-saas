@@ -60,6 +60,8 @@ export default function ConfiguracionPage() {
   const [whatsappMode, setWhatsappMode]         = useState<WhatsAppMode>("shared");
   const [reminderMaxCount, setReminderMaxCount] = useState<0 | 1 | 2>(2);
   const [ownAccountSid, setOwnAccountSid]       = useState("");
+  // Never store the actual token in client state — only track if one is saved and accept a new value
+  const [hasStoredToken, setHasStoredToken]     = useState(false);
   const [ownAuthToken, setOwnAuthToken]         = useState("");
   const [ownWhatsappNumber, setOwnWhatsappNumber] = useState("");
   const [showOwnToken, setShowOwnToken]         = useState(false);
@@ -112,7 +114,8 @@ export default function ConfiguracionPage() {
           setWhatsappMode((businessData.whatsapp_mode as WhatsAppMode) ?? "shared");
           setReminderMaxCount((businessData.reminder_max_count ?? 2) as 0 | 1 | 2);
           setOwnAccountSid(businessData.own_twilio_account_sid ?? "");
-          setOwnAuthToken(businessData.own_twilio_auth_token ?? "");
+          setHasStoredToken(!!businessData.own_twilio_auth_token);
+          setOwnAuthToken(""); // Never load the actual token into browser memory
           setOwnWhatsappNumber(businessData.own_twilio_whatsapp_number ?? "");
           const links: ReviewPlatformLink[] = businessData.review_links ?? [];
           const active = links.find((l) => l.url === businessData.google_maps_url);
@@ -233,7 +236,8 @@ export default function ConfiguracionPage() {
           whatsapp_mode: whatsappMode,
           reminder_max_count: reminderMaxCount,
           own_twilio_account_sid: ownAccountSid,
-          own_twilio_auth_token: ownAuthToken,
+          // Only send auth token if user typed a new value; empty string means keep existing
+          ...(ownAuthToken ? { own_twilio_auth_token: ownAuthToken } : {}),
           own_twilio_whatsapp_number: ownWhatsappNumber,
         }),
       });
@@ -753,13 +757,16 @@ export default function ConfiguracionPage() {
                           type={showOwnToken ? "text" : "password"}
                           value={ownAuthToken}
                           onChange={(e) => setOwnAuthToken(e.target.value)}
-                          placeholder="••••••••••••••••••••••••••••••••"
+                          placeholder={hasStoredToken ? t("tokenSavedPlaceholder") : "••••••••••••••••••••••••••••••••"}
                           className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
                         />
                         <button type="button" onClick={() => setShowOwnToken((v) => !v)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs">
                           {showOwnToken ? t("hideToken") : t("showToken")}
                         </button>
                       </div>
+                      {hasStoredToken && !ownAuthToken && (
+                        <p className="text-xs text-gray-500 mt-1">{t("tokenSavedHint")}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">{t("ownWhatsappNumberLabel")}</label>

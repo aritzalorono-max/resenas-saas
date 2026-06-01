@@ -16,13 +16,13 @@ CREATE INDEX IF NOT EXISTS idx_review_requests_phone_created
 
 -- Rate limiting: busca por key + created_at para contar intentos en ventana de tiempo
 -- checkGeneralRateLimit hace: WHERE key = $1 AND created_at > now() - interval
-CREATE INDEX IF NOT EXISTS idx_rate_limits_key_created
-  ON rate_limits(key, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_rate_limit_events_key_created
+  ON rate_limit_events(key, created_at DESC);
 
 -- Limpieza automática de rate limits expirados (si tienes un cron de limpieza)
 -- Este índice ayuda a DELETE WHERE created_at < now() - interval
-CREATE INDEX IF NOT EXISTS idx_rate_limits_created
-  ON rate_limits(created_at);
+CREATE INDEX IF NOT EXISTS idx_rate_limit_events_created
+  ON rate_limit_events(created_at);
 
 -- business_stats view: si se convierte en tabla materializada, este índice
 -- acelera el JOIN con auth.users

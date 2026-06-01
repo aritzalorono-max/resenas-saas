@@ -118,7 +118,10 @@ export async function POST(request: NextRequest) {
       reminder_max_count: [0, 1, 2].includes(Number(reminder_max_count)) ? Number(reminder_max_count) : 2,
       // Twilio SIDs are max 34 chars (AC + 32 hex); tokens are 32 chars; numbers max 20 chars in E.164
       own_twilio_account_sid:     safeMode === "own" ? (String(own_twilio_account_sid     ?? "").trim().slice(0, 64)  || null) : null,
-      own_twilio_auth_token:      safeMode === "own" ? (String(own_twilio_auth_token      ?? "").trim().slice(0, 64)  || null) : null,
+      // Only include auth token when explicitly sent — absent means "keep existing value"
+      ...(own_twilio_auth_token !== undefined
+        ? { own_twilio_auth_token: safeMode === "own" ? (String(own_twilio_auth_token).trim().slice(0, 64) || null) : null }
+        : safeMode !== "own" ? { own_twilio_auth_token: null } : {}),
       own_twilio_whatsapp_number: safeMode === "own" ? (String(own_twilio_whatsapp_number ?? "").trim().slice(0, 30)  || null) : null,
     };
 
