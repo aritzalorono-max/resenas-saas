@@ -707,7 +707,10 @@
     "ctaDesc": "Setzen Sie alles Gelesene in die Praxis um. Einrichtung in unter 1 Minute.",
     "ctaBtn": "Kostenlos starten →",
     "backToBlog": "← Zurück zum Blog",
-    "minutesRead": "Min. Lesezeit"
+    "minutesRead": "Min. Lesezeit",
+    "shareTitle": "Artikel teilen",
+    "prevPost": "Vorheriger Artikel",
+    "nextPost": "Nächster Artikel"
   },
   "casosExito": {
     "badge": "Erfolgsgeschichten",

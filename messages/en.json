@@ -707,7 +707,10 @@
     "ctaDesc": "Put everything you've read into practice. Set up in under 1 minute.",
     "ctaBtn": "Get started free →",
     "backToBlog": "← Back to blog",
-    "minutesRead": "min read"
+    "minutesRead": "min read",
+    "shareTitle": "Share this article",
+    "prevPost": "Previous article",
+    "nextPost": "Next article"
   },
   "casosExito": {
     "badge": "Success stories",

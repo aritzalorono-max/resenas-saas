@@ -707,7 +707,10 @@
     "ctaDesc": "Metti in pratica tutto ciò che hai letto. Configurazione in meno di 1 minuto.",
     "ctaBtn": "Inizia gratis →",
     "backToBlog": "← Torna al blog",
-    "minutesRead": "min di lettura"
+    "minutesRead": "min di lettura",
+    "shareTitle": "Condividi questo articolo",
+    "prevPost": "Articolo precedente",
+    "nextPost": "Articolo successivo"
   },
   "casosExito": {
     "badge": "Storie di successo",
