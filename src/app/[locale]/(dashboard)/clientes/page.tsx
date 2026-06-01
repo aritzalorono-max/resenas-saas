@@ -257,7 +257,7 @@ export default function ClientesPage() {
   const [retrying, setRetrying] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef   = useRef<HTMLInputElement>(null);
 
@@ -494,7 +494,7 @@ export default function ClientesPage() {
                   name="customer_name"
                   type="text"
                   value={form.customer_name}
-                  onChange={(e) => setForm((p) => ({ ...p, customer_name: e.target.value }))}
+                  onChange={(e) => { setForm((p) => ({ ...p, customer_name: e.target.value })); setError(""); }}
                   required
                   disabled={loading}
                   autoComplete="off"
@@ -575,7 +575,7 @@ export default function ClientesPage() {
                     type="tel"
                     inputMode="numeric"
                     value={form.customer_phone}
-                    onChange={(e) => setForm((p) => ({ ...p, customer_phone: e.target.value }))}
+                    onChange={(e) => { setForm((p) => ({ ...p, customer_phone: e.target.value })); setError(""); }}
                     required
                     disabled={loading}
                     className="flex-1 px-4 py-3.5 outline-none text-base rounded-r-xl bg-white min-w-0 disabled:bg-gray-50"
@@ -901,6 +901,12 @@ export default function ClientesPage() {
           {/* Send button */}
           {bulkRows.length > 0 && sendStatus === "idle" && validCount > 0 && (
             <>
+              {invalidCount > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" strokeWidth={2} />
+                  <p className="text-sm text-amber-700">{t("bulkInvalidWarning", { count: invalidCount })}</p>
+                </div>
+              )}
               <p className="text-xs text-gray-400 leading-relaxed px-1">
                 {t("gdprConsentBulk")}
               </p>

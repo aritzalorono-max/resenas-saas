@@ -222,8 +222,8 @@ export default async function DashboardPage() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900">{t("step2Title")}</p>
                 <p className="text-xs text-gray-400 mt-0.5">{t("step2Desc")}</p>
-                <Link href="/clientes" className="inline-block mt-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700">
-                  {t("sendRequest")}
+                <Link href="/clientes" className="inline-flex items-center gap-1 mt-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                  {t("sendRequest")} →
                 </Link>
               </div>
             </li>
