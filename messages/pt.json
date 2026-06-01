@@ -1299,6 +1299,8 @@
     "errLoadReviews": "Erro ao carregar as avaliações",
     "errDisconnected": "Google Business desligado",
     "copied": "Copiado",
-    "copy": "Copiar"
+    "copy": "Copiar",
+    "warnNoLocationTitle": "Conta conectada, mas nenhuma localização encontrada",
+    "warnNoLocation": "Sua conta Google foi conectada com sucesso, mas nenhuma localização do Google Business foi encontrada. Certifique-se: (1) de ter aceitado o convite de administrador em business.google.com, (2) de ter pelo menos uma localização ativa no seu perfil, e (3) que as APIs do Google Business Profile estão habilitadas no seu projeto Google Cloud."
   }
 }

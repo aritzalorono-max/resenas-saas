@@ -1299,6 +1299,8 @@
     "errLoadReviews": "Error loading reviews",
     "errDisconnected": "Google Business disconnected",
     "copied": "Copied",
-    "copy": "Copy"
+    "copy": "Copy",
+    "warnNoLocationTitle": "Account connected, but no location found",
+    "warnNoLocation": "Your Google account connected successfully, but no Google Business location was found. Make sure: (1) you have accepted the admin invitation at business.google.com, (2) you have at least one active location in your profile, and (3) the Google Business Profile APIs are enabled in your Google Cloud project."
   }
 }

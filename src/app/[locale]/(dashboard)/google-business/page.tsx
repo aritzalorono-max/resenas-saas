@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { MapPin, RefreshCw, AlertTriangle, Loader2 } from "lucide-react";
+import { MapPin, RefreshCw, AlertTriangle, Loader2, Info } from "lucide-react";
 import type { GoogleReview, ReviewAnalysis, Business } from "@/components/google-business/types";
 import { TabButton } from "@/components/google-business/helpers";
 import { ConnectPrompt } from "@/components/google-business/ConnectPrompt";
@@ -36,11 +36,13 @@ export default function GoogleBusinessPage() {
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [reviewsError, setReviewsError] = useState("");
   const [urlError, setUrlError] = useState("");
+  const [urlWarning, setUrlWarning] = useState("");
 
-  // Check for OAuth error in URL
+  // Check for OAuth error or warning in URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const err = params.get("error");
+    const warning = params.get("warning");
     if (err) {
       const msgs: Record<string, string> = {
         oauth_cancelled: t("errOauthCancelled"),
@@ -50,6 +52,9 @@ export default function GoogleBusinessPage() {
         db_save: t("errDbSave"),
       };
       setUrlError(msgs[err] ?? t("errUnknown"));
+    }
+    if (warning === "no_location") {
+      setUrlWarning(t("warnNoLocation"));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -183,6 +188,17 @@ export default function GoogleBusinessPage() {
         <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
           <AlertTriangle size={18} />
           {urlError}
+        </div>
+      )}
+
+      {/* No location warning */}
+      {urlWarning && (
+        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">
+          <Info size={18} className="shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold mb-1">{t("warnNoLocationTitle")}</p>
+            <p>{urlWarning}</p>
+          </div>
         </div>
       )}
 
