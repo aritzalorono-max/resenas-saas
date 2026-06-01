@@ -73,8 +73,8 @@ export default function GoogleBusinessPage() {
           setBusiness(data as Business);
           setConnected(!!data.google_access_token && !!data.google_location_name);
         }
-      } catch {
-        // silent
+      } catch (err) {
+        console.error("[ResenasYa] Error cargando negocio:", err);
       } finally {
         setLoadingBusiness(false);
       }
@@ -109,12 +109,13 @@ export default function GoogleBusinessPage() {
     setLoadingAnalysis(true);
     try {
       const res = await fetch("/api/google-business/analyze");
+      if (!res.ok) throw new Error(`analyze ${res.status}`);
       const data = await res.json();
       if (data.analysis) {
         setAnalysis(data.analysis);
       }
-    } catch {
-      // silent
+    } catch (err) {
+      console.error("[ResenasYa] Error cargando análisis:", err);
     } finally {
       setLoadingAnalysis(false);
     }

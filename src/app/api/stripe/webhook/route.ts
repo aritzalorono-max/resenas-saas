@@ -20,7 +20,7 @@ async function updateSubscription(
   const status = sub.status;
   const periodEnd = sub.current_period_end ?? sub.items?.data?.[0]?.current_period_end ?? null;
 
-  await supabase
+  const { error } = await supabase
     .from("businesses")
     .update({
       stripe_subscription_id: sub.id,
@@ -29,6 +29,7 @@ async function updateSubscription(
       subscription_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
     })
     .eq("id", businessId);
+  if (error) logger.error(`Error actualizando suscripción para negocio ${businessId}`, error);
 }
 
 export async function POST(req: NextRequest) {
@@ -60,10 +61,11 @@ export async function POST(req: NextRequest) {
         const sub = event.data.object as Stripe.Subscription;
         await updateSubscription(supabase, sub);
         if (event.type === "customer.subscription.deleted") {
-          await supabase
+          const { error: delErr } = await supabase
             .from("businesses")
             .update({ subscription_plan: "free", subscription_status: "canceled" })
             .eq("stripe_subscription_id", sub.id);
+          if (delErr) logger.error(`Error marcando suscripción cancelada ${sub.id}`, delErr);
         }
         break;
       }
@@ -74,7 +76,7 @@ export async function POST(req: NextRequest) {
           const sub = await getStripe().subscriptions.retrieve(invoice.subscription);
           const businessId = sub.metadata?.business_id;
           if (businessId) {
-            await supabase.from("payments").insert({
+            const { error: payErr } = await supabase.from("payments").insert({
               user_id: sub.metadata?.user_id,
               amount: invoice.amount_paid ?? 0,
               currency: invoice.currency,
@@ -85,6 +87,7 @@ export async function POST(req: NextRequest) {
               period_start: invoice.period_start ? new Date(invoice.period_start * 1000).toISOString() : null,
               period_end:   invoice.period_end   ? new Date(invoice.period_end   * 1000).toISOString() : null,
             });
+            if (payErr) logger.error(`Error registrando pago para negocio ${businessId}`, payErr);
           }
         }
         break;
@@ -92,10 +95,11 @@ export async function POST(req: NextRequest) {
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice & { subscription?: string };
         if (invoice.subscription) {
-          await supabase
+          const { error: failErr } = await supabase
             .from("businesses")
             .update({ subscription_status: "past_due" })
             .eq("stripe_subscription_id", invoice.subscription);
+          if (failErr) logger.error(`Error marcando pago fallido ${invoice.subscription}`, failErr);
         }
         break;
       }

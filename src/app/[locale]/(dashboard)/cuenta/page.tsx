@@ -83,17 +83,21 @@ export default function CuentaPage() {
     setDeleteLoading(true);
     setDeleteError("");
 
-    const res = await fetch("/api/account/delete", { method: "DELETE" });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      setDeleteError(body.error ?? t("errorDeleteAccount"));
+    try {
+      const res = await fetch("/api/account/delete", { method: "DELETE" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setDeleteError(body.error ?? t("errorDeleteAccount"));
+        return;
+      }
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push("/");
+    } catch {
+      setDeleteError(t("errorDeleteAccount"));
+    } finally {
       setDeleteLoading(false);
-      return;
     }
-
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/");
   }
 
   const isOAuth = provider !== "email";

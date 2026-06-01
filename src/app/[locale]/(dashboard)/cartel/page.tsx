@@ -4,6 +4,7 @@ import { getBusinessByUserId } from "@/lib/business";
 import { PosterClient } from "./PosterClient";
 import QRCode from "qrcode";
 import { getTranslations } from "next-intl/server";
+import { logger } from "@/lib/logger";
 
 export default async function CartelPage() {
   const supabase = await createClient();
@@ -36,22 +37,28 @@ export default async function CartelPage() {
   const whatsappNumber = rawTwilioNumber.replace(/^whatsapp:/i, "");
   const whatsappNumberClean = whatsappNumber.replace(/\D/g, "");
 
-  const [reviewQrDataUrl, whatsappQrDataUrl] = await Promise.all([
-    reviewUrl
-      ? QRCode.toDataURL(reviewUrl, {
-          width: 400, margin: 1,
-          color: { dark: "#111827", light: "#ffffff" },
-          errorCorrectionLevel: "M",
-        })
-      : Promise.resolve(""),
-    whatsappNumberClean
-      ? QRCode.toDataURL(`https://wa.me/${whatsappNumberClean}`, {
-          width: 400, margin: 1,
-          color: { dark: "#111827", light: "#ffffff" },
-          errorCorrectionLevel: "M",
-        })
-      : Promise.resolve(""),
-  ]);
+  let reviewQrDataUrl = "";
+  let whatsappQrDataUrl = "";
+  try {
+    [reviewQrDataUrl, whatsappQrDataUrl] = await Promise.all([
+      reviewUrl
+        ? QRCode.toDataURL(reviewUrl, {
+            width: 400, margin: 1,
+            color: { dark: "#111827", light: "#ffffff" },
+            errorCorrectionLevel: "M",
+          })
+        : Promise.resolve(""),
+      whatsappNumberClean
+        ? QRCode.toDataURL(`https://wa.me/${whatsappNumberClean}`, {
+            width: 400, margin: 1,
+            color: { dark: "#111827", light: "#ffffff" },
+            errorCorrectionLevel: "M",
+          })
+        : Promise.resolve(""),
+    ]);
+  } catch (err) {
+    logger.error("Error generando códigos QR para el cartel", err);
+  }
 
   return (
     <PosterClient

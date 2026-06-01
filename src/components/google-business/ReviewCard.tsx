@@ -58,6 +58,7 @@ export function ReviewCard({
           tone,
         }),
       });
+      if (!res.ok) throw new Error("suggest failed");
       const data = await res.json();
       setSuggestion(data.suggestion ?? "");
       setEditedReply(data.suggestion ?? "");
@@ -112,6 +113,7 @@ export function ReviewCard({
           flagReason: flagReason.trim(),
         }),
       });
+      if (!res.ok) throw new Error("flag failed");
       const data = await res.json();
       setFlagResult(data.complaintText ?? "");
       onFlagged(review.name);

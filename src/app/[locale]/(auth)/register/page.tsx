@@ -44,30 +44,35 @@ export default function RegisterPage() {
 
     setLoading(true);
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-        terms_accepted_at: new Date().toISOString(),
-        marketing_consent: marketingAccepted,
-      }),
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          terms_accepted_at: new Date().toISOString(),
+          marketing_consent: marketingAccepted,
+        }),
+      });
 
-    if (!res.ok) {
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error ?? t("errorDefault"));
+        return;
+      }
+
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? t("errorDefault"));
+      if (data.sessionCreated) {
+        router.push("/onboarding");
+        router.refresh();
+      } else {
+        setRegistered(true);
+      }
+    } catch {
+      setError(t("errorDefault"));
+    } finally {
       setLoading(false);
-      return;
-    }
-
-    const data = await res.json().catch(() => ({}));
-    if (data.sessionCreated) {
-      router.push("/onboarding");
-      router.refresh();
-    } else {
-      setRegistered(true);
     }
   }
 
