@@ -52,7 +52,8 @@ export default async function AdminPage() {
   ] = await Promise.all([
     supabase.from("businesses")
       .select("id, user_id, name, description, google_maps_url, review_links, incentive_enabled, incentive_description, created_at")
-      .order("created_at", { ascending: false }),
+      .order("created_at", { ascending: false })
+      .limit(500),
     supabase.from("business_stats").select("*"),
     supabase.auth.admin.listUsers({ perPage: 1000 }),
     supabase

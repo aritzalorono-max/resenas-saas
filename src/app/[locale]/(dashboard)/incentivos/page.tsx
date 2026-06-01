@@ -71,7 +71,7 @@ export default function IncentivosPage() {
     const [{ data: codesData }, { count: rewarded }] = await Promise.all([
       supabase
         .from("discount_codes")
-        .select("*")
+        .select("id, code, type, status, used_at, created_at")
         .eq("business_id", id)
         .order("created_at", { ascending: false })
         .limit(500),

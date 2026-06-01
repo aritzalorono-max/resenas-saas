@@ -69,7 +69,8 @@ async function generateForBusiness(
     const [reviewsResult, snapshotResult, datesResult] = await Promise.all([
       supabase.from("review_requests").select("customer_response, status, sentiment_score").eq("business_id", bizId).not("customer_response", "is", null).gte("created_at", periodStart.toISOString()).order("created_at", { ascending: false }).limit(200),
       supabase.from("google_maps_snapshots").select("rating, review_count").eq("business_id", bizId).order("fetched_at", { ascending: false }).limit(1).single(),
-      supabase.from("review_requests").select("created_at").eq("business_id", bizId).gte("created_at", periodStart.toISOString()),
+      // Cap at 5 000 rows — computeFrequencyRecommendation only needs a sample for monthly averages
+      supabase.from("review_requests").select("created_at").eq("business_id", bizId).gte("created_at", periodStart.toISOString()).limit(5000),
     ]);
 
     const reviews  = reviewsResult.data  ?? [];
@@ -136,7 +137,7 @@ export async function GET(request: Request): Promise<Response> {
   const periodStart  = new Date(periodEnd);
   periodStart.setMonth(periodStart.getMonth() - 6);
 
-  const { data: businesses } = await supabase.from("businesses").select("id, name");
+  const { data: businesses } = await supabase.from("businesses").select("id, name").limit(10000);
   if (!businesses?.length) return Response.json({ ok: true, processed: 0 });
 
   let ok = 0, skipped = 0, errors = 0;
