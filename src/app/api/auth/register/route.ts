@@ -52,11 +52,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) {
+    logger.warn("NEXT_PUBLIC_APP_URL no configurada — los emails de confirmación usarán la URL por defecto de Supabase");
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      ...(appUrl ? { emailRedirectTo: `${appUrl}/api/auth/callback` } : {}),
       data: {
         terms_accepted_at: terms_accepted_at ?? new Date().toISOString(),
         marketing_consent: marketing_consent ?? false,
