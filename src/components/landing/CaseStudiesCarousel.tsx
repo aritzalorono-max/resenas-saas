@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getCaseStudies } from "@/lib/case-studies-data";
+import { getCaseStudies } from "@/content/case-studies-data";
 
 export function CaseStudiesCarousel() {
   const t = useTranslations("home");

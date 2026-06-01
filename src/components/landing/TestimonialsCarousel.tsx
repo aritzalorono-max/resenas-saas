@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Star, TrendingUp, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { getTestimonials, type TestimonialItem } from "@/lib/testimonials-data";
+import { getTestimonials, type TestimonialItem } from "@/content/testimonials-data";
 
 function platformBadgeClass(type: TestimonialItem["platformType"]) {
   switch (type) {

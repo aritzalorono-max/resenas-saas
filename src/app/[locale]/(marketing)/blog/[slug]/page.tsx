@@ -1,7 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBlogPosts, getPostBySlug, getStaticBlogParams } from "@/lib/blog-posts-data";
+import { getBlogPosts, getPostBySlug, getStaticBlogParams } from "@/content/blog-posts-data";
 import { Clock, ArrowLeft, Tag } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 

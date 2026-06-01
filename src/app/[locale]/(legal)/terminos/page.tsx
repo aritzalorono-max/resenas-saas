@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { localizedPath } from "@/lib/localized-paths";
-import { getTermsContent } from "@/lib/terms-content";
+import { getTermsContent } from "@/content/terms-content";
 
 const COMPANY  = "Buy & Click, SL";
 const EMAIL    = "contacto.resenasya@gmail.com";

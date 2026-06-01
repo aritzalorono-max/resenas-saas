@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { ChevronDown } from "lucide-react";
-import { getFaqData, getFaqPageMeta, getFaqPageHeading } from "@/lib/faq-data";
+import { getFaqData, getFaqPageMeta, getFaqPageHeading } from "@/content/faq-data";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();

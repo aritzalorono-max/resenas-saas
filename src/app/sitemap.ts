@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getStaticBlogParams } from "@/lib/blog-posts-data";
+import { getStaticBlogParams } from "@/content/blog-posts-data";
 import { localizedPath } from "@/lib/localized-paths";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";

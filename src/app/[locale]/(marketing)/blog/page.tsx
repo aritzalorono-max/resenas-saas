@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
-import { getBlogPosts } from "@/lib/blog-posts-data";
+import { getBlogPosts } from "@/content/blog-posts-data";
 import { BookOpen, Clock, Tag } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 

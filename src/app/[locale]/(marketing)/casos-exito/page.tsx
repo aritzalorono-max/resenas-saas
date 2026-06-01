@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { TrendingUp } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
-import { getCaseStudies } from "@/lib/case-studies-data";
+import { getCaseStudies } from "@/content/case-studies-data";
 
 export const metadata: Metadata = {
   title: "Casos de éxito | ResenasYa",
