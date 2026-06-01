@@ -11,6 +11,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { anthropic, REPLY_SYSTEM_PROMPT } from "@/lib/claude";
 import { logger } from "@/lib/logger";
 import { checkGeneralRateLimit } from "@/lib/rate-limit";
+import { sanitizeField } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -44,9 +45,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
   }
 
-  const reviewerName = typeof body.reviewerName === "string" ? body.reviewerName.trim().slice(0, 200) : undefined;
-  const reviewText   = typeof body.reviewText   === "string" ? body.reviewText.trim().slice(0, 4096)  : undefined;
-  const businessName = typeof body.businessName === "string" ? body.businessName.trim().slice(0, 200)  : "";
+  const reviewerName = sanitizeField(body.reviewerName, 200);
+  const reviewText   = sanitizeField(body.reviewText,   4096);
+  const businessName = sanitizeField(body.businessName, 200, "");
   const tone         = typeof body.tone         === "string" ? body.tone : undefined;
   const ratingRaw    = body.rating;
   const rating       = typeof ratingRaw === "number" ? ratingRaw : Number(ratingRaw);

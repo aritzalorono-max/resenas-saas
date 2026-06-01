@@ -10,6 +10,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { replyToReview, getValidAccessToken } from "@/lib/google-business";
 import { logger } from "@/lib/logger";
 import { checkGeneralRateLimit } from "@/lib/rate-limit";
+import { sanitizeField } from "@/lib/validation";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -37,8 +38,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
   }
 
-  const reviewName = typeof body.reviewName === "string" ? body.reviewName.trim() : "";
-  const replyText  = typeof body.replyText  === "string" ? body.replyText.trim()  : "";
+  const reviewName = sanitizeField(body.reviewName, 500,  "");
+  const replyText  = sanitizeField(body.replyText,  4096, "");
 
   if (!reviewName || !replyText) {
     return NextResponse.json(

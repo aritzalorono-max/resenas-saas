@@ -6,6 +6,9 @@ import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import * as xlsx from "xlsx";
 
+// Column headers to skip when parsing uploaded code files
+const DISCOUNT_CODE_HEADER_WORDS = new Set(["CÓDIGO", "CODIGOS", "CODE", "CODES", "COUPON", "COUPONS"]);
+
 export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -46,12 +49,11 @@ export async function POST(request: Request) {
     const ws = wb.Sheets[wb.SheetNames[0]];
     const rows = xlsx.utils.sheet_to_json<string[]>(ws, { header: 1 });
 
-    const HEADER_WORDS = new Set(["CÓDIGO", "CODIGOS", "CODE", "CODES", "COUPON", "COUPONS"]);
     codes = rows
       .flat()
       .map((v) => String(v ?? "").trim().toUpperCase())
       .filter((v) => {
-        if (v.length === 0 || HEADER_WORDS.has(v)) return false;
+        if (v.length === 0 || DISCOUNT_CODE_HEADER_WORDS.has(v)) return false;
         if (v.length > 100) return false;
         // Only allow alphanumeric characters plus hyphens and underscores
         return /^[A-Z0-9_\-]+$/.test(v);

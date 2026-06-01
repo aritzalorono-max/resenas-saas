@@ -946,6 +946,21 @@ export const MESSAGE_TEMPLATES: Record<WhatsAppLanguage, Record<BusinessTone, To
 export const DEFAULT_WELCOME_MESSAGE =
   "¡Hola {nombre}! Soy el equipo de {negocio}. ¿Cómo fue tu experiencia con nosotros hoy? Tu opinión nos ayuda a mejorar 😊 (Responde STOP si no deseas recibir más mensajes)";
 
+// ---------------------------------------------------------------------------
+// Plan configuration
+// ---------------------------------------------------------------------------
+
+/** Nombres válidos de plan de suscripción — única fuente de verdad */
+export const PLAN_NAMES = ["free", "starter", "pro"] as const;
+export type PlanName = (typeof PLAN_NAMES)[number];
+
+/** Límite mensual de recordatorios WhatsApp por plan */
+export const PLAN_MONTHLY_REMINDER_LIMITS: Record<PlanName, number> = {
+  free:    5,
+  starter: 50,
+  pro:     250,
+};
+
 export const DEFAULT_WELCOME_MESSAGES: Record<WhatsAppLanguage, string> = {
   es: "¡Hola {nombre}! Soy el equipo de {negocio}. ¿Cómo fue tu experiencia con nosotros hoy? Tu opinión nos ayuda a mejorar 😊 (Responde STOP si no deseas recibir más mensajes)",
   en: "Hi {nombre}! We're the team at {negocio}. How was your experience with us today? Your feedback helps us improve 😊 (Reply STOP if you don't wish to receive further messages)",

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
+import { PLAN_NAMES } from "@/lib/constants";
 import type Stripe from "stripe";
 
 export const runtime = "nodejs";
@@ -14,9 +15,8 @@ async function updateSubscription(
   const businessId = sub.metadata?.business_id;
   if (!businessId || typeof businessId !== "string") return;
 
-  const VALID_PLANS = ["free", "starter", "pro"];
   const rawPlan = sub.metadata?.plan;
-  const plan = typeof rawPlan === "string" && VALID_PLANS.includes(rawPlan) ? rawPlan : "free";
+  const plan = typeof rawPlan === "string" && (PLAN_NAMES as readonly string[]).includes(rawPlan) ? rawPlan : "free";
   const status = sub.status;
   const periodEnd = sub.current_period_end ?? sub.items?.data?.[0]?.current_period_end ?? null;
 

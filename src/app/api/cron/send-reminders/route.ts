@@ -17,6 +17,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTwilioSender, sendWhatsAppTemplateWith } from "@/lib/twilio";
 import { logger } from "@/lib/logger";
+import { PLAN_MONTHLY_REMINDER_LIMITS } from "@/lib/constants";
 
 export const runtime  = "nodejs";
 export const maxDuration = 60;
@@ -74,7 +75,6 @@ export async function GET(request: Request) {
     return Response.json({ sent: 0 });
   }
 
-  const PLAN_LIMITS: Record<string, number> = { free: 5, starter: 50, pro: 250 };
 
   // Pre-fetch monthly usage for all affected businesses in one query (avoids N+1)
   const monthStart = new Date();
@@ -91,11 +91,10 @@ export async function GET(request: Request) {
     .in("business_id", uniqueBusinessIds)
     .gte("created_at", monthStart.toISOString());
 
-  const monthlyUsageByBusiness = new Map<string, number>();
-  for (const row of allUsageData ?? []) {
-    const prev = monthlyUsageByBusiness.get(row.business_id) ?? 0;
-    monthlyUsageByBusiness.set(row.business_id, prev + 1 + (row.reminder_count ?? 0));
-  }
+  const monthlyUsageByBusiness = (allUsageData ?? []).reduce((map, row) => {
+    map.set(row.business_id, (map.get(row.business_id) ?? 0) + 1 + (row.reminder_count ?? 0));
+    return map;
+  }, new Map<string, number>());
 
   let sent    = 0;
   let skipped = 0;
@@ -120,8 +119,8 @@ export async function GET(request: Request) {
 
     if (hoursElapsed < targetHours) { skipped++; continue; }
 
-    const planKey      = business.subscription_plan ?? "free";
-    const planLimit    = PLAN_LIMITS[planKey] ?? 5;
+    const planKey   = (business.subscription_plan ?? "free") as keyof typeof PLAN_MONTHLY_REMINDER_LIMITS;
+    const planLimit = PLAN_MONTHLY_REMINDER_LIMITS[planKey] ?? 5;
     const monthlyUsage = monthlyUsageByBusiness.get(business.id) ?? 0;
 
     if (monthlyUsage >= planLimit) {

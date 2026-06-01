@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { checkGeneralRateLimit } from "@/lib/rate-limit";
+import { validateEmail } from "@/lib/validation";
 import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
@@ -23,10 +24,8 @@ export async function POST(request: NextRequest) {
 
     const safeTipo = ["particular", "empresa"].includes(tipo) ? tipo : "particular";
 
-    const rawEmail = String(email_facturacion ?? "").trim();
-    const safeEmail = rawEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)
-      ? rawEmail.slice(0, 200)
-      : null;
+    const emailResult = validateEmail(email_facturacion);
+    const safeEmail = emailResult.valid ? (emailResult.sanitized ?? null) : null;
 
     const payload = {
       user_id: user.id,
