@@ -376,7 +376,7 @@ export default function ClientesPage() {
   }
 
   function downloadTemplate() {
-    const csv = "Nombre,Telefono\nCarlos García,+34612345678\nLaura Martínez,+34623456789";
+    const csv = "Nombre,Telefono\nEjemplo Cliente,+34612000001\nOtro Cliente,+34623000002";
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

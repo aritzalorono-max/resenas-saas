@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 const PLATFORMS: { name: string; placeholder: string }[] = [
   { name: "Google Maps",  placeholder: "https://maps.app.goo.gl/..." },
   { name: "Trustpilot",  placeholder: "https://www.trustpilot.com/review/tu-negocio.com" },
-  { name: "App Store",   placeholder: "https://apps.apple.com/app/idXXXXXXXXXX" },
+  { name: "App Store",   placeholder: "https://apps.apple.com/app/id000000000" },
   { name: "Play Store",  placeholder: "https://play.google.com/store/apps/details?id=com.tu.app" },
   { name: "TripAdvisor", placeholder: "https://www.tripadvisor.es/..." },
   { name: "Booking.com", placeholder: "https://www.booking.com/hotel/..." },
