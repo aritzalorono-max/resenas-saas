@@ -138,6 +138,9 @@ export default function FacturacionPage() {
     if (!form.ciudad.trim())        { setError(t("errorCity")); return; }
     if (!form.codigo_postal.trim()) { setError(t("errorPostCode")); return; }
     if (!form.pais.trim())          { setError(t("errorCountry")); return; }
+    if (form.email_facturacion?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email_facturacion.trim())) {
+      setError(t("errorEmailInvalid")); return;
+    }
 
     setSaving(true);
     try {

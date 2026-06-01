@@ -15,31 +15,41 @@ export default function RecuperarPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
-    const redirectTo =
-      (process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin) +
-      "/api/auth/callback?next=/nueva-contrasena";
-
-    const res = await fetch("/api/auth/recover", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, redirectTo }),
-    });
-
-    setLoading(false);
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setError(data.error ?? t("errorDefault"));
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError(t("errorDefault"));
       return;
     }
 
-    const data = await res.json();
-    if (data.googleAccount) {
-      setGoogleAccount(true);
-    } else {
-      setSent(true);
+    setLoading(true);
+
+    try {
+      const redirectTo =
+        (process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin) +
+        "/api/auth/callback?next=/nueva-contrasena";
+
+      const res = await fetch("/api/auth/recover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), redirectTo }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error ?? t("errorDefault"));
+        return;
+      }
+
+      const data = await res.json();
+      if (data.googleAccount) {
+        setGoogleAccount(true);
+      } else {
+        setSent(true);
+      }
+    } catch {
+      setError(t("errorDefault"));
+    } finally {
+      setLoading(false);
     }
   }
 

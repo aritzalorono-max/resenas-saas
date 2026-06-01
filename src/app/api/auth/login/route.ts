@@ -24,6 +24,9 @@ export async function POST(request: NextRequest) {
   if (typeof email !== "string" || typeof password !== "string") {
     return NextResponse.json({ error: "Email y contraseña son obligatorios" }, { status: 400 });
   }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return NextResponse.json({ error: "El email no tiene un formato válido" }, { status: 400 });
+  }
 
   // Check if email is registered — GoTrue Admin REST API supports ?filter=<email>
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

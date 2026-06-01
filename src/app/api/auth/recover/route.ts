@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
   }
 
   const { email, redirectTo } = body;
-  if (typeof email !== "string" || !email.includes("@")) {
-    return NextResponse.json({ error: "Email inválido" }, { status: 400 });
+  if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return NextResponse.json({ error: "El email no tiene un formato válido" }, { status: 400 });
   }
 
   // Per-email limit prevents enumerating all registered emails via password reset

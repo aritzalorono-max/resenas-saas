@@ -211,6 +211,15 @@ export default function ConfiguracionPage() {
       return;
     }
 
+    if (!form.name.trim()) { setError(t("errorNameRequired")); return; }
+    if (!form.welcome_message.trim()) { setError(t("errorWelcomeRequired")); return; }
+    if (form.google_maps_url && !/^https?:\/\/.+/.test(form.google_maps_url.trim())) {
+      setError(t("errorUrlInvalid")); return;
+    }
+    if (form.website_url && !/^https?:\/\/.+/.test(form.website_url.trim())) {
+      setError(t("errorUrlInvalid")); return;
+    }
+
     setSaving(true);
 
     const review_links: ReviewPlatformLink[] = [
@@ -644,7 +653,7 @@ export default function ConfiguracionPage() {
             <>
               <textarea
                 id="welcome_message" name="welcome_message" value={form.welcome_message}
-                onChange={handleChange} rows={4}
+                onChange={handleChange} rows={4} maxLength={1000}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition resize-none"
                 placeholder={t("welcomePlaceholder")}
               />

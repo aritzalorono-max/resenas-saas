@@ -140,7 +140,7 @@ function validateBulkRow(
     ? errors.tooLong
     : null;
   const digits = phone.replace(/\D/g, "");
-  const phoneError = digits.length < 6 ? errors.invalidPhone : null;
+  const phoneError = digits.length < 7 ? errors.invalidPhone : null;
   return { nameError, phoneError };
 }
 
@@ -319,7 +319,7 @@ export default function ClientesPage() {
     if (!form.customer_name.trim()) { setError(t("errorNameRequired")); return; }
     if (form.customer_name.trim().length > 100) { setError(t("errorNameTooLong")); return; }
     const digits = form.customer_phone.replace(/\D/g, "");
-    if (!digits || digits.length < 6) { setError(t("errorPhoneInvalid")); return; }
+    if (!digits || digits.length < 7) { setError(t("errorPhoneInvalid")); return; }
 
     setLoading(true);
     setRetrying(false);
