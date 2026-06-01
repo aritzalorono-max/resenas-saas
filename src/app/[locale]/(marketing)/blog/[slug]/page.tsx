@@ -1,9 +1,10 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBlogPosts, getPostBySlug, getStaticBlogParams } from "@/content/blog-posts-data";
+import { getBlogPosts, getPostBySlug, getStaticBlogParams, getBlogPostAllSlugs } from "@/content/blog-posts-data";
 import { Clock, ArrowLeft, Tag } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
+import { blogHreflangAlternates, buildUrl, APP_URL } from "@/lib/seo";
 
 export const revalidate = 86400;
 
@@ -16,16 +17,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const locale = await getLocale();
   const post = getPostBySlug(slug, locale);
   if (!post) return {};
+
+  const prefix = locale === "es" ? "" : `/${locale}`;
+  const url = `${APP_URL}${prefix}/blog/${post.slug}`;
+  const slugsByLocale = getBlogPostAllSlugs(slug, locale);
+  const title = `${post.title} | ResenasYa Blog`;
+
   return {
-    title: `${post.title} | ResenasYa Blog`,
+    title,
     description: post.description,
-    alternates: { canonical: `/blog/${post.slug}` },
+    alternates: {
+      canonical: url,
+      languages: blogHreflangAlternates(slugsByLocale),
+    },
     openGraph: {
       title: post.title,
       description: post.description,
+      url,
       type: "article",
       publishedTime: post.date,
+      authors: ["ResenasYa"],
+      locale: locale === "es" ? "es_ES" : locale === "en" ? "en_GB" : `${locale}_${locale.toUpperCase()}`,
     },
+    twitter: { card: "summary_large_image", title, description: post.description },
   };
 }
 

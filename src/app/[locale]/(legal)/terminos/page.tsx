@@ -3,6 +3,7 @@ import { getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { localizedPath } from "@/lib/localized-paths";
 import { getTermsContent } from "@/content/terms-content";
+import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
 const COMPANY  = "Buy & Click, SL";
 const EMAIL    = "contacto.resenasya@gmail.com";
@@ -13,11 +14,14 @@ const BILLING_PATH = "/facturacion";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const c = getTermsContent(locale);
+  const url = buildUrl("/terminos", locale);
   return {
     title: c.metaTitle,
     description: c.metaDesc,
-    alternates: { canonical: "/terminos" },
+    alternates: { canonical: url, languages: hreflangAlternates("/terminos") },
     robots: { index: true, follow: true },
+    openGraph: { title: c.metaTitle, description: c.metaDesc, url, type: "website" },
+    twitter: { card: "summary_large_image", title: c.metaTitle, description: c.metaDesc },
   };
 }
 

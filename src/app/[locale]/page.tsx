@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { localizedPath } from "@/lib/localized-paths";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import dynamic from "next/dynamic";
+import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
 const ConversationTabs = dynamic(
   () => import("@/components/landing/ConversationTabs").then((m) => m.ConversationTabs),
@@ -43,16 +44,23 @@ import {
 // so CDN edge nodes serve cached HTML globally without hitting the origin.
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: "ResenasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
-  description: "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
-  alternates: { canonical: "/" },
-  openGraph: {
-    url: "/",
-    title: "ResenasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
-    description: "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const url = buildUrl("/", locale);
+  const title = "ResenasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp";
+  const description =
+    "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.";
+  return {
+    title,
+    description,
+    alternates: { canonical: url, languages: hreflangAlternates("/") },
+    openGraph: { url, title, description },
+  };
+}
 
 // ── Datos estructurados Schema.org ────────────────────────────────────────────
 

@@ -2,15 +2,19 @@ import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { ChevronDown } from "lucide-react";
 import { getFaqData, getFaqPageMeta, getFaqPageHeading } from "@/content/faq-data";
+import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const { title, description } = getFaqPageMeta(locale);
+  const url = buildUrl("/faq", locale);
   return {
     title,
     description,
-    alternates: { canonical: "/faq" },
+    alternates: { canonical: url, languages: hreflangAlternates("/faq") },
     robots: { index: true, follow: true },
+    openGraph: { title, description, url, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

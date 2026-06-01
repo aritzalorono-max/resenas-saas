@@ -1,12 +1,21 @@
 import type { Metadata } from "next";
+import { getTranslations, getLocale } from "next-intl/server";
+import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contacto | ResenasYa",
-  description:
-    "Escríbenos para soporte técnico, consultas sobre planes o cualquier otra duda. Respondemos en menos de 24 horas.",
-  alternates: { canonical: "/contacto" },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const [t, locale] = await Promise.all([getTranslations("contact"), getLocale()]);
+  const title = `${t("title")} | ResenasYa`;
+  const description = t("subtitle");
+  const url = buildUrl("/contacto", locale);
+  return {
+    title,
+    description,
+    alternates: { canonical: url, languages: hreflangAlternates("/contacto") },
+    robots: { index: true, follow: true },
+    openGraph: { title, description, url, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export default function ContactoLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

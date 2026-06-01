@@ -2044,6 +2044,13 @@ export function getPostBySlug(
   };
 }
 
+/** Returns locale → localized-slug map for a post, used to build hreflang alternates. */
+export function getBlogPostAllSlugs(localSlug: string, locale: string): Partial<Record<string, string>> {
+  const internalSlug = getInternalSlug(localSlug, locale);
+  if (!internalSlug) return {};
+  return BLOG_SLUGS[internalSlug] ?? {};
+}
+
 export function getStaticBlogParams(): Array<{ locale: string; slug: string }> {
   const LOCALES = ["es", "en", "fr", "de", "it", "pt"] as const;
   return LOCALES.flatMap((locale) =>

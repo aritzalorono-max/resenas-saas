@@ -3,19 +3,22 @@ import type { Metadata } from "next";
 import { TrendingUp } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getCaseStudies } from "@/content/case-studies-data";
+import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Casos de éxito | ResenasYa",
-  description: "Descubre cómo restaurantes, clínicas, gimnasios y e-commerce han multiplicado sus reseñas en Google Maps, Trustpilot y App Store con ResenasYa.",
-  alternates: { canonical: "/casos-exito" },
-  robots: { index: true, follow: true },
-  openGraph: {
-    title: "Casos de éxito | ResenasYa",
-    description: "Descubre cómo restaurantes, clínicas, gimnasios y e-commerce han multiplicado sus reseñas en Google Maps, Trustpilot y App Store con ResenasYa.",
-    url: "/casos-exito",
-    type: "website",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const [t, locale] = await Promise.all([getTranslations("casosExito"), getLocale()]);
+  const title = `${t("title")} | ResenasYa`;
+  const description = t("subtitle");
+  const url = buildUrl("/casos-exito", locale);
+  return {
+    title,
+    description,
+    alternates: { canonical: url, languages: hreflangAlternates("/casos-exito") },
+    robots: { index: true, follow: true },
+    openGraph: { title, description, url, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export default async function CasosExitoPage() {
   const t = await getTranslations("casosExito");

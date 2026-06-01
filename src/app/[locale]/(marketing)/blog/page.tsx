@@ -3,20 +3,20 @@ import type { Metadata } from "next";
 import { getBlogPosts } from "@/content/blog-posts-data";
 import { BookOpen, Clock, Tag } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
+import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("blog");
+  const [t, locale] = await Promise.all([getTranslations("blog"), getLocale()]);
+  const title = `${t("title")} | ResenasYa`;
+  const description = t("subtitle");
+  const url = buildUrl("/blog", locale);
   return {
-    title: `${t("title")} | ResenasYa`,
-    description: t("subtitle"),
-    alternates: { canonical: "/blog" },
+    title,
+    description,
+    alternates: { canonical: url, languages: hreflangAlternates("/blog") },
     robots: { index: true, follow: true },
-    openGraph: {
-      title: `${t("title")} | ResenasYa`,
-      description: t("subtitle"),
-      url: "/blog",
-      type: "website",
-    },
+    openGraph: { title, description, url, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

@@ -1,17 +1,23 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
 const COMPANY     = "Buy & Click, SL";
 const EMAIL_LEGAL = "contacto.resenasya@gmail.com";
 const APP_URL     = "https://resenasya.com";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("privacy");
+  const [t, locale] = await Promise.all([getTranslations("privacy"), getLocale()]);
+  const title = t("metaTitle");
+  const description = t("metaDesc");
+  const url = buildUrl("/privacidad", locale);
   return {
-    title: t("metaTitle"),
-    description: t("metaDesc"),
-    alternates: { canonical: "/privacidad" },
+    title,
+    description,
+    alternates: { canonical: url, languages: hreflangAlternates("/privacidad") },
     robots: { index: true, follow: true },
+    openGraph: { title, description, url, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
