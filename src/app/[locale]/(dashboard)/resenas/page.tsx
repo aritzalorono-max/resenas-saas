@@ -249,7 +249,7 @@ export default async function ResenasPage({
       </div>
 
       {/* ── Filtros ───────────────────────────────────────────────────────── */}
-      <div className="flex gap-2 mb-3 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex gap-2 mb-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:[scrollbar-width:none] sm:[&::-webkit-scrollbar]:hidden">
         {STATUS_TABS.map((tab) => (
           <Link
             key={tab.value}

@@ -118,6 +118,7 @@ export default function RecuperarPage() {
           <input
             id="email"
             type="email"
+            inputMode="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required

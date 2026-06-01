@@ -196,7 +196,7 @@ export function ReviewCard({
           <button
             onClick={handleSuggest}
             disabled={loadingSuggest}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-60"
+            className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-60"
           >
             {loadingSuggest ? (
               <Loader2 size={12} className="animate-spin" />
@@ -208,7 +208,7 @@ export function ReviewCard({
           {showFlagButton && !review.flagged && (
             <button
               onClick={() => setShowFlagModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
             >
               <Flag size={12} />
               {t("markProblematic")}

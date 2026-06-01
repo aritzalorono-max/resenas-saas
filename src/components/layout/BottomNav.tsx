@@ -80,7 +80,7 @@ export function BottomNav() {
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Cerrar menú"
-                className="p-1 text-gray-400 hover:text-gray-600 transition"
+                className="p-2.5 -mr-1.5 text-gray-400 hover:text-gray-600 transition"
               >
                 <X size={20} aria-hidden="true" />
               </button>

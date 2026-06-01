@@ -402,7 +402,7 @@ export default function FacturacionPage() {
             </div>
             <div>
               <label htmlFor="codigo_postal" className="block text-sm font-medium text-gray-700 mb-1">{t("postCode")}</label>
-              <input id="codigo_postal" name="codigo_postal" type="text" value={form.codigo_postal} onChange={handleChange}
+              <input id="codigo_postal" name="codigo_postal" type="text" inputMode="numeric" autoComplete="postal-code" value={form.codigo_postal} onChange={handleChange}
                 placeholder={t("postCodePlaceholder")}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm" />
             </div>
@@ -410,7 +410,7 @@ export default function FacturacionPage() {
 
           <div>
             <label htmlFor="pais" className="block text-sm font-medium text-gray-700 mb-1">{t("country")}</label>
-            <input id="pais" name="pais" type="text" value={form.pais} onChange={handleChange}
+            <input id="pais" name="pais" type="text" autoComplete="country-name" value={form.pais} onChange={handleChange}
               placeholder={t("countryPlaceholder")}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm" />
           </div>
@@ -419,7 +419,7 @@ export default function FacturacionPage() {
             <label htmlFor="email_facturacion" className="block text-sm font-medium text-gray-700 mb-1">
               {t("invoiceEmail")} <span className="text-gray-400 font-normal">{t("optional")}</span>
             </label>
-            <input id="email_facturacion" name="email_facturacion" type="email" value={form.email_facturacion} onChange={handleChange}
+            <input id="email_facturacion" name="email_facturacion" type="email" inputMode="email" autoComplete="email" value={form.email_facturacion} onChange={handleChange}
               placeholder={t("invoiceEmailPlaceholder")}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm" />
           </div>

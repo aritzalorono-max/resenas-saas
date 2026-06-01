@@ -135,7 +135,7 @@ export function FlaggedTab({
               </div>
               <a
                 href="mailto:business-support@google.com?subject=Solicitud%20de%20eliminaci%C3%B3n%20de%20rese%C3%B1a"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors w-fit"
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors w-fit"
               >
                 <ExternalLink size={11} />
                 {t("openGmail")}

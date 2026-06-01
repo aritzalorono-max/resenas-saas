@@ -765,7 +765,7 @@ export default function ClientesPage() {
 
                   {/* Preview */}
                   <div className="overflow-x-auto max-h-64 overflow-y-auto">
-                    <table className="w-full text-xs">
+                    <table className="w-full min-w-[320px] text-xs">
                       <thead className="sticky top-0 bg-gray-50 border-b border-gray-100">
                         <tr>
                           <th className="text-left px-4 py-2 text-gray-400 font-medium w-8">#</th>
