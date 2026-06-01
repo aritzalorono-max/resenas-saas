@@ -20,6 +20,7 @@ import { createReviewRequest } from "@/lib/review-requests";
 import { validateCustomerName, validatePhone } from "@/lib/validation";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { applyTemplate } from "@/lib/messages";
+import { WHATSAPP_TEMPLATE_SIDS } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
 
@@ -120,15 +121,20 @@ export async function POST(
   }
 
   const { client: bizClient, fromNumber: bizFrom } = getTwilioSender(business);
-  const templateSid = process.env.TWILIO_REVIEW_REQUEST_TEMPLATE_SID;
+  const language = business.whatsapp_language ?? "es";
+  const useIncentiveTemplate = !!(business.incentive_enabled && business.incentive_description && incentiveTiming === "initial");
+  const templateSid = useIncentiveTemplate
+    ? WHATSAPP_TEMPLATE_SIDS[language].review_incentive
+    : WHATSAPP_TEMPLATE_SIDS[language].review_request;
 
   let messageSid: string;
   try {
-    if (templateSid) {
-      messageSid = await sendWhatsAppTemplateWith(bizClient, bizFrom, customerPhone, templateSid, {
-        "1": customerName,
-        "2": business.name,
-      });
+    if (business.whatsapp_mode !== "own") {
+      const vars: Record<string, string> = { "1": customerName, "2": business.name };
+      if (useIncentiveTemplate && business.incentive_description) {
+        vars["3"] = business.incentive_description;
+      }
+      messageSid = await sendWhatsAppTemplateWith(bizClient, bizFrom, customerPhone, templateSid, vars);
     } else {
       messageSid = await sendWhatsAppMessageWith(bizClient, bizFrom, customerPhone, messageText);
     }

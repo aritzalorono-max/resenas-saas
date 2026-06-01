@@ -17,7 +17,7 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTwilioSender, sendWhatsAppTemplateWith } from "@/lib/twilio";
 import { logger } from "@/lib/logger";
-import { PLAN_MONTHLY_REMINDER_LIMITS } from "@/lib/constants";
+import { PLAN_MONTHLY_REMINDER_LIMITS, WHATSAPP_TEMPLATE_SIDS } from "@/lib/constants";
 
 export const runtime  = "nodejs";
 export const maxDuration = 60;
@@ -37,12 +37,6 @@ export async function GET(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const templateSid = process.env.TWILIO_REMINDER_TEMPLATE_SID;
-  if (!templateSid) {
-    logger.warn("Cron recordatorios: TWILIO_REMINDER_TEMPLATE_SID no configurado, omitiendo");
-    return Response.json({ skipped: true, reason: "no template sid" });
-  }
-
   const supabase = await createServiceClient();
   const now      = new Date();
 
@@ -60,6 +54,7 @@ export async function GET(request: Request) {
         name,
         reminder_max_count,
         subscription_plan,
+        whatsapp_language,
         whatsapp_mode,
         own_twilio_account_sid,
         own_twilio_auth_token,
@@ -109,6 +104,7 @@ export async function GET(request: Request) {
       name: string;
       reminder_max_count: number;
       subscription_plan: string | null;
+      whatsapp_language: string | null;
       whatsapp_mode: string | null;
       own_twilio_account_sid: string | null;
       own_twilio_auth_token: string | null;
@@ -136,7 +132,9 @@ export async function GET(request: Request) {
     // Enviar recordatorio
     try {
       const { client, fromNumber } = getTwilioSender(business);
-      await sendWhatsAppTemplateWith(client, fromNumber, req.customer_phone, templateSid, {
+      const lang = (business.whatsapp_language ?? "es") as keyof typeof WHATSAPP_TEMPLATE_SIDS;
+      const reminderSid = WHATSAPP_TEMPLATE_SIDS[lang].review_reminder;
+      await sendWhatsAppTemplateWith(client, fromNumber, req.customer_phone, reminderSid, {
         "1": req.customer_name,
         "2": business.name,
       });
