@@ -4,10 +4,24 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getTranslations } from "next-intl/server";
 import { localizedPath } from "@/lib/localized-paths";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
-import { ConversationTabs } from "@/components/landing/ConversationTabs";
-import { PricingPlans } from "@/components/landing/PricingPlans";
-import { TestimonialsCarousel } from "@/components/landing/TestimonialsCarousel";
-import { CaseStudiesCarousel } from "@/components/landing/CaseStudiesCarousel";
+import dynamic from "next/dynamic";
+
+const ConversationTabs = dynamic(
+  () => import("@/components/landing/ConversationTabs").then((m) => m.ConversationTabs),
+  { loading: () => <div className="h-64 rounded-2xl bg-gray-100 animate-pulse" /> }
+);
+const PricingPlans = dynamic(
+  () => import("@/components/landing/PricingPlans").then((m) => m.PricingPlans),
+  { loading: () => <div className="h-96 rounded-2xl bg-gray-100 animate-pulse" /> }
+);
+const TestimonialsCarousel = dynamic(
+  () => import("@/components/landing/TestimonialsCarousel").then((m) => m.TestimonialsCarousel),
+  { loading: () => <div className="h-48 rounded-2xl bg-gray-100 animate-pulse" /> }
+);
+const CaseStudiesCarousel = dynamic(
+  () => import("@/components/landing/CaseStudiesCarousel").then((m) => m.CaseStudiesCarousel),
+  { loading: () => <div className="h-64 rounded-2xl bg-gray-100 animate-pulse" /> }
+);
 import {
   Zap,
   Utensils,
@@ -307,6 +321,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                     title="Demostración ResenasYa"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    loading="lazy"
                     className="absolute inset-0 w-full h-full"
                   />
                 </div>

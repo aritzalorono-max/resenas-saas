@@ -3,7 +3,11 @@
 import { Link } from "@/i18n/navigation";
 import { Cookie } from "lucide-react";
 import { useCookieConsent } from "@/hooks/useCookieConsent";
-import { CookieSettingsModal } from "./CookieSettingsModal";
+import dynamic from "next/dynamic";
+
+const CookieSettingsModal = dynamic(() =>
+  import("./CookieSettingsModal").then((m) => m.CookieSettingsModal)
+);
 import { REJECT_ALL } from "@/lib/cookie-consent";
 import { useTranslations } from "next-intl";
 

@@ -175,6 +175,13 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
         ],
       },
+      {
+        // Preconnect a YouTube para reducir latencia del iframe de la landing
+        source: "/es",
+        headers: [
+          { key: "Link", value: "<https://www.youtube.com>; rel=preconnect, <https://i.ytimg.com>; rel=preconnect" },
+        ],
+      },
     ];
   },
 };
