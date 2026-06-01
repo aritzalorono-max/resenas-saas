@@ -185,7 +185,7 @@ export default function GoogleBusinessPage() {
         </div>
       )}
 
-      {/* Tabs (mobile) */}
+      {/* Tabs */}
       <div className="lg:hidden flex gap-1 p-1 bg-gray-100 rounded-xl overflow-x-auto">
         <TabButton active={tab === "profile"} onClick={() => setTab("profile")}>
           {t("tabProfile")}
@@ -210,39 +210,42 @@ export default function GoogleBusinessPage() {
         <ConnectPrompt onConnect={handleConnect} t={t} />
       ) : (
         <>
-          {tab === "profile" && (
-            <ProfileTab
-              business={business}
-              analysis={analysis}
-              loadingAnalysis={loadingAnalysis}
-              onConnect={handleConnect}
-              connected={connected}
-              t={t}
-            />
-          )}
-          {tab === "reviews" && (
-            <ReviewsTab
-              reviews={reviews}
-              loading={loadingReviews}
-              error={reviewsError}
-              businessName={business?.name ?? ""}
-              tone={business?.tone ?? "tuteo"}
-              onReplyPublished={handleReplyPublished}
-              onFlagged={handleFlagged}
-              t={t}
-            />
-          )}
-          {tab === "analysis" && (
-            <AnalysisTab analysis={analysis} loading={loadingAnalysis} t={t} />
-          )}
-          {tab === "flagged" && (
-            <FlaggedTab
-              reviews={reviews}
-              loading={loadingReviews}
-              error={reviewsError}
-              t={t}
-            />
-          )}
+      {tab === "profile" && (
+        <ProfileTab
+          business={business}
+          analysis={analysis}
+          loadingAnalysis={loadingAnalysis}
+          onConnect={handleConnect}
+          connected={connected}
+          t={t}
+        />
+      )}
+
+      {tab === "reviews" && (
+        <ReviewsTab
+          reviews={reviews}
+          loading={loadingReviews}
+          error={reviewsError}
+          businessName={business?.name ?? ""}
+          tone={business?.tone ?? "tuteo"}
+          onReplyPublished={handleReplyPublished}
+          onFlagged={handleFlagged}
+          t={t}
+        />
+      )}
+
+      {tab === "analysis" && (
+        <AnalysisTab analysis={analysis} loading={loadingAnalysis} t={t} />
+      )}
+
+      {tab === "flagged" && (
+        <FlaggedTab
+          reviews={reviews}
+          loading={loadingReviews}
+          error={reviewsError}
+          t={t}
+        />
+      )}
         </>
       )}
     </div>
