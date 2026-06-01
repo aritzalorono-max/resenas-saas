@@ -74,6 +74,29 @@ export async function GET(request: Request) {
     return Response.json({ sent: 0 });
   }
 
+  const PLAN_LIMITS: Record<string, number> = { free: 5, starter: 50, pro: 250 };
+
+  // Pre-fetch monthly usage for all affected businesses in one query (avoids N+1)
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const uniqueBusinessIds = [...new Set(
+    requests.map((r) => ((r.businesses as unknown) as { id: string }).id)
+  )];
+
+  const { data: allUsageData } = await supabase
+    .from("review_requests")
+    .select("business_id, reminder_count")
+    .in("business_id", uniqueBusinessIds)
+    .gte("created_at", monthStart.toISOString());
+
+  const monthlyUsageByBusiness = new Map<string, number>();
+  for (const row of allUsageData ?? []) {
+    const prev = monthlyUsageByBusiness.get(row.business_id) ?? 0;
+    monthlyUsageByBusiness.set(row.business_id, prev + 1 + (row.reminder_count ?? 0));
+  }
+
   let sent    = 0;
   let skipped = 0;
 
@@ -97,23 +120,9 @@ export async function GET(request: Request) {
 
     if (hoursElapsed < targetHours) { skipped++; continue; }
 
-    // Comprobar límite mensual del plan (reminders cuentan como envíos)
-    const PLAN_LIMITS: Record<string, number> = { free: 5, starter: 50, pro: 250 };
-    const planKey   = business.subscription_plan ?? "free";
-    const planLimit = PLAN_LIMITS[planKey] ?? 5;
-    const monthStart = new Date();
-    monthStart.setDate(1);
-    monthStart.setHours(0, 0, 0, 0);
-
-    const { data: usageData } = await supabase
-      .from("review_requests")
-      .select("id, reminder_count")
-      .eq("business_id", business.id)
-      .gte("created_at", monthStart.toISOString());
-
-    const monthlyUsage = (usageData ?? []).reduce(
-      (sum, r) => sum + 1 + (r.reminder_count ?? 0), 0
-    );
+    const planKey      = business.subscription_plan ?? "free";
+    const planLimit    = PLAN_LIMITS[planKey] ?? 5;
+    const monthlyUsage = monthlyUsageByBusiness.get(business.id) ?? 0;
 
     if (monthlyUsage >= planLimit) {
       logger.info(`Cron recordatorios: negocio ${business.id} alcanzó límite mensual`);

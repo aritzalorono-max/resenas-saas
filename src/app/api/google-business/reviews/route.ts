@@ -9,51 +9,12 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import {
   getReviews,
-  refreshAccessToken,
+  getValidAccessToken,
   starRatingToNumber,
 } from "@/lib/google-business";
 import { logger } from "@/lib/logger";
 import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
-
-async function getValidAccessToken(business: {
-  google_access_token: string;
-  google_refresh_token: string | null;
-  google_token_expiry: string | null;
-  id: string;
-}): Promise<string> {
-  const expiryDate = business.google_token_expiry
-    ? new Date(business.google_token_expiry)
-    : null;
-  const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
-
-  if (!expiryDate || expiryDate <= fiveMinutesFromNow) {
-    if (!business.google_refresh_token) {
-      throw new Error("No refresh token available");
-    }
-
-    logger.info("[GoogleBusiness] Renovando access token");
-    const refreshed = await refreshAccessToken(business.google_refresh_token);
-
-    const newExpiry = new Date(
-      Date.now() + refreshed.expires_in * 1000
-    ).toISOString();
-
-    // Update DB with new token
-    const serviceClient = await createServiceClient();
-    await serviceClient
-      .from("businesses")
-      .update({
-        google_access_token: refreshed.access_token,
-        google_token_expiry: newExpiry,
-      })
-      .eq("id", business.id);
-
-    return refreshed.access_token;
-  }
-
-  return business.google_access_token;
-}
 
 export async function GET() {
   const supabase = await createClient();

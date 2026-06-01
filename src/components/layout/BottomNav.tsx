@@ -8,7 +8,7 @@ import {
   BarChart2, Settings, Gift, Printer, UserCircle, CreditCard, X,
 } from "lucide-react";
 
-const MORE_ITEMS = [
+const SECONDARY_NAV_ITEMS = [
   { href: "/informes",      labelKey: "reports",         Icon: BarChart2   },
   { href: "/configuracion", labelKey: "businessProfile", Icon: Settings    },
   { href: "/incentivos",    labelKey: "incentives",      Icon: Gift        },
@@ -17,18 +17,18 @@ const MORE_ITEMS = [
   { href: "/facturacion",   labelKey: "billing",         Icon: CreditCard  },
 ] as const;
 
-type LabelKey = (typeof MORE_ITEMS)[number]["labelKey"] | "home" | "sendRequest" | "reviews" | "googleShort" | "more";
+type LabelKey = (typeof SECONDARY_NAV_ITEMS)[number]["labelKey"] | "home" | "sendRequest" | "reviews" | "googleShort" | "more";
 
 export function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations("common");
   const [open, setOpen] = useState(false);
 
-  const moreActive = MORE_ITEMS.some(
+  const moreActive = SECONDARY_NAV_ITEMS.some(
     (i) => pathname === i.href || pathname.startsWith(i.href + "/")
   );
 
-  const mainItems = [
+  const primaryNavItems = [
     { href: "/dashboard",       labelKey: "home" as LabelKey,        Icon: Home   },
     { href: "/clientes",        labelKey: "sendRequest" as LabelKey, Icon: Send   },
     { href: "/resenas",         labelKey: "reviews" as LabelKey,     Icon: Star   },
@@ -39,7 +39,7 @@ export function BottomNav() {
     <>
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200
                       flex items-stretch safe-bottom">
-        {mainItems.map(({ href, labelKey, Icon }) => {
+        {primaryNavItems.map(({ href, labelKey, Icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
@@ -86,7 +86,7 @@ export function BottomNav() {
             </div>
 
             <div className="grid grid-cols-3 gap-1 px-3 pb-4">
-              {MORE_ITEMS.map(({ href, labelKey, Icon }) => {
+              {SECONDARY_NAV_ITEMS.map(({ href, labelKey, Icon }) => {
                 const isActive = pathname === href || pathname.startsWith(href + "/");
                 return (
                   <Link

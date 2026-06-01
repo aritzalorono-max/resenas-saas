@@ -8,33 +8,13 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import {
   getReviews,
-  refreshAccessToken,
+  getValidAccessToken,
   starRatingToNumber,
 } from "@/lib/google-business";
+import { anthropic, parseClaudeJson, ANALYSIS_SYSTEM_PROMPT } from "@/lib/claude";
 import { logger } from "@/lib/logger";
 import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-
-const ANALYSIS_SYSTEM_PROMPT = `Eres un experto en análisis de reputación online para negocios locales.
-Analiza el conjunto de reseñas de Google proporcionadas y genera un informe estructurado.
-
-Responde SIEMPRE con un JSON válido con esta estructura exacta:
-{
-  "overallSentiment": "string breve describiendo el sentimiento general (ej: 'Muy positivo', 'Mixto', 'Mayormente negativo')",
-  "averageRating": número con un decimal,
-  "reviewCount": número entero,
-  "ratingTrend": "string describiendo la tendencia (ej: 'Las últimas reseñas son más positivas que las antiguas')",
-  "topPraises": ["elogio 1", "elogio 2", "elogio 3"],
-  "topComplaints": ["queja 1", "queja 2", "queja 3"],
-  "profileSuggestions": ["sugerencia 1", "sugerencia 2", "sugerencia 3", "sugerencia 4"]
-}
-
-Los arrays deben tener entre 2 y 5 elementos.
-Las sugerencias de perfil deben ser accionables y específicas para mejorar la presencia en Google Business.
-Si hay pocas reseñas o no hay quejas/elogios claros, indícalo brevemente en el campo correspondiente.`;
 
 export async function GET() {
   const supabase = await createClient();
@@ -73,29 +53,17 @@ export async function GET() {
     );
   }
 
-  // Refresh token if needed
-  let accessToken = business.google_access_token as string;
-  const expiryDate = business.google_token_expiry
-    ? new Date(business.google_token_expiry as string)
-    : null;
-  const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
-
-  if ((!expiryDate || expiryDate <= fiveMinutesFromNow) && business.google_refresh_token) {
-    try {
-      const refreshed = await refreshAccessToken(business.google_refresh_token as string);
-      accessToken = refreshed.access_token;
-      const serviceClient = await createServiceClient();
-      await serviceClient
-        .from("businesses")
-        .update({
-          google_access_token: refreshed.access_token,
-          google_token_expiry: new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
-        })
-        .eq("id", business.id);
-    } catch (err) {
-      logger.error("[GoogleBusiness] Error al renovar token para análisis", err);
-      return NextResponse.json({ error: "Token expirado, reconecta Google Business" }, { status: 401 });
-    }
+  let accessToken: string;
+  try {
+    accessToken = await getValidAccessToken(business as {
+      google_access_token: string;
+      google_refresh_token: string | null;
+      google_token_expiry: string | null;
+      id: string;
+    });
+  } catch (err) {
+    logger.error("[GoogleBusiness] Error al renovar token para análisis", err);
+    return NextResponse.json({ error: "Token expirado, reconecta Google Business" }, { status: 401 });
   }
 
   let reviews;
@@ -145,20 +113,11 @@ export async function GET() {
       system: ANALYSIS_SYSTEM_PROMPT,
       messages: [{ role: "user", content: prompt }],
     });
-
-    const rawText =
-      response.content[0].type === "text" ? response.content[0].text : "{}";
-    const cleaned = rawText
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/\s*```$/, "")
-      .trim();
-    analysis = JSON.parse(cleaned);
+    const rawText = response.content[0].type === "text" ? response.content[0].text : "{}";
+    analysis = parseClaudeJson(rawText, "gb-analyze");
   } catch (err) {
     logger.error("[GoogleBusiness] Error en análisis de Claude", err);
-    return NextResponse.json(
-      { error: "Error al analizar las reseñas" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error al analizar las reseñas" }, { status: 500 });
   }
 
   return NextResponse.json({ analysis });

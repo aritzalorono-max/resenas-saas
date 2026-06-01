@@ -5,6 +5,9 @@
  * Uses native fetch — no extra dependencies required.
  */
 
+import { createServiceClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
+
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com"}/api/google-business/callback`;
@@ -251,6 +254,43 @@ export async function replyToReview(
       body: JSON.stringify({ comment: reply }),
     }
   );
+}
+
+// ---------------------------------------------------------------------------
+// Token management
+// ---------------------------------------------------------------------------
+
+type BusinessTokenFields = {
+  id: string;
+  google_access_token: string;
+  google_refresh_token: string | null;
+  google_token_expiry: string | null;
+};
+
+/**
+ * Returns a valid access token, refreshing it if it expires within 5 minutes.
+ * Persists the new token to the DB so subsequent calls reuse it.
+ */
+export async function getValidAccessToken(business: BusinessTokenFields): Promise<string> {
+  const expiryDate = business.google_token_expiry ? new Date(business.google_token_expiry) : null;
+  const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
+
+  if (!expiryDate || expiryDate <= fiveMinutesFromNow) {
+    if (!business.google_refresh_token) throw new Error("No refresh token available");
+    logger.info("[GoogleBusiness] Renovando access token");
+    const refreshed = await refreshAccessToken(business.google_refresh_token);
+    const serviceClient = await createServiceClient();
+    await serviceClient
+      .from("businesses")
+      .update({
+        google_access_token: refreshed.access_token,
+        google_token_expiry: new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
+      })
+      .eq("id", business.id);
+    return refreshed.access_token;
+  }
+
+  return business.google_access_token;
 }
 
 // ---------------------------------------------------------------------------

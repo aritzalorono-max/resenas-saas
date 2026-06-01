@@ -10,14 +10,14 @@ import {
   Users, Store, TrendingUp, Briefcase, QrCode,
 } from "lucide-react";
 
-type Item = { href: string; labelKey: string; Icon: React.ElementType; tab?: string };
-type Group = { id: string; labelKey: string; Icon: React.ElementType; items: Item[]; defaultOpen: boolean };
-type Entry = { type: "item"; href: string; labelKey: string; Icon: React.ElementType }
-           | { type: "group"; group: Group };
+type NavItem = { href: string; labelKey: string; Icon: React.ElementType; tab?: string };
+type NavGroup = { id: string; labelKey: string; Icon: React.ElementType; items: NavItem[]; defaultOpen: boolean };
+type NavEntry = { type: "item"; href: string; labelKey: string; Icon: React.ElementType }
+              | { type: "group"; group: NavGroup };
 
 const STORAGE_KEY = "ry_sidebar_open";
 
-const NAV: Entry[] = [
+const NAV: NavEntry[] = [
   { type: "item", href: "/dashboard", labelKey: "home", Icon: Home },
   {
     type: "group",
@@ -77,19 +77,19 @@ const NAV: Entry[] = [
   },
 ];
 
-function groupContainsPath(group: Group, pathname: string) {
+function isGroupActivePath(group: NavGroup, pathname: string) {
   return group.items.some((i) => {
     const base = i.href.split("?")[0];
     return pathname === base || pathname.startsWith(base + "/");
   });
 }
 
-function savedOpen(): Record<string, boolean> {
+function loadSavedGroupOpenStates(): Record<string, boolean> {
   if (typeof window === "undefined") return {};
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}"); } catch { return {}; }
 }
 
-function itemLinkHref(item: Item): string {
+function buildNavItemHref(item: NavItem): string {
   if (item.tab && item.tab !== "profile") return `${item.href}?tab=${item.tab}`;
   return item.href;
 }
@@ -108,13 +108,13 @@ export function SidebarNav() {
   });
 
   useEffect(() => {
-    const saved = savedOpen();
+    const saved = loadSavedGroupOpenStates();
     setOpen((prev) => {
       const next = { ...prev };
       NAV.forEach((e) => {
         if (e.type !== "group") return;
         const g = e.group;
-        if (groupContainsPath(g, pathname)) {
+        if (isGroupActivePath(g, pathname)) {
           next[g.id] = true;
         } else if (g.id in saved) {
           next[g.id] = saved[g.id];
@@ -127,7 +127,7 @@ export function SidebarNav() {
 
   useEffect(() => {
     NAV.forEach((e) => {
-      if (e.type === "group" && groupContainsPath(e.group, pathname)) {
+      if (e.type === "group" && isGroupActivePath(e.group, pathname)) {
         setOpen((prev) => ({ ...prev, [e.group.id]: true }));
       }
     });
@@ -141,11 +141,11 @@ export function SidebarNav() {
     });
   }
 
-  function isTopActive(href: string) {
+  function isNavItemActive(href: string) {
     return pathname === href || pathname.startsWith(href + "/");
   }
 
-  function isItemActive(item: Item): boolean {
+  function isItemActive(item: NavItem): boolean {
     const base = item.href.split("?")[0];
     if (pathname !== base && !pathname.startsWith(base + "/")) return false;
     if (!item.tab) return true;
@@ -157,7 +157,7 @@ export function SidebarNav() {
     <nav className="flex-1 p-3 overflow-y-auto space-y-0.5">
       {NAV.map((entry) => {
         if (entry.type === "item") {
-          const active = isTopActive(entry.href);
+          const active = isNavItemActive(entry.href);
           return (
             <Link
               key={entry.href}
@@ -176,7 +176,7 @@ export function SidebarNav() {
 
         const { group } = entry;
         const isOpen    = open[group.id] ?? group.defaultOpen;
-        const hasActive = groupContainsPath(group, pathname);
+        const hasActive = isGroupActivePath(group, pathname);
 
         return (
           <div key={group.id}>
@@ -203,7 +203,7 @@ export function SidebarNav() {
                   return (
                     <Link
                       key={item.tab ?? item.href}
-                      href={itemLinkHref(item)}
+                      href={buildNavItemHref(item)}
                       className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition
                         ${active
                           ? "bg-gray-900 text-white"

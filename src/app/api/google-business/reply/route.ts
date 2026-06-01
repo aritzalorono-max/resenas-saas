@@ -7,7 +7,7 @@
  */
 
 import { createClient, createServiceClient } from "@/lib/supabase/server";
-import { replyToReview, refreshAccessToken } from "@/lib/google-business";
+import { replyToReview, getValidAccessToken } from "@/lib/google-business";
 import { logger } from "@/lib/logger";
 import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
@@ -70,29 +70,17 @@ export async function POST(request: Request) {
     );
   }
 
-  // Refresh token if needed
-  let accessToken = business.google_access_token as string;
-  const expiryDate = business.google_token_expiry
-    ? new Date(business.google_token_expiry as string)
-    : null;
-  const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
-
-  if ((!expiryDate || expiryDate <= fiveMinutesFromNow) && business.google_refresh_token) {
-    try {
-      const refreshed = await refreshAccessToken(business.google_refresh_token as string);
-      accessToken = refreshed.access_token;
-      const serviceClient = await createServiceClient();
-      await serviceClient
-        .from("businesses")
-        .update({
-          google_access_token: refreshed.access_token,
-          google_token_expiry: new Date(Date.now() + refreshed.expires_in * 1000).toISOString(),
-        })
-        .eq("id", business.id);
-    } catch (err) {
-      logger.error("[GoogleBusiness] Error al renovar token para reply", err);
-      return NextResponse.json({ error: "Token expirado, reconecta Google Business" }, { status: 401 });
-    }
+  let accessToken: string;
+  try {
+    accessToken = await getValidAccessToken(business as {
+      google_access_token: string;
+      google_refresh_token: string | null;
+      google_token_expiry: string | null;
+      id: string;
+    });
+  } catch (err) {
+    logger.error("[GoogleBusiness] Error al renovar token para reply", err);
+    return NextResponse.json({ error: "Token expirado, reconecta Google Business" }, { status: 401 });
   }
 
   try {

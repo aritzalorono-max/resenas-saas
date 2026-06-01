@@ -8,28 +8,10 @@
  */
 
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { anthropic, REPLY_SYSTEM_PROMPT } from "@/lib/claude";
 import { logger } from "@/lib/logger";
 import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-
-const REPLY_SYSTEM_PROMPT = `Eres un experto en gestión de reputación online para negocios locales.
-Tu tarea es generar respuestas profesionales y personalizadas a reseñas de Google Business.
-
-Reglas:
-1. La respuesta debe ser en español.
-2. Comienza agradeciendo al cliente por su reseña.
-3. Para reseñas positivas: muestra entusiasmo genuino y anima a volver.
-4. Para reseñas negativas: muestra empatía, pide disculpas y ofrece solución o contacto directo.
-5. Para reseñas neutrales: agradece el feedback y menciona que trabajáis para mejorar.
-6. Usa el nombre del cliente si está disponible (no "Estimado usuario").
-7. Firma siempre con el nombre del negocio.
-8. Longitud: 3-5 frases. No uses emojis excesivos.
-9. Aplica el tono indicado: tuteo, usted, o juvenil.
-
-Responde SOLO con el texto de la respuesta, sin explicaciones adicionales.`;
 
 export async function POST(request: Request) {
   const supabase = await createClient();
