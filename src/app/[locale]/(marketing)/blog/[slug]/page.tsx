@@ -167,14 +167,27 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const allPosts = getBlogPosts(locale);
   const otherPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
   const articleSchema = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.description,
-    datePublished: post.date,
-    author: { "@type": "Organization", name: "ResenasYa" },
-    publisher: { "@type": "Organization", name: "ResenasYa", url: "https://resenasya.com" },
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: post.title,
+        description: post.description,
+        datePublished: post.date,
+        author: { "@type": "Organization", name: "ResenasYa" },
+        publisher: { "@type": "Organization", name: "ResenasYa", url: appUrl },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Inicio", item: appUrl },
+          { "@type": "ListItem", position: 2, name: "Blog", item: `${appUrl}/blog` },
+          { "@type": "ListItem", position: 3, name: post.title, item: `${appUrl}/blog/${post.slug}` },
+        ],
+      },
+    ],
   };
 
   return (

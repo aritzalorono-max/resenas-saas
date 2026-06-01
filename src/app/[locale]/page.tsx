@@ -53,7 +53,7 @@ export async function generateMetadata({
   const url = buildUrl("/", locale);
   const title = "ResenasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp";
   const description =
-    "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Para negocios locales, apps y e-commerce.";
+    "Envía WhatsApps a clientes, analiza su opinión con IA y dirige a los satisfechos a dejar reseña en Google Maps, App Store o Play Store. Para negocios locales y apps.";
   return {
     title,
     description,
@@ -149,6 +149,19 @@ const schemaOrg = {
           },
         },
       ],
+    },
+    {
+      "@type": "WebSite",
+      name: "ResenasYa",
+      url: process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com"}/blog?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
     },
     {
       "@type": "Organization",

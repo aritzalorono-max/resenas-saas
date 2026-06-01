@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | ResenasYa",
   },
   description:
-    "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot.",
+    "Envía WhatsApps automáticos, analiza opiniones con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Prueba gratis sin tarjeta.",
   authors: [{ name: "ResenasYa" }],
   creator: "ResenasYa",
   publisher: "ResenasYa",
@@ -35,12 +35,12 @@ export const metadata: Metadata = {
     siteName: "ResenasYa",
     title: "ResenasYa — Consigue más reseñas de 5★ automáticamente por WhatsApp",
     description:
-      "Envía WhatsApps automáticos a tus clientes, analiza su opinión con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot.",
+      "Envía WhatsApps automáticos, analiza opiniones con IA y consigue reseñas en Google Maps, App Store, Play Store o Trustpilot. Prueba gratis sin tarjeta.",
   },
   twitter: {
     card: "summary_large_image",
     title: "ResenasYa — Más reseñas de 5★ automáticamente por WhatsApp",
-    description: "IA + WhatsApp para conseguir más reseñas en Google Maps, App Store, Play Store o Trustpilot.",
+    description: "IA + WhatsApp para conseguir más reseñas en Google Maps, App Store, Play Store o Trustpilot. Automatiza la captación de opiniones y mejora tu reputación online.",
   },
   appleWebApp: { capable: true, statusBarStyle: "default", title: "ResenasYa" },
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
