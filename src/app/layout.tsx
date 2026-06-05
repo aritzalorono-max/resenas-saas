@@ -45,6 +45,7 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, statusBarStyle: "default", title: "ResenasYa" },
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  verification: { google: "ePD94B5VbO3yhJKMFAQcksCn4XfokHF7pSgPMhHumiE" },
 };
 
 export const viewport: Viewport = {
