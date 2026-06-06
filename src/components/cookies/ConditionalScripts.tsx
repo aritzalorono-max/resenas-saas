@@ -39,11 +39,12 @@ export function ConditionalScripts() {
           (window as any).dataLayer.push(args);
         };
         (window as any).gtag("js", new Date());
-        (window as any).gtag("config", GA_ID, { anonymize_ip: true });
+        (window as any).gtag("config", GA_ID);
         const s = document.createElement("script");
         s.id = "ga-script";
         s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
         s.async = true;
+        // gtag commands are queued in dataLayer before the script loads — this is the standard pattern
         document.head.appendChild(s);
       }
     }
