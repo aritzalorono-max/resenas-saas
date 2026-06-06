@@ -34,15 +34,17 @@ export function ConditionalScripts() {
       // Google Analytics 4
       const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
       if (GA_ID && !document.getElementById("ga-script")) {
+        (window as any).dataLayer = (window as any).dataLayer || [];
+        (window as any).gtag = function (...args: unknown[]) {
+          (window as any).dataLayer.push(args);
+        };
+        (window as any).gtag("js", new Date());
+        (window as any).gtag("config", GA_ID, { anonymize_ip: true });
         const s = document.createElement("script");
         s.id = "ga-script";
         s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
         s.async = true;
         document.head.appendChild(s);
-        (window as any).dataLayer = (window as any).dataLayer || [];
-        function gtag(...args: unknown[]) { (window as any).dataLayer.push(args); }
-        gtag("js", new Date());
-        gtag("config", GA_ID, { anonymize_ip: true });
       }
     }
 
