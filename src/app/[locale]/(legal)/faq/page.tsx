@@ -18,13 +18,19 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+const homeLabels: Record<string, string> = {
+  es: "Inicio", en: "Home", fr: "Accueil", de: "Startseite", it: "Home", pt: "Início",
+};
+const faqLabels: Record<string, string> = {
+  es: "Preguntas Frecuentes", en: "FAQ", fr: "FAQ", de: "FAQ", it: "FAQ", pt: "FAQ",
+};
+
 export default async function FaqPage() {
   const locale = await getLocale();
   const faqs = getFaqData(locale);
   const { title, subtitle } = getFaqPageHeading(locale);
 
   const allFaqs = faqs.flatMap((cat) => cat.items);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
   const faqSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -39,8 +45,8 @@ export default async function FaqPage() {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Inicio", item: appUrl },
-          { "@type": "ListItem", position: 2, name: "FAQ", item: `${appUrl}/faq` },
+          { "@type": "ListItem", position: 1, name: homeLabels[locale] ?? "Home", item: buildUrl("/", locale) },
+          { "@type": "ListItem", position: 2, name: faqLabels[locale] ?? "FAQ", item: buildUrl("/faq", locale) },
         ],
       },
     ],

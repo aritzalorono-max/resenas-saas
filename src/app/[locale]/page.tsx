@@ -154,14 +154,6 @@ const schemaOrg = {
       "@type": "WebSite",
       name: "ResenasYa",
       url: process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: {
-          "@type": "EntryPoint",
-          urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com"}/blog?q={search_term_string}`,
-        },
-        "query-input": "required name=search_term_string",
-      },
     },
     {
       "@type": "Organization",
@@ -172,8 +164,9 @@ const schemaOrg = {
       contactPoint: {
         "@type": "ContactPoint",
         email: "info@resenasya.com",
+        telephone: "+34613640396",
         contactType: "customer support",
-        availableLanguage: "Spanish",
+        availableLanguage: ["Spanish", "English", "French", "German", "Italian", "Portuguese"],
       },
       address: {
         "@type": "PostalAddress",

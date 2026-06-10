@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getBlogPosts } from "@/content/blog-posts-data";
 import { BookOpen, Clock, Tag } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
-import { hreflangAlternates, buildUrl } from "@/lib/seo";
+import { hreflangAlternates, buildUrl, APP_URL } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [t, locale] = await Promise.all([getTranslations("blog"), getLocale()]);
@@ -72,7 +72,36 @@ export default async function BlogPage() {
   const posts = getBlogPosts(locale);
   const [featured, ...rest] = posts;
 
+  const prefix = locale === "es" ? "" : `/${locale}`;
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Blog",
+        name: t("title"),
+        description: t("subtitle"),
+        url: buildUrl("/blog", locale),
+        blogPost: posts.map((post) => ({
+          "@type": "BlogPosting",
+          headline: post.title,
+          description: post.description,
+          datePublished: post.date,
+          url: `${APP_URL}${prefix}/blog/${post.slug}`,
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "ResenasYa", item: `${APP_URL}${prefix || "/"}` },
+          { "@type": "ListItem", position: 2, name: t("title"), item: buildUrl("/blog", locale) },
+        ],
+      },
+    ],
+  };
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }} />
     <div className="py-12 px-6">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
@@ -152,5 +181,6 @@ export default async function BlogPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
