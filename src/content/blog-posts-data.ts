@@ -1573,7 +1573,7 @@ La respuesta corta es: **sí, en la mayoría de los casos, si se hace correctame
 
 > *Nota: Este artículo es informativo y no constituye asesoramiento legal. Consulta con un abogado especializado en protección de datos para tu caso concreto.*
 
-## El marco legal aplicable en España
+## ¿Qué marco legal aplica en España?
 
 1. **Reglamento (UE) 2016/679 (RGPD)**: regula el tratamiento de datos personales, incluyendo el número de teléfono.
 2. **Ley 34/2002, de Servicios de la Sociedad de la Información (LSSICE)**: regula las comunicaciones comerciales electrónicas.
@@ -1645,7 +1645,7 @@ The short answer is: **yes, in most cases, if done correctly**. The longer answe
 
 > *Note: This article is for informational purposes only and does not constitute legal advice. Consult a data protection specialist for your specific situation.*
 
-## The applicable legal framework in the UK
+## What legal framework applies in the UK?
 
 1. **UK GDPR** (retained from EU GDPR): regulates the processing of personal data, including phone numbers.
 2. **Privacy and Electronic Communications Regulations (PECR)**: specifically regulates electronic marketing communications (including WhatsApp messages).
@@ -1717,7 +1717,7 @@ La réponse courte est : **oui, dans la plupart des cas, si c'est fait correctem
 
 > *Note : Cet article est informatif et ne constitue pas un conseil juridique. Consultez un spécialiste en protection des données pour votre situation spécifique.*
 
-## Le cadre légal applicable en France
+## Quel cadre légal s'applique en France ?
 
 1. **Règlement (UE) 2016/679 (RGPD)** : réglemente le traitement des données personnelles, dont le numéro de téléphone.
 2. **Loi pour la Confiance dans l'Économie Numérique (LCEN)** : réglemente les communications commerciales électroniques.
@@ -1781,7 +1781,7 @@ Die kurze Antwort: **Ja, in den meisten Fällen, wenn es korrekt gemacht wird.**
 
 > *Hinweis: Dieser Artikel dient nur zur Information und stellt keine Rechtsberatung dar. Konsultieren Sie einen Datenschutzspezialisten für Ihre spezifische Situation.*
 
-## Der anwendbare Rechtsrahmen in Deutschland
+## Welcher Rechtsrahmen gilt in Deutschland?
 
 1. **Datenschutz-Grundverordnung (DSGVO)**: regelt die Verarbeitung personenbezogener Daten, einschließlich Telefonnummern.
 2. **Gesetz gegen den unlauteren Wettbewerb (UWG)** und **Telekommunikations-Telemedien-Datenschutzgesetz (TTDSG)**: regeln elektronische Marketingkommunikation.
@@ -1845,7 +1845,7 @@ La risposta breve è: **sì, nella maggior parte dei casi, se fatto correttament
 
 > *Nota: Questo articolo è informativo e non costituisce consulenza legale. Consulta uno specialista in protezione dei dati per la tua situazione specifica.*
 
-## Il quadro legale applicabile in Italia
+## Quale quadro legale si applica in Italia?
 
 1. **Regolamento (UE) 2016/679 (GDPR)**: regola il trattamento dei dati personali, incluso il numero di telefono.
 2. **Decreto Legislativo 196/2003 (Codice Privacy)** come modificato dal D.Lgs. 101/2018: regolamenta le comunicazioni di marketing elettronico.
@@ -1909,7 +1909,7 @@ A resposta curta é: **sim, na maioria dos casos, se feito corretamente**. A res
 
 > *Nota: Este artigo é informativo e não constitui aconselhamento jurídico. Consulte um especialista em proteção de dados para a sua situação específica.*
 
-## O quadro legal aplicável em Portugal
+## Que quadro legal se aplica em Portugal?
 
 1. **Regulamento (UE) 2016/679 (RGPD)**: regula o tratamento de dados pessoais, incluindo o número de telefone.
 2. **Lei n.º 41/2004** (Lei das Comunicações Eletrónicas): regula as comunicações de marketing eletrónico.
@@ -6123,13 +6123,13 @@ As avaliações de uma estrela são as mais desconfortáveis de ler. São també
         category: "Google Maps",
         content: `**Respuesta corta: no existe un número mágico universal. Necesitas aproximadamente un 20% más de reseñas que la media de los 3 primeros resultados de tu búsqueda local principal, con al menos 4-6 reseñas nuevas al mes.** El resto de este artículo explica de dónde sale esa cifra y cómo calcular la tuya.
 
-## Por qué "cuantas más mejor" es mala respuesta
+## ¿Por qué "cuantas más mejor" es una mala respuesta?
 
 Un restaurante en el centro de Madrid compite contra negocios con 800-2.000 reseñas. Una clínica fisioterapia en Cuenca compite contra negocios con 30-80. Si ambos se ponen como objetivo "300 reseñas", uno está apuntando bajísimo y el otro está persiguiendo algo innecesario.
 
 Lo que importa no es el número absoluto, sino tu posición relativa frente a los negocios que aparecen cuando tu cliente busca.
 
-## Cómo calcular tu número objetivo (5 minutos)
+## ¿Cómo calcular tu número objetivo en 5 minutos?
 
 1. Abre Google Maps en modo incógnito.
 2. Busca tu término principal: "dentista Valencia", "taller mecánico Getafe", lo que buscaría tu cliente.
@@ -6198,13 +6198,13 @@ Ese filtrado previo es exactamente lo que automatiza ReseñasYa: envía el Whats
         category: "Google Maps",
         content: `**Short answer: there is no universal magic number. You need roughly 20% more reviews than the average of the top 3 results for your main local search, plus at least 4-6 new reviews per month.** The rest of this article explains where that figure comes from and how to calculate yours.
 
-## Why "the more the better" is a bad answer
+## Why is "the more the better" a bad answer?
 
 A restaurant in central Madrid competes against businesses with 800-2,000 reviews. A physiotherapy clinic in a small town competes against businesses with 30-80. If both set a goal of "300 reviews," one is aiming far too low and the other is chasing something unnecessary.
 
 What matters is not the absolute number but your relative position against the businesses that appear when your customer searches.
 
-## How to calculate your target number (5 minutes)
+## How do you calculate your target number in 5 minutes?
 
 1. Open Google Maps in incognito mode.
 2. Search your main term: "dentist Valencia," "auto repair shop near me" — whatever your customer would type.
@@ -6273,13 +6273,13 @@ That pre-filtering is exactly what ReseñasYa automates: it sends the WhatsApp, 
         category: "Google Maps",
         content: `**Réponse courte : il n'existe pas de chiffre magique universel. Il vous faut environ 20 % d'avis de plus que la moyenne des 3 premiers résultats de votre recherche locale principale, avec au moins 4 à 6 nouveaux avis par mois.** La suite de cet article explique d'où vient ce chiffre et comment calculer le vôtre.
 
-## Pourquoi « le plus possible » est une mauvaise réponse
+## Pourquoi « le plus possible » est-il une mauvaise réponse ?
 
 Un restaurant au centre de Madrid affronte des établissements avec 800 à 2 000 avis. Une clinique de kinésithérapie dans une petite ville affronte des concurrents avec 30 à 80 avis. Si les deux se fixent « 300 avis » comme objectif, l'un vise beaucoup trop bas et l'autre poursuit un but inutile.
 
 Ce qui compte n'est pas le nombre absolu, mais votre position relative face aux établissements qui apparaissent quand votre client cherche.
 
-## Comment calculer votre objectif (5 minutes)
+## Comment calculer votre objectif en 5 minutes ?
 
 1. Ouvrez Google Maps en navigation privée.
 2. Cherchez votre terme principal : « dentiste Valence », « garage Toulouse » — ce que taperait votre client.
@@ -6348,13 +6348,13 @@ Ce filtrage préalable est exactement ce qu'automatise ReseñasYa : envoi du Wha
         category: "Google Maps",
         content: `**Kurze Antwort: Es gibt keine universelle magische Zahl. Sie brauchen etwa 20 % mehr Bewertungen als der Durchschnitt der Top-3-Ergebnisse Ihrer wichtigsten lokalen Suche, plus mindestens 4-6 neue Bewertungen pro Monat.** Der Rest dieses Artikels erklärt, woher diese Zahl kommt und wie Sie Ihre eigene berechnen.
 
-## Warum „je mehr, desto besser" eine schlechte Antwort ist
+## Warum ist „je mehr, desto besser" eine schlechte Antwort?
 
 Ein Restaurant im Zentrum von Madrid konkurriert mit Betrieben, die 800-2.000 Bewertungen haben. Eine Physiotherapiepraxis in einer Kleinstadt konkurriert mit Betrieben, die 30-80 haben. Wenn sich beide „300 Bewertungen" als Ziel setzen, zielt einer viel zu niedrig und der andere verfolgt etwas Unnötiges.
 
 Entscheidend ist nicht die absolute Zahl, sondern Ihre relative Position gegenüber den Betrieben, die erscheinen, wenn Ihr Kunde sucht.
 
-## So berechnen Sie Ihre Zielzahl (5 Minuten)
+## Wie berechnen Sie Ihre Zielzahl in 5 Minuten?
 
 1. Öffnen Sie Google Maps im Inkognito-Modus.
 2. Suchen Sie Ihren Hauptbegriff: „Zahnarzt Valencia", „Autowerkstatt in der Nähe" — was Ihr Kunde eingeben würde.
@@ -6423,13 +6423,13 @@ Genau diese Vorfilterung automatisiert ReseñasYa: WhatsApp senden, Kundenantwor
         category: "Google Maps",
         content: `**Risposta breve: non esiste un numero magico universale. Ti servono circa il 20% di recensioni in più rispetto alla media dei primi 3 risultati della tua ricerca locale principale, con almeno 4-6 recensioni nuove al mese.** Il resto dell'articolo spiega da dove viene questa cifra e come calcolare la tua.
 
-## Perché "più ce ne sono meglio è" è una cattiva risposta
+## Perché "più ce ne sono meglio è" è una cattiva risposta?
 
 Un ristorante nel centro di Madrid compete con attività che hanno 800-2.000 recensioni. Uno studio di fisioterapia in una cittadina compete con attività che ne hanno 30-80. Se entrambi si pongono come obiettivo "300 recensioni", uno punta troppo in basso e l'altro insegue qualcosa di inutile.
 
 Ciò che conta non è il numero assoluto, ma la tua posizione relativa rispetto alle attività che compaiono quando il tuo cliente cerca.
 
-## Come calcolare il tuo numero obiettivo (5 minuti)
+## Come calcolare il tuo numero obiettivo in 5 minuti?
 
 1. Apri Google Maps in modalità incognito.
 2. Cerca il tuo termine principale: "dentista Valencia", "officina meccanica vicino a me" — quello che digiterebbe il tuo cliente.
@@ -6498,13 +6498,13 @@ Quel filtro preventivo è esattamente ciò che automatizza ReseñasYa: invia il 
         category: "Google Maps",
         content: `**Resposta curta: não existe um número mágico universal. Precisa de aproximadamente 20% mais avaliações do que a média dos 3 primeiros resultados da sua pesquisa local principal, com pelo menos 4-6 avaliações novas por mês.** O resto deste artigo explica de onde vem este número e como calcular o seu.
 
-## Por que "quantas mais melhor" é uma má resposta
+## Por que "quantas mais melhor" é uma má resposta?
 
 Um restaurante no centro de Madrid compete contra negócios com 800-2.000 avaliações. Uma clínica de fisioterapia numa cidade pequena compete contra negócios com 30-80. Se ambos definirem "300 avaliações" como objetivo, um está a apontar demasiado baixo e o outro persegue algo desnecessário.
 
 O que importa não é o número absoluto, mas a sua posição relativa face aos negócios que aparecem quando o seu cliente pesquisa.
 
-## Como calcular o seu número objetivo (5 minutos)
+## Como calcular o seu número objetivo em 5 minutos?
 
 1. Abra o Google Maps em modo anónimo.
 2. Pesquise o seu termo principal: "dentista Valência", "oficina mecânica perto de mim" — o que o seu cliente escreveria.
@@ -6638,7 +6638,7 @@ Si la respuesta es positiva:
 
 Esta es la plantilla con mayor conversión de todas (supera el 50% en muchos negocios), porque el cliente fiel ya tiene la opinión formada y solo le faltaba que se lo pidieran.
 
-## Los 4 errores que convierten tu mensaje en spam
+## ¿Qué errores convierten tu mensaje en spam?
 
 1. **Mensaje masivo idéntico para todos.** Sin nombre, sin contexto del servicio. Se percibe (y se ignora) como marketing.
 2. **Pedir la reseña antes de preguntar.** Mandar el enlace en frío a un cliente que ha tenido un problema es la forma más rápida de conseguir una reseña de 1 estrella.
@@ -6649,7 +6649,7 @@ Esta es la plantilla con mayor conversión de todas (supera el 50% en muchos neg
 
 Sí, con dos condiciones: que tengas el teléfono del cliente por una relación comercial real (RGPD, interés legítimo) y que no condiciones la reseña a recompensas. Pedir opinión a tus propios clientes tras un servicio es práctica aceptada; comprar o incentivar reseñas no lo es.
 
-## Automatizar sin perder el tono personal
+## ¿Se puede automatizar sin perder el tono personal?
 
 Enviar esto a mano funciona con 5 clientes al día. Con 30, se deja de hacer la segunda semana. La automatización útil mantiene las tres cosas que hacen que funcione: nombre del cliente, pregunta previa y filtrado de respuestas negativas.
 
@@ -6728,7 +6728,7 @@ If positive:
 
 This is the highest-converting template of all (over 50% in many businesses), because the loyal customer already has their opinion formed — they were just never asked.
 
-## The 4 mistakes that turn your message into spam
+## Which mistakes turn your message into spam?
 
 1. **Identical mass message for everyone.** No name, no service context. It reads (and gets ignored) as marketing.
 2. **Requesting before asking.** Cold-sending the link to a customer who had a problem is the fastest way to earn a 1-star review.
@@ -6739,7 +6739,7 @@ This is the highest-converting template of all (over 50% in many businesses), be
 
 Yes, with two conditions: you have the customer's phone number from a genuine business relationship (GDPR, legitimate interest), and you don't condition the review on rewards. Asking your own customers for feedback after a service is accepted practice; buying or incentivizing reviews is not.
 
-## Automating without losing the personal tone
+## Can you automate without losing the personal tone?
 
 Sending these by hand works with 5 customers a day. With 30, it stops happening by week two. Useful automation keeps the three things that make it work: the customer's name, the prior question, and the filtering of negative responses.
 
@@ -6814,7 +6814,7 @@ Si la réponse est positive :
 
 C'est le modèle qui convertit le mieux (plus de 50 % dans beaucoup de commerces) : le client fidèle a déjà son opinion, il ne manquait que la demande.
 
-## Les 4 erreurs qui transforment votre message en spam
+## Quelles erreurs transforment votre message en spam ?
 
 1. **Message de masse identique pour tous.** Sans prénom, sans contexte. Perçu (et ignoré) comme du marketing.
 2. **Solliciter avant de demander.** Envoyer le lien à froid à un client qui a eu un problème est le moyen le plus rapide d'obtenir un avis 1 étoile.
@@ -6825,7 +6825,7 @@ C'est le modèle qui convertit le mieux (plus de 50 % dans beaucoup de commerces
 
 Oui, à deux conditions : disposer du numéro du client grâce à une relation commerciale réelle (RGPD, intérêt légitime) et ne pas conditionner l'avis à une récompense. Demander leur opinion à ses propres clients après un service est une pratique acceptée ; acheter ou inciter des avis ne l'est pas.
 
-## Automatiser sans perdre le ton personnel
+## Peut-on automatiser sans perdre le ton personnel ?
 
 Envoyer ces messages à la main fonctionne avec 5 clients par jour. Avec 30, on arrête dès la deuxième semaine. L'automatisation utile conserve les trois éléments qui font que ça marche : le prénom du client, la question préalable et le filtrage des réponses négatives.
 
@@ -6900,7 +6900,7 @@ Bei positiver Antwort:
 
 Dies ist die Vorlage mit der höchsten Konversion (über 50 % in vielen Betrieben): Der treue Kunde hat seine Meinung längst — es fehlte nur die Bitte.
 
-## Die 4 Fehler, die Ihre Nachricht zu Spam machen
+## Welche Fehler machen Ihre Nachricht zu Spam?
 
 1. **Identische Massennachricht für alle.** Ohne Name, ohne Kontext. Wird als Marketing gelesen (und ignoriert).
 2. **Bitten, bevor man fragt.** Den Link kalt an einen Kunden mit Problem zu senden, ist der schnellste Weg zur 1-Stern-Bewertung.
@@ -6911,7 +6911,7 @@ Dies ist die Vorlage mit der höchsten Konversion (über 50 % in vielen Betriebe
 
 Ja, unter zwei Bedingungen: Sie haben die Nummer aus einer echten Geschäftsbeziehung (DSGVO, berechtigtes Interesse) und knüpfen die Bewertung nicht an Belohnungen. Eigene Kunden nach einem Service um Feedback zu bitten, ist akzeptierte Praxis; Bewertungen zu kaufen oder zu incentivieren nicht.
 
-## Automatisieren, ohne den persönlichen Ton zu verlieren
+## Kann man automatisieren, ohne den persönlichen Ton zu verlieren?
 
 Das von Hand zu senden funktioniert bei 5 Kunden am Tag. Bei 30 hört es in der zweiten Woche auf. Nützliche Automatisierung bewahrt die drei Dinge, die es funktionieren lassen: den Namen des Kunden, die vorherige Frage und das Herausfiltern negativer Antworten.
 
@@ -6986,7 +6986,7 @@ Se la risposta è positiva:
 
 È il modello con la conversione più alta di tutti (oltre il 50% in molte attività): il cliente fedele ha già l'opinione formata, mancava solo la richiesta.
 
-## I 4 errori che trasformano il tuo messaggio in spam
+## Quali errori trasformano il tuo messaggio in spam?
 
 1. **Messaggio di massa identico per tutti.** Senza nome, senza contesto. Viene percepito (e ignorato) come marketing.
 2. **Richiedere prima di chiedere.** Mandare il link a freddo a un cliente che ha avuto un problema è il modo più rapido per guadagnarsi una recensione da 1 stella.
@@ -6997,7 +6997,7 @@ Se la risposta è positiva:
 
 Sì, a due condizioni: avere il numero del cliente grazie a una relazione commerciale reale (GDPR, interesse legittimo) e non condizionare la recensione a ricompense. Chiedere un'opinione ai propri clienti dopo un servizio è prassi accettata; comprare o incentivare recensioni no.
 
-## Automatizzare senza perdere il tono personale
+## Si può automatizzare senza perdere il tono personale?
 
 Inviare questi messaggi a mano funziona con 5 clienti al giorno. Con 30, si smette alla seconda settimana. L'automazione utile mantiene le tre cose che la fanno funzionare: il nome del cliente, la domanda preliminare e il filtraggio delle risposte negative.
 
@@ -7072,7 +7072,7 @@ Se a resposta for positiva:
 
 Este é o modelo com maior conversão de todos (acima de 50% em muitos negócios): o cliente fiel já tem a opinião formada, só faltava o pedido.
 
-## Os 4 erros que transformam a sua mensagem em spam
+## Que erros transformam a sua mensagem em spam?
 
 1. **Mensagem em massa idêntica para todos.** Sem nome, sem contexto. É percebida (e ignorada) como marketing.
 2. **Pedir antes de perguntar.** Enviar o link a frio a um cliente que teve um problema é a forma mais rápida de ganhar uma avaliação de 1 estrela.
@@ -7083,7 +7083,7 @@ Este é o modelo com maior conversão de todos (acima de 50% em muitos negócios
 
 Sim, com duas condições: ter o telefone do cliente por uma relação comercial real (RGPD, interesse legítimo) e não condicionar a avaliação a recompensas. Pedir opinião aos próprios clientes após um serviço é prática aceite; comprar ou incentivar avaliações não é.
 
-## Automatizar sem perder o tom pessoal
+## É possível automatizar sem perder o tom pessoal?
 
 Enviar isto à mão funciona com 5 clientes por dia. Com 30, deixa de se fazer na segunda semana. A automatização útil mantém as três coisas que a fazem funcionar: o nome do cliente, a pergunta prévia e a filtragem das respostas negativas.
 
@@ -7109,7 +7109,7 @@ Enviar isto à mão funciona com 5 clientes por dia. Com 30, deixa de se fazer n
         category: "Google Maps",
         content: `**Si has notado que tu número de reseñas baja, casi nunca es que el cliente la haya borrado: en la mayoría de casos el filtro antispam de Google la ha eliminado automáticamente, y suele ser por cómo se pidió, no por su contenido.** Aquí están las 7 causas más frecuentes y cómo evitar cada una.
 
-## Primero: cómo confirmar que te han desaparecido reseñas
+## ¿Cómo confirmar que te han desaparecido reseñas?
 
 1. Anota tu número total de reseñas hoy (aparece junto a tu nota en tu ficha).
 2. Compáralo cada semana. Una bajada sin que nadie haya borrado nada manualmente = filtro de Google.
@@ -7163,7 +7163,7 @@ Generalmente no. No hay proceso de apelación para reseñas filtradas (solo para
 
 La estrategia realista no es recuperar, sino generar un flujo constante que haga que el porcentaje filtrado (que siempre existirá: entre el 5% y el 20% es normal) sea irrelevante.
 
-## El patrón de petición que minimiza el filtrado
+## ¿Qué patrón de petición minimiza el filtrado?
 
 Combinar todo lo anterior da un método concreto:
 
@@ -7188,7 +7188,7 @@ Este es el flujo que automatiza ReseñasYa, y la razón de que las reseñas cons
         category: "Google Maps",
         content: `**If you've noticed your review count dropping, it's almost never the customer deleting it: in most cases Google's spam filter removed it automatically, and it's usually because of how it was requested, not its content.** Here are the 7 most frequent causes and how to avoid each one.
 
-## First: how to confirm reviews have disappeared
+## How do you confirm reviews have disappeared?
 
 1. Note your total review count today (it appears next to your rating on your profile).
 2. Compare it weekly. A drop without anyone manually deleting anything = Google's filter.
@@ -7242,7 +7242,7 @@ Generally not. There is no appeal process for filtered reviews (only for reviews
 
 The realistic strategy isn't recovery — it's generating a constant flow that makes the filtered percentage (which will always exist: 5-20% is normal) irrelevant.
 
-## The request pattern that minimizes filtering
+## Which request pattern minimizes filtering?
 
 Combining all of the above gives a concrete method:
 
@@ -7267,7 +7267,7 @@ This is the flow ReseñasYa automates, and the reason reviews obtained this way 
         category: "Google Maps",
         content: `**Si vous avez remarqué que votre nombre d'avis baisse, ce n'est presque jamais le client qui l'a supprimé : dans la plupart des cas, le filtre antispam de Google l'a éliminé automatiquement, et c'est généralement à cause de la façon dont il a été demandé, pas de son contenu.** Voici les 7 causes les plus fréquentes et comment éviter chacune.
 
-## D'abord : comment confirmer que des avis ont disparu
+## Comment confirmer que des avis ont disparu ?
 
 1. Notez votre nombre total d'avis aujourd'hui (il apparaît à côté de votre note sur votre fiche).
 2. Comparez-le chaque semaine. Une baisse sans suppression manuelle = filtre de Google.
@@ -7321,7 +7321,7 @@ Généralement non. Il n'existe pas de procédure d'appel pour les avis filtrés
 
 La stratégie réaliste n'est pas de récupérer, mais de générer un flux constant qui rende le pourcentage filtré (qui existera toujours : 5 à 20 % est normal) insignifiant.
 
-## Le schéma de demande qui minimise le filtrage
+## Quel schéma de demande minimise le filtrage ?
 
 En combinant tout ce qui précède, on obtient une méthode concrète :
 
@@ -7346,7 +7346,7 @@ C'est le flux qu'automatise ReseñasYa, et la raison pour laquelle les avis obte
         category: "Google Maps",
         content: `**Wenn Ihre Bewertungszahl sinkt, hat fast nie der Kunde gelöscht: In den meisten Fällen hat Googles Spamfilter die Bewertung automatisch entfernt — und meist wegen der Art der Anfrage, nicht wegen des Inhalts.** Hier sind die 7 häufigsten Ursachen und wie Sie jede vermeiden.
 
-## Zuerst: So bestätigen Sie, dass Bewertungen verschwunden sind
+## Wie bestätigen Sie, dass Bewertungen verschwunden sind?
 
 1. Notieren Sie heute Ihre Gesamtzahl an Bewertungen (steht neben Ihrer Note im Profil).
 2. Vergleichen Sie wöchentlich. Ein Rückgang ohne manuelle Löschung = Googles Filter.
@@ -7400,7 +7400,7 @@ In der Regel nicht. Es gibt kein Einspruchsverfahren für gefilterte Bewertungen
 
 Die realistische Strategie ist nicht Wiederherstellung, sondern ein konstanter Fluss, der den gefilterten Anteil (den es immer geben wird: 5-20 % sind normal) irrelevant macht.
 
-## Das Anfragemuster, das das Filtern minimiert
+## Welches Anfragemuster minimiert das Filtern?
 
 Alles oben Genannte kombiniert ergibt eine konkrete Methode:
 
@@ -7425,7 +7425,7 @@ Genau diesen Ablauf automatisiert ReseñasYa — und deshalb haben so gewonnene 
         category: "Google Maps",
         content: `**Se hai notato che il numero delle tue recensioni cala, quasi mai è il cliente ad averla cancellata: nella maggior parte dei casi il filtro antispam di Google l'ha eliminata automaticamente, e di solito per come è stata richiesta, non per il contenuto.** Ecco le 7 cause più frequenti e come evitarle.
 
-## Prima di tutto: come confermare che sono sparite recensioni
+## Come confermare che sono sparite recensioni?
 
 1. Annota oggi il tuo numero totale di recensioni (appare accanto al voto sulla tua scheda).
 2. Confrontalo ogni settimana. Un calo senza cancellazioni manuali = filtro di Google.
@@ -7479,7 +7479,7 @@ In genere no. Non esiste una procedura di appello per le recensioni filtrate (so
 
 La strategia realistica non è recuperare, ma generare un flusso costante che renda irrilevante la percentuale filtrata (che esisterà sempre: il 5-20% è normale).
 
-## Il pattern di richiesta che minimizza il filtraggio
+## Quale pattern di richiesta minimizza il filtraggio?
 
 Combinando tutto quanto sopra si ottiene un metodo concreto:
 
@@ -7504,7 +7504,7 @@ Combinando tutto quanto sopra si ottiene un metodo concreto:
         category: "Google Maps",
         content: `**Se notou que o seu número de avaliações desce, quase nunca foi o cliente que a apagou: na maioria dos casos o filtro antispam do Google eliminou-a automaticamente, e normalmente pela forma como foi pedida, não pelo conteúdo.** Aqui estão as 7 causas mais frequentes e como evitar cada uma.
 
-## Primeiro: como confirmar que desapareceram avaliações
+## Como confirmar que desapareceram avaliações?
 
 1. Anote hoje o seu número total de avaliações (aparece junto à nota no seu perfil).
 2. Compare-o todas as semanas. Uma descida sem ninguém ter apagado nada manualmente = filtro do Google.
@@ -7558,7 +7558,7 @@ Geralmente não. Não há processo de recurso para avaliações filtradas (apena
 
 A estratégia realista não é recuperar, mas gerar um fluxo constante que torne irrelevante a percentagem filtrada (que existirá sempre: entre 5% e 20% é normal).
 
-## O padrão de pedido que minimiza a filtragem
+## Que padrão de pedido minimiza a filtragem?
 
 Combinando tudo o que está acima obtém-se um método concreto:
 

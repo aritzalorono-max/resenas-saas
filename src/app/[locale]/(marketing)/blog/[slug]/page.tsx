@@ -83,6 +83,32 @@ function formatDate(dateStr: string, locale: string) {
   });
 }
 
+/**
+ * Extrae pares pregunta/respuesta de los encabezados H2 en forma de pregunta.
+ * La respuesta es el texto que sigue al encabezado hasta el siguiente encabezado.
+ */
+function extractFaq(content: string): Array<{ question: string; answer: string }> {
+  const lines = content.split("\n");
+  const faq: Array<{ question: string; answer: string }> = [];
+  let current: { question: string; answer: string[] } | null = null;
+
+  for (const line of lines) {
+    if (line.startsWith("## ")) {
+      if (current) faq.push({ question: current.question, answer: current.answer.join(" ") });
+      const heading = line.slice(3).trim();
+      current = /[?？]$/.test(heading) ? { question: heading, answer: [] } : null;
+    } else if (current && line.trim() !== "" && !line.startsWith("|")) {
+      // Texto plano sin marcas de markdown para el schema
+      current.answer.push(
+        line.replace(/^[->]\s*/, "").replace(/\*\*(.+?)\*\*/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").trim()
+      );
+    }
+  }
+  if (current) faq.push({ question: current.question, answer: current.answer.join(" ") });
+
+  return faq.filter((f) => f.answer.length > 0);
+}
+
 function renderContent(content: string) {
   const lines = content.split("\n");
   const elements: React.ReactNode[] = [];
@@ -167,19 +193,55 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const allPosts = getBlogPosts(locale);
   const otherPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
+  const prefix = locale === "es" ? "" : `/${locale}`;
+  const postUrl = `${APP_URL}${prefix}/blog/${post.slug}`;
+
   const articleSchema = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    author: { "@type": "Organization", name: "ResenasYa" },
-    publisher: { "@type": "Organization", name: "ResenasYa", url: "https://resenasya.com" },
+    dateModified: post.date,
+    inLanguage: locale,
+    url: postUrl,
+    mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
+    articleSection: post.category,
+    wordCount: post.content.split(/\s+/).length,
+    author: { "@type": "Organization", name: "ResenasYa", url: APP_URL },
+    publisher: { "@type": "Organization", name: "ResenasYa", url: APP_URL },
   };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "ResenasYa", item: `${APP_URL}${prefix || "/"}` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${APP_URL}${prefix}/blog` },
+      { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
+    ],
+  };
+
+  const faqItems = extractFaq(post.content);
+  const faqSchema = faqItems.length >= 2
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((f) => ({
+          "@type": "Question",
+          name: f.question,
+          acceptedAnswer: { "@type": "Answer", text: f.answer },
+        })),
+      }
+    : null;
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      {faqSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
 
       <div className="py-10 px-6">
         <div className="max-w-3xl mx-auto">
