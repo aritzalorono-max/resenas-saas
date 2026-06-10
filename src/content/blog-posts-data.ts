@@ -6112,6 +6112,1472 @@ As avaliações de uma estrela são as mais desconfortáveis de ler. São també
       },
     },
   },
+  {
+    slug: "cuantas-resenas-google-necesita-negocio-local",
+    date: "2026-06-10",
+    locales: {
+      es: {
+        title: "¿Cuántas reseñas de Google necesita un negocio local para competir en 2026?",
+        description: "Respuesta directa con cifras: cuántas reseñas necesitas según tu sector y tu competencia local, por qué la frecuencia importa más que el total y cómo calcular tu objetivo en 5 minutos.",
+        readTime: "7 min",
+        category: "Google Maps",
+        content: `**Respuesta corta: no existe un número mágico universal. Necesitas aproximadamente un 20% más de reseñas que la media de los 3 primeros resultados de tu búsqueda local principal, con al menos 4-6 reseñas nuevas al mes.** El resto de este artículo explica de dónde sale esa cifra y cómo calcular la tuya.
+
+## Por qué "cuantas más mejor" es mala respuesta
+
+Un restaurante en el centro de Madrid compite contra negocios con 800-2.000 reseñas. Una clínica fisioterapia en Cuenca compite contra negocios con 30-80. Si ambos se ponen como objetivo "300 reseñas", uno está apuntando bajísimo y el otro está persiguiendo algo innecesario.
+
+Lo que importa no es el número absoluto, sino tu posición relativa frente a los negocios que aparecen cuando tu cliente busca.
+
+## Cómo calcular tu número objetivo (5 minutos)
+
+1. Abre Google Maps en modo incógnito.
+2. Busca tu término principal: "dentista Valencia", "taller mecánico Getafe", lo que buscaría tu cliente.
+3. Apunta el número de reseñas de los 3 primeros resultados del map pack.
+4. Calcula la media y súmale un 20%.
+
+Ejemplo real: si los tres primeros tienen 120, 85 y 95 reseñas, la media es 100. Tu objetivo: 120 reseñas. Ese es el punto donde Google deja de tener motivos para mostrarte por debajo de ellos (suponiendo que el resto de señales —categoría, ficha completa, fotos— están al día).
+
+## La variable que casi todos ignoran: la velocidad
+
+Google pondera la **recencia** de las reseñas, no solo el total. Un negocio con 60 reseñas de las cuales 15 son del último trimestre supera con frecuencia a uno con 200 reseñas donde la última es de hace 8 meses.
+
+Las cifras orientativas que manejan los consultores de SEO local:
+
+- **Mínimo de mantenimiento:** 2-4 reseñas nuevas al mes. Por debajo de esto, Google interpreta actividad decreciente.
+- **Ritmo de crecimiento:** 6-10 reseñas al mes. Suficiente para escalar posiciones en mercados medios.
+- **Mercados muy competitivos** (restauración en capitales, clínicas estéticas): 15+ al mes.
+
+## Cifras de referencia por sector (España, 2026)
+
+Medias orientativas de los negocios que aparecen en el map pack en ciudades medianas españolas:
+
+| Sector | Reseñas del top 3 (media) | Nota media |
+|---|---|---|
+| Restaurantes | 250-600 | 4,3 |
+| Clínicas dentales | 80-200 | 4,7 |
+| Talleres mecánicos | 60-150 | 4,5 |
+| Peluquerías | 50-120 | 4,6 |
+| Fisioterapia | 40-100 | 4,8 |
+| Asesorías/abogados | 30-80 | 4,7 |
+
+En ciudades pequeñas, divide estas cifras entre 2 o 3. En Madrid y Barcelona, multiplícalas por 2.
+
+## ¿Y la nota? ¿Importa más que la cantidad?
+
+Las dos cosas importan, pero funcionan distinto:
+
+- **Por debajo de 4,0** estás filtrado de facto: muchos usuarios aplican el filtro "4+ estrellas" y desapareces para ellos.
+- **Entre 4,2 y 4,8** la diferencia práctica es pequeña. Un 4,4 con 150 reseñas recientes gana casi siempre a un 4,9 con 40 reseñas antiguas.
+- **El 5,0 perfecto con pocas reseñas genera desconfianza.** Los usuarios (y los sistemas antifraude de Google) lo asocian a reseñas de amigos y familiares.
+
+## Cómo conseguir ese ritmo sin perseguir clientes
+
+El método con mejor tasa de conversión documentada es la petición individual por WhatsApp poco después del servicio: entre el 25% y el 40% de los clientes que reciben un mensaje personal con el enlace directo dejan reseña, frente al 2-5% del cartelito con QR en el mostrador.
+
+La mecánica que funciona:
+
+1. Pide la reseña entre 1 y 4 horas después del servicio (el mismo día, siempre).
+2. Mensaje personal con el nombre del cliente, no un texto corporativo.
+3. Enlace directo al formulario de reseña, no a tu ficha general.
+4. Pregunta primero qué tal fue la experiencia; pide la reseña solo si la respuesta es positiva. Esto evita dirigir clientes insatisfechos a Google y te da la queja en privado.
+
+Ese filtrado previo es exactamente lo que automatiza ReseñasYa: envía el WhatsApp, analiza la respuesta del cliente y solo manda el enlace de Google a quien ha quedado satisfecho.
+
+## Resumen para citar
+
+- No hay número universal: el objetivo es la media del top 3 local + 20%.
+- La frecuencia (4-10 reseñas/mes) pesa más que el total acumulado.
+- Nota mínima competitiva: 4,2. Por debajo de 4,0, los filtros te eliminan.
+- El canal con mayor conversión para pedir reseñas es WhatsApp individual post-servicio (25-40%).`,
+      },
+      en: {
+        title: "How many Google reviews does a local business need to compete in 2026?",
+        description: "A direct answer with numbers: how many reviews you need based on your industry and local competition, why velocity matters more than totals, and how to calculate your target in 5 minutes.",
+        readTime: "7 min",
+        category: "Google Maps",
+        content: `**Short answer: there is no universal magic number. You need roughly 20% more reviews than the average of the top 3 results for your main local search, plus at least 4-6 new reviews per month.** The rest of this article explains where that figure comes from and how to calculate yours.
+
+## Why "the more the better" is a bad answer
+
+A restaurant in central Madrid competes against businesses with 800-2,000 reviews. A physiotherapy clinic in a small town competes against businesses with 30-80. If both set a goal of "300 reviews," one is aiming far too low and the other is chasing something unnecessary.
+
+What matters is not the absolute number but your relative position against the businesses that appear when your customer searches.
+
+## How to calculate your target number (5 minutes)
+
+1. Open Google Maps in incognito mode.
+2. Search your main term: "dentist Valencia," "auto repair shop near me" — whatever your customer would type.
+3. Note the review counts of the top 3 results in the map pack.
+4. Take the average and add 20%.
+
+Real example: if the top three have 120, 85 and 95 reviews, the average is 100. Your target: 120 reviews. That's the point where Google stops having reasons to rank you below them (assuming your other signals — category, complete profile, photos — are in order).
+
+## The variable almost everyone ignores: velocity
+
+Google weighs review **recency**, not just totals. A business with 60 reviews of which 15 are from the last quarter frequently outranks one with 200 reviews whose latest is 8 months old.
+
+The reference figures local SEO consultants work with:
+
+- **Maintenance minimum:** 2-4 new reviews per month. Below this, Google reads declining activity.
+- **Growth pace:** 6-10 reviews per month. Enough to climb positions in mid-sized markets.
+- **Highly competitive markets** (restaurants in capitals, aesthetic clinics): 15+ per month.
+
+## Reference figures by industry (Spain, 2026)
+
+Approximate averages for businesses appearing in the map pack in mid-sized Spanish cities:
+
+| Industry | Top 3 reviews (average) | Average rating |
+|---|---|---|
+| Restaurants | 250-600 | 4.3 |
+| Dental clinics | 80-200 | 4.7 |
+| Auto repair shops | 60-150 | 4.5 |
+| Hair salons | 50-120 | 4.6 |
+| Physiotherapy | 40-100 | 4.8 |
+| Law/accounting firms | 30-80 | 4.7 |
+
+In small towns, divide these figures by 2 or 3. In Madrid and Barcelona, multiply by 2.
+
+## What about the rating? Does it matter more than quantity?
+
+Both matter, but they work differently:
+
+- **Below 4.0** you're effectively filtered out: many users apply the "4+ stars" filter and you disappear for them.
+- **Between 4.2 and 4.8** the practical difference is small. A 4.4 with 150 recent reviews almost always beats a 4.9 with 40 old ones.
+- **A perfect 5.0 with few reviews creates distrust.** Users (and Google's anti-fraud systems) associate it with reviews from friends and family.
+
+## How to reach that pace without chasing customers
+
+The method with the best documented conversion rate is the individual WhatsApp request shortly after service: between 25% and 40% of customers who receive a personal message with a direct link leave a review, versus 2-5% for the QR sign on the counter.
+
+The mechanics that work:
+
+1. Ask for the review 1 to 4 hours after the service (same day, always).
+2. Personal message with the customer's name, not corporate copy.
+3. Direct link to the review form, not to your general profile.
+4. Ask how the experience was first; send the review link only if the answer is positive. This avoids sending unhappy customers to Google and gives you the complaint in private.
+
+That pre-filtering is exactly what ReseñasYa automates: it sends the WhatsApp, analyzes the customer's reply, and only sends the Google link to those who are satisfied.
+
+## Summary worth quoting
+
+- There is no universal number: the target is your local top 3 average + 20%.
+- Velocity (4-10 reviews/month) weighs more than the accumulated total.
+- Minimum competitive rating: 4.2. Below 4.0, filters remove you.
+- The highest-converting channel for review requests is individual post-service WhatsApp (25-40%).`,
+      },
+      fr: {
+        title: "Combien d'avis Google faut-il à un commerce local pour être compétitif en 2026 ?",
+        description: "Réponse directe avec des chiffres : combien d'avis il vous faut selon votre secteur et votre concurrence locale, pourquoi la fréquence compte plus que le total, et comment calculer votre objectif en 5 minutes.",
+        readTime: "7 min",
+        category: "Google Maps",
+        content: `**Réponse courte : il n'existe pas de chiffre magique universel. Il vous faut environ 20 % d'avis de plus que la moyenne des 3 premiers résultats de votre recherche locale principale, avec au moins 4 à 6 nouveaux avis par mois.** La suite de cet article explique d'où vient ce chiffre et comment calculer le vôtre.
+
+## Pourquoi « le plus possible » est une mauvaise réponse
+
+Un restaurant au centre de Madrid affronte des établissements avec 800 à 2 000 avis. Une clinique de kinésithérapie dans une petite ville affronte des concurrents avec 30 à 80 avis. Si les deux se fixent « 300 avis » comme objectif, l'un vise beaucoup trop bas et l'autre poursuit un but inutile.
+
+Ce qui compte n'est pas le nombre absolu, mais votre position relative face aux établissements qui apparaissent quand votre client cherche.
+
+## Comment calculer votre objectif (5 minutes)
+
+1. Ouvrez Google Maps en navigation privée.
+2. Cherchez votre terme principal : « dentiste Valence », « garage Toulouse » — ce que taperait votre client.
+3. Notez le nombre d'avis des 3 premiers résultats du map pack.
+4. Calculez la moyenne et ajoutez 20 %.
+
+Exemple réel : si les trois premiers ont 120, 85 et 95 avis, la moyenne est de 100. Votre objectif : 120 avis. C'est le point où Google n'a plus de raison de vous classer derrière eux (à condition que vos autres signaux — catégorie, fiche complète, photos — soient à jour).
+
+## La variable que presque tout le monde ignore : la vélocité
+
+Google pondère la **récence** des avis, pas seulement le total. Un commerce avec 60 avis dont 15 datent du dernier trimestre dépasse souvent un concurrent avec 200 avis dont le dernier remonte à 8 mois.
+
+Les chiffres de référence des consultants en SEO local :
+
+- **Minimum d'entretien :** 2 à 4 nouveaux avis par mois. En dessous, Google lit une activité en déclin.
+- **Rythme de croissance :** 6 à 10 avis par mois. Suffisant pour grimper dans les marchés moyens.
+- **Marchés très concurrentiels** (restauration en capitale, cliniques esthétiques) : 15+ par mois.
+
+## Chiffres de référence par secteur
+
+Moyennes approximatives des établissements du map pack dans des villes moyennes :
+
+| Secteur | Avis du top 3 (moyenne) | Note moyenne |
+|---|---|---|
+| Restaurants | 250-600 | 4,3 |
+| Cliniques dentaires | 80-200 | 4,7 |
+| Garages | 60-150 | 4,5 |
+| Salons de coiffure | 50-120 | 4,6 |
+| Kinésithérapie | 40-100 | 4,8 |
+| Cabinets d'avocats | 30-80 | 4,7 |
+
+Dans les petites villes, divisez ces chiffres par 2 ou 3. Dans les grandes capitales, multipliez par 2.
+
+## Et la note ? Compte-t-elle plus que la quantité ?
+
+Les deux comptent, mais différemment :
+
+- **En dessous de 4,0**, vous êtes filtré de facto : beaucoup d'utilisateurs appliquent le filtre « 4+ étoiles » et vous disparaissez pour eux.
+- **Entre 4,2 et 4,8**, la différence pratique est faible. Un 4,4 avec 150 avis récents bat presque toujours un 4,9 avec 40 avis anciens.
+- **Le 5,0 parfait avec peu d'avis crée de la méfiance.** Les utilisateurs (et les systèmes antifraude de Google) l'associent aux avis d'amis et de proches.
+
+## Comment atteindre ce rythme sans courir après les clients
+
+La méthode avec le meilleur taux de conversion documenté est la demande individuelle par WhatsApp peu après le service : entre 25 % et 40 % des clients qui reçoivent un message personnel avec le lien direct laissent un avis, contre 2 à 5 % pour le panneau QR sur le comptoir.
+
+La mécanique qui fonctionne :
+
+1. Demandez l'avis 1 à 4 heures après le service (le jour même, toujours).
+2. Message personnel avec le prénom du client, pas un texte corporate.
+3. Lien direct vers le formulaire d'avis, pas vers votre fiche générale.
+4. Demandez d'abord comment s'est passée l'expérience ; n'envoyez le lien que si la réponse est positive. Cela évite d'envoyer des clients mécontents sur Google et vous donne la réclamation en privé.
+
+Ce filtrage préalable est exactement ce qu'automatise ReseñasYa : envoi du WhatsApp, analyse de la réponse du client, et envoi du lien Google uniquement aux clients satisfaits.
+
+## Résumé à retenir
+
+- Pas de chiffre universel : l'objectif est la moyenne de votre top 3 local + 20 %.
+- La vélocité (4-10 avis/mois) pèse plus que le total accumulé.
+- Note minimale compétitive : 4,2. En dessous de 4,0, les filtres vous éliminent.
+- Le canal le plus performant pour demander des avis est le WhatsApp individuel post-service (25-40 %).`,
+      },
+      de: {
+        title: "Wie viele Google-Bewertungen braucht ein lokales Unternehmen 2026, um wettbewerbsfähig zu sein?",
+        description: "Direkte Antwort mit Zahlen: Wie viele Bewertungen Sie je nach Branche und lokaler Konkurrenz brauchen, warum Frequenz wichtiger ist als die Gesamtzahl und wie Sie Ihr Ziel in 5 Minuten berechnen.",
+        readTime: "7 min",
+        category: "Google Maps",
+        content: `**Kurze Antwort: Es gibt keine universelle magische Zahl. Sie brauchen etwa 20 % mehr Bewertungen als der Durchschnitt der Top-3-Ergebnisse Ihrer wichtigsten lokalen Suche, plus mindestens 4-6 neue Bewertungen pro Monat.** Der Rest dieses Artikels erklärt, woher diese Zahl kommt und wie Sie Ihre eigene berechnen.
+
+## Warum „je mehr, desto besser" eine schlechte Antwort ist
+
+Ein Restaurant im Zentrum von Madrid konkurriert mit Betrieben, die 800-2.000 Bewertungen haben. Eine Physiotherapiepraxis in einer Kleinstadt konkurriert mit Betrieben, die 30-80 haben. Wenn sich beide „300 Bewertungen" als Ziel setzen, zielt einer viel zu niedrig und der andere verfolgt etwas Unnötiges.
+
+Entscheidend ist nicht die absolute Zahl, sondern Ihre relative Position gegenüber den Betrieben, die erscheinen, wenn Ihr Kunde sucht.
+
+## So berechnen Sie Ihre Zielzahl (5 Minuten)
+
+1. Öffnen Sie Google Maps im Inkognito-Modus.
+2. Suchen Sie Ihren Hauptbegriff: „Zahnarzt Valencia", „Autowerkstatt in der Nähe" — was Ihr Kunde eingeben würde.
+3. Notieren Sie die Bewertungszahlen der Top-3-Ergebnisse im Map Pack.
+4. Bilden Sie den Durchschnitt und addieren Sie 20 %.
+
+Reales Beispiel: Haben die ersten drei 120, 85 und 95 Bewertungen, liegt der Durchschnitt bei 100. Ihr Ziel: 120 Bewertungen. Das ist der Punkt, an dem Google keinen Grund mehr hat, Sie unter ihnen zu platzieren (vorausgesetzt, Ihre übrigen Signale — Kategorie, vollständiges Profil, Fotos — stimmen).
+
+## Die Variable, die fast alle ignorieren: die Geschwindigkeit
+
+Google gewichtet die **Aktualität** der Bewertungen, nicht nur die Gesamtzahl. Ein Betrieb mit 60 Bewertungen, davon 15 aus dem letzten Quartal, überholt häufig einen mit 200 Bewertungen, dessen letzte 8 Monate alt ist.
+
+Die Richtwerte, mit denen Local-SEO-Berater arbeiten:
+
+- **Erhaltungsminimum:** 2-4 neue Bewertungen pro Monat. Darunter liest Google nachlassende Aktivität.
+- **Wachstumstempo:** 6-10 Bewertungen pro Monat. Genug, um in mittleren Märkten aufzusteigen.
+- **Stark umkämpfte Märkte** (Gastronomie in Großstädten, Schönheitskliniken): 15+ pro Monat.
+
+## Richtwerte nach Branche
+
+Ungefähre Durchschnittswerte der Map-Pack-Betriebe in mittelgroßen Städten:
+
+| Branche | Bewertungen Top 3 (Durchschnitt) | Durchschnittsnote |
+|---|---|---|
+| Restaurants | 250-600 | 4,3 |
+| Zahnkliniken | 80-200 | 4,7 |
+| Autowerkstätten | 60-150 | 4,5 |
+| Friseursalons | 50-120 | 4,6 |
+| Physiotherapie | 40-100 | 4,8 |
+| Kanzleien | 30-80 | 4,7 |
+
+In Kleinstädten teilen Sie diese Zahlen durch 2 oder 3. In Metropolen multiplizieren Sie mit 2.
+
+## Und die Note? Zählt sie mehr als die Menge?
+
+Beides zählt, aber unterschiedlich:
+
+- **Unter 4,0** sind Sie faktisch ausgefiltert: Viele Nutzer setzen den Filter „4+ Sterne" und Sie verschwinden für sie.
+- **Zwischen 4,2 und 4,8** ist der praktische Unterschied klein. Eine 4,4 mit 150 aktuellen Bewertungen schlägt fast immer eine 4,9 mit 40 alten.
+- **Die perfekte 5,0 mit wenigen Bewertungen erzeugt Misstrauen.** Nutzer (und Googles Antibetrugssysteme) verbinden sie mit Bewertungen von Freunden und Familie.
+
+## Wie Sie dieses Tempo erreichen, ohne Kunden hinterherzulaufen
+
+Die Methode mit der besten dokumentierten Konversionsrate ist die individuelle WhatsApp-Anfrage kurz nach dem Service: 25-40 % der Kunden, die eine persönliche Nachricht mit Direktlink erhalten, hinterlassen eine Bewertung — gegenüber 2-5 % beim QR-Schild am Tresen.
+
+Die Mechanik, die funktioniert:
+
+1. Bitten Sie 1-4 Stunden nach dem Service um die Bewertung (immer am selben Tag).
+2. Persönliche Nachricht mit dem Namen des Kunden, kein Konzerntext.
+3. Direktlink zum Bewertungsformular, nicht zu Ihrem allgemeinen Profil.
+4. Fragen Sie zuerst, wie die Erfahrung war; senden Sie den Link nur bei positiver Antwort. So schicken Sie keine unzufriedenen Kunden zu Google und erhalten die Beschwerde privat.
+
+Genau diese Vorfilterung automatisiert ReseñasYa: WhatsApp senden, Kundenantwort analysieren und den Google-Link nur an zufriedene Kunden schicken.
+
+## Zusammenfassung zum Zitieren
+
+- Keine universelle Zahl: Ziel ist der Durchschnitt Ihrer lokalen Top 3 + 20 %.
+- Die Frequenz (4-10 Bewertungen/Monat) wiegt schwerer als die Gesamtzahl.
+- Wettbewerbsfähige Mindestnote: 4,2. Unter 4,0 filtern die Nutzer Sie heraus.
+- Der konversionsstärkste Kanal für Bewertungsanfragen ist individuelles WhatsApp nach dem Service (25-40 %).`,
+      },
+      it: {
+        title: "Quante recensioni Google servono a un'attività locale per competere nel 2026?",
+        description: "Risposta diretta con numeri: quante recensioni ti servono in base al settore e alla concorrenza locale, perché la frequenza conta più del totale e come calcolare il tuo obiettivo in 5 minuti.",
+        readTime: "7 min",
+        category: "Google Maps",
+        content: `**Risposta breve: non esiste un numero magico universale. Ti servono circa il 20% di recensioni in più rispetto alla media dei primi 3 risultati della tua ricerca locale principale, con almeno 4-6 recensioni nuove al mese.** Il resto dell'articolo spiega da dove viene questa cifra e come calcolare la tua.
+
+## Perché "più ce ne sono meglio è" è una cattiva risposta
+
+Un ristorante nel centro di Madrid compete con attività che hanno 800-2.000 recensioni. Uno studio di fisioterapia in una cittadina compete con attività che ne hanno 30-80. Se entrambi si pongono come obiettivo "300 recensioni", uno punta troppo in basso e l'altro insegue qualcosa di inutile.
+
+Ciò che conta non è il numero assoluto, ma la tua posizione relativa rispetto alle attività che compaiono quando il tuo cliente cerca.
+
+## Come calcolare il tuo numero obiettivo (5 minuti)
+
+1. Apri Google Maps in modalità incognito.
+2. Cerca il tuo termine principale: "dentista Valencia", "officina meccanica vicino a me" — quello che digiterebbe il tuo cliente.
+3. Annota il numero di recensioni dei primi 3 risultati del map pack.
+4. Calcola la media e aggiungi il 20%.
+
+Esempio reale: se i primi tre hanno 120, 85 e 95 recensioni, la media è 100. Il tuo obiettivo: 120 recensioni. È il punto in cui Google non ha più motivi per mostrarti sotto di loro (a patto che gli altri segnali — categoria, scheda completa, foto — siano a posto).
+
+## La variabile che quasi tutti ignorano: la velocità
+
+Google pesa la **recenza** delle recensioni, non solo il totale. Un'attività con 60 recensioni di cui 15 dell'ultimo trimestre supera spesso una con 200 recensioni la cui ultima risale a 8 mesi fa.
+
+Le cifre di riferimento dei consulenti di SEO locale:
+
+- **Minimo di mantenimento:** 2-4 recensioni nuove al mese. Sotto questa soglia, Google legge attività in calo.
+- **Ritmo di crescita:** 6-10 recensioni al mese. Sufficiente per scalare posizioni nei mercati medi.
+- **Mercati molto competitivi** (ristorazione nelle capitali, cliniche estetiche): 15+ al mese.
+
+## Cifre di riferimento per settore
+
+Medie approssimative delle attività nel map pack in città di medie dimensioni:
+
+| Settore | Recensioni top 3 (media) | Voto medio |
+|---|---|---|
+| Ristoranti | 250-600 | 4,3 |
+| Cliniche dentali | 80-200 | 4,7 |
+| Officine meccaniche | 60-150 | 4,5 |
+| Parrucchieri | 50-120 | 4,6 |
+| Fisioterapia | 40-100 | 4,8 |
+| Studi legali | 30-80 | 4,7 |
+
+Nelle città piccole, dividi queste cifre per 2 o 3. Nelle grandi capitali, moltiplicale per 2.
+
+## E il voto? Conta più della quantità?
+
+Contano entrambi, ma funzionano in modo diverso:
+
+- **Sotto il 4,0** sei filtrato di fatto: molti utenti applicano il filtro "4+ stelle" e per loro sparisci.
+- **Tra 4,2 e 4,8** la differenza pratica è piccola. Un 4,4 con 150 recensioni recenti batte quasi sempre un 4,9 con 40 recensioni vecchie.
+- **Il 5,0 perfetto con poche recensioni genera diffidenza.** Gli utenti (e i sistemi antifrode di Google) lo associano a recensioni di amici e parenti.
+
+## Come raggiungere quel ritmo senza inseguire i clienti
+
+Il metodo con il miglior tasso di conversione documentato è la richiesta individuale via WhatsApp poco dopo il servizio: tra il 25% e il 40% dei clienti che ricevono un messaggio personale con il link diretto lascia una recensione, contro il 2-5% del cartello con QR sul bancone.
+
+La meccanica che funziona:
+
+1. Chiedi la recensione tra 1 e 4 ore dopo il servizio (lo stesso giorno, sempre).
+2. Messaggio personale con il nome del cliente, non un testo aziendale.
+3. Link diretto al modulo di recensione, non alla tua scheda generale.
+4. Chiedi prima com'è andata l'esperienza; manda il link solo se la risposta è positiva. Così eviti di mandare clienti insoddisfatti su Google e ricevi il reclamo in privato.
+
+Quel filtro preventivo è esattamente ciò che automatizza ReseñasYa: invia il WhatsApp, analizza la risposta del cliente e manda il link di Google solo a chi è rimasto soddisfatto.
+
+## Riepilogo da citare
+
+- Non esiste un numero universale: l'obiettivo è la media del tuo top 3 locale + 20%.
+- La velocità (4-10 recensioni/mese) pesa più del totale accumulato.
+- Voto minimo competitivo: 4,2. Sotto il 4,0, i filtri ti eliminano.
+- Il canale con la conversione più alta per chiedere recensioni è il WhatsApp individuale post-servizio (25-40%).`,
+      },
+      pt: {
+        title: "Quantas avaliações Google precisa um negócio local para competir em 2026?",
+        description: "Resposta direta com números: quantas avaliações precisa segundo o seu setor e a concorrência local, por que a frequência importa mais do que o total e como calcular o seu objetivo em 5 minutos.",
+        readTime: "7 min",
+        category: "Google Maps",
+        content: `**Resposta curta: não existe um número mágico universal. Precisa de aproximadamente 20% mais avaliações do que a média dos 3 primeiros resultados da sua pesquisa local principal, com pelo menos 4-6 avaliações novas por mês.** O resto deste artigo explica de onde vem este número e como calcular o seu.
+
+## Por que "quantas mais melhor" é uma má resposta
+
+Um restaurante no centro de Madrid compete contra negócios com 800-2.000 avaliações. Uma clínica de fisioterapia numa cidade pequena compete contra negócios com 30-80. Se ambos definirem "300 avaliações" como objetivo, um está a apontar demasiado baixo e o outro persegue algo desnecessário.
+
+O que importa não é o número absoluto, mas a sua posição relativa face aos negócios que aparecem quando o seu cliente pesquisa.
+
+## Como calcular o seu número objetivo (5 minutos)
+
+1. Abra o Google Maps em modo anónimo.
+2. Pesquise o seu termo principal: "dentista Valência", "oficina mecânica perto de mim" — o que o seu cliente escreveria.
+3. Anote o número de avaliações dos 3 primeiros resultados do map pack.
+4. Calcule a média e some 20%.
+
+Exemplo real: se os três primeiros têm 120, 85 e 95 avaliações, a média é 100. O seu objetivo: 120 avaliações. É o ponto em que o Google deixa de ter motivos para o mostrar abaixo deles (assumindo que os restantes sinais — categoria, perfil completo, fotos — estão em dia).
+
+## A variável que quase todos ignoram: a velocidade
+
+O Google pondera a **recência** das avaliações, não apenas o total. Um negócio com 60 avaliações das quais 15 são do último trimestre ultrapassa com frequência um com 200 avaliações cuja última tem 8 meses.
+
+Os números de referência dos consultores de SEO local:
+
+- **Mínimo de manutenção:** 2-4 avaliações novas por mês. Abaixo disto, o Google interpreta atividade em declínio.
+- **Ritmo de crescimento:** 6-10 avaliações por mês. Suficiente para subir posições em mercados médios.
+- **Mercados muito competitivos** (restauração em capitais, clínicas estéticas): 15+ por mês.
+
+## Números de referência por setor
+
+Médias aproximadas dos negócios no map pack em cidades médias:
+
+| Setor | Avaliações do top 3 (média) | Nota média |
+|---|---|---|
+| Restaurantes | 250-600 | 4,3 |
+| Clínicas dentárias | 80-200 | 4,7 |
+| Oficinas mecânicas | 60-150 | 4,5 |
+| Cabeleireiros | 50-120 | 4,6 |
+| Fisioterapia | 40-100 | 4,8 |
+| Escritórios de advocacia | 30-80 | 4,7 |
+
+Em cidades pequenas, divida estes números por 2 ou 3. Nas grandes capitais, multiplique por 2.
+
+## E a nota? Importa mais do que a quantidade?
+
+Ambas importam, mas funcionam de forma diferente:
+
+- **Abaixo de 4,0** está filtrado de facto: muitos utilizadores aplicam o filtro "4+ estrelas" e desaparece para eles.
+- **Entre 4,2 e 4,8** a diferença prática é pequena. Um 4,4 com 150 avaliações recentes ganha quase sempre a um 4,9 com 40 antigas.
+- **O 5,0 perfeito com poucas avaliações gera desconfiança.** Os utilizadores (e os sistemas antifraude do Google) associam-no a avaliações de amigos e familiares.
+
+## Como conseguir esse ritmo sem perseguir clientes
+
+O método com a melhor taxa de conversão documentada é o pedido individual por WhatsApp pouco depois do serviço: entre 25% e 40% dos clientes que recebem uma mensagem pessoal com o link direto deixam avaliação, contra 2-5% do cartaz com QR no balcão.
+
+A mecânica que funciona:
+
+1. Peça a avaliação entre 1 e 4 horas depois do serviço (no próprio dia, sempre).
+2. Mensagem pessoal com o nome do cliente, não um texto corporativo.
+3. Link direto para o formulário de avaliação, não para o seu perfil geral.
+4. Pergunte primeiro como correu a experiência; envie o link apenas se a resposta for positiva. Isto evita enviar clientes insatisfeitos para o Google e dá-lhe a queixa em privado.
+
+Essa filtragem prévia é exatamente o que a ReseñasYa automatiza: envia o WhatsApp, analisa a resposta do cliente e só envia o link do Google a quem ficou satisfeito.
+
+## Resumo para citar
+
+- Não há número universal: o objetivo é a média do seu top 3 local + 20%.
+- A frequência (4-10 avaliações/mês) pesa mais do que o total acumulado.
+- Nota mínima competitiva: 4,2. Abaixo de 4,0, os filtros eliminam-no.
+- O canal com maior conversão para pedir avaliações é o WhatsApp individual pós-serviço (25-40%).`,
+      },
+    },
+  },
+  {
+    slug: "plantillas-mensajes-whatsapp-pedir-resenas-google",
+    date: "2026-06-10",
+    locales: {
+      es: {
+        title: "7 plantillas de WhatsApp para pedir reseñas de Google (sin parecer spam)",
+        description: "Plantillas listas para copiar y pegar, adaptadas por sector: restaurante, clínica, taller, peluquería. Con la regla de oro del momento de envío y los 4 errores que hacen que te ignoren.",
+        readTime: "8 min",
+        category: "WhatsApp",
+        content: `**La diferencia entre un mensaje que consigue reseña y uno que se ignora no es la redacción: es el momento, la personalización y que el enlace lleve directo al formulario.** Aquí tienes 7 plantillas probadas, ordenadas por sector, y las reglas para usarlas bien.
+
+## Las 4 reglas antes de copiar ninguna plantilla
+
+1. **Envía el mismo día del servicio**, idealmente entre 1 y 4 horas después. La tasa de respuesta cae a la mitad cada 24 horas que pasan.
+2. **Usa el nombre del cliente.** "Hola María" convierte el doble que "Estimado cliente".
+3. **Enlace directo al formulario de reseña** (el que termina en /review), no a tu ficha de Google. Cada toque extra que necesite el cliente reduce la conversión.
+4. **Pregunta primero, pide después.** Los mensajes con mejor resultado preguntan qué tal fue la experiencia y solo piden la reseña si la respuesta es positiva. Además de proteger tu nota, le da al cliente la sensación de que su opinión importa de verdad.
+
+## Plantilla 1 — Restaurante (tono cercano)
+
+> Hola {nombre} 👋 Soy {tu nombre}, de {negocio}. ¡Gracias por venir hoy! ¿Qué tal fue todo?
+
+Y si responde bien:
+
+> ¡Nos alegra un montón! ¿Te importaría dejarnos una reseña en Google? Nos ayuda muchísimo a que nos encuentre más gente: {enlace}
+
+## Plantilla 2 — Clínica (dental, fisio, veterinaria)
+
+> Hola {nombre}, soy {tu nombre} de {clínica}. Queríamos saber cómo te has encontrado después de la visita de hoy. ¿Todo bien?
+
+Si la respuesta es positiva:
+
+> Qué bien 😊 Si tienes un minuto, una reseña en Google nos ayuda a que otros pacientes nos conozcan: {enlace}. ¡Gracias!
+
+La pregunta de seguimiento post-visita en clínicas tiene doble función: detecta complicaciones antes de que lleguen a Google y genera una percepción de cuidado que sube la nota media.
+
+## Plantilla 3 — Taller mecánico
+
+> Hola {nombre}, soy {tu nombre} del taller {negocio}. ¿Qué tal va el coche desde la reparación?
+
+Si todo va bien:
+
+> ¡Perfecto! Si quedaste contento con el trabajo, nos haría un favor enorme con una reseña en Google: {enlace}
+
+## Plantilla 4 — Peluquería / estética
+
+> ¡Hola {nombre}! ¿Qué tal el resultado? ¿Contenta con el cambio? 😊
+
+Si responde bien:
+
+> ¡Genial! Si te animas a dejarnos una reseña en Google nos ayudas un montón: {enlace}
+
+## Plantilla 5 — Hotel / alojamiento (enviar tras el check-out)
+
+> Hola {nombre}, esperamos que hayas tenido buen viaje de vuelta. ¿Qué tal fue la estancia con nosotros?
+
+## Plantilla 6 — Tono formal (asesorías, abogados, servicios profesionales)
+
+> Estimado/a {nombre}: gracias por confiar en {negocio}. ¿Quedó satisfecho/a con el servicio prestado?
+
+Si la respuesta es positiva:
+
+> Nos alegra saberlo. Si desea compartir su experiencia en Google, puede hacerlo aquí: {enlace}. Su opinión ayuda a otros clientes a conocernos.
+
+## Plantilla 7 — Cliente recurrente que nunca ha dejado reseña
+
+> Hola {nombre} 👋 Llevas tiempo viniendo a {negocio} y nunca te lo habíamos pedido: ¿te animarías a dejarnos una reseña en Google? Viniendo de un cliente de confianza vale doble: {enlace}
+
+Esta es la plantilla con mayor conversión de todas (supera el 50% en muchos negocios), porque el cliente fiel ya tiene la opinión formada y solo le faltaba que se lo pidieran.
+
+## Los 4 errores que convierten tu mensaje en spam
+
+1. **Mensaje masivo idéntico para todos.** Sin nombre, sin contexto del servicio. Se percibe (y se ignora) como marketing.
+2. **Pedir la reseña antes de preguntar.** Mandar el enlace en frío a un cliente que ha tenido un problema es la forma más rápida de conseguir una reseña de 1 estrella.
+3. **Insistir más de una vez.** Un recordatorio a los 3-4 días es aceptable. Dos, ya es presión.
+4. **Ofrecer descuentos a cambio de reseña.** Va contra las políticas de Google y puede acabar con reseñas eliminadas o la ficha suspendida.
+
+## ¿Es legal pedir reseñas por WhatsApp?
+
+Sí, con dos condiciones: que tengas el teléfono del cliente por una relación comercial real (RGPD, interés legítimo) y que no condiciones la reseña a recompensas. Pedir opinión a tus propios clientes tras un servicio es práctica aceptada; comprar o incentivar reseñas no lo es.
+
+## Automatizar sin perder el tono personal
+
+Enviar esto a mano funciona con 5 clientes al día. Con 30, se deja de hacer la segunda semana. La automatización útil mantiene las tres cosas que hacen que funcione: nombre del cliente, pregunta previa y filtrado de respuestas negativas.
+
+Así funciona ReseñasYa: el negocio introduce el nombre y teléfono, el sistema envía el WhatsApp personalizado, una IA analiza la respuesta del cliente, y solo los clientes satisfechos reciben el enlace de Google. Los insatisfechos reciben un mensaje empático y su queja queda en privado.
+
+## Resumen
+
+- Momento óptimo de envío: 1-4 horas tras el servicio, siempre el mismo día.
+- Estructura ganadora: saludo con nombre → pregunta por la experiencia → enlace solo si es positiva.
+- La plantilla de mayor conversión: la petición al cliente recurrente (50%+).
+- Nunca: mensajes masivos sin nombre, enlaces en frío, insistencia múltiple ni incentivos.`,
+      },
+      en: {
+        title: "7 WhatsApp templates to ask for Google reviews (without sounding like spam)",
+        description: "Copy-paste ready templates by industry: restaurant, clinic, repair shop, hair salon. With the golden rule on timing and the 4 mistakes that get you ignored.",
+        readTime: "8 min",
+        category: "WhatsApp",
+        content: `**The difference between a message that gets a review and one that gets ignored isn't the wording: it's the timing, the personalization, and a link that goes straight to the review form.** Here are 7 proven templates by industry, plus the rules for using them well.
+
+## The 4 rules before copying any template
+
+1. **Send the same day as the service**, ideally 1 to 4 hours after. Response rates halve with every 24 hours that pass.
+2. **Use the customer's name.** "Hi Maria" converts twice as well as "Dear customer."
+3. **Direct link to the review form** (the one ending in /review), not your Google profile. Every extra tap the customer needs reduces conversion.
+4. **Ask first, request after.** The best-performing messages ask how the experience was and only request the review if the answer is positive. Besides protecting your rating, it makes the customer feel their opinion genuinely matters.
+
+## Template 1 — Restaurant (friendly tone)
+
+> Hi {name} 👋 This is {your name} from {business}. Thanks for coming in today! How was everything?
+
+If they respond positively:
+
+> So glad to hear it! Would you mind leaving us a review on Google? It really helps more people find us: {link}
+
+## Template 2 — Clinic (dental, physio, veterinary)
+
+> Hi {name}, this is {your name} from {clinic}. We wanted to check how you're feeling after today's visit. All good?
+
+If positive:
+
+> Great to hear 😊 If you have a minute, a Google review helps other patients find us: {link}. Thank you!
+
+The post-visit follow-up question in clinics serves a double purpose: it catches complications before they reach Google and creates a perception of care that raises your average rating.
+
+## Template 3 — Auto repair shop
+
+> Hi {name}, this is {your name} from {business}. How's the car running since the repair?
+
+If all is well:
+
+> Perfect! If you were happy with the work, you'd do us a huge favor with a Google review: {link}
+
+## Template 4 — Hair salon / beauty
+
+> Hi {name}! How's the result? Happy with the change? 😊
+
+If positive:
+
+> Wonderful! If you'd leave us a Google review it would help us so much: {link}
+
+## Template 5 — Hotel / accommodation (send after check-out)
+
+> Hi {name}, we hope you had a good trip home. How was your stay with us?
+
+## Template 6 — Formal tone (consultancies, lawyers, professional services)
+
+> Dear {name}, thank you for trusting {business}. Were you satisfied with the service provided?
+
+If positive:
+
+> We're glad to hear it. If you'd like to share your experience on Google, you can do so here: {link}. Your opinion helps other clients find us.
+
+## Template 7 — Loyal customer who never left a review
+
+> Hi {name} 👋 You've been coming to {business} for a while and we never asked: would you leave us a Google review? Coming from a trusted customer it counts double: {link}
+
+This is the highest-converting template of all (over 50% in many businesses), because the loyal customer already has their opinion formed — they were just never asked.
+
+## The 4 mistakes that turn your message into spam
+
+1. **Identical mass message for everyone.** No name, no service context. It reads (and gets ignored) as marketing.
+2. **Requesting before asking.** Cold-sending the link to a customer who had a problem is the fastest way to earn a 1-star review.
+3. **Following up more than once.** One reminder after 3-4 days is acceptable. Two is pressure.
+4. **Offering discounts in exchange for reviews.** It violates Google's policies and can end in deleted reviews or a suspended profile.
+
+## Is it legal to ask for reviews via WhatsApp?
+
+Yes, with two conditions: you have the customer's phone number from a genuine business relationship (GDPR, legitimate interest), and you don't condition the review on rewards. Asking your own customers for feedback after a service is accepted practice; buying or incentivizing reviews is not.
+
+## Automating without losing the personal tone
+
+Sending these by hand works with 5 customers a day. With 30, it stops happening by week two. Useful automation keeps the three things that make it work: the customer's name, the prior question, and the filtering of negative responses.
+
+That's how ReseñasYa works: the business enters the name and phone number, the system sends the personalized WhatsApp, an AI analyzes the customer's reply, and only satisfied customers receive the Google link. Unhappy ones get an empathetic message and their complaint stays private.
+
+## Summary
+
+- Optimal send time: 1-4 hours after the service, always the same day.
+- Winning structure: greeting with name → ask about the experience → link only if positive.
+- Highest-converting template: the loyal-customer request (50%+).
+- Never: nameless mass messages, cold links, repeated follow-ups, or incentives.`,
+      },
+      fr: {
+        title: "7 modèles de messages WhatsApp pour demander des avis Google (sans passer pour du spam)",
+        description: "Modèles prêts à copier-coller par secteur : restaurant, clinique, garage, salon de coiffure. Avec la règle d'or du moment d'envoi et les 4 erreurs qui font qu'on vous ignore.",
+        readTime: "8 min",
+        category: "WhatsApp",
+        content: `**La différence entre un message qui obtient un avis et un message ignoré, ce n'est pas la rédaction : c'est le moment, la personnalisation et un lien qui mène directement au formulaire d'avis.** Voici 7 modèles éprouvés par secteur, avec les règles pour bien les utiliser.
+
+## Les 4 règles avant de copier un modèle
+
+1. **Envoyez le jour même du service**, idéalement 1 à 4 heures après. Le taux de réponse diminue de moitié toutes les 24 heures.
+2. **Utilisez le prénom du client.** « Bonjour Marie » convertit deux fois mieux que « Cher client ».
+3. **Lien direct vers le formulaire d'avis** (celui qui se termine par /review), pas vers votre fiche Google. Chaque clic supplémentaire réduit la conversion.
+4. **Demandez d'abord, sollicitez ensuite.** Les messages les plus performants demandent comment s'est passée l'expérience et ne sollicitent l'avis que si la réponse est positive. En plus de protéger votre note, le client sent que son opinion compte vraiment.
+
+## Modèle 1 — Restaurant (ton convivial)
+
+> Bonjour {prénom} 👋 C'est {votre prénom} de {établissement}. Merci de votre visite aujourd'hui ! Tout s'est bien passé ?
+
+S'il répond positivement :
+
+> Ça nous fait très plaisir ! Ça vous dérangerait de nous laisser un avis sur Google ? Ça nous aide énormément : {lien}
+
+## Modèle 2 — Clinique (dentaire, kiné, vétérinaire)
+
+> Bonjour {prénom}, c'est {votre prénom} de {clinique}. Nous voulions savoir comment vous vous sentez après la visite d'aujourd'hui. Tout va bien ?
+
+Si la réponse est positive :
+
+> Tant mieux 😊 Si vous avez une minute, un avis Google aide d'autres patients à nous trouver : {lien}. Merci !
+
+La question de suivi post-visite a une double fonction : détecter les complications avant qu'elles n'arrivent sur Google et créer une perception d'attention qui fait monter la note moyenne.
+
+## Modèle 3 — Garage
+
+> Bonjour {prénom}, c'est {votre prénom} du garage {établissement}. Comment va la voiture depuis la réparation ?
+
+Si tout va bien :
+
+> Parfait ! Si vous êtes content du travail, un avis Google nous rendrait un grand service : {lien}
+
+## Modèle 4 — Salon de coiffure / esthétique
+
+> Bonjour {prénom} ! Alors, ce résultat ? Contente du changement ? 😊
+
+## Modèle 5 — Hôtel / hébergement (à envoyer après le check-out)
+
+> Bonjour {prénom}, nous espérons que votre retour s'est bien passé. Comment s'est déroulé votre séjour chez nous ?
+
+## Modèle 6 — Ton formel (cabinets, avocats, services professionnels)
+
+> Bonjour {prénom}, merci d'avoir fait confiance à {établissement}. Avez-vous été satisfait(e) du service ?
+
+Si la réponse est positive :
+
+> Nous en sommes ravis. Si vous souhaitez partager votre expérience sur Google : {lien}. Votre opinion aide d'autres clients à nous connaître.
+
+## Modèle 7 — Client fidèle qui n'a jamais laissé d'avis
+
+> Bonjour {prénom} 👋 Vous venez chez {établissement} depuis longtemps et nous ne vous l'avions jamais demandé : accepteriez-vous de nous laisser un avis Google ? Venant d'un client de confiance, ça compte double : {lien}
+
+C'est le modèle qui convertit le mieux (plus de 50 % dans beaucoup de commerces) : le client fidèle a déjà son opinion, il ne manquait que la demande.
+
+## Les 4 erreurs qui transforment votre message en spam
+
+1. **Message de masse identique pour tous.** Sans prénom, sans contexte. Perçu (et ignoré) comme du marketing.
+2. **Solliciter avant de demander.** Envoyer le lien à froid à un client qui a eu un problème est le moyen le plus rapide d'obtenir un avis 1 étoile.
+3. **Relancer plus d'une fois.** Un rappel après 3-4 jours est acceptable. Deux, c'est de la pression.
+4. **Offrir des remises contre des avis.** Contraire aux règles de Google : avis supprimés ou fiche suspendue à la clé.
+
+## Est-il légal de demander des avis par WhatsApp ?
+
+Oui, à deux conditions : disposer du numéro du client grâce à une relation commerciale réelle (RGPD, intérêt légitime) et ne pas conditionner l'avis à une récompense. Demander leur opinion à ses propres clients après un service est une pratique acceptée ; acheter ou inciter des avis ne l'est pas.
+
+## Automatiser sans perdre le ton personnel
+
+Envoyer ces messages à la main fonctionne avec 5 clients par jour. Avec 30, on arrête dès la deuxième semaine. L'automatisation utile conserve les trois éléments qui font que ça marche : le prénom du client, la question préalable et le filtrage des réponses négatives.
+
+C'est ainsi que fonctionne ReseñasYa : le commerce saisit le nom et le téléphone, le système envoie le WhatsApp personnalisé, une IA analyse la réponse du client, et seuls les clients satisfaits reçoivent le lien Google. Les mécontents reçoivent un message empathique et leur réclamation reste privée.
+
+## Résumé
+
+- Moment optimal d'envoi : 1 à 4 heures après le service, toujours le jour même.
+- Structure gagnante : salutation avec prénom → question sur l'expérience → lien seulement si positif.
+- Modèle le plus performant : la demande au client fidèle (50 %+).
+- Jamais : messages de masse sans prénom, liens à froid, relances multiples ni récompenses.`,
+      },
+      de: {
+        title: "7 WhatsApp-Vorlagen, um Google-Bewertungen zu erbitten (ohne wie Spam zu wirken)",
+        description: "Fertige Copy-Paste-Vorlagen nach Branche: Restaurant, Praxis, Werkstatt, Friseursalon. Mit der goldenen Regel zum Sendezeitpunkt und den 4 Fehlern, die dafür sorgen, dass man Sie ignoriert.",
+        readTime: "8 min",
+        category: "WhatsApp",
+        content: `**Der Unterschied zwischen einer Nachricht, die eine Bewertung bringt, und einer, die ignoriert wird, liegt nicht in der Formulierung: Es sind Timing, Personalisierung und ein Link, der direkt zum Bewertungsformular führt.** Hier sind 7 erprobte Vorlagen nach Branche, plus die Regeln für ihren richtigen Einsatz.
+
+## Die 4 Regeln, bevor Sie eine Vorlage kopieren
+
+1. **Senden Sie am selben Tag wie der Service**, idealerweise 1-4 Stunden danach. Die Antwortrate halbiert sich mit jeden 24 Stunden.
+2. **Verwenden Sie den Namen des Kunden.** „Hallo Maria" konvertiert doppelt so gut wie „Sehr geehrter Kunde".
+3. **Direktlink zum Bewertungsformular** (der mit /review endet), nicht zu Ihrem Google-Profil. Jeder zusätzliche Klick senkt die Konversion.
+4. **Erst fragen, dann bitten.** Die erfolgreichsten Nachrichten fragen zuerst nach der Erfahrung und bitten nur bei positiver Antwort um die Bewertung. Das schützt Ihre Note und gibt dem Kunden das Gefühl, dass seine Meinung wirklich zählt.
+
+## Vorlage 1 — Restaurant (lockerer Ton)
+
+> Hallo {Name} 👋 Hier ist {Ihr Name} von {Betrieb}. Danke für Ihren Besuch heute! Wie war alles?
+
+Bei positiver Antwort:
+
+> Das freut uns sehr! Würden Sie uns eine Google-Bewertung hinterlassen? Das hilft uns enorm: {Link}
+
+## Vorlage 2 — Praxis (Zahnarzt, Physio, Tierarzt)
+
+> Hallo {Name}, hier ist {Ihr Name} von {Praxis}. Wir wollten fragen, wie es Ihnen nach dem heutigen Termin geht. Alles in Ordnung?
+
+Bei positiver Antwort:
+
+> Das freut uns 😊 Wenn Sie eine Minute haben: Eine Google-Bewertung hilft anderen Patienten, uns zu finden: {Link}. Danke!
+
+Die Nachsorgefrage hat doppelte Funktion: Sie fängt Komplikationen ab, bevor sie auf Google landen, und erzeugt ein Gefühl von Fürsorge, das die Durchschnittsnote hebt.
+
+## Vorlage 3 — Autowerkstatt
+
+> Hallo {Name}, hier ist {Ihr Name} von der Werkstatt {Betrieb}. Wie läuft das Auto seit der Reparatur?
+
+Wenn alles gut ist:
+
+> Perfekt! Wenn Sie mit der Arbeit zufrieden waren, würden Sie uns mit einer Google-Bewertung einen großen Gefallen tun: {Link}
+
+## Vorlage 4 — Friseur / Kosmetik
+
+> Hallo {Name}! Wie gefällt Ihnen das Ergebnis? Zufrieden mit der Veränderung? 😊
+
+## Vorlage 5 — Hotel / Unterkunft (nach dem Check-out senden)
+
+> Hallo {Name}, wir hoffen, Sie hatten eine gute Heimreise. Wie war Ihr Aufenthalt bei uns?
+
+## Vorlage 6 — Formeller Ton (Kanzleien, Beratungen, Dienstleister)
+
+> Sehr geehrte/r {Name}, vielen Dank für Ihr Vertrauen in {Betrieb}. Waren Sie mit der erbrachten Leistung zufrieden?
+
+Bei positiver Antwort:
+
+> Das freut uns zu hören. Wenn Sie Ihre Erfahrung auf Google teilen möchten: {Link}. Ihre Meinung hilft anderen Kunden, uns zu finden.
+
+## Vorlage 7 — Stammkunde, der nie eine Bewertung hinterlassen hat
+
+> Hallo {Name} 👋 Sie kommen schon lange zu {Betrieb} und wir haben nie gefragt: Würden Sie uns eine Google-Bewertung hinterlassen? Von einem Stammkunden zählt sie doppelt: {Link}
+
+Dies ist die Vorlage mit der höchsten Konversion (über 50 % in vielen Betrieben): Der treue Kunde hat seine Meinung längst — es fehlte nur die Bitte.
+
+## Die 4 Fehler, die Ihre Nachricht zu Spam machen
+
+1. **Identische Massennachricht für alle.** Ohne Name, ohne Kontext. Wird als Marketing gelesen (und ignoriert).
+2. **Bitten, bevor man fragt.** Den Link kalt an einen Kunden mit Problem zu senden, ist der schnellste Weg zur 1-Stern-Bewertung.
+3. **Mehr als einmal nachhaken.** Eine Erinnerung nach 3-4 Tagen ist akzeptabel. Zwei sind Druck.
+4. **Rabatte gegen Bewertungen anbieten.** Verstößt gegen Googles Richtlinien — gelöschte Bewertungen oder gesperrtes Profil drohen.
+
+## Ist es legal, per WhatsApp um Bewertungen zu bitten?
+
+Ja, unter zwei Bedingungen: Sie haben die Nummer aus einer echten Geschäftsbeziehung (DSGVO, berechtigtes Interesse) und knüpfen die Bewertung nicht an Belohnungen. Eigene Kunden nach einem Service um Feedback zu bitten, ist akzeptierte Praxis; Bewertungen zu kaufen oder zu incentivieren nicht.
+
+## Automatisieren, ohne den persönlichen Ton zu verlieren
+
+Das von Hand zu senden funktioniert bei 5 Kunden am Tag. Bei 30 hört es in der zweiten Woche auf. Nützliche Automatisierung bewahrt die drei Dinge, die es funktionieren lassen: den Namen des Kunden, die vorherige Frage und das Herausfiltern negativer Antworten.
+
+So funktioniert ReseñasYa: Der Betrieb gibt Name und Telefonnummer ein, das System sendet das personalisierte WhatsApp, eine KI analysiert die Antwort des Kunden, und nur zufriedene Kunden erhalten den Google-Link. Unzufriedene bekommen eine empathische Nachricht, und ihre Beschwerde bleibt privat.
+
+## Zusammenfassung
+
+- Optimaler Sendezeitpunkt: 1-4 Stunden nach dem Service, immer am selben Tag.
+- Gewinnerstruktur: Begrüßung mit Name → Frage nach der Erfahrung → Link nur bei positiver Antwort.
+- Vorlage mit höchster Konversion: die Bitte an den Stammkunden (50 %+).
+- Niemals: namenlose Massennachrichten, kalte Links, mehrfaches Nachhaken oder Anreize.`,
+      },
+      it: {
+        title: "7 modelli di messaggi WhatsApp per chiedere recensioni Google (senza sembrare spam)",
+        description: "Modelli pronti da copiare e incollare per settore: ristorante, clinica, officina, parrucchiere. Con la regola d'oro del momento di invio e i 4 errori che ti fanno ignorare.",
+        readTime: "8 min",
+        category: "WhatsApp",
+        content: `**La differenza tra un messaggio che ottiene una recensione e uno che viene ignorato non è la formulazione: è il momento, la personalizzazione e un link che porta direttamente al modulo di recensione.** Ecco 7 modelli collaudati per settore, con le regole per usarli bene.
+
+## Le 4 regole prima di copiare qualsiasi modello
+
+1. **Invia lo stesso giorno del servizio**, idealmente tra 1 e 4 ore dopo. Il tasso di risposta si dimezza ogni 24 ore che passano.
+2. **Usa il nome del cliente.** "Ciao Maria" converte il doppio di "Gentile cliente".
+3. **Link diretto al modulo di recensione** (quello che finisce in /review), non alla tua scheda Google. Ogni tocco in più riduce la conversione.
+4. **Prima chiedi, poi richiedi.** I messaggi più efficaci chiedono com'è andata l'esperienza e richiedono la recensione solo se la risposta è positiva. Oltre a proteggere il tuo voto, fa sentire al cliente che la sua opinione conta davvero.
+
+## Modello 1 — Ristorante (tono amichevole)
+
+> Ciao {nome} 👋 Sono {tuo nome} di {attività}. Grazie per essere venuto oggi! Com'è andata?
+
+Se risponde positivamente:
+
+> Ci fa molto piacere! Ti andrebbe di lasciarci una recensione su Google? Ci aiuta tantissimo: {link}
+
+## Modello 2 — Clinica (dentista, fisio, veterinario)
+
+> Ciao {nome}, sono {tuo nome} di {clinica}. Volevamo sapere come ti senti dopo la visita di oggi. Tutto bene?
+
+Se la risposta è positiva:
+
+> Che bello 😊 Se hai un minuto, una recensione su Google aiuta altri pazienti a trovarci: {link}. Grazie!
+
+La domanda di follow-up post-visita ha doppia funzione: intercetta le complicazioni prima che arrivino su Google e genera una percezione di cura che alza il voto medio.
+
+## Modello 3 — Officina meccanica
+
+> Ciao {nome}, sono {tuo nome} dell'officina {attività}. Come va l'auto dopo la riparazione?
+
+Se va tutto bene:
+
+> Perfetto! Se sei rimasto contento del lavoro, ci faresti un grande favore con una recensione su Google: {link}
+
+## Modello 4 — Parrucchiere / estetica
+
+> Ciao {nome}! Com'è il risultato? Contenta del cambiamento? 😊
+
+## Modello 5 — Hotel / alloggio (da inviare dopo il check-out)
+
+> Ciao {nome}, speriamo che il viaggio di ritorno sia andato bene. Com'è stato il soggiorno da noi?
+
+## Modello 6 — Tono formale (studi, avvocati, servizi professionali)
+
+> Gentile {nome}, grazie per la fiducia in {attività}. È rimasto/a soddisfatto/a del servizio?
+
+Se la risposta è positiva:
+
+> Ci fa piacere saperlo. Se desidera condividere la sua esperienza su Google: {link}. La sua opinione aiuta altri clienti a conoscerci.
+
+## Modello 7 — Cliente abituale che non ha mai lasciato recensioni
+
+> Ciao {nome} 👋 Vieni da {attività} da tempo e non te l'avevamo mai chiesto: ti andrebbe di lasciarci una recensione su Google? Da un cliente di fiducia vale doppio: {link}
+
+È il modello con la conversione più alta di tutti (oltre il 50% in molte attività): il cliente fedele ha già l'opinione formata, mancava solo la richiesta.
+
+## I 4 errori che trasformano il tuo messaggio in spam
+
+1. **Messaggio di massa identico per tutti.** Senza nome, senza contesto. Viene percepito (e ignorato) come marketing.
+2. **Richiedere prima di chiedere.** Mandare il link a freddo a un cliente che ha avuto un problema è il modo più rapido per guadagnarsi una recensione da 1 stella.
+3. **Insistere più di una volta.** Un promemoria dopo 3-4 giorni è accettabile. Due sono pressione.
+4. **Offrire sconti in cambio di recensioni.** Viola le politiche di Google: recensioni eliminate o scheda sospesa.
+
+## È legale chiedere recensioni via WhatsApp?
+
+Sì, a due condizioni: avere il numero del cliente grazie a una relazione commerciale reale (GDPR, interesse legittimo) e non condizionare la recensione a ricompense. Chiedere un'opinione ai propri clienti dopo un servizio è prassi accettata; comprare o incentivare recensioni no.
+
+## Automatizzare senza perdere il tono personale
+
+Inviare questi messaggi a mano funziona con 5 clienti al giorno. Con 30, si smette alla seconda settimana. L'automazione utile mantiene le tre cose che la fanno funzionare: il nome del cliente, la domanda preliminare e il filtraggio delle risposte negative.
+
+Così funziona ReseñasYa: l'attività inserisce nome e telefono, il sistema invia il WhatsApp personalizzato, un'IA analizza la risposta del cliente e solo i clienti soddisfatti ricevono il link di Google. Gli insoddisfatti ricevono un messaggio empatico e il reclamo resta privato.
+
+## Riepilogo
+
+- Momento ottimale di invio: 1-4 ore dopo il servizio, sempre lo stesso giorno.
+- Struttura vincente: saluto con nome → domanda sull'esperienza → link solo se positiva.
+- Modello con la conversione più alta: la richiesta al cliente abituale (50%+).
+- Mai: messaggi di massa senza nome, link a freddo, solleciti multipli o incentivi.`,
+      },
+      pt: {
+        title: "7 modelos de mensagens WhatsApp para pedir avaliações Google (sem parecer spam)",
+        description: "Modelos prontos a copiar e colar por setor: restaurante, clínica, oficina, cabeleireiro. Com a regra de ouro do momento de envio e os 4 erros que fazem com que o ignorem.",
+        readTime: "8 min",
+        category: "WhatsApp",
+        content: `**A diferença entre uma mensagem que consegue avaliação e uma que é ignorada não é a redação: é o momento, a personalização e um link que leva diretamente ao formulário de avaliação.** Aqui tem 7 modelos comprovados por setor, com as regras para usá-los bem.
+
+## As 4 regras antes de copiar qualquer modelo
+
+1. **Envie no mesmo dia do serviço**, idealmente entre 1 e 4 horas depois. A taxa de resposta cai para metade a cada 24 horas.
+2. **Use o nome do cliente.** "Olá Maria" converte o dobro de "Estimado cliente".
+3. **Link direto para o formulário de avaliação** (o que termina em /review), não para o seu perfil Google. Cada toque extra reduz a conversão.
+4. **Pergunte primeiro, peça depois.** As mensagens com melhores resultados perguntam como foi a experiência e só pedem a avaliação se a resposta for positiva. Além de proteger a sua nota, o cliente sente que a sua opinião importa de verdade.
+
+## Modelo 1 — Restaurante (tom próximo)
+
+> Olá {nome} 👋 Sou {seu nome}, do {negócio}. Obrigado pela visita de hoje! Correu tudo bem?
+
+Se responder bem:
+
+> Ficamos muito contentes! Importava-se de nos deixar uma avaliação no Google? Ajuda-nos imenso: {link}
+
+## Modelo 2 — Clínica (dentária, fisio, veterinária)
+
+> Olá {nome}, sou {seu nome} da {clínica}. Queríamos saber como se sente depois da consulta de hoje. Está tudo bem?
+
+Se a resposta for positiva:
+
+> Que bom 😊 Se tiver um minuto, uma avaliação no Google ajuda outros pacientes a encontrarem-nos: {link}. Obrigado!
+
+A pergunta de acompanhamento pós-consulta tem dupla função: deteta complicações antes de chegarem ao Google e gera uma perceção de cuidado que sobe a nota média.
+
+## Modelo 3 — Oficina mecânica
+
+> Olá {nome}, sou {seu nome} da oficina {negócio}. Como está o carro desde a reparação?
+
+Se estiver tudo bem:
+
+> Perfeito! Se ficou contente com o trabalho, fazia-nos um grande favor com uma avaliação no Google: {link}
+
+## Modelo 4 — Cabeleireiro / estética
+
+> Olá {nome}! Que tal o resultado? Contente com a mudança? 😊
+
+## Modelo 5 — Hotel / alojamento (enviar após o check-out)
+
+> Olá {nome}, esperamos que tenha tido boa viagem de regresso. Como foi a estadia connosco?
+
+## Modelo 6 — Tom formal (consultorias, advogados, serviços profissionais)
+
+> Estimado/a {nome}: obrigado por confiar no {negócio}. Ficou satisfeito/a com o serviço prestado?
+
+Se a resposta for positiva:
+
+> Ficamos contentes por sabê-lo. Se desejar partilhar a sua experiência no Google: {link}. A sua opinião ajuda outros clientes a conhecerem-nos.
+
+## Modelo 7 — Cliente habitual que nunca deixou avaliação
+
+> Olá {nome} 👋 Já vem ao {negócio} há algum tempo e nunca lhe tínhamos pedido: animava-se a deixar-nos uma avaliação no Google? Vinda de um cliente de confiança vale a dobrar: {link}
+
+Este é o modelo com maior conversão de todos (acima de 50% em muitos negócios): o cliente fiel já tem a opinião formada, só faltava o pedido.
+
+## Os 4 erros que transformam a sua mensagem em spam
+
+1. **Mensagem em massa idêntica para todos.** Sem nome, sem contexto. É percebida (e ignorada) como marketing.
+2. **Pedir antes de perguntar.** Enviar o link a frio a um cliente que teve um problema é a forma mais rápida de ganhar uma avaliação de 1 estrela.
+3. **Insistir mais de uma vez.** Um lembrete aos 3-4 dias é aceitável. Dois já é pressão.
+4. **Oferecer descontos em troca de avaliações.** Vai contra as políticas do Google e pode acabar com avaliações eliminadas ou o perfil suspenso.
+
+## É legal pedir avaliações por WhatsApp?
+
+Sim, com duas condições: ter o telefone do cliente por uma relação comercial real (RGPD, interesse legítimo) e não condicionar a avaliação a recompensas. Pedir opinião aos próprios clientes após um serviço é prática aceite; comprar ou incentivar avaliações não é.
+
+## Automatizar sem perder o tom pessoal
+
+Enviar isto à mão funciona com 5 clientes por dia. Com 30, deixa de se fazer na segunda semana. A automatização útil mantém as três coisas que a fazem funcionar: o nome do cliente, a pergunta prévia e a filtragem das respostas negativas.
+
+É assim que funciona a ReseñasYa: o negócio introduz o nome e o telefone, o sistema envia o WhatsApp personalizado, uma IA analisa a resposta do cliente e só os clientes satisfeitos recebem o link do Google. Os insatisfeitos recebem uma mensagem empática e a queixa fica em privado.
+
+## Resumo
+
+- Momento ótimo de envio: 1-4 horas após o serviço, sempre no mesmo dia.
+- Estrutura vencedora: saudação com nome → pergunta pela experiência → link só se for positiva.
+- Modelo com maior conversão: o pedido ao cliente habitual (50%+).
+- Nunca: mensagens em massa sem nome, links a frio, insistência múltipla nem incentivos.`,
+      },
+    },
+  },
+  {
+    slug: "por-que-desaparecen-resenas-google-como-evitarlo",
+    date: "2026-06-10",
+    locales: {
+      es: {
+        title: "¿Por qué desaparecen reseñas de Google? Las 7 causas y cómo evitar perderlas",
+        description: "Google elimina millones de reseñas legítimas cada año por sus filtros automáticos. Estas son las 7 causas más frecuentes, cómo saber si te ha pasado y qué hacer para que las reseñas de tus clientes no se borren.",
+        readTime: "8 min",
+        category: "Google Maps",
+        content: `**Si has notado que tu número de reseñas baja, casi nunca es que el cliente la haya borrado: en la mayoría de casos el filtro antispam de Google la ha eliminado automáticamente, y suele ser por cómo se pidió, no por su contenido.** Aquí están las 7 causas más frecuentes y cómo evitar cada una.
+
+## Primero: cómo confirmar que te han desaparecido reseñas
+
+1. Anota tu número total de reseñas hoy (aparece junto a tu nota en tu ficha).
+2. Compáralo cada semana. Una bajada sin que nadie haya borrado nada manualmente = filtro de Google.
+3. Pista habitual: el cliente te dice "te dejé la reseña" pero tú no la ves. La reseña existe en su perfil, pero Google no la publica en tu ficha. Es el caso más común y el más invisible.
+
+Google no notifica cuándo filtra una reseña ni explica el motivo. Lo único que puedes hacer es entender las causas y evitarlas de antemano.
+
+## Causa 1 — Muchas reseñas en muy poco tiempo
+
+El patrón que más reseñas legítimas mata. Si tu ficha recibe 15 reseñas en 48 horas tras meses de inactividad (típico tras una campaña, un sorteo o pedirlo a toda tu lista de golpe), el filtro lo lee como compra de reseñas y elimina buena parte.
+
+**Cómo evitarlo:** pide reseñas de forma continua y gradual, a cada cliente tras su servicio, no en campañas puntuales masivas. Un flujo constante de 1-3 reseñas diarias es natural; 20 el mismo día no.
+
+## Causa 2 — Todos los clientes escriben desde tu wifi
+
+Si pides la reseña en el local y el cliente la escribe conectado a tu red, Google ve decenas de reseñas desde la misma IP. Patrón clásico de fraude (dueño escribiendo reseñas falsas), aunque en tu caso sea legítimo.
+
+**Cómo evitarlo:** pide la reseña cuando el cliente ya no está en tu local. El mensaje por WhatsApp una o dos horas después del servicio resuelve esto por diseño: cada cliente escribe desde su casa, su red y su ubicación.
+
+## Causa 3 — Perfiles de Google "vacíos" o nuevos
+
+Las reseñas de cuentas sin foto, sin historial y recién creadas se filtran con mucha más frecuencia. Es habitual cuando el cliente crea una cuenta de Google solo para dejarte la reseña.
+
+**Cómo evitarlo:** no puedes controlar el perfil del cliente, pero sí el volumen: cuantos más clientes reales pidas, menos te afecta el porcentaje filtrado.
+
+## Causa 4 — Palabras prohibidas o enlaces en el texto
+
+Reseñas con números de teléfono, URLs, correos o ciertos términos sensibles (sanitarios, financieros) se bloquean automáticamente.
+
+**Cómo evitarlo:** si orientas al cliente sobre qué escribir, sugiere experiencias concretas ("menciona qué servicio te hicimos"), nunca datos de contacto.
+
+## Causa 5 — Reseñas incentivadas detectadas
+
+Sorteos, descuentos o regalos a cambio de reseña violan las políticas de Google. Si detecta el patrón (por ejemplo, varias reseñas que mencionan "el descuento" o el sorteo), puede eliminar las reseñas e incluso suspender la ficha.
+
+**Cómo evitarlo:** no incentives nunca. La petición directa y personal tras un buen servicio convierte mejor que cualquier sorteo y no tiene riesgo.
+
+## Causa 6 — Ediciones en tu ficha de Google Business
+
+Cambios de categoría, nombre o dirección pueden poner la ficha en re-evaluación y ocultar temporalmente reseñas. Suelen volver en días o semanas.
+
+**Cómo evitarlo:** evita renombrar el negocio con palabras clave ("Restaurante Casa Pepe - Mejor Paella Valencia"); es motivo directo de sanción.
+
+## Causa 7 — La reseña viene de un dispositivo con apps de automatización
+
+Reseñas generadas o asistidas por bots, emuladores o granjas de móviles se eliminan de forma sistemática. Afecta a quien compra reseñas — y es la razón por la que comprar reseñas es tirar el dinero: se eliminan casi todas y la ficha queda marcada.
+
+## ¿Se pueden recuperar las reseñas eliminadas?
+
+Generalmente no. No hay proceso de apelación para reseñas filtradas (solo para reseñas que tú denuncias y quieres eliminar). Si crees que tu ficha sufre un filtrado masivo injustificado, puedes contactar con el soporte de Google Business Profile, pero las restauraciones son raras.
+
+La estrategia realista no es recuperar, sino generar un flujo constante que haga que el porcentaje filtrado (que siempre existirá: entre el 5% y el 20% es normal) sea irrelevante.
+
+## El patrón de petición que minimiza el filtrado
+
+Combinar todo lo anterior da un método concreto:
+
+- Petición individual por WhatsApp, 1-4 horas después del servicio.
+- El cliente escribe desde su propia red y dispositivo, fuera del local.
+- Flujo continuo (cada cliente, cada día) en lugar de campañas puntuales.
+- Sin incentivos, sin texto dictado, sin presión.
+
+Este es el flujo que automatiza ReseñasYa, y la razón de que las reseñas conseguidas así tengan tasas de filtrado mínimas: para Google son indistinguibles de las espontáneas, porque de hecho lo son — solo que con un recordatorio en el momento justo.
+
+## Resumen
+
+- Google filtra reseñas automáticamente y sin avisar; entre el 5 y el 20% es normal.
+- Las 3 causas evitables más comunes: ráfagas de reseñas, escritura desde la wifi del local e incentivos.
+- Las reseñas filtradas casi nunca se recuperan: la solución es el flujo constante, no la apelación.
+- El método con menos filtrado: petición individual post-servicio por WhatsApp, con el cliente fuera del local.`,
+      },
+      en: {
+        title: "Why do Google reviews disappear? The 7 causes and how to stop losing them",
+        description: "Google removes millions of legitimate reviews every year through its automatic filters. These are the 7 most frequent causes, how to know if it happened to you, and what to do so your customers' reviews don't get deleted.",
+        readTime: "8 min",
+        category: "Google Maps",
+        content: `**If you've noticed your review count dropping, it's almost never the customer deleting it: in most cases Google's spam filter removed it automatically, and it's usually because of how it was requested, not its content.** Here are the 7 most frequent causes and how to avoid each one.
+
+## First: how to confirm reviews have disappeared
+
+1. Note your total review count today (it appears next to your rating on your profile).
+2. Compare it weekly. A drop without anyone manually deleting anything = Google's filter.
+3. The usual clue: a customer says "I left you the review" but you can't see it. The review exists on their profile, but Google doesn't publish it on your listing. This is the most common case and the most invisible.
+
+Google doesn't notify you when it filters a review or explain why. The only thing you can do is understand the causes and avoid them in advance.
+
+## Cause 1 — Many reviews in a very short time
+
+The pattern that kills the most legitimate reviews. If your listing receives 15 reviews in 48 hours after months of inactivity (typical after a campaign, a giveaway, or messaging your whole list at once), the filter reads it as review buying and removes a good portion.
+
+**How to avoid it:** request reviews continuously and gradually, from each customer after their service, not in one-off mass campaigns. A steady flow of 1-3 reviews a day looks natural; 20 on the same day does not.
+
+## Cause 2 — All your customers write from your wifi
+
+If you ask for the review on-premises and the customer writes it connected to your network, Google sees dozens of reviews from the same IP. A classic fraud pattern (owner writing fake reviews), even though in your case it's legitimate.
+
+**How to avoid it:** ask for the review when the customer is no longer at your premises. The WhatsApp message one or two hours after the service solves this by design: each customer writes from their home, their network, and their location.
+
+## Cause 3 — "Empty" or brand-new Google profiles
+
+Reviews from accounts with no photo, no history, and recently created get filtered far more often. This is common when a customer creates a Google account just to leave you the review.
+
+**How to avoid it:** you can't control the customer's profile, but you can control volume: the more real customers you ask, the less the filtered percentage affects you.
+
+## Cause 4 — Forbidden words or links in the text
+
+Reviews containing phone numbers, URLs, emails, or certain sensitive terms (medical, financial) are blocked automatically.
+
+**How to avoid it:** if you guide the customer on what to write, suggest concrete experiences ("mention which service we did for you"), never contact details.
+
+## Cause 5 — Detected incentivized reviews
+
+Giveaways, discounts, or gifts in exchange for reviews violate Google's policies. If it detects the pattern (e.g., several reviews mentioning "the discount" or the giveaway), it can remove the reviews and even suspend the listing.
+
+**How to avoid it:** never incentivize. The direct, personal request after good service converts better than any giveaway and carries no risk.
+
+## Cause 6 — Edits to your Google Business profile
+
+Changes to category, name, or address can put the listing into re-evaluation and temporarily hide reviews. They usually return within days or weeks.
+
+**How to avoid it:** avoid renaming the business with keywords ("Casa Pepe Restaurant - Best Paella Valencia"); it's a direct cause for penalties.
+
+## Cause 7 — The review comes from a device with automation apps
+
+Reviews generated or assisted by bots, emulators, or phone farms are removed systematically. This affects those who buy reviews — and it's why buying reviews is throwing money away: almost all get removed and the listing gets flagged.
+
+## Can removed reviews be recovered?
+
+Generally not. There is no appeal process for filtered reviews (only for reviews you report and want removed). If you believe your listing is suffering unjustified mass filtering, you can contact Google Business Profile support, but restorations are rare.
+
+The realistic strategy isn't recovery — it's generating a constant flow that makes the filtered percentage (which will always exist: 5-20% is normal) irrelevant.
+
+## The request pattern that minimizes filtering
+
+Combining all of the above gives a concrete method:
+
+- Individual WhatsApp request, 1-4 hours after the service.
+- The customer writes from their own network and device, away from your premises.
+- Continuous flow (each customer, every day) instead of one-off campaigns.
+- No incentives, no dictated text, no pressure.
+
+This is the flow ReseñasYa automates, and the reason reviews obtained this way have minimal filtering rates: to Google they are indistinguishable from spontaneous ones — because they actually are, just with a reminder at the right moment.
+
+## Summary
+
+- Google filters reviews automatically and without notice; 5-20% is normal.
+- The 3 most common avoidable causes: review bursts, writing from the business wifi, and incentives.
+- Filtered reviews are almost never recovered: the solution is constant flow, not appeals.
+- The method with the least filtering: individual post-service WhatsApp request, with the customer away from your premises.`,
+      },
+      fr: {
+        title: "Pourquoi des avis Google disparaissent-ils ? Les 7 causes et comment éviter de les perdre",
+        description: "Google supprime chaque année des millions d'avis légitimes via ses filtres automatiques. Voici les 7 causes les plus fréquentes, comment savoir si cela vous est arrivé et quoi faire pour que les avis de vos clients ne soient pas effacés.",
+        readTime: "8 min",
+        category: "Google Maps",
+        content: `**Si vous avez remarqué que votre nombre d'avis baisse, ce n'est presque jamais le client qui l'a supprimé : dans la plupart des cas, le filtre antispam de Google l'a éliminé automatiquement, et c'est généralement à cause de la façon dont il a été demandé, pas de son contenu.** Voici les 7 causes les plus fréquentes et comment éviter chacune.
+
+## D'abord : comment confirmer que des avis ont disparu
+
+1. Notez votre nombre total d'avis aujourd'hui (il apparaît à côté de votre note sur votre fiche).
+2. Comparez-le chaque semaine. Une baisse sans suppression manuelle = filtre de Google.
+3. L'indice habituel : un client vous dit « je t'ai laissé l'avis » mais vous ne le voyez pas. L'avis existe sur son profil, mais Google ne le publie pas sur votre fiche. C'est le cas le plus courant et le plus invisible.
+
+Google ne notifie pas quand il filtre un avis et n'explique pas pourquoi. La seule chose à faire est de comprendre les causes et de les éviter en amont.
+
+## Cause 1 — Beaucoup d'avis en très peu de temps
+
+Le schéma qui tue le plus d'avis légitimes. Si votre fiche reçoit 15 avis en 48 heures après des mois d'inactivité (typique après une campagne, un concours ou un message envoyé à toute votre liste d'un coup), le filtre y voit un achat d'avis et en supprime une bonne partie.
+
+**Comment l'éviter :** demandez des avis de façon continue et progressive, à chaque client après son service, pas en campagnes massives ponctuelles. Un flux constant de 1 à 3 avis par jour est naturel ; 20 le même jour, non.
+
+## Cause 2 — Tous vos clients écrivent depuis votre wifi
+
+Si vous demandez l'avis sur place et que le client l'écrit connecté à votre réseau, Google voit des dizaines d'avis depuis la même IP. Schéma classique de fraude (le gérant écrit de faux avis), même si dans votre cas c'est légitime.
+
+**Comment l'éviter :** demandez l'avis quand le client n'est plus chez vous. Le message WhatsApp une ou deux heures après le service résout cela par conception : chaque client écrit depuis chez lui, son réseau et sa position.
+
+## Cause 3 — Profils Google « vides » ou récents
+
+Les avis de comptes sans photo, sans historique et créés récemment sont filtrés bien plus souvent. C'est courant quand le client crée un compte Google juste pour vous laisser l'avis.
+
+**Comment l'éviter :** vous ne contrôlez pas le profil du client, mais vous contrôlez le volume : plus vous sollicitez de vrais clients, moins le pourcentage filtré vous affecte.
+
+## Cause 4 — Mots interdits ou liens dans le texte
+
+Les avis contenant des numéros de téléphone, des URL, des e-mails ou certains termes sensibles (médicaux, financiers) sont bloqués automatiquement.
+
+**Comment l'éviter :** si vous orientez le client sur quoi écrire, suggérez des expériences concrètes (« mentionne le service réalisé »), jamais de coordonnées.
+
+## Cause 5 — Avis incités détectés
+
+Concours, remises ou cadeaux contre un avis violent les règles de Google. S'il détecte le schéma (plusieurs avis mentionnant « la remise » ou le concours), il peut supprimer les avis et même suspendre la fiche.
+
+**Comment l'éviter :** n'incitez jamais. La demande directe et personnelle après un bon service convertit mieux que n'importe quel concours, sans risque.
+
+## Cause 6 — Modifications de votre fiche Google Business
+
+Les changements de catégorie, de nom ou d'adresse peuvent placer la fiche en réévaluation et masquer temporairement des avis. Ils reviennent généralement en quelques jours ou semaines.
+
+**Comment l'éviter :** évitez de renommer l'établissement avec des mots-clés (« Restaurant Casa Pepe - Meilleure Paella Valence ») ; c'est un motif direct de sanction.
+
+## Cause 7 — L'avis provient d'un appareil avec des applications d'automatisation
+
+Les avis générés ou assistés par des bots, des émulateurs ou des fermes de téléphones sont supprimés systématiquement. Cela concerne ceux qui achètent des avis — et c'est pourquoi acheter des avis revient à jeter son argent : presque tous sont supprimés et la fiche est marquée.
+
+## Peut-on récupérer les avis supprimés ?
+
+Généralement non. Il n'existe pas de procédure d'appel pour les avis filtrés (seulement pour ceux que vous signalez et voulez faire supprimer). Si vous pensez subir un filtrage massif injustifié, vous pouvez contacter le support Google Business Profile, mais les restaurations sont rares.
+
+La stratégie réaliste n'est pas de récupérer, mais de générer un flux constant qui rende le pourcentage filtré (qui existera toujours : 5 à 20 % est normal) insignifiant.
+
+## Le schéma de demande qui minimise le filtrage
+
+En combinant tout ce qui précède, on obtient une méthode concrète :
+
+- Demande individuelle par WhatsApp, 1 à 4 heures après le service.
+- Le client écrit depuis son propre réseau et appareil, hors de votre établissement.
+- Flux continu (chaque client, chaque jour) au lieu de campagnes ponctuelles.
+- Sans incitation, sans texte dicté, sans pression.
+
+C'est le flux qu'automatise ReseñasYa, et la raison pour laquelle les avis obtenus ainsi ont des taux de filtrage minimes : pour Google, ils sont indiscernables des avis spontanés — parce qu'ils le sont, simplement avec un rappel au bon moment.
+
+## Résumé
+
+- Google filtre les avis automatiquement et sans préavis ; 5 à 20 % est normal.
+- Les 3 causes évitables les plus courantes : rafales d'avis, rédaction depuis le wifi du commerce et incitations.
+- Les avis filtrés ne se récupèrent presque jamais : la solution est le flux constant, pas l'appel.
+- La méthode avec le moins de filtrage : demande individuelle post-service par WhatsApp, client hors de l'établissement.`,
+      },
+      de: {
+        title: "Warum verschwinden Google-Bewertungen? Die 7 Ursachen und wie Sie sie nicht mehr verlieren",
+        description: "Google entfernt jedes Jahr Millionen legitimer Bewertungen durch automatische Filter. Das sind die 7 häufigsten Ursachen, wie Sie erkennen, ob es Sie betrifft, und was Sie tun können, damit die Bewertungen Ihrer Kunden nicht gelöscht werden.",
+        readTime: "8 min",
+        category: "Google Maps",
+        content: `**Wenn Ihre Bewertungszahl sinkt, hat fast nie der Kunde gelöscht: In den meisten Fällen hat Googles Spamfilter die Bewertung automatisch entfernt — und meist wegen der Art der Anfrage, nicht wegen des Inhalts.** Hier sind die 7 häufigsten Ursachen und wie Sie jede vermeiden.
+
+## Zuerst: So bestätigen Sie, dass Bewertungen verschwunden sind
+
+1. Notieren Sie heute Ihre Gesamtzahl an Bewertungen (steht neben Ihrer Note im Profil).
+2. Vergleichen Sie wöchentlich. Ein Rückgang ohne manuelle Löschung = Googles Filter.
+3. Das übliche Indiz: Ein Kunde sagt „Ich habe dir die Bewertung hinterlassen", aber Sie sehen sie nicht. Die Bewertung existiert in seinem Profil, aber Google veröffentlicht sie nicht auf Ihrem Eintrag. Der häufigste und unsichtbarste Fall.
+
+Google benachrichtigt nicht, wenn es eine Bewertung filtert, und erklärt keine Gründe. Sie können nur die Ursachen verstehen und im Voraus vermeiden.
+
+## Ursache 1 — Viele Bewertungen in sehr kurzer Zeit
+
+Das Muster, das die meisten legitimen Bewertungen vernichtet. Erhält Ihr Eintrag 15 Bewertungen in 48 Stunden nach Monaten der Inaktivität (typisch nach einer Kampagne, einem Gewinnspiel oder einer Nachricht an die ganze Liste auf einmal), liest der Filter das als Bewertungskauf und entfernt einen Großteil.
+
+**So vermeiden Sie es:** Bitten Sie kontinuierlich und schrittweise um Bewertungen — jeden Kunden nach seinem Service, nicht in punktuellen Massenkampagnen. Ein stetiger Fluss von 1-3 Bewertungen täglich wirkt natürlich; 20 am selben Tag nicht.
+
+## Ursache 2 — Alle Kunden schreiben über Ihr WLAN
+
+Wenn Sie vor Ort um die Bewertung bitten und der Kunde sie in Ihrem Netzwerk schreibt, sieht Google Dutzende Bewertungen von derselben IP. Klassisches Betrugsmuster (Inhaber schreibt falsche Bewertungen), auch wenn es bei Ihnen legitim ist.
+
+**So vermeiden Sie es:** Bitten Sie um die Bewertung, wenn der Kunde nicht mehr im Geschäft ist. Die WhatsApp-Nachricht ein bis zwei Stunden nach dem Service löst das per Design: Jeder Kunde schreibt von zu Hause, aus seinem Netzwerk, von seinem Standort.
+
+## Ursache 3 — „Leere" oder ganz neue Google-Profile
+
+Bewertungen von Konten ohne Foto, ohne Historie und frisch erstellt werden deutlich häufiger gefiltert. Häufig, wenn der Kunde nur für Ihre Bewertung ein Google-Konto anlegt.
+
+**So vermeiden Sie es:** Das Kundenprofil können Sie nicht kontrollieren, das Volumen schon: Je mehr echte Kunden Sie bitten, desto weniger trifft Sie der gefilterte Anteil.
+
+## Ursache 4 — Verbotene Wörter oder Links im Text
+
+Bewertungen mit Telefonnummern, URLs, E-Mails oder bestimmten sensiblen Begriffen (medizinisch, finanziell) werden automatisch blockiert.
+
+**So vermeiden Sie es:** Wenn Sie dem Kunden Hinweise geben, schlagen Sie konkrete Erlebnisse vor („erwähne, welchen Service wir gemacht haben"), nie Kontaktdaten.
+
+## Ursache 5 — Erkannte incentivierte Bewertungen
+
+Gewinnspiele, Rabatte oder Geschenke gegen Bewertungen verletzen Googles Richtlinien. Erkennt Google das Muster (z. B. mehrere Bewertungen, die „den Rabatt" erwähnen), kann es die Bewertungen entfernen und sogar den Eintrag sperren.
+
+**So vermeiden Sie es:** Incentivieren Sie nie. Die direkte, persönliche Bitte nach gutem Service konvertiert besser als jedes Gewinnspiel — ohne Risiko.
+
+## Ursache 6 — Änderungen an Ihrem Google-Business-Profil
+
+Änderungen an Kategorie, Name oder Adresse können den Eintrag in eine Neubewertung schicken und Bewertungen vorübergehend verbergen. Sie kehren meist nach Tagen oder Wochen zurück.
+
+**So vermeiden Sie es:** Benennen Sie das Geschäft nicht mit Keywords um („Restaurant Casa Pepe - Beste Paella Valencia"); das ist ein direkter Sanktionsgrund.
+
+## Ursache 7 — Die Bewertung kommt von einem Gerät mit Automatisierungs-Apps
+
+Von Bots, Emulatoren oder Handyfarmen erzeugte Bewertungen werden systematisch entfernt. Das betrifft Bewertungskäufer — und deshalb ist Bewertungskauf Geldverschwendung: Fast alle werden entfernt und der Eintrag wird markiert.
+
+## Lassen sich entfernte Bewertungen wiederherstellen?
+
+In der Regel nicht. Es gibt kein Einspruchsverfahren für gefilterte Bewertungen (nur für Bewertungen, die Sie melden und entfernen lassen wollen). Bei vermutetem ungerechtfertigtem Massenfiltern können Sie den Google-Business-Profile-Support kontaktieren, aber Wiederherstellungen sind selten.
+
+Die realistische Strategie ist nicht Wiederherstellung, sondern ein konstanter Fluss, der den gefilterten Anteil (den es immer geben wird: 5-20 % sind normal) irrelevant macht.
+
+## Das Anfragemuster, das das Filtern minimiert
+
+Alles oben Genannte kombiniert ergibt eine konkrete Methode:
+
+- Individuelle WhatsApp-Anfrage, 1-4 Stunden nach dem Service.
+- Der Kunde schreibt aus seinem eigenen Netzwerk und Gerät, außerhalb Ihres Geschäfts.
+- Kontinuierlicher Fluss (jeder Kunde, jeden Tag) statt punktueller Kampagnen.
+- Ohne Anreize, ohne diktierten Text, ohne Druck.
+
+Genau diesen Ablauf automatisiert ReseñasYa — und deshalb haben so gewonnene Bewertungen minimale Filterraten: Für Google sind sie von spontanen nicht zu unterscheiden, weil sie es tatsächlich sind — nur mit einer Erinnerung im richtigen Moment.
+
+## Zusammenfassung
+
+- Google filtert Bewertungen automatisch und ohne Hinweis; 5-20 % sind normal.
+- Die 3 häufigsten vermeidbaren Ursachen: Bewertungsschübe, Schreiben über das Geschäfts-WLAN und Anreize.
+- Gefilterte Bewertungen kommen fast nie zurück: Die Lösung ist konstanter Fluss, kein Einspruch.
+- Die Methode mit dem geringsten Filtern: individuelle WhatsApp-Anfrage nach dem Service, Kunde außerhalb des Geschäfts.`,
+      },
+      it: {
+        title: "Perché spariscono le recensioni Google? Le 7 cause e come evitare di perderle",
+        description: "Google elimina ogni anno milioni di recensioni legittime con i suoi filtri automatici. Ecco le 7 cause più frequenti, come capire se è successo anche a te e cosa fare perché le recensioni dei tuoi clienti non vengano cancellate.",
+        readTime: "8 min",
+        category: "Google Maps",
+        content: `**Se hai notato che il numero delle tue recensioni cala, quasi mai è il cliente ad averla cancellata: nella maggior parte dei casi il filtro antispam di Google l'ha eliminata automaticamente, e di solito per come è stata richiesta, non per il contenuto.** Ecco le 7 cause più frequenti e come evitarle.
+
+## Prima di tutto: come confermare che sono sparite recensioni
+
+1. Annota oggi il tuo numero totale di recensioni (appare accanto al voto sulla tua scheda).
+2. Confrontalo ogni settimana. Un calo senza cancellazioni manuali = filtro di Google.
+3. L'indizio tipico: il cliente ti dice "ti ho lasciato la recensione" ma tu non la vedi. La recensione esiste sul suo profilo, ma Google non la pubblica sulla tua scheda. È il caso più comune e il più invisibile.
+
+Google non avvisa quando filtra una recensione né spiega il motivo. L'unica cosa da fare è capire le cause ed evitarle in anticipo.
+
+## Causa 1 — Molte recensioni in pochissimo tempo
+
+Il pattern che uccide più recensioni legittime. Se la tua scheda riceve 15 recensioni in 48 ore dopo mesi di inattività (tipico dopo una campagna, un'estrazione o un messaggio a tutta la lista in una volta), il filtro lo legge come acquisto di recensioni e ne elimina buona parte.
+
+**Come evitarlo:** chiedi recensioni in modo continuo e graduale, a ogni cliente dopo il servizio, non con campagne massicce una tantum. Un flusso costante di 1-3 recensioni al giorno è naturale; 20 lo stesso giorno no.
+
+## Causa 2 — Tutti i clienti scrivono dal tuo wifi
+
+Se chiedi la recensione nel locale e il cliente la scrive connesso alla tua rete, Google vede decine di recensioni dallo stesso IP. Pattern classico di frode (titolare che scrive recensioni false), anche se nel tuo caso è legittimo.
+
+**Come evitarlo:** chiedi la recensione quando il cliente non è più nel locale. Il messaggio WhatsApp una o due ore dopo il servizio risolve il problema per costruzione: ogni cliente scrive da casa sua, dalla sua rete e dalla sua posizione.
+
+## Causa 3 — Profili Google "vuoti" o nuovissimi
+
+Le recensioni da account senza foto, senza cronologia e appena creati vengono filtrate molto più spesso. Capita spesso quando il cliente crea un account Google solo per lasciarti la recensione.
+
+**Come evitarlo:** non puoi controllare il profilo del cliente, ma puoi controllare il volume: più clienti reali coinvolgi, meno ti pesa la percentuale filtrata.
+
+## Causa 4 — Parole vietate o link nel testo
+
+Recensioni con numeri di telefono, URL, email o certi termini sensibili (sanitari, finanziari) vengono bloccate automaticamente.
+
+**Come evitarlo:** se orienti il cliente su cosa scrivere, suggerisci esperienze concrete ("racconta quale servizio ti abbiamo fatto"), mai dati di contatto.
+
+## Causa 5 — Recensioni incentivate rilevate
+
+Estrazioni, sconti o regali in cambio di recensioni violano le politiche di Google. Se rileva il pattern (per esempio, più recensioni che citano "lo sconto"), può eliminare le recensioni e perfino sospendere la scheda.
+
+**Come evitarlo:** non incentivare mai. La richiesta diretta e personale dopo un buon servizio converte meglio di qualsiasi estrazione, senza rischi.
+
+## Causa 6 — Modifiche alla tua scheda Google Business
+
+Cambi di categoria, nome o indirizzo possono mandare la scheda in rivalutazione e nascondere temporaneamente le recensioni. Di solito tornano in giorni o settimane.
+
+**Come evitarlo:** evita di rinominare l'attività con parole chiave ("Ristorante Casa Pepe - Migliore Paella Valencia"); è motivo diretto di sanzione.
+
+## Causa 7 — La recensione arriva da un dispositivo con app di automazione
+
+Recensioni generate o assistite da bot, emulatori o farm di telefoni vengono eliminate sistematicamente. Riguarda chi compra recensioni — ed è il motivo per cui comprarle è buttare soldi: vengono quasi tutte eliminate e la scheda resta segnalata.
+
+## Si possono recuperare le recensioni eliminate?
+
+In genere no. Non esiste una procedura di appello per le recensioni filtrate (solo per quelle che segnali tu e vuoi far rimuovere). Se ritieni che la tua scheda subisca un filtraggio massiccio ingiustificato, puoi contattare il supporto di Google Business Profile, ma i ripristini sono rari.
+
+La strategia realistica non è recuperare, ma generare un flusso costante che renda irrilevante la percentuale filtrata (che esisterà sempre: il 5-20% è normale).
+
+## Il pattern di richiesta che minimizza il filtraggio
+
+Combinando tutto quanto sopra si ottiene un metodo concreto:
+
+- Richiesta individuale via WhatsApp, 1-4 ore dopo il servizio.
+- Il cliente scrive dalla propria rete e dispositivo, fuori dal locale.
+- Flusso continuo (ogni cliente, ogni giorno) invece di campagne una tantum.
+- Senza incentivi, senza testo dettato, senza pressioni.
+
+È il flusso che automatizza ReseñasYa, ed è il motivo per cui le recensioni ottenute così hanno tassi di filtraggio minimi: per Google sono indistinguibili da quelle spontanee — perché di fatto lo sono, solo con un promemoria al momento giusto.
+
+## Riepilogo
+
+- Google filtra le recensioni automaticamente e senza avvisare; il 5-20% è normale.
+- Le 3 cause evitabili più comuni: raffiche di recensioni, scrittura dal wifi del locale e incentivi.
+- Le recensioni filtrate quasi mai si recuperano: la soluzione è il flusso costante, non l'appello.
+- Il metodo con meno filtraggio: richiesta individuale post-servizio via WhatsApp, con il cliente fuori dal locale.`,
+      },
+      pt: {
+        title: "Por que desaparecem avaliações do Google? As 7 causas e como evitar perdê-las",
+        description: "O Google elimina milhões de avaliações legítimas todos os anos com os seus filtros automáticos. Estas são as 7 causas mais frequentes, como saber se lhe aconteceu e o que fazer para que as avaliações dos seus clientes não sejam apagadas.",
+        readTime: "8 min",
+        category: "Google Maps",
+        content: `**Se notou que o seu número de avaliações desce, quase nunca foi o cliente que a apagou: na maioria dos casos o filtro antispam do Google eliminou-a automaticamente, e normalmente pela forma como foi pedida, não pelo conteúdo.** Aqui estão as 7 causas mais frequentes e como evitar cada uma.
+
+## Primeiro: como confirmar que desapareceram avaliações
+
+1. Anote hoje o seu número total de avaliações (aparece junto à nota no seu perfil).
+2. Compare-o todas as semanas. Uma descida sem ninguém ter apagado nada manualmente = filtro do Google.
+3. A pista habitual: o cliente diz "deixei-te a avaliação" mas você não a vê. A avaliação existe no perfil dele, mas o Google não a publica na sua ficha. É o caso mais comum e o mais invisível.
+
+O Google não notifica quando filtra uma avaliação nem explica o motivo. A única coisa que pode fazer é entender as causas e evitá-las antecipadamente.
+
+## Causa 1 — Muitas avaliações em muito pouco tempo
+
+O padrão que mata mais avaliações legítimas. Se a sua ficha recebe 15 avaliações em 48 horas após meses de inatividade (típico depois de uma campanha, um sorteio ou uma mensagem a toda a lista de uma vez), o filtro lê isso como compra de avaliações e elimina boa parte.
+
+**Como evitar:** peça avaliações de forma contínua e gradual, a cada cliente após o serviço, não em campanhas massivas pontuais. Um fluxo constante de 1-3 avaliações por dia é natural; 20 no mesmo dia não.
+
+## Causa 2 — Todos os clientes escrevem a partir do seu wifi
+
+Se pede a avaliação no estabelecimento e o cliente a escreve ligado à sua rede, o Google vê dezenas de avaliações do mesmo IP. Padrão clássico de fraude (dono a escrever avaliações falsas), mesmo que no seu caso seja legítimo.
+
+**Como evitar:** peça a avaliação quando o cliente já não está no seu estabelecimento. A mensagem por WhatsApp uma ou duas horas depois do serviço resolve isto por construção: cada cliente escreve a partir de casa, da sua rede e da sua localização.
+
+## Causa 3 — Perfis Google "vazios" ou novos
+
+Avaliações de contas sem foto, sem histórico e acabadas de criar são filtradas com muito mais frequência. É habitual quando o cliente cria uma conta Google só para lhe deixar a avaliação.
+
+**Como evitar:** não pode controlar o perfil do cliente, mas pode controlar o volume: quantos mais clientes reais pedir, menos o afeta a percentagem filtrada.
+
+## Causa 4 — Palavras proibidas ou links no texto
+
+Avaliações com números de telefone, URLs, emails ou certos termos sensíveis (médicos, financeiros) são bloqueadas automaticamente.
+
+**Como evitar:** se orientar o cliente sobre o que escrever, sugira experiências concretas ("menciona que serviço te fizemos"), nunca dados de contacto.
+
+## Causa 5 — Avaliações incentivadas detetadas
+
+Sorteios, descontos ou ofertas em troca de avaliações violam as políticas do Google. Se detetar o padrão (por exemplo, várias avaliações que mencionam "o desconto"), pode eliminar as avaliações e até suspender a ficha.
+
+**Como evitar:** nunca incentive. O pedido direto e pessoal após um bom serviço converte melhor do que qualquer sorteio e não tem risco.
+
+## Causa 6 — Alterações no seu perfil Google Business
+
+Mudanças de categoria, nome ou morada podem colocar a ficha em reavaliação e ocultar temporariamente avaliações. Normalmente voltam em dias ou semanas.
+
+**Como evitar:** evite renomear o negócio com palavras-chave ("Restaurante Casa Pepe - Melhor Paella Valência"); é motivo direto de sanção.
+
+## Causa 7 — A avaliação vem de um dispositivo com apps de automatização
+
+Avaliações geradas ou assistidas por bots, emuladores ou farms de telemóveis são eliminadas sistematicamente. Afeta quem compra avaliações — e é a razão pela qual comprar avaliações é deitar dinheiro fora: quase todas são eliminadas e a ficha fica marcada.
+
+## É possível recuperar as avaliações eliminadas?
+
+Geralmente não. Não há processo de recurso para avaliações filtradas (apenas para avaliações que você denuncia e quer eliminar). Se acredita que a sua ficha sofre uma filtragem massiva injustificada, pode contactar o suporte do Google Business Profile, mas as restaurações são raras.
+
+A estratégia realista não é recuperar, mas gerar um fluxo constante que torne irrelevante a percentagem filtrada (que existirá sempre: entre 5% e 20% é normal).
+
+## O padrão de pedido que minimiza a filtragem
+
+Combinando tudo o que está acima obtém-se um método concreto:
+
+- Pedido individual por WhatsApp, 1-4 horas depois do serviço.
+- O cliente escreve a partir da sua própria rede e dispositivo, fora do estabelecimento.
+- Fluxo contínuo (cada cliente, todos os dias) em vez de campanhas pontuais.
+- Sem incentivos, sem texto ditado, sem pressão.
+
+Este é o fluxo que a ReseñasYa automatiza, e a razão pela qual as avaliações conseguidas assim têm taxas de filtragem mínimas: para o Google são indistinguíveis das espontâneas — porque de facto o são, apenas com um lembrete no momento certo.
+
+## Resumo
+
+- O Google filtra avaliações automaticamente e sem avisar; entre 5% e 20% é normal.
+- As 3 causas evitáveis mais comuns: rajadas de avaliações, escrita a partir do wifi do estabelecimento e incentivos.
+- As avaliações filtradas quase nunca se recuperam: a solução é o fluxo constante, não o recurso.
+- O método com menos filtragem: pedido individual pós-serviço por WhatsApp, com o cliente fora do estabelecimento.`,
+      },
+    },
+  },
 ];
 
 // Locale-specific URL slugs for each blog post (keyed by the internal ES slug)
@@ -6210,6 +7676,9 @@ const BLOG_SLUGS: Record<string, Partial<Record<string, string>>> = {
   "que-aprendes-leer-todas-resenas-restaurante-seguidas": { es: "que-aprendes-leer-todas-resenas-restaurante-seguidas", en: "what-you-learn-reading-all-restaurant-reviews-at-once", fr: "ce-quon-apprend-lire-tous-les-avis-restaurant-dun-coup", de: "was-man-lernt-alle-restaurantbewertungen-auf-einmal-lesen", it: "cosa-impari-leggendo-tutte-le-recensioni-ristorante-subito", pt: "o-que-aprendes-ao-ler-todas-avaliacoes-restaurante-seguidas" },
   "restaurante-centro-ciudad-turistas-no-encuentran-google": { es: "restaurante-centro-ciudad-turistas-no-encuentran-google", en: "restaurant-city-center-tourists-cant-find-on-google", fr: "restaurant-centre-ville-touristes-ne-me-trouvent-pas-google", de: "restaurant-innenstadt-touristen-finden-mich-nicht-google", it: "ristorante-centro-citta-turisti-non-mi-trovano-google", pt: "restaurante-centro-cidade-turistas-nao-me-encontram-google" },
   "resena-1-estrella-restaurante-tenia-razon": { es: "resena-1-estrella-restaurante-tenia-razon", en: "1-star-review-restaurant-customer-was-right-about-everything", fr: "avis-1-etoile-restaurant-client-avait-raison-sur-tout", de: "1-stern-bewertung-restaurant-kunde-hatte-in-allem-recht", it: "recensione-1-stella-ristorante-cliente-aveva-ragione-su-tutto", pt: "avaliacao-1-estrela-restaurante-cliente-tinha-razao-em-tudo" },
+  "cuantas-resenas-google-necesita-negocio-local": { es: "cuantas-resenas-google-necesita-negocio-local", en: "how-many-google-reviews-local-business-needs", fr: "combien-avis-google-faut-il-commerce-local", de: "wie-viele-google-bewertungen-braucht-lokales-unternehmen", it: "quante-recensioni-google-servono-attivita-locale", pt: "quantas-avaliacoes-google-precisa-negocio-local" },
+  "plantillas-mensajes-whatsapp-pedir-resenas-google": { es: "plantillas-mensajes-whatsapp-pedir-resenas-google", en: "whatsapp-message-templates-ask-google-reviews", fr: "modeles-messages-whatsapp-demander-avis-google", de: "whatsapp-vorlagen-google-bewertungen-erbitten", it: "modelli-messaggi-whatsapp-chiedere-recensioni-google", pt: "modelos-mensagens-whatsapp-pedir-avaliacoes-google" },
+  "por-que-desaparecen-resenas-google-como-evitarlo": { es: "por-que-desaparecen-resenas-google-como-evitarlo", en: "why-google-reviews-disappear-how-to-prevent-it", fr: "pourquoi-avis-google-disparaissent-comment-eviter", de: "warum-google-bewertungen-verschwinden-wie-verhindern", it: "perche-spariscono-recensioni-google-come-evitarlo", pt: "por-que-desaparecem-avaliacoes-google-como-evitar" },
 };
 
 function getLocalSlug(internalSlug: string, locale: string): string {
