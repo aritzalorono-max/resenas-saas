@@ -6,7 +6,7 @@ import { getTermsContent } from "@/content/terms-content";
 import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
 const COMPANY  = "Buy & Click, SL";
-const EMAIL    = "contacto.resenasya@gmail.com";
+const EMAIL    = "info@resenasya.com";
 const APP_URL  = "https://resenasya.com";
 const ODR_URL  = "https://ec.europa.eu/consumers/odr";
 const BILLING_PATH = "/facturacion";

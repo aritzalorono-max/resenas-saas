@@ -3,7 +3,8 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
 const COMPANY     = "Buy & Click, SL";
-const EMAIL_LEGAL = "contacto.resenasya@gmail.com";
+const EMAIL_LEGAL = "info@resenasya.com";
+const PHONE       = "613 640 396";
 const APP_URL     = "https://resenasya.com";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -49,6 +50,7 @@ export default async function PrivacidadPage() {
           [t("s1_registryK"), "R.M. de Vizcaya, Tomo 5138, Folio 19, Inscripción 1.ª, Hoja BI-56789"],
           [t("s1_trademarkK"), t("s1_trademarkV")],
           [t("s1_emailK"), EMAIL_LEGAL],
+          [t("s1_phoneK") ?? "Teléfono", PHONE],
           [t("s1_webK"), APP_URL],
           [t("s1_activityK"), t("s1_activityV")],
         ]} />

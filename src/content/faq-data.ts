@@ -55,7 +55,7 @@ const FAQ_DATA: Record<string, FaqCategory[]> = {
       items: [
         { q: "¿Es legal enviar WhatsApps a clientes para pedir reseñas?", a: "Sí, siempre que el cliente haya dado su consentimiento para recibir comunicaciones. Recomendamos informarle durante la visita o en el proceso de compra, y contar con su número de teléfono facilitado voluntariamente. El envío cumple con el RGPD bajo base legitimadora de interés legítimo o consentimiento." },
         { q: "¿Los datos de mis clientes están seguros?", a: "Sí. Los datos se almacenan en Supabase con cifrado en tránsito (HTTPS/TLS) y Row Level Security activo: cada negocio solo accede a sus propios datos. Los datos de pago son gestionados íntegramente por Stripe y nunca se almacenan en nuestros servidores." },
-        { q: "¿Qué pasa con mis datos si cancelo la cuenta?", a: "Tras la cancelación de la cuenta, los datos se conservarán durante el período de retención establecido en nuestra Política de Privacidad, tras el cual serán eliminados permanentemente. Puedes solicitar la eliminación anticipada contactando con nosotros en contacto.resenasya@gmail.com." },
+        { q: "¿Qué pasa con mis datos si cancelo la cuenta?", a: "Tras la cancelación de la cuenta, los datos se conservarán durante el período de retención establecido en nuestra Política de Privacidad, tras el cual serán eliminados permanentemente. Puedes solicitar la eliminación anticipada contactando con nosotros en info@resenasya.com." },
       ],
     },
   ],
@@ -113,7 +113,7 @@ const FAQ_DATA: Record<string, FaqCategory[]> = {
       items: [
         { q: "Is it legal to send WhatsApps to customers to ask for reviews?", a: "Yes, provided the customer has given their consent to receive communications. We recommend informing them during their visit or purchase process, and ensuring their phone number was provided voluntarily. The sending complies with GDPR under the legal basis of legitimate interest or consent." },
         { q: "Is my customers' data safe?", a: "Yes. Data is stored in Supabase with in-transit encryption (HTTPS/TLS) and active Row Level Security: each business only accesses its own data. Payment data is handled entirely by Stripe and is never stored on our servers." },
-        { q: "What happens to my data if I cancel my account?", a: "After account cancellation, data will be retained during the retention period established in our Privacy Policy, after which it will be permanently deleted. You can request early deletion by contacting us at contacto.resenasya@gmail.com." },
+        { q: "What happens to my data if I cancel my account?", a: "After account cancellation, data will be retained during the retention period established in our Privacy Policy, after which it will be permanently deleted. You can request early deletion by contacting us at info@resenasya.com." },
       ],
     },
   ],
@@ -171,7 +171,7 @@ const FAQ_DATA: Record<string, FaqCategory[]> = {
       items: [
         { q: "Est-il légal d'envoyer des WhatsApps aux clients pour demander des avis ?", a: "Oui, à condition que le client ait donné son consentement pour recevoir des communications. Nous recommandons de l'informer lors de sa visite ou de son processus d'achat, et de disposer de son numéro de téléphone fourni volontairement. L'envoi est conforme au RGPD sous la base légale de l'intérêt légitime ou du consentement." },
         { q: "Les données de mes clients sont-elles sécurisées ?", a: "Oui. Les données sont stockées dans Supabase avec chiffrement en transit (HTTPS/TLS) et Row Level Security actif : chaque entreprise n'accède qu'à ses propres données. Les données de paiement sont entièrement gérées par Stripe et ne sont jamais stockées sur nos serveurs." },
-        { q: "Que se passe-t-il avec mes données si j'annule mon compte ?", a: "Après l'annulation du compte, les données seront conservées pendant la période de rétention établie dans notre Politique de Confidentialité, après quoi elles seront supprimées définitivement. Vous pouvez demander une suppression anticipée en nous contactant à contacto.resenasya@gmail.com." },
+        { q: "Que se passe-t-il avec mes données si j'annule mon compte ?", a: "Après l'annulation du compte, les données seront conservées pendant la période de rétention établie dans notre Politique de Confidentialité, après quoi elles seront supprimées définitivement. Vous pouvez demander une suppression anticipée en nous contactant à info@resenasya.com." },
       ],
     },
   ],
@@ -229,7 +229,7 @@ const FAQ_DATA: Record<string, FaqCategory[]> = {
       items: [
         { q: "Ist es legal, Kunden WhatsApps zu schicken, um nach Bewertungen zu fragen?", a: "Ja, sofern der Kunde seine Zustimmung zum Erhalt von Mitteilungen gegeben hat. Wir empfehlen, ihn beim Besuch oder im Kaufprozess zu informieren und seine Telefonnummer freiwillig zu haben. Der Versand entspricht der DSGVO auf der Grundlage berechtigter Interessen oder Einwilligung." },
         { q: "Sind die Daten meiner Kunden sicher?", a: "Ja. Die Daten werden in Supabase mit Verschlüsselung im Transit (HTTPS/TLS) und aktivierter Row Level Security gespeichert: Jedes Unternehmen greift nur auf seine eigenen Daten zu. Zahlungsdaten werden vollständig von Stripe verwaltet und nie auf unseren Servern gespeichert." },
-        { q: "Was passiert mit meinen Daten, wenn ich mein Konto kündige?", a: "Nach der Kontokündigung werden die Daten während der in unserer Datenschutzrichtlinie festgelegten Aufbewahrungsfrist gespeichert, danach werden sie dauerhaft gelöscht. Du kannst eine frühzeitige Löschung beantragen, indem du uns unter contacto.resenasya@gmail.com kontaktierst." },
+        { q: "Was passiert mit meinen Daten, wenn ich mein Konto kündige?", a: "Nach der Kontokündigung werden die Daten während der in unserer Datenschutzrichtlinie festgelegten Aufbewahrungsfrist gespeichert, danach werden sie dauerhaft gelöscht. Du kannst eine frühzeitige Löschung beantragen, indem du uns unter info@resenasya.com kontaktierst." },
       ],
     },
   ],
@@ -287,7 +287,7 @@ const FAQ_DATA: Record<string, FaqCategory[]> = {
       items: [
         { q: "È legale inviare WhatsApp ai clienti per chiedere recensioni?", a: "Sì, purché il cliente abbia dato il suo consenso a ricevere comunicazioni. Consigliamo di informarlo durante la visita o nel processo di acquisto, e di avere il suo numero di telefono fornito volontariamente. L'invio è conforme al GDPR sulla base giuridica dell'interesse legittimo o del consenso." },
         { q: "I dati dei miei clienti sono al sicuro?", a: "Sì. I dati sono archiviati in Supabase con crittografia in transito (HTTPS/TLS) e Row Level Security attivo: ogni attività accede solo ai propri dati. I dati di pagamento sono gestiti interamente da Stripe e non vengono mai archiviati sui nostri server." },
-        { q: "Cosa succede ai miei dati se cancello l'account?", a: "Dopo la cancellazione dell'account, i dati verranno conservati durante il periodo di conservazione stabilito nella nostra Informativa sulla Privacy, dopodiché verranno eliminati definitivamente. Puoi richiedere la cancellazione anticipata contattandoci all'indirizzo contacto.resenasya@gmail.com." },
+        { q: "Cosa succede ai miei dati se cancello l'account?", a: "Dopo la cancellazione dell'account, i dati verranno conservati durante il periodo di conservazione stabilito nella nostra Informativa sulla Privacy, dopodiché verranno eliminati definitivamente. Puoi richiedere la cancellazione anticipata contattandoci all'indirizzo info@resenasya.com." },
       ],
     },
   ],
@@ -345,7 +345,7 @@ const FAQ_DATA: Record<string, FaqCategory[]> = {
       items: [
         { q: "É legal enviar WhatsApps a clientes para pedir avaliações?", a: "Sim, desde que o cliente tenha dado o seu consentimento para receber comunicações. Recomendamos informá-lo durante a visita ou no processo de compra, e ter o seu número de telefone fornecido voluntariamente. O envio cumpre o RGPD sob a base jurídica de interesse legítimo ou consentimento." },
         { q: "Os dados dos meus clientes estão seguros?", a: "Sim. Os dados são armazenados na Supabase com encriptação em trânsito (HTTPS/TLS) e Row Level Security ativo: cada negócio acede apenas aos seus próprios dados. Os dados de pagamento são geridos integralmente pelo Stripe e nunca são armazenados nos nossos servidores." },
-        { q: "O que acontece aos meus dados se cancelar a conta?", a: "Após o cancelamento da conta, os dados serão conservados durante o período de retenção estabelecido na nossa Política de Privacidade, após o qual serão eliminados permanentemente. Podes solicitar a eliminação antecipada contactando-nos em contacto.resenasya@gmail.com." },
+        { q: "O que acontece aos meus dados se cancelar a conta?", a: "Após o cancelamento da conta, os dados serão conservados durante o período de retenção estabelecido na nossa Política de Privacidade, após o qual serão eliminados permanentemente. Podes solicitar a eliminação antecipada contactando-nos em info@resenasya.com." },
       ],
     },
   ],
