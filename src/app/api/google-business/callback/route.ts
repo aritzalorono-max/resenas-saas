@@ -113,5 +113,9 @@ export async function GET(request: NextRequest): Promise<never> {
     locationName,
   });
 
+  if (!locationName) {
+    redirect("/google-business?warning=no_location");
+  }
+
   redirect("/google-business");
 }

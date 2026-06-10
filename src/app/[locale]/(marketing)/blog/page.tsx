@@ -126,7 +126,7 @@ export default async function BlogPage() {
                     {post.category}
                   </span>
                 </div>
-                <h2 className="font-bold text-gray-900 mb-2 group-hover:text-brand-700 transition-colors leading-snug text-sm md:text-base flex-1">
+                <h2 className="font-bold text-gray-900 mb-2 group-hover:text-brand-700 transition-colors leading-snug text-base md:text-lg flex-1">
                   {post.title}
                 </h2>
                 <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">{post.description}</p>

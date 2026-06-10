@@ -24,14 +24,26 @@ export default async function FaqPage() {
   const { title, subtitle } = getFaqPageHeading(locale);
 
   const allFaqs = faqs.flatMap((cat) => cat.items);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
   const faqSchema = {
     "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: allFaqs.map((faq) => ({
-      "@type": "Question",
-      name: faq.q,
-      acceptedAnswer: { "@type": "Answer", text: faq.a },
-    })),
+    "@graph": [
+      {
+        "@type": "FAQPage",
+        mainEntity: allFaqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.q,
+          acceptedAnswer: { "@type": "Answer", text: faq.a },
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Inicio", item: appUrl },
+          { "@type": "ListItem", position: 2, name: "FAQ", item: `${appUrl}/faq` },
+        ],
+      },
+    ],
   };
 
   return (

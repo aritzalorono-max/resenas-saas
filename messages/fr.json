@@ -707,7 +707,10 @@
     "ctaDesc": "Mettez en pratique tout ce que vous avez lu. Configuré en moins d'1 minute.",
     "ctaBtn": "Commencer gratuitement →",
     "backToBlog": "← Retour au blog",
-    "minutesRead": "min de lecture"
+    "minutesRead": "min de lecture",
+    "shareTitle": "Partager cet article",
+    "prevPost": "Article précédent",
+    "nextPost": "Article suivant"
   },
   "casosExito": {
     "badge": "Cas de succès",
@@ -1296,6 +1299,8 @@
     "errLoadReviews": "Erreur lors du chargement des avis",
     "errDisconnected": "Google Business déconnecté",
     "copied": "Copié",
-    "copy": "Copier"
+    "copy": "Copier",
+    "warnNoLocationTitle": "Compte connecté, mais aucun établissement trouvé",
+    "warnNoLocation": "Votre compte Google s'est connecté avec succès, mais aucun établissement Google Business n'a été trouvé. Assurez-vous : (1) d'avoir accepté l'invitation d'administrateur sur business.google.com, (2) d'avoir au moins un établissement actif dans votre profil, et (3) que les API Google Business Profile sont activées dans votre projet Google Cloud."
   }
 }

@@ -18,11 +18,11 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // unsafe-eval only in dev (Next.js HMR requires it); removed in production
-      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+      `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com${isDev ? " 'unsafe-eval'" : ""}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self'",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
       "frame-src https://www.youtube.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",

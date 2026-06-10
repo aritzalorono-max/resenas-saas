@@ -2,9 +2,11 @@ import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBlogPosts, getPostBySlug, getStaticBlogParams, getBlogPostAllSlugs } from "@/content/blog-posts-data";
-import { Clock, ArrowLeft, Tag } from "lucide-react";
+import { Clock, ArrowLeft, ArrowRight, Tag } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { blogHreflangAlternates, buildUrl, APP_URL } from "@/lib/seo";
+import { MarkdownContent } from "@/components/blog/MarkdownContent";
+import { ShareButtons } from "@/components/blog/ShareButtons";
 
 export const revalidate = 86400;
 
@@ -67,19 +69,12 @@ const categoryColors: Record<string, string> = {
 };
 
 const localeToDateFormat: Record<string, string> = {
-  es: "es-ES",
-  en: "en-GB",
-  fr: "fr-FR",
-  de: "de-DE",
-  it: "it-IT",
-  pt: "pt-PT",
+  es: "es-ES", en: "en-GB", fr: "fr-FR", de: "de-DE", it: "it-IT", pt: "pt-PT",
 };
 
 function formatDate(dateStr: string, locale: string) {
   return new Date(dateStr).toLocaleDateString(localeToDateFormat[locale] ?? "en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+    day: "numeric", month: "long", year: "numeric",
   });
 }
 
@@ -109,80 +104,6 @@ function extractFaq(content: string): Array<{ question: string; answer: string }
   return faq.filter((f) => f.answer.length > 0);
 }
 
-function renderContent(content: string) {
-  const lines = content.split("\n");
-  const elements: React.ReactNode[] = [];
-  let i = 0;
-
-  while (i < lines.length) {
-    const line = lines[i];
-
-    if (line.startsWith("## ")) {
-      elements.push(<h2 key={i} className="text-2xl font-bold text-gray-900 mt-10 mb-4 pb-2 border-b border-gray-100">{line.slice(3)}</h2>);
-    } else if (line.startsWith("### ")) {
-      elements.push(<h3 key={i} className="text-lg font-bold text-gray-900 mt-6 mb-3">{line.slice(4)}</h3>);
-    } else if (line.startsWith("**") && line.endsWith("**") && line.length > 4) {
-      elements.push(<p key={i} className="font-semibold text-gray-900 mt-4 mb-1">{line.slice(2, -2)}</p>);
-    } else if (line.startsWith("- ")) {
-      const listItems: string[] = [];
-      while (i < lines.length && lines[i].startsWith("- ")) {
-        listItems.push(lines[i].slice(2));
-        i++;
-      }
-      elements.push(
-        <ul key={`ul-${i}`} className="list-disc list-inside space-y-1.5 my-4 text-gray-600">
-          {listItems.map((item, j) => (
-            <li key={j} dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>") }} />
-          ))}
-        </ul>
-      );
-      continue;
-    } else if (line.startsWith("> ")) {
-      elements.push(
-        <blockquote key={i} className="border-l-4 border-brand-300 bg-brand-50 pl-4 py-3 pr-4 my-4 rounded-r-xl">
-          <p className="text-gray-700 italic text-sm leading-relaxed">{line.slice(2)}</p>
-        </blockquote>
-      );
-    } else if (line.startsWith("| ")) {
-      const tableLines: string[] = [];
-      while (i < lines.length && lines[i].startsWith("| ")) {
-        if (!lines[i].includes("---")) tableLines.push(lines[i]);
-        i++;
-      }
-      if (tableLines.length > 0) {
-        const headers = tableLines[0].split("|").filter(Boolean).map(s => s.trim());
-        const rows = tableLines.slice(1).map(row => row.split("|").filter(Boolean).map(s => s.trim()));
-        elements.push(
-          <div key={`table-${i}`} className="overflow-x-auto my-6">
-            <table className="w-full text-sm border border-gray-100 rounded-xl overflow-hidden">
-              <thead className="bg-gray-50">
-                <tr>{headers.map((h, j) => <th key={j} className="text-left px-4 py-2.5 font-semibold text-gray-700 border-b border-gray-100">{h}</th>)}</tr>
-              </thead>
-              <tbody>
-                {rows.map((row, j) => (
-                  <tr key={j} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
-                    {row.map((cell, k) => <td key={k} className="px-4 py-2.5 text-gray-600">{cell}</td>)}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-        continue;
-      }
-    } else if (line.trim() !== "") {
-      const html = line
-        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-brand-600 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>');
-      elements.push(<p key={i} className="text-gray-600 leading-relaxed my-3" dangerouslySetInnerHTML={{ __html: html }} />);
-    }
-
-    i++;
-  }
-
-  return elements;
-}
-
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = await getTranslations("blog");
   const locale = await getLocale();
@@ -191,7 +112,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   if (!post) notFound();
 
   const allPosts = getBlogPosts(locale);
-  const otherPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 3);
+  const currentIndex = allPosts.findIndex((p) => p.slug === slug);
+  const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+  const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+  const relatedPosts = allPosts.filter((p) => p.slug !== slug && p.category === post.category).slice(0, 3);
+  const otherPosts = relatedPosts.length > 0 ? relatedPosts : allPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
   const prefix = locale === "es" ? "" : `/${locale}`;
   const postUrl = `${APP_URL}${prefix}/blog/${post.slug}`;
@@ -245,6 +170,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       <div className="py-10 px-6">
         <div className="max-w-3xl mx-auto">
+
           {/* Back */}
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-brand-600 transition mb-8">
             <ArrowLeft className="w-4 h-4" />
@@ -264,16 +190,22 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <span className="text-xs text-gray-400">{formatDate(post.date, locale)}</span>
             </div>
             <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">{post.title}</h1>
-            <p className="text-lg text-gray-500 leading-relaxed border-l-4 border-brand-200 pl-4">{post.description}</p>
+            <p className="text-lg text-gray-500 leading-relaxed border-l-4 border-brand-300 pl-4">{post.description}</p>
           </header>
 
           {/* Content */}
           <div className="min-h-[400px]">
-            {renderContent(post.content)}
+            <MarkdownContent content={post.content} />
           </div>
 
-          {/* CTA inline */}
-          <div className="mt-14 bg-gradient-to-br from-brand-600 to-brand-700 rounded-2xl p-8 text-center">
+          {/* Share */}
+          <div className="mt-10 pt-8 border-t border-gray-100">
+            <p className="text-sm font-semibold text-gray-700 mb-3">{t("shareTitle") || "Compartir"}</p>
+            <ShareButtons url={postUrl} title={post.title} />
+          </div>
+
+          {/* CTA */}
+          <div className="mt-10 bg-gradient-to-br from-brand-600 to-brand-700 rounded-2xl p-8 text-center">
             <h2 className="text-xl font-bold text-white mb-2">{t("ctaTitle")}</h2>
             <p className="text-brand-100 text-sm mb-5">{t("ctaDesc")}</p>
             <Link href="/register" className="bg-white text-brand-700 font-bold px-6 py-3 rounded-xl hover:bg-brand-50 transition inline-block text-sm">
@@ -281,11 +213,35 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </Link>
           </div>
 
+          {/* Prev / Next */}
+          {(prevPost || nextPost) && (
+            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {prevPost ? (
+                <Link href={`/blog/${prevPost.slug}`} className="group flex items-start gap-3 p-4 rounded-xl border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 transition">
+                  <ArrowLeft className="w-4 h-4 text-gray-300 group-hover:text-brand-400 transition shrink-0 mt-0.5" />
+                  <div className="min-w-0">
+                    <p className="text-xs text-gray-400 mb-1">{t("prevPost") || "Anterior"}</p>
+                    <p className="text-sm font-semibold text-gray-800 group-hover:text-brand-700 transition leading-snug line-clamp-2">{prevPost.title}</p>
+                  </div>
+                </Link>
+              ) : <div />}
+              {nextPost && (
+                <Link href={`/blog/${nextPost.slug}`} className="group flex items-start gap-3 p-4 rounded-xl border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 transition sm:text-right sm:flex-row-reverse">
+                  <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-brand-400 transition shrink-0 mt-0.5" />
+                  <div className="min-w-0">
+                    <p className="text-xs text-gray-400 mb-1">{t("nextPost") || "Siguiente"}</p>
+                    <p className="text-sm font-semibold text-gray-800 group-hover:text-brand-700 transition leading-snug line-clamp-2">{nextPost.title}</p>
+                  </div>
+                </Link>
+              )}
+            </div>
+          )}
+
           {/* Related posts */}
           {otherPosts.length > 0 && (
-            <div className="mt-14">
+            <div className="mt-10">
               <h2 className="text-lg font-bold text-gray-900 mb-5">{t("relatedTitle")}</h2>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {otherPosts.map((p) => (
                   <Link key={p.slug} href={`/blog/${p.slug}`} className="block group">
                     <div className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 transition">
@@ -295,13 +251,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                           <Clock className="w-3 h-3" /> {p.readTime} · {p.category}
                         </p>
                       </div>
-                      <ArrowLeft className="w-4 h-4 text-gray-300 group-hover:text-brand-400 transition rotate-180 shrink-0 mt-0.5" />
+                      <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-brand-400 transition shrink-0 mt-0.5" />
                     </div>
                   </Link>
                 ))}
               </div>
             </div>
           )}
+
         </div>
       </div>
     </>

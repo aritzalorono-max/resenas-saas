@@ -4,6 +4,10 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { CookieBanner } from "@/components/cookies/CookieBanner";
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function LocaleLayout({
   children,
   params,

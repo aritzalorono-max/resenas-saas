@@ -707,7 +707,10 @@
     "ctaDesc": "Setzen Sie alles Gelesene in die Praxis um. Einrichtung in unter 1 Minute.",
     "ctaBtn": "Kostenlos starten →",
     "backToBlog": "← Zurück zum Blog",
-    "minutesRead": "Min. Lesezeit"
+    "minutesRead": "Min. Lesezeit",
+    "shareTitle": "Artikel teilen",
+    "prevPost": "Vorheriger Artikel",
+    "nextPost": "Nächster Artikel"
   },
   "casosExito": {
     "badge": "Erfolgsgeschichten",
@@ -1296,6 +1299,8 @@
     "errLoadReviews": "Fehler beim Laden der Bewertungen",
     "errDisconnected": "Google Business getrennt",
     "copied": "Kopiert",
-    "copy": "Kopieren"
+    "copy": "Kopieren",
+    "warnNoLocationTitle": "Konto verbunden, aber kein Standort gefunden",
+    "warnNoLocation": "Ihr Google-Konto wurde erfolgreich verbunden, es wurde jedoch kein Google Business-Standort gefunden. Stellen Sie sicher: (1) Sie haben die Admin-Einladung auf business.google.com angenommen, (2) Sie haben mindestens einen aktiven Standort in Ihrem Profil, und (3) die Google Business Profile APIs sind in Ihrem Google Cloud-Projekt aktiviert."
   }
 }

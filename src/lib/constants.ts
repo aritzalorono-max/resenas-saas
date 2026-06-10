@@ -929,6 +929,47 @@ Podes mandar-nos um screenshot mais clarinho com a avaliação? Assim que virmos
 // Exportación del mapa completo de plantillas por idioma y tono
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Twilio Content Template SIDs aprobados por Meta (business-initiated)
+// ---------------------------------------------------------------------------
+
+export const WHATSAPP_TEMPLATE_SIDS: Record<WhatsAppLanguage, {
+  review_request: string;
+  review_reminder: string;
+  review_incentive: string;
+}> = {
+  es: {
+    review_request:  "HX62d7875668bf5c8fb93aba6906903448",
+    review_reminder: "HX7ea4e97d6deddc8767a290b92adf6a09",
+    review_incentive:"HXb784e5ecce5fb44f06c667ef6142f468",
+  },
+  en: {
+    review_request:  "HX2aff647ed8f587640223e0dfbfb772d6",
+    review_reminder: "HXadc1fa2679fcde03fd963afd29371d74",
+    review_incentive:"HXb2d479006ed3a4ac2330d733b11a3cd6",
+  },
+  fr: {
+    review_request:  "HXcd142766f99fa7347f6fb373bc1a6eaf",
+    review_reminder: "HXbfb4e1e9f183f5b14e093e3eb6fedc64",
+    review_incentive:"HX054b4435ee8c7d559d63bafaede00728",
+  },
+  de: {
+    review_request:  "HX19403156b9d8f975ca64e709ff3632e1",
+    review_reminder: "HXb1f9990c79233bd0d2d391f8286ba670",
+    review_incentive:"HXf5db3fc2c17ac153a2c3bf9488925365",
+  },
+  it: {
+    review_request:  "HXb3c6951ed53ae59333d4f60916178d53",
+    review_reminder: "HX950d43fddb04f5722c1180c3f8fea2c4",
+    review_incentive:"HXf9bb8425def3362df89d6ad856fcc834",
+  },
+  pt: {
+    review_request:  "HXa8ee35555bbe1b7c3c938bcb00874c5c",
+    review_reminder: "HX679d4c3087c0baa09ebe0e95719ddec8",
+    review_incentive:"HXbc1a6983c7e87e544a6706407baa37d7",
+  },
+};
+
 export const MESSAGE_TEMPLATES: Record<WhatsAppLanguage, Record<BusinessTone, ToneTemplates>> = {
   es: { tuteo: TUTEO_ES, usted: USTED_ES, juvenil: JUVENIL_ES },
   en: { tuteo: TUTEO_EN, usted: USTED_EN, juvenil: JUVENIL_EN },
