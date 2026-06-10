@@ -46,7 +46,7 @@ export default async function PrivacidadPage() {
           [t("s1_companyNameK"), COMPANY],
           [t("s1_legalFormK"), t("s1_legalFormV")],
           [t("s1_cifK"), "B-95612958"],
-          [t("s1_addressK"), "Avda. Ribera de Axpe 11, 2D - 202, 48950 Erandio (Bizkaia)"],
+          [t("s1_addressK"), "Avda. Ribera de Axpe 11, 2D - 202. 48950 Erandio (Bizkaia)"],
           [t("s1_registryK"), "R.M. de Vizcaya, Tomo 5138, Folio 19, Inscripción 1.ª, Hoja BI-56789"],
           [t("s1_trademarkK"), t("s1_trademarkV")],
           [t("s1_emailK"), EMAIL_LEGAL],
