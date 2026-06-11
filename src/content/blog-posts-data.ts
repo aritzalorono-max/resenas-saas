@@ -7701,6 +7701,17 @@ export function getBlogPosts(locale: string): Array<{ slug: string; date: string
   }));
 }
 
+/** Returns only slug + title for each post — cheap prev/next navigation without loading content. */
+export function getBlogPostMeta(locale: string): Array<{ slug: string; title: string }> {
+  return BLOG_POSTS.map((post) => {
+    const lang = post.locales[locale] ? locale : "en";
+    return {
+      slug: getLocalSlug(post.slug, locale),
+      title: (post.locales[lang] ?? post.locales["es"]!).title,
+    };
+  });
+}
+
 export function getPostBySlug(
   slug: string,
   locale: string

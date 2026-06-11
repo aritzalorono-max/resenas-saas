@@ -1,7 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBlogPosts, getPostBySlug, getStaticBlogParams, getBlogPostAllSlugs } from "@/content/blog-posts-data";
+import { getBlogPostMeta, getPostBySlug, getStaticBlogParams, getBlogPostAllSlugs } from "@/content/blog-posts-data";
 import { Clock, ArrowLeft, ArrowRight, Tag } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { blogHreflangAlternates, buildUrl, APP_URL } from "@/lib/seo";
@@ -79,7 +79,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const post = getPostBySlug(slug, locale);
   if (!post) notFound();
 
-  const allPosts = getBlogPosts(locale);
+  const allPosts = getBlogPostMeta(locale);
   const currentIndex = allPosts.findIndex((p) => p.slug === slug);
   const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;

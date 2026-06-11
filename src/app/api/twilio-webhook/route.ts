@@ -380,6 +380,12 @@ export async function POST(request: Request): Promise<Response> {
     }
   } catch (dbError) {
     logger.error("Error al actualizar la solicitud en la BD", dbError);
+    if (assignedCode) {
+      logger.error(
+        `ATENCIÓN: código de descuento "${assignedCode}" asignado para solicitud ${reviewRequest.id} ` +
+        `pero la BD no se actualizó. El código puede haber quedado huérfano.`
+      );
+    }
   }
 
   // ── 6. Construir y enviar mensaje de seguimiento ──────────────────────────
