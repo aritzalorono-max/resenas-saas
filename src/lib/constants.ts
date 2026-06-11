@@ -1010,3 +1010,15 @@ export const DEFAULT_WELCOME_MESSAGES: Record<WhatsAppLanguage, string> = {
   it: "Ciao {nombre}! Siamo il team di {negocio}. Com'è stata la tua esperienza con noi oggi? La tua opinione ci aiuta a migliorare 😊 (Rispondi STOP se non desideri ricevere altri messaggi)",
   pt: "Olá {nombre}! Somos a equipa de {negocio}. Como foi a sua experiência connosco hoje? A sua opinião ajuda-nos a melhorar 😊 (Responda STOP se não desejar receber mais mensagens)",
 };
+
+
+// ---------------------------------------------------------------------------
+// Datos de contacto y empresa (única fuente de verdad)
+// ---------------------------------------------------------------------------
+
+export const CONTACT = {
+  EMAIL:   "info@resenasya.com",
+  PHONE:   "613 640 396",
+  COMPANY: "Buy & Click, SL",
+  CIF:     "B-95612958",
+} as const;

@@ -32,7 +32,7 @@ export async function checkRateLimit(
 
   const { count: shortCount, error: shortError } = await supabase
     .from("review_requests")
-    .select("*", { count: "exact", head: true })
+    .select("id", { count: "exact", head: true })
     .eq("business_id", businessId)
     .gte("created_at", shortWindowStart);
 
@@ -48,7 +48,7 @@ export async function checkRateLimit(
 
   const { count: dayCount, error: dayError } = await supabase
     .from("review_requests")
-    .select("*", { count: "exact", head: true })
+    .select("id", { count: "exact", head: true })
     .eq("business_id", businessId)
     .gte("created_at", dayWindowStart);
 
@@ -80,7 +80,7 @@ export async function checkGeneralRateLimit(
 
   const { count, error } = await supabase
     .from("rate_limit_events")
-    .select("*", { count: "exact", head: true })
+    .select("id", { count: "exact", head: true })
     .eq("key", key)
     .gte("created_at", windowStart);
 

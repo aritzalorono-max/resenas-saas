@@ -7,6 +7,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { blogHreflangAlternates, buildUrl, APP_URL } from "@/lib/seo";
 import { MarkdownContent } from "@/components/blog/MarkdownContent";
 import { ShareButtons } from "@/components/blog/ShareButtons";
+import { CATEGORY_COLORS, formatPostDate } from "@/lib/blog-utils";
 
 export const revalidate = 86400;
 
@@ -43,39 +44,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: { card: "summary_large_image", title, description: post.description },
   };
-}
-
-const categoryColors: Record<string, string> = {
-  "Google Maps": "bg-blue-50 text-blue-700",
-  "Estrategia": "bg-purple-50 text-purple-700",
-  "Reputación": "bg-red-50 text-red-700",
-  "SEO Local": "bg-green-50 text-green-700",
-  "Legal": "bg-gray-100 text-gray-700",
-  "Strategy": "bg-purple-50 text-purple-700",
-  "Reputation": "bg-red-50 text-red-700",
-  "Local SEO": "bg-green-50 text-green-700",
-  "Stratégie": "bg-purple-50 text-purple-700",
-  "Réputation": "bg-red-50 text-red-700",
-  "Légal": "bg-gray-100 text-gray-700",
-  "Strategie": "bg-purple-50 text-purple-700",
-  "Lokales SEO": "bg-green-50 text-green-700",
-  "Rechtliches": "bg-gray-100 text-gray-700",
-  "Strategia": "bg-purple-50 text-purple-700",
-  "Reputazione": "bg-red-50 text-red-700",
-  "SEO Locale": "bg-green-50 text-green-700",
-  "Legale": "bg-gray-100 text-gray-700",
-  "Estratégia": "bg-purple-50 text-purple-700",
-  "Reputação": "bg-red-50 text-red-700",
-};
-
-const localeToDateFormat: Record<string, string> = {
-  es: "es-ES", en: "en-GB", fr: "fr-FR", de: "de-DE", it: "it-IT", pt: "pt-PT",
-};
-
-function formatDate(dateStr: string, locale: string) {
-  return new Date(dateStr).toLocaleDateString(localeToDateFormat[locale] ?? "en-GB", {
-    day: "numeric", month: "long", year: "numeric",
-  });
 }
 
 /**
@@ -180,14 +148,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {/* Header */}
           <header className="mb-10">
             <div className="flex items-center gap-3 mb-5 flex-wrap">
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${categoryColors[post.category] ?? "bg-gray-100 text-gray-600"}`}>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"}`}>
                 <Tag className="w-3 h-3" />
                 {post.category}
               </span>
               <span className="flex items-center gap-1 text-xs text-gray-400">
                 <Clock className="w-3.5 h-3.5" /> {post.readTime} {t("readTime")}
               </span>
-              <span className="text-xs text-gray-400">{formatDate(post.date, locale)}</span>
+              <span className="text-xs text-gray-400">{formatPostDate(post.date, locale)}</span>
             </div>
             <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">{post.title}</h1>
             <p className="text-lg text-gray-500 leading-relaxed border-l-4 border-brand-300 pl-4">{post.description}</p>

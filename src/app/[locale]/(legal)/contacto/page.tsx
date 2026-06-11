@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { CONTACT } from "@/lib/constants";
 
-const EMAIL_SOPORTE = "info@resenasya.com";
-const PHONE = "613 640 396";
+const EMAIL_SOPORTE = CONTACT.EMAIL;
+const PHONE = CONTACT.PHONE;
 
 export default function ContactoPage() {
   const t = useTranslations("contact");

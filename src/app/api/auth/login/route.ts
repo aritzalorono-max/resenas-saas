@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   if (foundUser === null) {
     logger.info(`Login fallido: email no encontrado`);
     return NextResponse.json(
-      { error: "No encontramos ninguna cuenta con ese email. ¿Quieres registrarte?" },
+      { error: "Email o contraseña incorrectos." },
       { status: 400 }
     );
   }
@@ -68,9 +68,9 @@ export async function POST(request: NextRequest) {
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
   if (signInError) {
-    logger.info(`Login fallido: contraseña incorrecta`);
+    logger.info(`Login fallido: credenciales incorrectas`);
     return NextResponse.json(
-      { error: "Contraseña incorrecta. ¿Olvidaste tu contraseña?" },
+      { error: "Email o contraseña incorrectos." },
       { status: 400 }
     );
   }

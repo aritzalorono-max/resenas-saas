@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "crypto";
 import { createServiceClient } from "@/lib/supabase/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { logger } from "@/lib/logger";
@@ -127,8 +128,11 @@ async function generateForBusiness(
 
 export async function GET(request: Request): Promise<Response> {
   const cronSecret = process.env.CRON_SECRET;
-  const auth = request.headers.get("authorization");
-  if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
+  const auth = request.headers.get("authorization") ?? "";
+  const expected = `Bearer ${cronSecret ?? ""}`;
+  const valid = cronSecret && auth.length === expected.length &&
+    timingSafeEqual(Buffer.from(auth), Buffer.from(expected));
+  if (!valid) {
     return new Response("Unauthorized", { status: 401 });
   }
 

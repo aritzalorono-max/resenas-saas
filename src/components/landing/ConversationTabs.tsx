@@ -189,16 +189,6 @@ function ProgressBar({ duration, colorClass }: { duration: number; colorClass: s
   );
 }
 
-// Inject the keyframe once via a style tag
-if (typeof document !== "undefined") {
-  if (!document.getElementById("progress-fill-keyframe")) {
-    const style = document.createElement("style");
-    style.id = "progress-fill-keyframe";
-    style.textContent = `@keyframes progressFill { from { width: 0% } to { width: 100% } }`;
-    document.head.appendChild(style);
-  }
-}
-
 // ─── Chat bubble ──────────────────────────────────────────────────────────────
 
 function Bubble({

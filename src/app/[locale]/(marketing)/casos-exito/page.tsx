@@ -4,6 +4,7 @@ import { TrendingUp } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getCaseStudies } from "@/content/case-studies-data";
 import { hreflangAlternates, buildUrl } from "@/lib/seo";
+import { BREADCRUMB_HOME } from "@/lib/blog-utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [t, locale] = await Promise.all([getTranslations("casosExito"), getLocale()]);
@@ -19,10 +20,6 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card: "summary_large_image", title, description },
   };
 }
-
-const homeLabels: Record<string, string> = {
-  es: "Inicio", en: "Home", fr: "Accueil", de: "Startseite", it: "Home", pt: "Início",
-};
 const casosLabels: Record<string, string> = {
   es: "Casos de Éxito", en: "Case Studies", fr: "Cas Clients", de: "Erfolgsgeschichten", it: "Casi di Successo", pt: "Casos de Sucesso",
 };
@@ -37,7 +34,7 @@ export default async function CasosExitoPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: homeLabels[locale] ?? "Home", item: buildUrl("/", locale) },
+      { "@type": "ListItem", position: 1, name: BREADCRUMB_HOME[locale] ?? "Home", item: buildUrl("/", locale) },
       { "@type": "ListItem", position: 2, name: casosLabels[locale] ?? "Case Studies", item: casosUrl },
     ],
   };

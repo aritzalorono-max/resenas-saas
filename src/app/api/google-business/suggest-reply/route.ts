@@ -48,7 +48,8 @@ export async function POST(request: Request) {
   const reviewerName = sanitizeField(body.reviewerName, 200);
   const reviewText   = sanitizeField(body.reviewText,   4096);
   const businessName = sanitizeField(body.businessName, 200, "");
-  const tone         = typeof body.tone         === "string" ? body.tone : undefined;
+  const VALID_TONES = ["tuteo", "usted", "juvenil"] as const;
+  const tone = VALID_TONES.includes(body.tone as (typeof VALID_TONES)[number]) ? body.tone as (typeof VALID_TONES)[number] : "tuteo";
   const ratingRaw    = body.rating;
   const rating       = typeof ratingRaw === "number" ? ratingRaw : Number(ratingRaw);
 

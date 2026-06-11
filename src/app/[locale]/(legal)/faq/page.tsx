@@ -3,6 +3,11 @@ import { getLocale } from "next-intl/server";
 import { ChevronDown } from "lucide-react";
 import { getFaqData, getFaqPageMeta, getFaqPageHeading } from "@/content/faq-data";
 import { hreflangAlternates, buildUrl } from "@/lib/seo";
+import { BREADCRUMB_HOME } from "@/lib/blog-utils";
+
+const faqLabels: Record<string, string> = {
+  es: "Preguntas Frecuentes", en: "FAQ", fr: "FAQ", de: "FAQ", it: "FAQ", pt: "FAQ",
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -17,13 +22,6 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card: "summary_large_image", title, description },
   };
 }
-
-const homeLabels: Record<string, string> = {
-  es: "Inicio", en: "Home", fr: "Accueil", de: "Startseite", it: "Home", pt: "Início",
-};
-const faqLabels: Record<string, string> = {
-  es: "Preguntas Frecuentes", en: "FAQ", fr: "FAQ", de: "FAQ", it: "FAQ", pt: "FAQ",
-};
 
 export default async function FaqPage() {
   const locale = await getLocale();
@@ -45,7 +43,7 @@ export default async function FaqPage() {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: homeLabels[locale] ?? "Home", item: buildUrl("/", locale) },
+          { "@type": "ListItem", position: 1, name: BREADCRUMB_HOME[locale] ?? "Home", item: buildUrl("/", locale) },
           { "@type": "ListItem", position: 2, name: faqLabels[locale] ?? "FAQ", item: buildUrl("/faq", locale) },
         ],
       },

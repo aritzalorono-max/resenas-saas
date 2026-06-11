@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { getTranslations, getLocale } from "next-intl/server";
-import { hreflangAlternates, buildUrl } from "@/lib/seo";
+import { hreflangAlternates, buildUrl, APP_URL } from "@/lib/seo";
+import { CONTACT } from "@/lib/constants";
 
-const COMPANY     = "Buy & Click, SL";
-const EMAIL_LEGAL = "info@resenasya.com";
-const PHONE       = "613 640 396";
-const APP_URL     = "https://resenasya.com";
+const COMPANY     = CONTACT.COMPANY;
+const EMAIL_LEGAL = CONTACT.EMAIL;
+const PHONE       = CONTACT.PHONE;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [t, locale] = await Promise.all([getTranslations("privacy"), getLocale()]);
