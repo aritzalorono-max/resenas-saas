@@ -7701,14 +7701,13 @@ export function getBlogPosts(locale: string): Array<{ slug: string; date: string
   }));
 }
 
-/** Returns only slug + title for each post — cheap prev/next navigation without loading content. */
-export function getBlogPostMeta(locale: string): Array<{ slug: string; title: string }> {
+/** Returns slug, title, category, and readTime for each post — lightweight lookup for
+ *  prev/next navigation and related-posts cards without loading full post content. */
+export function getBlogPostMeta(locale: string): Array<{ slug: string; title: string; category: string; readTime: string }> {
   return BLOG_POSTS.map((post) => {
     const lang = post.locales[locale] ? locale : "en";
-    return {
-      slug: getLocalSlug(post.slug, locale),
-      title: (post.locales[lang] ?? post.locales["es"]!).title,
-    };
+    const { title, category, readTime } = post.locales[lang] ?? post.locales["es"]!;
+    return { slug: getLocalSlug(post.slug, locale), title, category, readTime };
   });
 }
 
