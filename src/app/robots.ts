@@ -15,10 +15,10 @@ export default function robots(): MetadataRoute.Robots {
           "/faq",
           "/contacto",
           "/register",
-          "/login",
           "/terminos",
           "/privacidad",
           "/cookies",
+          "/llms.txt",
         ],
         disallow: [
           "/dashboard",

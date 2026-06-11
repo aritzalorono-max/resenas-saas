@@ -4,6 +4,7 @@ import { TrendingUp } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getCaseStudies } from "@/content/case-studies-data";
 import { hreflangAlternates, buildUrl } from "@/lib/seo";
+import { BREADCRUMB_HOME } from "@/lib/blog-utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [t, locale] = await Promise.all([getTranslations("casosExito"), getLocale()]);
@@ -19,13 +20,28 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: { card: "summary_large_image", title, description },
   };
 }
+const casosLabels: Record<string, string> = {
+  es: "Casos de Éxito", en: "Case Studies", fr: "Cas Clients", de: "Erfolgsgeschichten", it: "Casi di Successo", pt: "Casos de Sucesso",
+};
 
 export default async function CasosExitoPage() {
   const t = await getTranslations("casosExito");
   const locale = await getLocale();
   const cases = getCaseStudies(locale);
+
+  const casosUrl = buildUrl("/casos-exito", locale);
+  const casosSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: BREADCRUMB_HOME[locale] ?? "Home", item: buildUrl("/", locale) },
+      { "@type": "ListItem", position: 2, name: casosLabels[locale] ?? "Case Studies", item: casosUrl },
+    ],
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(casosSchema) }} />
       {/* Hero */}
       <section className="bg-gradient-to-b from-brand-50 via-white to-white py-16 lg:py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">

@@ -36,8 +36,8 @@ export async function GET(): Promise<never | NextResponse> {
   response.cookies.set("__gb_oauth_state", JSON.stringify({ nonce, userId: user.id }), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 600,
+    sameSite: "strict",
+    maxAge: 300,
     path: "/",
   });
   return response;

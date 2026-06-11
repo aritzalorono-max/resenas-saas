@@ -704,7 +704,7 @@ export default function ClientesPage() {
               <p className="text-xs text-gray-400 mt-2">
                 {t("crmNote")}{" "}
                 <a
-                  href="mailto:contacto.resenasya@gmail.com"
+                  href="mailto:info@resenasya.com"
                   className="underline hover:text-gray-600 transition"
                 >
                   {t("crmContact")}

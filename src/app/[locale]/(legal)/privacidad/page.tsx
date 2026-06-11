@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { getTranslations, getLocale } from "next-intl/server";
-import { hreflangAlternates, buildUrl } from "@/lib/seo";
+import { hreflangAlternates, buildUrl, APP_URL } from "@/lib/seo";
+import { CONTACT } from "@/lib/constants";
 
-const COMPANY     = "Buy & Click, SL";
-const EMAIL_LEGAL = "contacto.resenasya@gmail.com";
-const APP_URL     = "https://resenasya.com";
+const COMPANY     = CONTACT.COMPANY;
+const EMAIL_LEGAL = CONTACT.EMAIL;
+const PHONE       = CONTACT.PHONE;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [t, locale] = await Promise.all([getTranslations("privacy"), getLocale()]);
@@ -45,10 +46,11 @@ export default async function PrivacidadPage() {
           [t("s1_companyNameK"), COMPANY],
           [t("s1_legalFormK"), t("s1_legalFormV")],
           [t("s1_cifK"), "B-95612958"],
-          [t("s1_addressK"), "Avda. Ribera de Axpe 11, 2D - 202, 48950 Erandio (Bizkaia)"],
+          [t("s1_addressK"), "Avda. Ribera de Axpe 11, 2D - 202. 48950 Erandio (Bizkaia)"],
           [t("s1_registryK"), "R.M. de Vizcaya, Tomo 5138, Folio 19, Inscripción 1.ª, Hoja BI-56789"],
           [t("s1_trademarkK"), t("s1_trademarkV")],
           [t("s1_emailK"), EMAIL_LEGAL],
+          [t("s1_phoneK"), PHONE],
           [t("s1_webK"), APP_URL],
           [t("s1_activityK"), t("s1_activityV")],
         ]} />
@@ -117,10 +119,17 @@ export default async function PrivacidadPage() {
             </tr>
           </thead>
           <tbody>
-            {([0,1,2,3,4,5] as const).map((i) => (
-              <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
-                <td className="p-3 border border-gray-200 text-gray-600">{t(`s8_r${i}p` as Parameters<typeof t>[0])}</td>
-                <td className="p-3 border border-gray-200 text-gray-600">{t(`s8_r${i}b` as Parameters<typeof t>[0])}</td>
+            {([
+              ["s8_r0p", "s8_r0b"],
+              ["s8_r1p", "s8_r1b"],
+              ["s8_r2p", "s8_r2b"],
+              ["s8_r3p", "s8_r3b"],
+              ["s8_r4p", "s8_r4b"],
+              ["s8_r5p", "s8_r5b"],
+            ] as const).map(([kp, kb], i) => (
+              <tr key={kp} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
+                <td className="p-3 border border-gray-200 text-gray-600">{t(kp)}</td>
+                <td className="p-3 border border-gray-200 text-gray-600">{t(kb)}</td>
               </tr>
             ))}
           </tbody>
@@ -138,10 +147,17 @@ export default async function PrivacidadPage() {
             </tr>
           </thead>
           <tbody>
-            {(["Supabase, Inc.", "Twilio Inc.", "Anthropic, PBC", "Vercel Inc.", "Stripe, Inc.", "Google LLC"] as const).map((prov, i) => (
+            {([
+              ["Supabase, Inc.", "s9_r0s"],
+              ["Twilio Inc.", "s9_r1s"],
+              ["Anthropic, PBC", "s9_r2s"],
+              ["Vercel Inc.", "s9_r3s"],
+              ["Stripe, Inc.", "s9_r4s"],
+              ["Google LLC", "s9_r5s"],
+            ] as const).map(([prov, ks], i) => (
               <tr key={prov} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
                 <td className="p-3 border border-gray-200 text-gray-600 font-medium">{prov}</td>
-                <td className="p-3 border border-gray-200 text-gray-600">{t(`s9_r${i}s` as Parameters<typeof t>[0])}</td>
+                <td className="p-3 border border-gray-200 text-gray-600">{t(ks)}</td>
                 <td className="p-3 border border-gray-200 text-gray-600">{t("s9_sccs")}</td>
               </tr>
             ))}
@@ -152,8 +168,8 @@ export default async function PrivacidadPage() {
 
       <Section title={t("s10Title")}>
         <ul>
-          {([0,1,2,3] as const).map((i) => (
-            <li key={i}>{t.rich(`s10l${i}` as Parameters<typeof t>[0], { strong })}</li>
+          {(["s10l0", "s10l1", "s10l2", "s10l3"] as const).map((key) => (
+            <li key={key}>{t.rich(key, { strong })}</li>
           ))}
         </ul>
       </Section>
@@ -161,10 +177,19 @@ export default async function PrivacidadPage() {
       <Section title={t("s11Title")}>
         <p>{t("s11intro", { email: EMAIL_LEGAL })}</p>
         <div className="grid sm:grid-cols-2 gap-3 mt-3 not-prose">
-          {([0,1,2,3,4,5,6,7] as const).map((i) => (
-            <div key={i} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
-              <p className="font-semibold text-gray-800 text-sm">{t(`s11_r${i}title` as Parameters<typeof t>[0])}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{t(`s11_r${i}desc` as Parameters<typeof t>[0])}</p>
+          {([
+              ["s11_r0title", "s11_r0desc"],
+              ["s11_r1title", "s11_r1desc"],
+              ["s11_r2title", "s11_r2desc"],
+              ["s11_r3title", "s11_r3desc"],
+              ["s11_r4title", "s11_r4desc"],
+              ["s11_r5title", "s11_r5desc"],
+              ["s11_r6title", "s11_r6desc"],
+              ["s11_r7title", "s11_r7desc"],
+            ] as const).map(([kt, kd]) => (
+            <div key={kt} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <p className="font-semibold text-gray-800 text-sm">{t(kt)}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{t(kd)}</p>
             </div>
           ))}
         </div>
@@ -174,8 +199,8 @@ export default async function PrivacidadPage() {
       <Section title={t("s12Title")}>
         <p>{t("s12intro", { company: COMPANY })}</p>
         <ul>
-          {([0,1,2,3,4,5] as const).map((i) => (
-            <li key={i}>{t(`s12l${i}` as Parameters<typeof t>[0])}</li>
+          {(["s12l0", "s12l1", "s12l2", "s12l3", "s12l4", "s12l5"] as const).map((key) => (
+            <li key={key}>{t(key)}</li>
           ))}
         </ul>
         <p>{t("s12p2", { company: COMPANY })}</p>

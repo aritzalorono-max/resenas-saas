@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 
 const COMPANY = "Buy & Click, SL";
-const EMAIL   = "contacto.resenasya@gmail.com";
+const EMAIL   = "info@resenasya.com";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("cookies");

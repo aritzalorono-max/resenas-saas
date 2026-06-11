@@ -60,14 +60,19 @@ export function formatWhatsAppNumber(phone: string): string {
  * @returns Array de variantes del número para buscar en la BD
  */
 export function getPhoneVariants(fromField: string): string[] {
-  const normalized = fromField.replace("whatsapp:", "").replace(/\s/g, "");
+  const normalized = fromField.replace("whatsapp:", "").replace(/[\s\-().]/g, "");
+  const variants = new Set<string>();
 
-  return [
-    normalized,                                  // ej: +34612345678
-    normalized.replace(/^\+\d{2}/, ""),          // sin prefijo de país (2 dígitos)
-    normalized.replace(/^\+\d{1,3}/, ""),        // sin prefijo de país (1-3 dígitos)
-    normalized.replace("+", ""),                  // sin el +
-  ].filter((v, i, arr) => arr.indexOf(v) === i); // eliminamos duplicados
+  variants.add(normalized);                       // +34612345678
+  if (normalized.startsWith("+")) {
+    const digits = normalized.slice(1);           // 34612345678
+    variants.add(digits);                         // sin +
+    variants.add(digits.slice(1));                // sin prefijo 1 dígito (+1)
+    variants.add(digits.slice(2));                // sin prefijo 2 dígitos (+34)
+    variants.add(digits.slice(3));                // sin prefijo 3 dígitos (+358)
+  }
+
+  return Array.from(variants).filter(Boolean);
 }
 
 // ---------------------------------------------------------------------------

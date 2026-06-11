@@ -14,6 +14,7 @@
  * Requiere TWILIO_REMINDER_TEMPLATE_SID en las variables de entorno.
  */
 
+import { timingSafeEqual } from "crypto";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getTwilioSender, sendWhatsAppTemplateWith } from "@/lib/twilio";
 import { logger } from "@/lib/logger";
@@ -32,8 +33,11 @@ const REMINDER_HOURS  = [24, 72] as const;
 
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET;
-  const auth       = request.headers.get("authorization");
-  if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
+  const auth = request.headers.get("authorization") ?? "";
+  const expected = `Bearer ${cronSecret ?? ""}`;
+  const valid = cronSecret && auth.length === expected.length &&
+    timingSafeEqual(Buffer.from(auth), Buffer.from(expected));
+  if (!valid) {
     return new Response("Unauthorized", { status: 401 });
   }
 

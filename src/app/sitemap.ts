@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getStaticBlogParams } from "@/content/blog-posts-data";
+import { getStaticBlogParams, getBlogPosts } from "@/content/blog-posts-data";
 import { localizedPath } from "@/lib/localized-paths";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
@@ -39,12 +39,15 @@ function entry(
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // getStaticBlogParams returns LOCALES.flatMap(locale => POSTS) — ordered locale-first
-  // So for 5 posts and 6 locales: indices 0-4 = es, 5-9 = en, 10-14 = fr, etc.
+  // So for N posts and 6 locales: indices 0..N-1 = es, N..2N-1 = en, etc.
   const allParams = getStaticBlogParams();
-  const postCount = allParams.filter((p) => p.locale === DEFAULT_LOCALE).length;
+  const esPosts = getBlogPosts(DEFAULT_LOCALE);
+  const postCount = esPosts.length;
 
   const blogEntries: MetadataRoute.Sitemap[number][] = [];
   for (let i = 0; i < postCount; i++) {
+    const postDate = new Date(esPosts[i].date);
+
     // Build slug-by-locale map for this post
     const alts: Record<string, string> = {};
     LOCALES.forEach((locale, li) => {
@@ -62,7 +65,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       const prefix = locale === DEFAULT_LOCALE ? "" : `/${locale}`;
       blogEntries.push({
         url: `${APP_URL}${prefix}/blog/${param.slug}`,
-        lastModified: new Date("2026-05-28"),
+        lastModified: postDate,
         changeFrequency: "monthly",
         priority: locale === DEFAULT_LOCALE ? 0.7 : 0.63,
         alternates: { languages: alts },
@@ -78,7 +81,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...entry("/faq", { changeFrequency: "monthly", priority: 0.8 }),
     ...entry("/contacto", { changeFrequency: "monthly", priority: 0.6 }),
     ...entry("/register", { changeFrequency: "monthly", priority: 0.7 }),
-    ...entry("/login", { changeFrequency: "monthly", priority: 0.5 }),
     ...entry("/terminos", { changeFrequency: "yearly", priority: 0.3 }),
     ...entry("/privacidad", { changeFrequency: "yearly", priority: 0.3 }),
     ...entry("/cookies", { changeFrequency: "yearly", priority: 0.2 }),

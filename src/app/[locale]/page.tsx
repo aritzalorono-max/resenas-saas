@@ -154,14 +154,6 @@ const schemaOrg = {
       "@type": "WebSite",
       name: "ResenasYa",
       url: process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: {
-          "@type": "EntryPoint",
-          urlTemplate: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com"}/blog?q={search_term_string}`,
-        },
-        "query-input": "required name=search_term_string",
-      },
     },
     {
       "@type": "Organization",
@@ -171,9 +163,10 @@ const schemaOrg = {
       logo: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com"}/icon.svg`,
       contactPoint: {
         "@type": "ContactPoint",
-        email: "contacto.resenasya@gmail.com",
+        email: "info@resenasya.com",
+        telephone: "+34613640396",
         contactType: "customer support",
-        availableLanguage: "Spanish",
+        availableLanguage: ["Spanish", "English", "French", "German", "Italian", "Portuguese"],
       },
       address: {
         "@type": "PostalAddress",
@@ -621,8 +614,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                   <ul className="space-y-2">
                     <li><Link href={localizedPath("/contacto", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{footer("contact")}</Link></li>
                     <li>
-                      <a href="mailto:contacto.resenasya@gmail.com" className="text-sm text-gray-500 hover:text-gray-800 transition">
-                        contacto.resenasya@gmail.com
+                      <a href="mailto:info@resenasya.com" className="text-sm text-gray-500 hover:text-gray-800 transition">
+                        info@resenasya.com
                       </a>
                     </li>
                   </ul>

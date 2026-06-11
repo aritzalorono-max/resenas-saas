@@ -64,7 +64,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
                 <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">{t("footer.support")}</p>
                 <ul className="space-y-2">
                   <li><Link href={localizedPath("/contacto", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.contact")}</Link></li>
-                  <li><a href="mailto:contacto.resenasya@gmail.com" className="text-sm text-gray-500 hover:text-gray-800 transition">contacto.resenasya@gmail.com</a></li>
+                  <li><a href="mailto:info@resenasya.com" className="text-sm text-gray-500 hover:text-gray-800 transition">info@resenasya.com</a></li>
                 </ul>
               </div>
               <div>

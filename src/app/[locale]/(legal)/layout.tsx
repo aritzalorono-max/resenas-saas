@@ -69,8 +69,8 @@ export default async function LegalLayout({ children }: { children: React.ReactN
                 <ul className="space-y-2">
                   <li><Link href={localizedPath("/contacto", locale)} className="text-sm text-gray-500 hover:text-gray-800 transition">{t("footer.contact")}</Link></li>
                   <li>
-                    <a href="mailto:contacto.resenasya@gmail.com" className="text-sm text-gray-500 hover:text-gray-800 transition">
-                      contacto.resenasya@gmail.com
+                    <a href="mailto:info@resenasya.com" className="text-sm text-gray-500 hover:text-gray-800 transition">
+                      info@resenasya.com
                     </a>
                   </li>
                 </ul>

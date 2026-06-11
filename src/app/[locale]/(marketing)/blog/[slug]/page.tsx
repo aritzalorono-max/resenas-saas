@@ -1,12 +1,13 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBlogPosts, getPostBySlug, getStaticBlogParams, getBlogPostAllSlugs } from "@/content/blog-posts-data";
+import { getBlogPostMeta, getPostBySlug, getStaticBlogParams, getBlogPostAllSlugs } from "@/content/blog-posts-data";
 import { Clock, ArrowLeft, ArrowRight, Tag } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { blogHreflangAlternates, buildUrl, APP_URL } from "@/lib/seo";
 import { MarkdownContent } from "@/components/blog/MarkdownContent";
 import { ShareButtons } from "@/components/blog/ShareButtons";
+import { CATEGORY_COLORS, formatPostDate } from "@/lib/blog-utils";
 
 export const revalidate = 86400;
 
@@ -45,37 +46,30 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-const categoryColors: Record<string, string> = {
-  "Google Maps": "bg-blue-50 text-blue-700",
-  "Estrategia": "bg-purple-50 text-purple-700",
-  "Reputación": "bg-red-50 text-red-700",
-  "SEO Local": "bg-green-50 text-green-700",
-  "Legal": "bg-gray-100 text-gray-700",
-  "Strategy": "bg-purple-50 text-purple-700",
-  "Reputation": "bg-red-50 text-red-700",
-  "Local SEO": "bg-green-50 text-green-700",
-  "Stratégie": "bg-purple-50 text-purple-700",
-  "Réputation": "bg-red-50 text-red-700",
-  "Légal": "bg-gray-100 text-gray-700",
-  "Strategie": "bg-purple-50 text-purple-700",
-  "Lokales SEO": "bg-green-50 text-green-700",
-  "Rechtliches": "bg-gray-100 text-gray-700",
-  "Strategia": "bg-purple-50 text-purple-700",
-  "Reputazione": "bg-red-50 text-red-700",
-  "SEO Locale": "bg-green-50 text-green-700",
-  "Legale": "bg-gray-100 text-gray-700",
-  "Estratégia": "bg-purple-50 text-purple-700",
-  "Reputação": "bg-red-50 text-red-700",
-};
+/**
+ * Extrae pares pregunta/respuesta de los encabezados H2 en forma de pregunta.
+ * La respuesta es el texto que sigue al encabezado hasta el siguiente encabezado.
+ */
+function extractFaq(content: string): Array<{ question: string; answer: string }> {
+  const lines = content.split("\n");
+  const faq: Array<{ question: string; answer: string }> = [];
+  let current: { question: string; answer: string[] } | null = null;
 
-const localeToDateFormat: Record<string, string> = {
-  es: "es-ES", en: "en-GB", fr: "fr-FR", de: "de-DE", it: "it-IT", pt: "pt-PT",
-};
+  for (const line of lines) {
+    if (line.startsWith("## ")) {
+      if (current) faq.push({ question: current.question, answer: current.answer.join(" ") });
+      const heading = line.slice(3).trim();
+      current = /[?？]$/.test(heading) ? { question: heading, answer: [] } : null;
+    } else if (current && line.trim() !== "" && !line.startsWith("|")) {
+      // Texto plano sin marcas de markdown para el schema
+      current.answer.push(
+        line.replace(/^[->]\s*/, "").replace(/\*\*(.+?)\*\*/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").trim()
+      );
+    }
+  }
+  if (current) faq.push({ question: current.question, answer: current.answer.join(" ") });
 
-function formatDate(dateStr: string, locale: string) {
-  return new Date(dateStr).toLocaleDateString(localeToDateFormat[locale] ?? "en-GB", {
-    day: "numeric", month: "long", year: "numeric",
-  });
+  return faq.filter((f) => f.answer.length > 0);
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -85,42 +79,62 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const post = getPostBySlug(slug, locale);
   if (!post) notFound();
 
-  const allPosts = getBlogPosts(locale);
+  const allPosts = getBlogPostMeta(locale);
   const currentIndex = allPosts.findIndex((p) => p.slug === slug);
   const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
   const relatedPosts = allPosts.filter((p) => p.slug !== slug && p.category === post.category).slice(0, 3);
   const otherPosts = relatedPosts.length > 0 ? relatedPosts : allPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
   const prefix = locale === "es" ? "" : `/${locale}`;
-  const postUrl = `${appUrl}${prefix}/blog/${post.slug}`;
+  const postUrl = `${APP_URL}${prefix}/blog/${post.slug}`;
 
   const articleSchema = {
     "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Article",
-        headline: post.title,
-        description: post.description,
-        datePublished: post.date,
-        author: { "@type": "Organization", name: "ResenasYa" },
-        publisher: { "@type": "Organization", name: "ResenasYa", url: appUrl },
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Inicio", item: appUrl },
-          { "@type": "ListItem", position: 2, name: "Blog", item: `${appUrl}/blog` },
-          { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
-        ],
-      },
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
+    inLanguage: locale,
+    url: postUrl,
+    mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
+    articleSection: post.category,
+    wordCount: post.content.split(/\s+/).length,
+    author: { "@type": "Organization", name: "ResenasYa", url: APP_URL },
+    publisher: { "@type": "Organization", name: "ResenasYa", url: APP_URL },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "ResenasYa", item: `${APP_URL}${prefix || "/"}` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${APP_URL}${prefix}/blog` },
+      { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
     ],
   };
+
+  const faqItems = extractFaq(post.content);
+  const faqSchema = faqItems.length >= 2
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((f) => ({
+          "@type": "Question",
+          name: f.question,
+          acceptedAnswer: { "@type": "Answer", text: f.answer },
+        })),
+      }
+    : null;
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      {faqSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
 
       <div className="py-10 px-6">
         <div className="max-w-3xl mx-auto">
@@ -134,14 +148,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {/* Header */}
           <header className="mb-10">
             <div className="flex items-center gap-3 mb-5 flex-wrap">
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${categoryColors[post.category] ?? "bg-gray-100 text-gray-600"}`}>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"}`}>
                 <Tag className="w-3 h-3" />
                 {post.category}
               </span>
               <span className="flex items-center gap-1 text-xs text-gray-400">
                 <Clock className="w-3.5 h-3.5" /> {post.readTime} {t("readTime")}
               </span>
-              <span className="text-xs text-gray-400">{formatDate(post.date, locale)}</span>
+              <span className="text-xs text-gray-400">{formatPostDate(post.date, locale)}</span>
             </div>
             <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">{post.title}</h1>
             <p className="text-lg text-gray-500 leading-relaxed border-l-4 border-brand-300 pl-4">{post.description}</p>

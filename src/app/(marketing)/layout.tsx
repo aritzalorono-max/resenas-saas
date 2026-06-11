@@ -54,7 +54,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
                 <p className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">Soporte</p>
                 <ul className="space-y-2">
                   <li><Link href="/contacto" className="text-sm text-gray-500 hover:text-gray-800 transition">Contacto</Link></li>
-                  <li><a href="mailto:contacto.resenasya@gmail.com" className="text-sm text-gray-500 hover:text-gray-800 transition">contacto.resenasya@gmail.com</a></li>
+                  <li><a href="mailto:info@resenasya.com" className="text-sm text-gray-500 hover:text-gray-800 transition">info@resenasya.com</a></li>
                 </ul>
               </div>
               <div>
@@ -68,7 +68,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             </div>
           </div>
           <div className="border-t border-gray-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-gray-500">© {new Date().getFullYear()} ReseñasYa S.L. Todos los derechos reservados.</p>
+            <p className="text-xs text-gray-500">© {new Date().getFullYear()} Buy & Click, SL Todos los derechos reservados.</p>
             <div className="flex flex-wrap gap-4 text-xs text-gray-500 items-center">
               <Link href="/privacidad" className="hover:text-gray-600 transition">Privacidad</Link>
               <Link href="/terminos" className="hover:text-gray-600 transition">Términos</Link>

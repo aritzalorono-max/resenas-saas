@@ -3,6 +3,11 @@ import { getLocale } from "next-intl/server";
 import { ChevronDown } from "lucide-react";
 import { getFaqData, getFaqPageMeta, getFaqPageHeading } from "@/content/faq-data";
 import { hreflangAlternates, buildUrl } from "@/lib/seo";
+import { BREADCRUMB_HOME } from "@/lib/blog-utils";
+
+const faqLabels: Record<string, string> = {
+  es: "Preguntas Frecuentes", en: "FAQ", fr: "FAQ", de: "FAQ", it: "FAQ", pt: "FAQ",
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -24,7 +29,6 @@ export default async function FaqPage() {
   const { title, subtitle } = getFaqPageHeading(locale);
 
   const allFaqs = faqs.flatMap((cat) => cat.items);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://resenasya.com";
   const faqSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -39,8 +43,8 @@ export default async function FaqPage() {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Inicio", item: appUrl },
-          { "@type": "ListItem", position: 2, name: "FAQ", item: `${appUrl}/faq` },
+          { "@type": "ListItem", position: 1, name: BREADCRUMB_HOME[locale] ?? "Home", item: buildUrl("/", locale) },
+          { "@type": "ListItem", position: 2, name: faqLabels[locale] ?? "FAQ", item: buildUrl("/faq", locale) },
         ],
       },
     ],
