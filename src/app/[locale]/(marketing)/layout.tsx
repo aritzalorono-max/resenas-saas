@@ -35,7 +35,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
               {t("nav.login")}
             </Link>
             <LanguageSwitcher />
-            <Link href="/register" className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+            <Link href="/register" className="bg-brand-700 hover:bg-brand-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
               {t("nav.startFree")}
             </Link>
           </div>

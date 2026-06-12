@@ -267,7 +267,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
               <LanguageSwitcher />
               <Link
                 href="/register"
-                className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+                className="bg-brand-700 hover:bg-brand-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
               >
                 {nav("startFree")}
               </Link>
@@ -309,7 +309,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/register"
-                className="bg-brand-600 hover:bg-brand-700 text-white font-bold px-8 py-4 rounded-xl text-lg transition shadow-lg shadow-brand-200"
+                className="bg-brand-700 hover:bg-brand-800 text-white font-bold px-8 py-4 rounded-xl text-lg transition shadow-lg shadow-brand-200"
               >
                 {t("startFree")}
               </Link>
@@ -328,7 +328,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
               {steps.map((step) => (
                 <div key={step.number} className="text-center">
-                  <div className="text-4xl font-extrabold text-brand-300 mb-3">{step.number}</div>
+                  <div className="text-4xl font-extrabold text-brand-600 mb-3">{step.number}</div>
                   <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">{step.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
                 </div>
@@ -338,15 +338,29 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             {/* Vídeo demostrativo — solo en español */}
             {locale === "es" && (
               <div className="mt-14">
-                <div className="relative w-full rounded-2xl overflow-hidden shadow-xl aspect-video">
-                  <iframe
-                    src="https://www.youtube.com/embed/Hu52ipdFzjk"
-                    title="Demostración ResenasYa"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
+                <div className="relative w-full rounded-2xl overflow-hidden shadow-xl aspect-video bg-gray-900">
+                  {/* YouTube facade: thumbnail only — iframe loads on click to avoid
+                      third-party cookies and network requests on initial page load */}
+                  <img
+                    src="https://i.ytimg.com/vi/Hu52ipdFzjk/maxresdefault.jpg"
+                    alt="Demostración ResenasYa"
+                    className="absolute inset-0 w-full h-full object-cover"
                     loading="lazy"
-                    className="absolute inset-0 w-full h-full"
                   />
+                  <button
+                    aria-label="Reproducir vídeo de demostración"
+                    className="absolute inset-0 flex items-center justify-center group"
+                    onClick={(e) => {
+                      const wrapper = (e.currentTarget as HTMLElement).parentElement!;
+                      wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/Hu52ipdFzjk?autoplay=1" title="Demostración ResenasYa" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full" />`;
+                    }}
+                  >
+                    <span className="w-16 h-16 bg-white/90 group-hover:bg-white rounded-full flex items-center justify-center shadow-lg transition">
+                      <svg viewBox="0 0 24 24" className="w-7 h-7 text-brand-600 translate-x-0.5" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </span>
+                  </button>
                 </div>
               </div>
             )}
@@ -515,7 +529,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
               </Link>
               <Link
                 href="/register"
-                className="bg-brand-600 hover:bg-brand-700 text-white font-bold px-7 py-3.5 rounded-xl text-base transition shadow-lg shadow-brand-200 inline-block"
+                className="bg-brand-700 hover:bg-brand-800 text-white font-bold px-7 py-3.5 rounded-xl text-base transition shadow-lg shadow-brand-200 inline-block"
               >
                 {t("startFree")}
               </Link>

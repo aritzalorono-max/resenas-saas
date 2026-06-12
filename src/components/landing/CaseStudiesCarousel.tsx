@@ -88,7 +88,7 @@ export function CaseStudiesCarousel() {
             {/* Before / After */}
             <div className="grid grid-cols-2 gap-0 divide-x divide-gray-100">
               <div className="p-4">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">{t("casesBeforeLabel")}</p>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1.5">{t("casesBeforeLabel")}</p>
                 <p className="text-xs text-gray-600 leading-relaxed">{challenge}</p>
               </div>
               <div className="p-4 bg-brand-50/40">
@@ -102,7 +102,7 @@ export function CaseStudiesCarousel() {
               {stats.map(({ label, value }) => (
                 <div key={label} className="p-3 text-center">
                   <p className="text-xl font-extrabold text-gray-900">{value}</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">{label}</p>
+                  <p className="text-[10px] text-gray-600 mt-0.5 leading-tight">{label}</p>
                 </div>
               ))}
             </div>

@@ -72,7 +72,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <link rel="dns-prefetch" href={`https://${supabaseHost}`} />
           </>
         )}
-        <link rel="preconnect" href="https://www.youtube.com" />
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
       </head>
       <body className={inter.className}>
