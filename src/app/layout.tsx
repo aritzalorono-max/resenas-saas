@@ -8,7 +8,7 @@ import { getLocale } from "next-intl/server";
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "600", "700", "800"],
   display: "swap",
   preload: true,
   variable: "--font-inter",
@@ -72,6 +72,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <link rel="dns-prefetch" href={`https://${supabaseHost}`} />
           </>
         )}
+        <link rel="preconnect" href="https://www.youtube.com" />
+        <link rel="dns-prefetch" href="https://i.ytimg.com" />
       </head>
       <body className={inter.className}>
         {children}

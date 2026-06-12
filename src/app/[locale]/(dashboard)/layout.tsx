@@ -1,11 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
+import { NextIntlClientProvider } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/layout/LogoutButton";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { SidebarNav } from "@/components/layout/SidebarNav";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale, getMessages } from "next-intl/server";
 import { UserCircle, ShieldCheck } from "lucide-react";
 
 function Logo() {
@@ -38,7 +39,28 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .map((e) => e.trim())
     .includes(user.email ?? "");
 
-  const t = await getTranslations("common");
+  const [t, locale, all] = await Promise.all([
+    getTranslations("common"),
+    getLocale(),
+    getMessages(),
+  ]);
+  // Pages inside the dashboard are client components — provide their namespaces here.
+  // SidebarNav / BottomNav / LogoutButton / LanguageSwitcher use `common` which is
+  // already in the locale-level provider, so they stay outside this inner provider.
+  const dashboardMessages = {
+    common: all.common,
+    dashboard: all.dashboard,
+    clientes: all.clientes,
+    configuracion: all.configuracion,
+    cuenta: all.cuenta,
+    facturacion: all.facturacion,
+    informes: all.informes,
+    incentivos: all.incentivos,
+    cartel: all.cartel,
+    googleBusiness: all.googleBusiness,
+    error: all.error,
+    resenas: all.resenas,
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -101,7 +123,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </header>
 
         <main id="main-content" className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
-          {children}
+          <NextIntlClientProvider locale={locale} messages={dashboardMessages}>
+            {children}
+          </NextIntlClientProvider>
         </main>
       </div>
 

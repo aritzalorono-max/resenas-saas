@@ -1,12 +1,18 @@
+import { NextIntlClientProvider } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, getMessages } from "next-intl/server";
 import { localizedPath } from "@/lib/localized-paths";
 
 export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
   const t = await getTranslations();
   const locale = await getLocale();
+  const all = await getMessages();
+  // Client components inside <main> (ConversationTabs, PricingPlans, etc.) need these.
+  // Nav/footer client components (LanguageSwitcher, ManageCookiesButton) use the
+  // locale-level provider which already has `common` and `cookieBanner`.
+  const pageMessages = { home: all.home, precios: all.precios };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -36,7 +42,11 @@ export default async function MarketingLayout({ children }: { children: React.Re
         </div>
       </nav>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <NextIntlClientProvider locale={locale} messages={pageMessages}>
+          {children}
+        </NextIntlClientProvider>
+      </main>
 
       <footer className="border-t border-gray-100 bg-gray-50 py-12 px-6">
         <div className="max-w-6xl mx-auto">
