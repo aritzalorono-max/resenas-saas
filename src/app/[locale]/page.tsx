@@ -1,7 +1,8 @@
+import { NextIntlClientProvider } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getMessages } from "next-intl/server";
 import { localizedPath } from "@/lib/localized-paths";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import dynamic from "next/dynamic";
@@ -199,9 +200,16 @@ const sectorIcons = [
 
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const t = await getTranslations("home");
-  const nav = await getTranslations("nav");
-  const footer = await getTranslations("footer");
+  const [t, nav, footer, all] = await Promise.all([
+    getTranslations("home"),
+    getTranslations("nav"),
+    getTranslations("footer"),
+    getMessages(),
+  ]);
+  // Dynamic client components (ConversationTabs, PricingPlans, etc.) need these
+  // namespaces. The locale-level provider only ships universal namespaces, so we
+  // add a page-scoped provider here.
+  const pageMessages = { home: all.home, precios: all.precios };
 
   const sectors = sectorIcons.map(({ Icon, key }) => ({ Icon, name: t(key), key }));
 
@@ -229,7 +237,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
   ];
 
   return (
-    <>
+    <NextIntlClientProvider locale={locale} messages={pageMessages}>
       {/* Datos estructurados Schema.org */}
       <script
         type="application/ld+json"
@@ -646,6 +654,6 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           </div>
         </footer>
       </div>
-    </>
+    </NextIntlClientProvider>
   );
 }
