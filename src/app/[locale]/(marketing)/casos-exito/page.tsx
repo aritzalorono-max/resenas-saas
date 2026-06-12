@@ -140,6 +140,15 @@ export default async function CasosExitoPage() {
         </div>
       </section>
 
+      {/* Disclaimer */}
+      <section className="py-6 px-6">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs text-gray-400 leading-relaxed text-center">
+            {t("disclaimer")}
+          </p>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-16 px-6 bg-gradient-to-br from-brand-600 to-brand-700">
         <div className="max-w-2xl mx-auto text-center">

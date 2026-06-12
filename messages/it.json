@@ -69,8 +69,8 @@
     "replyExampleLabel": "Risposta del proprietario · generata dall'IA",
     "replyExampleResponse": "Grazie mille, Marco! Siamo felici che tu abbia apprezzato. A presto 😊",
     "removeCardBadge": "Protezione",
-    "removeCardTitle": "Elimina recensioni false o ingiuste",
-    "removeCardDesc": "Rileviamo quali recensioni negative violano le politiche di Google. Con un solo clic puoi richiederne la rimozione ufficiale direttamente dal pannello.",
+    "removeCardTitle": "Richiedi la rimozione di recensioni false o ingiuste",
+    "removeCardDesc": "Rileviamo quali recensioni negative possono violare le politiche di Google e generiamo la richiesta ufficiale. La decisione finale spetta sempre a Google.",
     "removeFeature1": "Analisi automatica delle politiche di Google",
     "removeFeature2": "Richiesta di rimozione in 1 clic",
     "removeFeature3": "Monitoraggio dello stato di ogni richiesta",
@@ -725,7 +725,8 @@
     "ctaTitle": "Vuoi essere la prossima storia di successo?",
     "ctaDesc": "Inizia gratis oggi e ottieni le tue prime recensioni questa settimana.",
     "ctaBtn": "Crea account gratuito →",
-    "noContract": "Senza vincoli · Cancella quando vuoi"
+    "noContract": "Senza vincoli · Cancella quando vuoi",
+    "disclaimer": "I casi presentati sono rappresentativi di risultati reali ottenuti da aziende che utilizzano ResenasYa. I risultati individuali possono variare in base al settore, alla base clienti e ad altri fattori. ResenasYa non garantisce risultati specifici. Le statistiche globali riflettono i dati cumulati dal lancio della piattaforma."
   },
   "precios": {
     "title": "Prezzi semplici e trasparenti",

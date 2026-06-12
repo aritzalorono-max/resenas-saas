@@ -137,6 +137,17 @@ export async function POST(request: Request): Promise<Response> {
 
   logger.info(`Mensaje recibido de ${maskPhone(fromNumber)} → ${toNumber} | media: ${numMedia} | len: ${messageBody.length}`);
 
+  // ── STOP / opt-out ────────────────────────────────────────────────────────
+  // Twilio gestiona STOP automáticamente a nivel de número para números
+  // dedicados. Para el sandbox compartido o modo "own" añadimos detección
+  // explícita: si el cliente responde STOP (o variantes) no enviamos nada más.
+  // Twilio ya bloquea futuros envíos al número; nosotros simplemente salimos.
+  const stopWords = /^\s*(stop|cancel|unsubscribe|quit|end|baja|para|alto|stopp|arrêt|ferma|parar)\s*$/i;
+  if (stopWords.test(messageBody)) {
+    logger.info(`Mensaje STOP recibido de ${maskPhone(fromNumber)} — sin respuesta enviada`);
+    return twilioEmptyResponse();
+  }
+
   // ── 1. Validar firma (producción) ─────────────────────────────────────────
   if (process.env.NODE_ENV === "production") {
     const isSharedNumber = toNumber.includes(TWILIO_WHATSAPP_NUMBER.replace("whatsapp:", ""));
