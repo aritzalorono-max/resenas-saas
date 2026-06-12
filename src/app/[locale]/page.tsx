@@ -328,7 +328,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
               {steps.map((step) => (
                 <div key={step.number} className="text-center">
-                  <div className="text-4xl font-extrabold text-brand-200 mb-3">{step.number}</div>
+                  <div className="text-4xl font-extrabold text-brand-300 mb-3">{step.number}</div>
                   <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">{step.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
                 </div>
@@ -454,7 +454,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                     <span className="bg-red-100 text-red-600 text-xs font-semibold px-2.5 py-1 rounded-full">
                       {t("removeExampleBadge")}
                     </span>
-                    <span className="text-xs text-gray-400">{t("removeExampleMeta")}</span>
+                    <span className="text-xs text-gray-500">{t("removeExampleMeta")}</span>
                   </div>
                   <div className="w-full bg-red-500 text-white text-xs font-semibold py-2 rounded-lg text-center">
                     {t("removeBtn")}

@@ -54,7 +54,7 @@ export default function ContactoPage() {
       <header className="mb-10 pb-6 border-b border-gray-100">
         <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">{t("eyebrow")}</p>
         <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{t("title")}</h1>
-        <p className="text-gray-400 text-sm">{t("subtitle")}</p>
+        <p className="text-gray-500 text-sm">{t("subtitle")}</p>
       </header>
 
       <div className="grid lg:grid-cols-5 gap-10">
@@ -178,7 +178,7 @@ export default function ContactoPage() {
                   </>
                 )}
               </button>
-              <p className="text-xs text-gray-400 text-center">{t("footerNote")}</p>
+              <p className="text-xs text-gray-500 text-center">{t("footerNote")}</p>
             </form>
           )}
         </div>
@@ -259,7 +259,7 @@ function ContactItem({
         {icon}
       </div>
       <div>
-        <p className="text-xs text-gray-400">{label}</p>
+        <p className="text-xs text-gray-500">{label}</p>
         <p className="text-sm font-medium text-gray-700 group-hover:text-brand-600 transition">{value}</p>
       </div>
     </a>

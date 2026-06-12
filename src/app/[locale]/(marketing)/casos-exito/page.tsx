@@ -96,7 +96,7 @@ export default async function CasosExitoPage() {
                       <span className="text-xs font-semibold text-gray-500 bg-white/70 px-2 py-0.5 rounded-full">{platform}</span>
                     </div>
                     <h2 className="text-xl font-bold text-gray-900 mt-0.5">
-                      {name} <span className="text-gray-400 font-normal">· {location}</span>
+                      {name} <span className="text-gray-500 font-normal">· {location}</span>
                     </h2>
                   </div>
                 </div>
@@ -106,11 +106,11 @@ export default async function CasosExitoPage() {
               <div className="p-8">
                 <div className="grid md:grid-cols-3 gap-8 mb-8">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">{t("challenge")}</p>
+                    <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">{t("challenge")}</p>
                     <p className="text-sm text-gray-600 leading-relaxed">{challenge}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">{t("solution")}</p>
+                    <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">{t("solution")}</p>
                     <p className="text-sm text-gray-600 leading-relaxed">{solution}</p>
                   </div>
                   <div>
@@ -122,7 +122,7 @@ export default async function CasosExitoPage() {
                 {/* Quote */}
                 <blockquote className="border-l-4 border-brand-200 pl-4 mb-8">
                   <p className="text-sm text-gray-600 italic leading-relaxed">&ldquo;{quote}&rdquo;</p>
-                  <p className="text-xs text-gray-400 mt-2 font-medium">— {quoteName}</p>
+                  <p className="text-xs text-gray-500 mt-2 font-medium">— {quoteName}</p>
                 </blockquote>
 
                 {/* Stats */}
@@ -130,7 +130,7 @@ export default async function CasosExitoPage() {
                   {stats.map(({ label, value }) => (
                     <div key={label} className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
                       <p className="text-2xl font-extrabold text-gray-900">{value}</p>
-                      <p className="text-xs text-gray-400 mt-1 leading-tight">{label}</p>
+                      <p className="text-xs text-gray-500 mt-1 leading-tight">{label}</p>
                     </div>
                   ))}
                 </div>
@@ -143,7 +143,7 @@ export default async function CasosExitoPage() {
       {/* Disclaimer */}
       <section className="py-6 px-6">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs text-gray-400 leading-relaxed text-center">
+          <p className="text-xs text-gray-500 leading-relaxed text-center">
             {t("disclaimer")}
           </p>
         </div>
@@ -164,7 +164,7 @@ export default async function CasosExitoPage() {
           >
             {t("ctaBtn")}
           </Link>
-          <p className="text-brand-200 text-sm mt-4">{t("noContract")}</p>
+          <p className="text-brand-100 text-sm mt-4">{t("noContract")}</p>
         </div>
       </section>
     </>
