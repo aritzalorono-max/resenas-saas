@@ -12,6 +12,7 @@
  */
 
 import { createServiceClient } from "@/lib/supabase/server";
+import { timingSafeEqual } from "crypto";
 import { extractPlaceIdFromUrl, findPlaceIdByName, getPlaceRating } from "@/lib/google-places";
 import { logger } from "@/lib/logger";
 
@@ -82,8 +83,11 @@ async function processOneBusiness(
 export async function GET(request: Request): Promise<Response> {
   // ── Auth check ────────────────────────────────────────────────────────────
   const cronSecret = process.env.CRON_SECRET;
-  const auth = request.headers.get("authorization");
-  if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
+  const auth = request.headers.get("authorization") ?? "";
+  const expected = `Bearer ${cronSecret ?? ""}`;
+  const valid = cronSecret && auth.length === expected.length &&
+    timingSafeEqual(Buffer.from(auth), Buffer.from(expected));
+  if (!valid) {
     return new Response("Unauthorized", { status: 401 });
   }
 

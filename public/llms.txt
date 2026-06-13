@@ -1,0 +1,34 @@
+# ResenasYa
+
+> ResenasYa is a SaaS platform that automates Google Maps review collection for local businesses via WhatsApp and AI sentiment analysis. When a customer replies, Claude AI classifies the sentiment and automatically directs satisfied customers to leave a Google Maps, App Store, or Play Store review.
+
+## Product
+
+- Landing page: https://resenasya.com
+- Register: https://resenasya.com/register
+- Pricing: https://resenasya.com/#precios
+- FAQ: https://resenasya.com/faq
+- Case studies: https://resenasya.com/casos-exito
+
+## Blog
+
+- How to get more Google Maps reviews: https://resenasya.com/blog/como-conseguir-mas-resenas-google-maps
+- Why customers don't leave reviews via WhatsApp: https://resenasya.com/blog/por-que-clientes-no-dejan-resenas-whatsapp
+- How to handle negative reviews: https://resenasya.com/blog/gestionar-resenas-negativas
+- Google Maps algorithm and local SEO: https://resenasya.com/blog/algoritmo-google-maps-reputacion-local
+- Is it legal to request reviews via WhatsApp (GDPR): https://resenasya.com/blog/legal-pedir-resenas-whatsapp-rgpd
+- How many Google reviews does a local business need: https://resenasya.com/blog/cuantas-resenas-google-necesita-negocio-local
+- WhatsApp message templates to request Google reviews: https://resenasya.com/blog/plantillas-mensajes-whatsapp-pedir-resenas-google
+- Why Google reviews disappear and how to prevent it: https://resenasya.com/blog/por-que-desaparecen-resenas-google-como-evitarlo
+
+## Legal
+
+- Privacy policy: https://resenasya.com/privacidad
+- Terms of service: https://resenasya.com/terminos
+- Cookie policy: https://resenasya.com/cookies
+- Contact: https://resenasya.com/contacto
+
+## Company
+
+ResenasYa is operated by Buy & Click, SL (CIF B-95612958), based in Erandio, Bizkaia, Spain.
+Contact: info@resenasya.com | +34 613 640 396

@@ -44,25 +44,15 @@ export async function assignDiscountCode(
     return error ? null : code;
   }
 
-  // Pool: pick the first available code atomically
-  const { data, error } = await supabase
-    .from("discount_codes")
-    .select("id, code")
-    .eq("business_id", businessId)
-    .eq("type", "pool")
-    .eq("status", "available")
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .single();
+  // Pool: assign atomically via RPC (UPDATE … FOR UPDATE SKIP LOCKED)
+  // to prevent two concurrent requests getting the same code.
+  const { data, error } = await supabase.rpc("assign_pool_discount_code", {
+    p_business_id:       businessId,
+    p_review_request_id: reviewRequestId,
+  });
 
-  if (error || !data) return null;
-
-  await supabase
-    .from("discount_codes")
-    .update({ status: "used", review_request_id: reviewRequestId, used_at: usedAt })
-    .eq("id", data.id);
-
-  return data.code;
+  if (error || data === null) return null;
+  return data as string;
 }
 
 /**

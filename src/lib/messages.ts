@@ -7,7 +7,7 @@
  */
 
 import { MESSAGE_TEMPLATES } from "@/lib/constants";
-import type { BusinessTone } from "@/types";
+import type { BusinessTone, WhatsAppLanguage } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Helper interno: reemplaza las variables en una plantilla
@@ -43,9 +43,10 @@ export function buildPositiveFollowUp(
   businessName: string,
   reviewUrl: string,
   tone: BusinessTone = "tuteo",
-  platformName = "Google Maps"
+  platformName = "Google Maps",
+  language: WhatsAppLanguage = "es"
 ): string {
-  return applyTemplate(MESSAGE_TEMPLATES[tone].positive, {
+  return applyTemplate(MESSAGE_TEMPLATES[language][tone].positive, {
     nombre: customerName,
     negocio: businessName,
     url: reviewUrl,
@@ -60,9 +61,10 @@ export function buildPositiveFollowUp(
 export function buildNegativeFollowUp(
   customerName: string,
   businessName: string,
-  tone: BusinessTone = "tuteo"
+  tone: BusinessTone = "tuteo",
+  language: WhatsAppLanguage = "es"
 ): string {
-  return applyTemplate(MESSAGE_TEMPLATES[tone].negative, {
+  return applyTemplate(MESSAGE_TEMPLATES[language][tone].negative, {
     nombre: customerName,
     negocio: businessName,
   });
@@ -77,9 +79,10 @@ export function buildNeutralFollowUp(
   businessName: string,
   reviewUrl: string,
   tone: BusinessTone = "tuteo",
-  platformName = "Google Maps"
+  platformName = "Google Maps",
+  language: WhatsAppLanguage = "es"
 ): string {
-  return applyTemplate(MESSAGE_TEMPLATES[tone].neutral, {
+  return applyTemplate(MESSAGE_TEMPLATES[language][tone].neutral, {
     nombre: customerName,
     negocio: businessName,
     url: reviewUrl,
@@ -94,9 +97,10 @@ export function buildNeutralFollowUp(
 export function buildFallbackFollowUp(
   customerName: string,
   businessName: string,
-  tone: BusinessTone = "tuteo"
+  tone: BusinessTone = "tuteo",
+  language: WhatsAppLanguage = "es"
 ): string {
-  return applyTemplate(MESSAGE_TEMPLATES[tone].fallback, {
+  return applyTemplate(MESSAGE_TEMPLATES[language][tone].fallback, {
     nombre: customerName,
     negocio: businessName,
   });
@@ -116,29 +120,31 @@ export function buildFollowUpMessage(params: {
   incentiveEnabled?: boolean;
   incentiveDescription?: string | null;
   discountCode?: string | null;
+  language?: WhatsAppLanguage;
 }): string {
   const {
     customerName, businessName, googleMapsUrl, sentiment, tone,
     platformName = "Google Maps", incentiveEnabled, incentiveDescription, discountCode,
+    language = "es",
   } = params;
 
   if (sentiment === "positive" && googleMapsUrl && incentiveEnabled && incentiveDescription) {
-    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone, platformName);
+    return buildIncentiveFollowUp(customerName, businessName, googleMapsUrl, incentiveDescription, tone, platformName, language);
   }
 
   if (sentiment === "positive" && googleMapsUrl) {
-    return buildPositiveFollowUp(customerName, businessName, googleMapsUrl, tone, platformName);
+    return buildPositiveFollowUp(customerName, businessName, googleMapsUrl, tone, platformName, language);
   }
 
   if (sentiment === "negative") {
-    return buildNegativeFollowUp(customerName, businessName, tone);
+    return buildNegativeFollowUp(customerName, businessName, tone, language);
   }
 
   if (googleMapsUrl) {
-    return buildNeutralFollowUp(customerName, businessName, googleMapsUrl, tone, platformName);
+    return buildNeutralFollowUp(customerName, businessName, googleMapsUrl, tone, platformName, language);
   }
 
-  return buildFallbackFollowUp(customerName, businessName, tone);
+  return buildFallbackFollowUp(customerName, businessName, tone, language);
 }
 
 /**
@@ -152,8 +158,9 @@ export function buildIncentiveFollowUp(
   incentiveDescription: string,
   tone: BusinessTone = "tuteo",
   platformName = "Google Maps",
+  language: WhatsAppLanguage = "es",
 ): string {
-  return applyTemplate(MESSAGE_TEMPLATES[tone].positive_incentive, {
+  return applyTemplate(MESSAGE_TEMPLATES[language][tone].positive_incentive, {
     nombre: customerName,
     negocio: businessName,
     url: reviewUrl,
@@ -171,12 +178,13 @@ export function buildScreenshotVerifiedMessage(
   incentiveDescription: string,
   tone: BusinessTone = "tuteo",
   platformName = "Google Maps",
-  discountCode?: string | null
+  discountCode?: string | null,
+  language: WhatsAppLanguage = "es"
 ): string {
   const incentivo = discountCode
     ? `${incentiveDescription} — código *${discountCode}*`
     : incentiveDescription;
-  return applyTemplate(MESSAGE_TEMPLATES[tone].screenshot_verified, {
+  return applyTemplate(MESSAGE_TEMPLATES[language][tone].screenshot_verified, {
     nombre: customerName,
     negocio: businessName,
     incentivo,
@@ -189,9 +197,10 @@ export function buildScreenshotVerifiedMessage(
  */
 export function buildScreenshotRetryMessage(
   customerName: string,
-  tone: BusinessTone = "tuteo"
+  tone: BusinessTone = "tuteo",
+  language: WhatsAppLanguage = "es"
 ): string {
-  return applyTemplate(MESSAGE_TEMPLATES[tone].screenshot_retry, {
+  return applyTemplate(MESSAGE_TEMPLATES[language][tone].screenshot_retry, {
     nombre: customerName,
   });
 }
@@ -202,9 +211,10 @@ export function buildScreenshotRetryMessage(
 export function buildConversationClosingMessage(
   customerName: string,
   businessName: string,
-  tone: BusinessTone = "tuteo"
+  tone: BusinessTone = "tuteo",
+  language: WhatsAppLanguage = "es"
 ): string {
-  return applyTemplate(MESSAGE_TEMPLATES[tone].conversation_closing, {
+  return applyTemplate(MESSAGE_TEMPLATES[language][tone].conversation_closing, {
     nombre: customerName,
     negocio: businessName,
   });

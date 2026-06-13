@@ -1,11 +1,11 @@
 /**
- * Logger centralizado para ReseñasYa.
+ * Logger centralizado para ResenasYa.
  *
- * Prefija todos los mensajes con [ReseñasYa] para facilitar
+ * Prefija todos los mensajes con [ResenasYa] para facilitar
  * el filtrado en los logs de producción (Vercel, etc.).
  */
 
-const PREFIX = "[ReseñasYa]";
+const PREFIX = "[ResenasYa]";
 
 export const logger = {
   /** Información general sobre el flujo de la aplicación */

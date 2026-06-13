@@ -6,11 +6,23 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { logger } from "@/lib/logger";
 import type { SentimentResult, ScreenshotResult } from "@/types";
 
-const anthropic = new Anthropic({
+export const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
+
+/** Strip optional ```json fences and parse Claude's JSON output. Throws on invalid JSON. */
+export function parseClaudeJson<T>(rawText: string, context: string): T {
+  const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  try {
+    return JSON.parse(cleaned) as T;
+  } catch (err) {
+    logger.error(`${context}: respuesta de Claude no es JSON válido`, err);
+    throw new Error("No se pudo analizar la respuesta de la IA");
+  }
+}
 
 // Positive-bias rule: when a response is ambiguous between "positive" and "neutral"
 // (e.g. "ok", "bien"), we classify it as positive with a lower score. This increases
@@ -115,16 +127,14 @@ export async function analyzeScreenshot(mediaUrl: string): Promise<ScreenshotRes
     ],
   });
 
-  const rawText =
-    response.content[0].type === "text" ? response.content[0].text : "";
-  const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
-  return JSON.parse(cleaned) as ScreenshotResult;
+  const rawText = response.content[0].type === "text" ? response.content[0].text : "";
+  return parseClaudeJson<ScreenshotResult>(rawText, "analyzeScreenshot");
 }
 
-const CONVERSATIONAL_SYSTEM_PROMPT = `Eres el Asistente de ReseñasYa, una IA diseñada para recoger feedback de clientes de negocios locales.
+const CONVERSATIONAL_SYSTEM_PROMPT = `Eres el Asistente de ResenasYa, una IA diseñada para recoger feedback de clientes de negocios locales.
 
 Reglas que debes seguir siempre:
-1. Si alguien te pregunta qué eres, identifícate como "Asistente de ReseñasYa, una IA para recoger feedback de clientes".
+1. Si alguien te pregunta qué eres, identifícate como "Asistente de ResenasYa, una IA para recoger feedback de clientes".
 2. Nunca uses palabras malsonantes ni lenguaje inapropiado.
 3. Mantente centrado en recoger feedback sobre la experiencia del cliente con {negocio}.
 4. Sé amable, breve y directo. Máximo 2-3 frases por respuesta.
@@ -150,8 +160,11 @@ export async function generateConversationalResponse(
       ? "Usa un tono muy informal y desenfadado (tuteo juvenil)."
       : "Usa el tuteo (tono informal amigable).";
 
+  // Strip newlines and control characters from businessName before interpolating
+  // into the system prompt to prevent prompt injection via a crafted business name.
+  const safeName = businessName.replace(/[\n\r\t\x00-\x1F\x7F]/g, " ").trim().slice(0, 200);
   const systemPrompt =
-    CONVERSATIONAL_SYSTEM_PROMPT.replace(/{negocio}/g, businessName) +
+    CONVERSATIONAL_SYSTEM_PROMPT.replace(/{negocio}/g, safeName) +
     `\n\nTono: ${toneInstruction}`;
 
   const response = await anthropic.messages.create({
@@ -185,10 +198,44 @@ export async function analyzeSentiment(
     ],
   });
 
-  const rawText =
-    response.content[0].type === "text" ? response.content[0].text : "";
-
-  const cleaned = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
-  const result = JSON.parse(cleaned) as SentimentResult;
-  return result;
+  const rawText = response.content[0].type === "text" ? response.content[0].text : "";
+  return parseClaudeJson<SentimentResult>(rawText, "analyzeSentiment");
 }
+
+// ---------------------------------------------------------------------------
+// Shared prompts used by Google Business route handlers
+// ---------------------------------------------------------------------------
+
+export const ANALYSIS_SYSTEM_PROMPT = `Eres un experto en análisis de reputación online para negocios locales.
+Analiza el conjunto de reseñas de Google proporcionadas y genera un informe estructurado.
+
+Responde SIEMPRE con un JSON válido con esta estructura exacta:
+{
+  "overallSentiment": "string breve describiendo el sentimiento general (ej: 'Muy positivo', 'Mixto', 'Mayormente negativo')",
+  "averageRating": número con un decimal,
+  "reviewCount": número entero,
+  "ratingTrend": "string describiendo la tendencia (ej: 'Las últimas reseñas son más positivas que las antiguas')",
+  "topPraises": ["elogio 1", "elogio 2", "elogio 3"],
+  "topComplaints": ["queja 1", "queja 2", "queja 3"],
+  "profileSuggestions": ["sugerencia 1", "sugerencia 2", "sugerencia 3", "sugerencia 4"]
+}
+
+Los arrays deben tener entre 2 y 5 elementos.
+Las sugerencias de perfil deben ser accionables y específicas para mejorar la presencia en Google Business.
+Si hay pocas reseñas o no hay quejas/elogios claros, indícalo brevemente en el campo correspondiente.`;
+
+export const REPLY_SYSTEM_PROMPT = `Eres un experto en gestión de reputación online para negocios locales.
+Tu tarea es generar respuestas profesionales y personalizadas a reseñas de Google Business.
+
+Reglas:
+1. La respuesta debe ser en español.
+2. Comienza agradeciendo al cliente por su reseña.
+3. Para reseñas positivas: muestra entusiasmo genuino y anima a volver.
+4. Para reseñas negativas: muestra empatía, pide disculpas y ofrece solución o contacto directo.
+5. Para reseñas neutrales: agradece el feedback y menciona que trabajáis para mejorar.
+6. Usa el nombre del cliente si está disponible (no "Estimado usuario").
+7. Firma siempre con el nombre del negocio.
+8. Longitud: 3-5 frases. No uses emojis excesivos.
+9. Aplica el tono indicado: tuteo, usted, o juvenil.
+
+Responde SOLO con el texto de la respuesta, sin explicaciones adicionales.`;

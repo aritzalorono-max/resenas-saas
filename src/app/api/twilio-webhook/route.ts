@@ -137,6 +137,17 @@ export async function POST(request: Request): Promise<Response> {
 
   logger.info(`Mensaje recibido de ${maskPhone(fromNumber)} → ${toNumber} | media: ${numMedia} | len: ${messageBody.length}`);
 
+  // ── STOP / opt-out ────────────────────────────────────────────────────────
+  // Twilio gestiona STOP automáticamente a nivel de número para números
+  // dedicados. Para el sandbox compartido o modo "own" añadimos detección
+  // explícita: si el cliente responde STOP (o variantes) no enviamos nada más.
+  // Twilio ya bloquea futuros envíos al número; nosotros simplemente salimos.
+  const stopWords = /^\s*(stop|cancel|unsubscribe|quit|end|baja|para|alto|stopp|arrêt|ferma|parar)\s*$/i;
+  if (stopWords.test(messageBody)) {
+    logger.info(`Mensaje STOP recibido de ${maskPhone(fromNumber)} — sin respuesta enviada`);
+    return twilioEmptyResponse();
+  }
+
   // ── 1. Validar firma (producción) ─────────────────────────────────────────
   if (process.env.NODE_ENV === "production") {
     const isSharedNumber = toNumber.includes(TWILIO_WHATSAPP_NUMBER.replace("whatsapp:", ""));
@@ -180,6 +191,7 @@ export async function POST(request: Request): Promise<Response> {
     if (screenshotRequest) {
       logger.info(`Solicitud awaiting_screenshot encontrada: ${screenshotRequest.id}`);
       const { businesses: business } = screenshotRequest;
+      const language = business.whatsapp_language ?? "es";
       const tone = business.tone ?? "tuteo";
       const incentiveDescription = business.incentive_description ?? "";
       const screenshotActiveLink = business.review_links?.find((l) => l.url === business.google_maps_url);
@@ -213,7 +225,8 @@ export async function POST(request: Request): Promise<Response> {
           incentiveDescription,
           tone,
           activePlatformName,
-          screenshotRequest.discount_code
+          screenshotRequest.discount_code,
+          language
         );
 
         try {
@@ -227,7 +240,7 @@ export async function POST(request: Request): Promise<Response> {
           logger.error("Error al enviar el mensaje de recompensa", twilioError);
         }
       } else {
-        const retryMsg = buildScreenshotRetryMessage(screenshotRequest.customer_name, tone);
+        const retryMsg = buildScreenshotRetryMessage(screenshotRequest.customer_name, tone, language);
 
         try {
           await screenshotClient.messages.create({
@@ -284,7 +297,8 @@ export async function POST(request: Request): Promise<Response> {
       conversationResponse = buildConversationClosingMessage(
         activeRequest.customer_name,
         activeBusiness.name,
-        activeBusiness.tone ?? "tuteo"
+        activeBusiness.tone ?? "tuteo",
+        activeBusiness.whatsapp_language ?? "es"
       );
       logger.info(`Enviando mensaje de cierre (turno ${MAX_CONVERSATION_TURNS}/${MAX_CONVERSATION_TURNS}) a ${maskPhone(activeRequest.customer_phone)}`);
     } else {
@@ -324,9 +338,12 @@ export async function POST(request: Request): Promise<Response> {
   const placeReviewUrl   = business.google_place_id
     ? `https://search.google.com/local/writereview?placeid=${business.google_place_id}`
     : null;
-  const reviewUrl        = activeLink?.shortCode
-    ? `${appOrigin}/r/${activeLink.shortCode}`
-    : (placeReviewUrl ?? business.google_maps_url ?? "");
+  // Prefer direct review form URL (best UX: opens 5-star form directly)
+  // Fall back to our short link, then the original Maps URL
+  const reviewUrl = placeReviewUrl
+    ?? (activeLink?.shortCode ? `${appOrigin}/r/${activeLink.shortCode}` : null)
+    ?? business.google_maps_url
+    ?? "";
 
   // ── 4. Analizar sentimiento con Claude ────────────────────────────────────
   let sentiment: Awaited<ReturnType<typeof analyzeSentiment>>;
@@ -374,9 +391,16 @@ export async function POST(request: Request): Promise<Response> {
     }
   } catch (dbError) {
     logger.error("Error al actualizar la solicitud en la BD", dbError);
+    if (assignedCode) {
+      logger.error(
+        `ATENCIÓN: código de descuento "${assignedCode}" asignado para solicitud ${reviewRequest.id} ` +
+        `pero la BD no se actualizó. El código puede haber quedado huérfano.`
+      );
+    }
   }
 
   // ── 6. Construir y enviar mensaje de seguimiento ──────────────────────────
+  const language = business.whatsapp_language ?? "es";
   const followUpMessage = buildFollowUpMessage({
     customerName:         reviewRequest.customer_name,
     businessName:         business.name,
@@ -387,6 +411,7 @@ export async function POST(request: Request): Promise<Response> {
     incentiveEnabled:     business.incentive_enabled,
     incentiveDescription: business.incentive_description,
     discountCode:         assignedCode,
+    language,
   });
 
   const { client: followUpClient, fromNumber: followUpFrom } = getTwilioSender(business);

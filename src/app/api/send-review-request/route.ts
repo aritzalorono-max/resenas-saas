@@ -14,12 +14,13 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
-import { getTwilioSender, sendWhatsAppMessageWith } from "@/lib/twilio";
+import { getTwilioSender, sendWhatsAppMessageWith, sendWhatsAppTemplateWith } from "@/lib/twilio";
 import { getBusinessByUserId } from "@/lib/business";
 import { createReviewRequest } from "@/lib/review-requests";
 import { validateCustomerName, validatePhone } from "@/lib/validation";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { applyTemplate } from "@/lib/messages";
+import { WHATSAPP_TEMPLATE_SIDS } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
 
@@ -70,7 +71,7 @@ export async function POST(
   if (!business) {
     logger.warn(`Negocio no encontrado para usuario ${user.id}`);
     return NextResponse.json(
-      { error: "Negocio no encontrado. Completa tu perfil en Configuración primero." },
+      { error: "Negocio no encontrado. Completa tu perfil en 'Perfil del negocio' primero." },
       { status: 404 }
     );
   }
@@ -84,7 +85,7 @@ export async function POST(
   monthStart.setHours(0, 0, 0, 0);
   const { count: monthCount } = await supabase
     .from("review_requests")
-    .select("*", { count: "exact", head: true })
+    .select("id", { count: "exact", head: true })
     .eq("business_id", business.id)
     .gte("created_at", monthStart.toISOString());
   if ((monthCount ?? 0) >= planLimit) {
@@ -120,36 +121,58 @@ export async function POST(
   }
 
   const { client: bizClient, fromNumber: bizFrom } = getTwilioSender(business);
+  const language = business.whatsapp_language ?? "es";
+  const useIncentiveTemplate = !!(business.incentive_enabled && business.incentive_description && incentiveTiming === "initial");
+  const templateSid = useIncentiveTemplate
+    ? WHATSAPP_TEMPLATE_SIDS[language].review_incentive
+    : WHATSAPP_TEMPLATE_SIDS[language].review_request;
 
-  let messageSid: string;
-  try {
-    messageSid = await sendWhatsAppMessageWith(bizClient, bizFrom, customerPhone, messageText);
-    logger.info(`WhatsApp enviado desde ${bizFrom}. SID: ${messageSid}`);
-  } catch (twilioError) {
-    logger.error("Error al enviar el WhatsApp via Twilio", twilioError);
-    return NextResponse.json(
-      { error: "No se pudo enviar el WhatsApp. Comprueba que el número es correcto y que el cliente ha aceptado el sandbox de Twilio." },
-      { status: 502 }
-    );
-  }
-
-  // ── 6. Guardar en base de datos ───────────────────────────────────────────
+  // ── 6. Guardar en base de datos ANTES de enviar WhatsApp ─────────────────
+  // Si guardamos después y la BD falla, el webhook de respuesta no encontraría
+  // ninguna solicitud pendiente para ese número.
   let reviewRequest: object;
   try {
     reviewRequest = await createReviewRequest(supabase, {
       business_id: business.id,
       customer_name: customerName,
       customer_phone: customerPhone,
-      twilio_message_sid: messageSid,
+      twilio_message_sid: "",
     });
     logger.info(`Solicitud guardada. ID: ${(reviewRequest as { id: string }).id}`);
   } catch (dbError) {
     logger.error("Error al guardar la solicitud en la BD", dbError);
     return NextResponse.json(
-      { error: "El mensaje fue enviado pero no se pudo guardar el registro. Contacta con soporte." },
+      { error: "No se pudo registrar la solicitud. Inténtalo de nuevo." },
       { status: 500 }
     );
   }
+
+  // ── 7. Enviar WhatsApp ────────────────────────────────────────────────────
+  let messageSid: string;
+  try {
+    if (business.whatsapp_mode !== "own") {
+      const vars: Record<string, string> = { "1": customerName, "2": business.name };
+      if (useIncentiveTemplate && business.incentive_description) {
+        vars["3"] = business.incentive_description;
+      }
+      messageSid = await sendWhatsAppTemplateWith(bizClient, bizFrom, customerPhone, templateSid, vars);
+    } else {
+      messageSid = await sendWhatsAppMessageWith(bizClient, bizFrom, customerPhone, messageText);
+    }
+    logger.info(`WhatsApp enviado desde ${bizFrom}. SID: ${messageSid}`);
+  } catch (twilioError) {
+    logger.error("Error al enviar el WhatsApp via Twilio", twilioError);
+    return NextResponse.json(
+      { error: "No se pudo enviar el WhatsApp. Comprueba que el número de teléfono es correcto." },
+      { status: 502 }
+    );
+  }
+
+  // Actualizar el SID del mensaje una vez enviado
+  await supabase
+    .from("review_requests")
+    .update({ twilio_message_sid: messageSid })
+    .eq("id", (reviewRequest as { id: string }).id);
 
   logger.info(`Flujo completado para ${customerName}`);
   return NextResponse.json({ success: true, data: reviewRequest });

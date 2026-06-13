@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "next-intl";
 
-export function GoogleButton({ label = "Continuar con Google" }: { label?: string }) {
+export function GoogleButton({ label }: { label?: string }) {
+  const t = useTranslations("auth.register");
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
@@ -13,7 +15,6 @@ export function GoogleButton({ label = "Continuar con Google" }: { label?: strin
       provider: "google",
       options: { redirectTo: `${window.location.origin}/api/auth/callback` },
     });
-    // El navegador redirige a Google; no hace falta resetear loading
   }
 
   return (
@@ -38,7 +39,7 @@ export function GoogleButton({ label = "Continuar con Google" }: { label?: strin
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
         </svg>
       )}
-      <span>{loading ? "Redirigiendo..." : label}</span>
+      <span>{loading ? "..." : (label ?? t("googleLabel"))}</span>
     </button>
   );
 }

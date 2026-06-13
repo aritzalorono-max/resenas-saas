@@ -105,6 +105,39 @@ const ALLOWED_PROTOCOLS = ["https:", "http:"];
  * Valida que una cadena sea una URL bien formada con protocolo HTTP/HTTPS.
  * Devuelve valid=true con sanitized=undefined si el campo está vacío (es opcional).
  */
+// ---------------------------------------------------------------------------
+// Email
+// ---------------------------------------------------------------------------
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Valida y sanea una dirección de email. Campo opcional: devuelve valid=true con sanitized=undefined si está vacío. */
+export function validateEmail(raw: unknown): ValidationResult {
+  if (raw === undefined || raw === null || raw === "") return { valid: true, sanitized: undefined };
+  const trimmed = String(raw).trim();
+  if (trimmed.length === 0) return { valid: true, sanitized: undefined };
+  if (!EMAIL_REGEX.test(trimmed)) return { valid: false, error: "El email no tiene un formato válido" };
+  return { valid: true, sanitized: trimmed.slice(0, 200) };
+}
+
+// ---------------------------------------------------------------------------
+// Campo de texto genérico (sanitización sin validación estricta)
+// ---------------------------------------------------------------------------
+
+/**
+ * Sanea un campo de texto: comprueba que sea string, recorta espacios y limita longitud.
+ * Devuelve el fallback si el valor no es un string (por defecto undefined).
+ */
+export function sanitizeField(value: unknown, maxLength: number, fallback: string): string;
+export function sanitizeField(value: unknown, maxLength: number, fallback?: undefined): string | undefined;
+export function sanitizeField(value: unknown, maxLength: number, fallback?: string): string | undefined {
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : fallback;
+}
+
+// ---------------------------------------------------------------------------
+// URL (Google Maps / web)
+// ---------------------------------------------------------------------------
+
 export function validateUrl(raw: unknown): ValidationResult {
   if (raw === undefined || raw === null || raw === "") {
     return { valid: true, sanitized: undefined }; // campo opcional

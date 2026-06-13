@@ -44,16 +44,20 @@ export function getStoredConsent(): StoredConsent | null {
 }
 
 export function saveConsent(prefs: ConsentPreferences): void {
-  const consent: StoredConsent = {
-    ...prefs,
-    version: CONSENT_VERSION,
-    timestamp: new Date().toISOString(),
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
+  try {
+    const consent: StoredConsent = {
+      ...prefs,
+      version: CONSENT_VERSION,
+      timestamp: new Date().toISOString(),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
+  } catch { /* Safari private mode blocks localStorage */ }
 }
 
 export function clearConsent(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch { /* Safari private mode blocks localStorage */ }
 }
 
 /**
@@ -94,7 +98,7 @@ export const COOKIE_CATEGORIES: (RequiredCategory | CookieCategory)[] = [
     label: "Estrictamente necesarias",
     description:
       "Imprescindibles para el funcionamiento de la plataforma. Sin ellas, no es posible iniciar sesión ni garantizar la seguridad de tu cuenta.",
-    examples: ["Sesión de usuario (Supabase)", "Protección CSRF", "Preferencias de consentimiento"],
+    examples: ["Sesión de usuario (Supabase)", "Protección CSRF", "Preferencias de consentimiento", "OAuth state Google Business (__gb_oauth_state)"],
     required: true,
   },
   {

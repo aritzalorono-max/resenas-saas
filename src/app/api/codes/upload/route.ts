@@ -1,8 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { getBusinessByUserId } from "@/lib/business";
 import { uploadPoolCodes } from "@/lib/discount-codes";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import * as xlsx from "xlsx";
+
+// Column headers to skip when parsing uploaded code files
+const DISCOUNT_CODE_HEADER_WORDS = new Set(["CÓDIGO", "CODIGOS", "CODE", "CODES", "COUPON", "COUPONS"]);
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -10,6 +15,13 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
+  // 3 file uploads per minute per user (files can contain up to 5 000 rows each)
+  const rateSvc = await createServiceClient();
+  const rl = await checkGeneralRateLimit(rateSvc, `codes-upload:${user.id}`, 1, 3);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Demasiadas subidas. Espera un momento." }, { status: 429 });
   }
 
   const business = await getBusinessByUserId(supabase, user.id);
@@ -40,7 +52,12 @@ export async function POST(request: Request) {
     codes = rows
       .flat()
       .map((v) => String(v ?? "").trim().toUpperCase())
-      .filter((v) => v.length > 0 && v !== "CÓDIGO" && v !== "CODE" && v !== "CODES" && v !== "CODIGOS");
+      .filter((v) => {
+        if (v.length === 0 || DISCOUNT_CODE_HEADER_WORDS.has(v)) return false;
+        if (v.length > 100) return false;
+        // Only allow alphanumeric characters plus hyphens and underscores
+        return /^[A-Z0-9_\-]+$/.test(v);
+      });
   } catch {
     return NextResponse.json({ error: "No se pudo leer el archivo. Asegúrate de que sea .xlsx, .xls o .csv" }, { status: 400 });
   }
@@ -57,6 +74,7 @@ export async function POST(request: Request) {
     const inserted = await uploadPoolCodes(supabase, business.id, codes);
     return NextResponse.json({ success: true, inserted, total: codes.length });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    logger.error("Error al subir códigos de descuento", err);
+    return NextResponse.json({ error: "Error al procesar los códigos. Por favor, inténtalo de nuevo." }, { status: 500 });
   }
 }
