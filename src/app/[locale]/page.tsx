@@ -5,6 +5,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getTranslations, getMessages } from "next-intl/server";
 import { localizedPath } from "@/lib/localized-paths";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
+import { YoutubeEmbed } from "@/components/landing/YoutubeEmbed";
 import dynamic from "next/dynamic";
 import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
@@ -209,7 +210,17 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
   // Dynamic client components (ConversationTabs, PricingPlans, etc.) need these
   // namespaces. The locale-level provider only ships universal namespaces, so we
   // add a page-scoped provider here.
-  const pageMessages = { home: all.home, precios: all.precios };
+  // Inner provider replaces (does not inherit) the locale-level outer provider.
+  // Include all namespaces used by client components inside this page:
+  // - home / precios: ConversationTabs, PricingPlans, TestimonialsCarousel, CaseStudiesCarousel
+  // - common: LanguageSwitcher
+  // - cookieBanner: ManageCookiesButton
+  const pageMessages = {
+    home: all.home,
+    precios: all.precios,
+    common: all.common,
+    cookieBanner: all.cookieBanner,
+  };
 
   const sectors = sectorIcons.map(({ Icon, key }) => ({ Icon, name: t(key), key }));
 
@@ -339,28 +350,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             {locale === "es" && (
               <div className="mt-14">
                 <div className="relative w-full rounded-2xl overflow-hidden shadow-xl aspect-video bg-gray-900">
-                  {/* YouTube facade: thumbnail only — iframe loads on click to avoid
-                      third-party cookies and network requests on initial page load */}
-                  <img
-                    src="https://i.ytimg.com/vi/Hu52ipdFzjk/maxresdefault.jpg"
-                    alt="Demostración ResenasYa"
-                    className="absolute inset-0 w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <button
-                    aria-label="Reproducir vídeo de demostración"
-                    className="absolute inset-0 flex items-center justify-center group"
-                    onClick={(e) => {
-                      const wrapper = (e.currentTarget as HTMLElement).parentElement!;
-                      wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/Hu52ipdFzjk?autoplay=1" title="Demostración ResenasYa" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full" />`;
-                    }}
-                  >
-                    <span className="w-16 h-16 bg-white/90 group-hover:bg-white rounded-full flex items-center justify-center shadow-lg transition">
-                      <svg viewBox="0 0 24 24" className="w-7 h-7 text-brand-600 translate-x-0.5" fill="currentColor">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </span>
-                  </button>
+                  <YoutubeEmbed videoId="Hu52ipdFzjk" title="Demostración ResenasYa" />
                 </div>
               </div>
             )}
