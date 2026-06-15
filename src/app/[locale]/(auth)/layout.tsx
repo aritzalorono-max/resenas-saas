@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
+  const [locale, all] = await Promise.all([getLocale(), getMessages()]);
+  // Auth pages (login, register, recuperar, nueva-contrasena) and GoogleButton
+  // are client components that use the `auth` namespace.
+  const messages = { auth: all.auth, common: all.common };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -16,7 +23,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <span className="text-xl font-bold text-gray-900">ResenasYa</span>
           </a>
         </div>
-        {children}
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
       </div>
     </div>
   );

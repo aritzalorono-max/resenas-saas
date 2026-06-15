@@ -1,12 +1,16 @@
+import { NextIntlClientProvider } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, getMessages } from "next-intl/server";
 import { localizedPath } from "@/lib/localized-paths";
 
 export default async function LegalLayout({ children }: { children: React.ReactNode }) {
-  const t = await getTranslations();
-  const locale = await getLocale();
+  const [t, locale, all] = await Promise.all([getTranslations(), getLocale(), getMessages()]);
+  // The contacto page is a client component using the `contact` namespace.
+  // Nav/footer client components (LanguageSwitcher, ManageCookiesButton) stay
+  // under the locale-level provider, which already has common + cookieBanner.
+  const pageMessages = { contact: all.contact };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -38,7 +42,11 @@ export default async function LegalLayout({ children }: { children: React.ReactN
       </nav>
 
       <main className="flex-1 py-12 px-6">
-        <div className="max-w-3xl mx-auto">{children}</div>
+        <div className="max-w-3xl mx-auto">
+          <NextIntlClientProvider locale={locale} messages={pageMessages}>
+            {children}
+          </NextIntlClientProvider>
+        </div>
       </main>
 
       <footer className="border-t border-gray-100 bg-gray-50 py-12 px-6">
