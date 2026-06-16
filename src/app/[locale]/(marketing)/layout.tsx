@@ -96,6 +96,13 @@ export default async function MarketingLayout({ children }: { children: React.Re
               <ManageCookiesButton />
             </div>
           </div>
+
+          <div className="border-t border-gray-200 mt-6 pt-6 flex flex-col sm:flex-row items-center gap-4">
+            <img src="/bizkaia-foru-aldundia.jpeg" alt="Bizkaia Foru Aldundia · Diputación Foral de Bizkaia" className="h-10 w-auto shrink-0" />
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Bizkaiko Foru Aldundiak finantzatu du proiektu hau, 2025eko Trantsizio Digitala Programaren barruan. / Este proyecto ha sido financiado por la Diputación Foral de Bizkaia dentro del Programa Transición Digital 2025.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
