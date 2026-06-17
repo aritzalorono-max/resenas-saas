@@ -22,45 +22,29 @@ export interface RateLimitResult {
 const MAX_PER_WINDOW = 20;
 const WINDOW_MINUTES = 5;
 const MAX_PER_DAY    = 200;
-const DAY_MINUTES    = 24 * 60;
 
 export async function checkRateLimit(
   supabase: SupabaseClient,
   businessId: string
 ): Promise<RateLimitResult> {
-  const shortWindowStart = new Date(Date.now() - WINDOW_MINUTES * 60 * 1000).toISOString();
+  const { data, error } = await supabase.rpc("check_business_rate_limit", {
+    p_business_id: businessId,
+  });
 
-  const { count: shortCount, error: shortError } = await supabase
-    .from("review_requests")
-    .select("*", { count: "exact", head: true })
-    .eq("business_id", businessId)
-    .gte("created_at", shortWindowStart);
-
-  if (shortError) {
+  if (error) {
     return { allowed: false, count: 0, error: "No se pudo verificar el límite de envíos. Inténtalo en unos segundos." };
   }
 
-  if ((shortCount ?? 0) >= MAX_PER_WINDOW) {
-    return { allowed: false, count: shortCount ?? 0, error: `Has enviado demasiadas solicitudes. Espera unos minutos antes de continuar (máximo ${MAX_PER_WINDOW} en ${WINDOW_MINUTES} minutos).` };
+  const result = data as { allowed: boolean; count: number; reason?: string };
+
+  if (!result.allowed) {
+    const msg = result.reason === "day_window"
+      ? `Has alcanzado el límite diario de ${MAX_PER_DAY} solicitudes. El contador se reinicia en 24 horas.`
+      : `Has enviado demasiadas solicitudes. Espera unos minutos antes de continuar (máximo ${MAX_PER_WINDOW} en ${WINDOW_MINUTES} minutos).`;
+    return { allowed: false, count: result.count, error: msg };
   }
 
-  const dayWindowStart = new Date(Date.now() - DAY_MINUTES * 60 * 1000).toISOString();
-
-  const { count: dayCount, error: dayError } = await supabase
-    .from("review_requests")
-    .select("*", { count: "exact", head: true })
-    .eq("business_id", businessId)
-    .gte("created_at", dayWindowStart);
-
-  if (dayError) {
-    return { allowed: false, count: 0, error: "No se pudo verificar el límite diario. Inténtalo en unos segundos." };
-  }
-
-  if ((dayCount ?? 0) >= MAX_PER_DAY) {
-    return { allowed: false, count: dayCount ?? 0, error: `Has alcanzado el límite diario de ${MAX_PER_DAY} solicitudes. El contador se reinicia en 24 horas.` };
-  }
-
-  return { allowed: true, count: shortCount ?? 0 };
+  return { allowed: true, count: result.count };
 }
 
 /**
@@ -80,7 +64,7 @@ export async function checkGeneralRateLimit(
 
   const { count, error } = await supabase
     .from("rate_limit_events")
-    .select("*", { count: "exact", head: true })
+    .select("id", { count: "exact", head: true })
     .eq("key", key)
     .gte("created_at", windowStart);
 

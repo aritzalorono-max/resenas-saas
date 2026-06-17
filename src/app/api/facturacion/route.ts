@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
+import { validateEmail } from "@/lib/validation";
 import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
@@ -10,21 +12,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
+    // 10 billing info saves per minute per user
+    const rateSvc = await createServiceClient();
+    const rl = await checkGeneralRateLimit(rateSvc, `facturacion:${user.id}`, 1, 10);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
+    }
+
     const body = await request.json();
     const { tipo, nombre, nif, direccion, ciudad, codigo_postal, pais, email_facturacion } = body;
 
     const safeTipo = ["particular", "empresa"].includes(tipo) ? tipo : "particular";
 
+    const emailResult = validateEmail(email_facturacion);
+    const safeEmail = emailResult.valid ? (emailResult.sanitized ?? null) : null;
+
     const payload = {
       user_id: user.id,
       tipo: safeTipo,
       nombre: String(nombre ?? "").trim().slice(0, 200),
-      nif: String(nif ?? "").trim().slice(0, 20),
+      // Allow alphanumeric, hyphens, and dots (covers ES NIF/NIE and EU VAT formats)
+      nif: String(nif ?? "").trim().replace(/[^A-Z0-9\-\.]/gi, "").slice(0, 20),
       direccion: String(direccion ?? "").trim().slice(0, 300),
       ciudad: String(ciudad ?? "").trim().slice(0, 100),
-      codigo_postal: String(codigo_postal ?? "").trim().slice(0, 10),
+      codigo_postal: String(codigo_postal ?? "").trim().replace(/[^A-Z0-9\- ]/gi, "").slice(0, 10),
       pais: String(pais ?? "España").trim().slice(0, 100) || "España",
-      email_facturacion: String(email_facturacion ?? "").trim().slice(0, 200) || null,
+      email_facturacion: safeEmail,
       updated_at: new Date().toISOString(),
     };
 

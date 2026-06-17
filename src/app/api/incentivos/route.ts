@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 import type { IncentiveCodeType, IncentiveTiming } from "@/types";
 
@@ -14,6 +15,13 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
+    // 10 incentive saves per minute per user
+    const rateSvc = await createServiceClient();
+    const rl = await checkGeneralRateLimit(rateSvc, `incentivos:${user.id}`, 1, 10);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
     }
 
     const body = await request.json();

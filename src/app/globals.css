@@ -11,6 +11,13 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Firefox scrollbar styling */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
+
+  /* Chrome / Safari / Edge scrollbar styling */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -48,4 +55,10 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+
+@keyframes progressFill {
+  from { width: 0% }
+  to   { width: 100% }
 }

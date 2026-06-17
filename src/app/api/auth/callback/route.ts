@@ -12,14 +12,17 @@ export async function GET(request: Request) {
     if (!error && user) {
       const { data: existing } = await supabase
         .from("businesses")
-        .select("id")
+        .select("id, name")
         .eq("user_id", user.id)
         .single();
       if (!existing) {
         await supabase.from("businesses").insert({ user_id: user.id, name: "" });
       }
+      // New users (no business name yet) go through onboarding wizard
+      const isNewUser = !existing || !existing.name;
+      const defaultPath = isNewUser ? "/onboarding" : "/dashboard";
       // Only allow relative paths to prevent open redirect attacks
-      const safePath = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+      const safePath = !isNewUser && next.startsWith("/") && !next.startsWith("//") ? next : defaultPath;
       return NextResponse.redirect(`${origin}${safePath}`);
     }
   }

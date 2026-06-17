@@ -46,10 +46,12 @@ export interface UpdateBusinessParams {
   logo_url: string | null;
   welcome_message: string;
   tone: Business["tone"];
+  whatsapp_language: Business["whatsapp_language"];
   incentive_enabled: boolean;
   incentive_description: string | null;
   incentive_code_enabled: boolean;
   incentive_code_type: Business["incentive_code_type"];
+  reminder_max_count: number;
 }
 
 /**

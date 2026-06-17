@@ -1,55 +1,48 @@
+"use client";
+
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-const plans = [
+const planKeys = [
   {
     name: "Gratis",
-    tagline: "Para probar",
+    nameKey: null,
+    taglineKey: "taglineFree",
     price: "0",
-    requests: "5 WhatsApp / mes",
+    requestsKey: "requestsFree",
     highlight: false,
-    cta: "Empezar gratis",
+    ctaKey: "ctaFree",
     ctaHref: "/register",
-    features: [
-      "Google Maps",
-      "Análisis de sentimiento con IA",
-      "Panel de métricas",
-    ],
+    featureKeys: ["featMaps", "featAI", "featMetrics"],
   },
   {
     name: "Starter",
-    tagline: "Para pequeños negocios",
+    nameKey: null,
+    taglineKey: "taglineStarter",
     price: "9,9",
-    requests: "50 contactos / mes",
+    requestsKey: "requestsStarter",
     highlight: false,
-    cta: "Empezar",
+    ctaKey: "ctaPaid",
     ctaHref: "/register",
-    features: [
-      "Google Maps, App Store, Play Store",
-      "Análisis de sentimiento con IA",
-      "Panel de métricas",
-      "Soporte email",
-    ],
+    featureKeys: ["featMapsPlus", "featAI", "featMetrics", "featEmail"],
   },
   {
     name: "Pro",
-    tagline: "El más completo",
+    nameKey: null,
+    taglineKey: "taglinePro",
     price: "29,9",
-    requests: "250 contactos / mes",
+    requestsKey: "requestsPro",
     highlight: true,
-    badge: "Más popular",
-    cta: "Empezar",
+    ctaKey: "ctaPaid",
     ctaHref: "/register",
-    features: [
-      "Todas las plataformas",
-      "Análisis de sentimiento con IA",
-      "Incentivos y códigos de descuento",
-      "Exportación CSV · Soporte prioritario",
-    ],
+    featureKeys: ["featAllPlatforms", "featAI", "featIncentives", "featExport"],
   },
-];
+] as const;
 
 export function PricingPlans() {
+  const t = useTranslations("precios");
+
   return (
     <div>
       {/* Cards — horizontal carousel on mobile, 3-col grid on md+ */}
@@ -59,7 +52,7 @@ export function PricingPlans() {
         md:grid md:grid-cols-3 md:gap-6
         md:overflow-visible md:pt-5 md:pb-0 md:mx-0 md:px-0
       ">
-        {plans.map((plan) => (
+        {planKeys.map((plan) => (
           <div
             key={plan.name}
             className={`shrink-0 w-[72vw] snap-center md:w-auto
@@ -69,10 +62,10 @@ export function PricingPlans() {
                 : "bg-white border border-gray-100 hover:border-brand-200 transition-colors"
               }`}
           >
-            {plan.badge && (
+            {plan.highlight && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <span className="bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                  {plan.badge}
+                  {t("popular")}
                 </span>
               </div>
             )}
@@ -81,8 +74,8 @@ export function PricingPlans() {
             <p className={`text-xs font-bold uppercase tracking-widest mb-0.5 ${plan.highlight ? "text-brand-200" : "text-brand-600"}`}>
               {plan.name}
             </p>
-            <p className={`text-xs mb-5 ${plan.highlight ? "text-brand-100" : "text-gray-400"}`}>
-              {plan.tagline}
+            <p className={`text-xs mb-5 ${plan.highlight ? "text-brand-100" : "text-gray-500"}`}>
+              {t(plan.taglineKey)}
             </p>
 
             {/* Price */}
@@ -90,7 +83,7 @@ export function PricingPlans() {
               <span className={`text-5xl font-extrabold ${plan.highlight ? "text-white" : "text-gray-900"}`}>
                 {plan.price}€
               </span>
-              <span className={`text-sm mb-1.5 ${plan.highlight ? "text-brand-200" : "text-gray-400"}`}>
+              <span className={`text-sm mb-1.5 ${plan.highlight ? "text-brand-200" : "text-gray-500"}`}>
                 /mes
               </span>
             </div>
@@ -99,19 +92,19 @@ export function PricingPlans() {
             <span className={`inline-flex text-xs font-semibold px-2.5 py-1 rounded-full mb-6 w-fit ${
               plan.highlight ? "bg-white/20 text-white" : "bg-brand-50 text-brand-700"
             }`}>
-              {plan.requests}
+              {t(plan.requestsKey)}
             </span>
 
             {/* Features */}
             <ul className="space-y-2.5 flex-1 mb-7">
-              {plan.features.map((feat) => (
-                <li key={feat} className="flex items-start gap-2 text-sm">
+              {plan.featureKeys.map((key) => (
+                <li key={key} className="flex items-start gap-2 text-sm">
                   <Check
                     size={14}
                     className={`mt-0.5 shrink-0 ${plan.highlight ? "text-brand-200" : "text-brand-500"}`}
                     strokeWidth={2.5}
                   />
-                  <span className={plan.highlight ? "text-white/90" : "text-gray-600"}>{feat}</span>
+                  <span className={plan.highlight ? "text-white/90" : "text-gray-600"}>{t(key)}</span>
                 </li>
               ))}
             </ul>
@@ -124,7 +117,7 @@ export function PricingPlans() {
                   : "bg-brand-600 text-white hover:bg-brand-700"
               }`}
             >
-              {plan.cta} →
+              {t(plan.ctaKey)} →
             </Link>
           </div>
         ))}

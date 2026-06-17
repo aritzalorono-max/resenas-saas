@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { DEFAULT_WELCOME_MESSAGE } from "@/lib/constants";
 import { validateUrl } from "@/lib/validation";
+import { extractPlaceIdFromUrl } from "@/lib/google-places";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
-import type { ReviewPlatformLink, BusinessTone, WhatsAppMode } from "@/types";
+import type { ReviewPlatformLink, BusinessTone, WhatsAppLanguage, WhatsAppMode } from "@/types";
 
 const VALID_TONES: BusinessTone[] = ["tuteo", "usted", "juvenil"];
 const VALID_WHATSAPP_MODES: WhatsAppMode[] = ["shared", "own", "dedicated"];
+const VALID_LANGUAGES: WhatsAppLanguage[] = ["es", "en", "fr", "de", "it", "pt"];
 const WELCOME_MESSAGE_MAX = 1000;
 
 function generateShortCode(): string {
@@ -46,6 +49,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
+    // 10 config saves per minute per user
+    const rateSvc = await createServiceClient();
+    const rl = await checkGeneralRateLimit(rateSvc, `configuracion:${user.id}`, 1, 10);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
+    }
+
     const body = await request.json();
     const {
       name,
@@ -55,7 +65,9 @@ export async function POST(request: NextRequest) {
       review_links,
       welcome_message,
       tone,
+      whatsapp_language,
       whatsapp_mode,
+      reminder_max_count,
       own_twilio_account_sid,
       own_twilio_auth_token,
       own_twilio_whatsapp_number,
@@ -64,15 +76,21 @@ export async function POST(request: NextRequest) {
     // Validate tone
     const safeTone: BusinessTone = VALID_TONES.includes(tone) ? tone : "tuteo";
 
+    // Validate whatsapp_language
+    const safeLanguage: WhatsAppLanguage = VALID_LANGUAGES.includes(whatsapp_language) ? whatsapp_language : "es";
+
     // Validate whatsapp_mode
     const safeMode: WhatsAppMode = VALID_WHATSAPP_MODES.includes(whatsapp_mode) ? whatsapp_mode : "shared";
 
     // Validate welcome_message length
     const safeWelcome = String(welcome_message ?? "").trim().slice(0, WELCOME_MESSAGE_MAX) || DEFAULT_WELCOME_MESSAGE;
 
-    // Validate review_links URLs
+    // Validate review_links URLs (max 10 platforms)
     const rawLinks: ReviewPlatformLink[] = [];
     if (Array.isArray(review_links)) {
+      if (review_links.length > 10) {
+        return NextResponse.json({ error: "Máximo 10 plataformas de reseñas" }, { status: 400 });
+      }
       for (const link of review_links) {
         if (typeof link !== "object" || !link) continue;
         const urlResult = validateUrl(link.url);
@@ -95,10 +113,16 @@ export async function POST(request: NextRequest) {
       review_links: rawLinks,
       welcome_message: safeWelcome,
       tone: safeTone,
+      whatsapp_language: safeLanguage,
       whatsapp_mode: safeMode,
-      own_twilio_account_sid: safeMode === "own" ? (String(own_twilio_account_sid ?? "").trim() || null) : null,
-      own_twilio_auth_token:  safeMode === "own" ? (String(own_twilio_auth_token ?? "").trim() || null) : null,
-      own_twilio_whatsapp_number: safeMode === "own" ? (String(own_twilio_whatsapp_number ?? "").trim() || null) : null,
+      reminder_max_count: [0, 1, 2].includes(Number(reminder_max_count)) ? Number(reminder_max_count) : 2,
+      // Twilio SIDs are max 34 chars (AC + 32 hex); tokens are 32 chars; numbers max 20 chars in E.164
+      own_twilio_account_sid:     safeMode === "own" ? (String(own_twilio_account_sid     ?? "").trim().slice(0, 64)  || null) : null,
+      // Only include auth token when explicitly sent — absent means "keep existing value"
+      ...(own_twilio_auth_token !== undefined
+        ? { own_twilio_auth_token: safeMode === "own" ? (String(own_twilio_auth_token).trim().slice(0, 64) || null) : null }
+        : safeMode !== "own" ? { own_twilio_auth_token: null } : {}),
+      own_twilio_whatsapp_number: safeMode === "own" ? (String(own_twilio_whatsapp_number ?? "").trim().slice(0, 30)  || null) : null,
     };
 
     // Check whether the row already exists
@@ -118,7 +142,7 @@ export async function POST(request: NextRequest) {
         .eq("user_id", user.id);
       if (error) {
         logger.error("Error al actualizar configuración", error);
-        return NextResponse.json({ error: "Error al guardar los cambios" }, { status: 500 });
+        return NextResponse.json({ error: "Error al guardar la configuración. Por favor, inténtalo de nuevo." }, { status: 500 });
       }
       businessId = existing.id;
     } else {
@@ -130,7 +154,7 @@ export async function POST(request: NextRequest) {
         .maybeSingle();
       if (error) {
         logger.error("Error al crear negocio", error);
-        return NextResponse.json({ error: "Error al guardar los cambios" }, { status: 500 });
+        return NextResponse.json({ error: "Error al guardar la configuración. Por favor, inténtalo de nuevo." }, { status: 500 });
       }
       businessId = inserted?.id;
     }
@@ -147,6 +171,21 @@ export async function POST(request: NextRequest) {
       }
     } catch {
       // short_links table might not exist yet
+    }
+
+    // Resolve Google Place ID from the Maps URL (silently, best-effort)
+    const mapsUrl = payload.google_maps_url;
+    if (businessId && mapsUrl && process.env.GOOGLE_PLACES_API_KEY) {
+      try {
+        const placeId = await extractPlaceIdFromUrl(mapsUrl);
+        if (placeId) {
+          const service = await createServiceClient();
+          await service.from("businesses").update({ google_place_id: placeId }).eq("id", businessId);
+          logger.info(`Place ID resuelto al guardar config: ${placeId}`);
+        }
+      } catch {
+        // non-critical
+      }
     }
 
     return NextResponse.json({ success: true, review_links: allLinks });

@@ -24,6 +24,9 @@ export type IncentiveTiming = "initial" | "after_positive";
 /** Modo de envío de WhatsApp del negocio */
 export type WhatsAppMode = "shared" | "own" | "dedicated";
 
+/** Language for outbound WhatsApp messages sent to customers */
+export type WhatsAppLanguage = "es" | "en" | "fr" | "de" | "it" | "pt";
+
 // ---------------------------------------------------------------------------
 // Entidades de base de datos
 // ---------------------------------------------------------------------------
@@ -51,6 +54,7 @@ export interface Business {
   logo_url: string | null;
   welcome_message: string;
   tone: BusinessTone;
+  whatsapp_language: WhatsAppLanguage;
   incentive_enabled: boolean;
   incentive_description: string | null;
   incentive_code_enabled: boolean;
@@ -64,6 +68,8 @@ export interface Business {
   own_twilio_whatsapp_number: string | null;
   /** Google Places ID para seguimiento automático de puntuación */
   google_place_id: string | null;
+  /** Número máximo de recordatorios automáticos: 0 = ninguno, 1 = uno, 2 = dos */
+  reminder_max_count: number;
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   subscription_status: "free" | "trialing" | "active" | "past_due" | "canceled" | "incomplete";
@@ -96,6 +102,8 @@ export interface ReviewRequest {
   follow_up_sent: boolean;
   discount_code: string | null;
   message_count: number;
+  reminder_count: number;
+  last_reminder_at: string | null;
   created_at: string;
   responded_at: string | null;
 }
@@ -105,7 +113,7 @@ export interface ReviewRequest {
  * Usado en el webhook para evitar una segunda consulta a la base de datos.
  */
 export interface ReviewRequestWithBusiness extends ReviewRequest {
-  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type" | "incentive_fixed_code" | "whatsapp_mode" | "own_twilio_account_sid" | "own_twilio_auth_token" | "own_twilio_whatsapp_number" | "google_place_id">;
+  businesses: Pick<Business, "name" | "google_maps_url" | "review_links" | "tone" | "whatsapp_language" | "incentive_enabled" | "incentive_description" | "incentive_code_enabled" | "incentive_code_type" | "incentive_fixed_code" | "whatsapp_mode" | "own_twilio_account_sid" | "own_twilio_auth_token" | "own_twilio_whatsapp_number" | "google_place_id">;
 }
 
 /** Código de descuento generado o subido por el negocio */

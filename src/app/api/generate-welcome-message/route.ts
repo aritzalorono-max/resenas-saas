@@ -5,9 +5,10 @@
  * El mensaje resultante es editable por el usuario antes de guardarse.
  */
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { logger } from "@/lib/logger";
+import { checkGeneralRateLimit } from "@/lib/rate-limit";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
@@ -36,6 +37,13 @@ export async function POST(request: Request): Promise<Response> {
 
   if (!user) {
     return Response.json({ error: "No autenticado" }, { status: 401 });
+  }
+
+  // 5 AI generations per minute per user
+  const serviceClient = await createServiceClient();
+  const rl = await checkGeneralRateLimit(serviceClient, `gen-welcome:${user.id}`, 1, 5);
+  if (!rl.allowed) {
+    return Response.json({ error: "Demasiadas solicitudes. Espera un momento." }, { status: 429 });
   }
 
   let body: { name?: string; description?: string; website_url?: string; tone?: string };

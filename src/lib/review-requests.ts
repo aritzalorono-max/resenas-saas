@@ -175,10 +175,11 @@ export async function incrementMessageCount(
   currentCount: number
 ): Promise<number> {
   const newCount = currentCount + 1;
-  await supabase
+  const { error } = await supabase
     .from("review_requests")
     .update({ message_count: newCount })
     .eq("id", requestId);
+  if (error) throw new Error(`Failed to increment message count: ${error.message}`);
   return newCount;
 }
 

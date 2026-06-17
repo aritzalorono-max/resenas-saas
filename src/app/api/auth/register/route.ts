@@ -37,12 +37,12 @@ export async function POST(request: NextRequest) {
   }
 
   // ── Rate limiting por email ───────────────────────────────────────────────
-  // Máx 3 intentos de registro con el mismo email en 1 hora
+  // Máx 5 intentos de registro con el mismo email en 1 hora
   const emailRl = await checkGeneralRateLimit(
     serviceClient,
     `register:email:${email.toLowerCase()}`,
     60,
-    3
+    5
   );
   if (!emailRl.allowed) {
     // Respuesta genérica para no confirmar si el email existe
@@ -52,11 +52,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) {
+    logger.warn("NEXT_PUBLIC_APP_URL no configurada — los emails de confirmación usarán la URL por defecto de Supabase");
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      ...(appUrl ? { emailRedirectTo: `${appUrl}/api/auth/callback` } : {}),
       data: {
         terms_accepted_at: terms_accepted_at ?? new Date().toISOString(),
         marketing_consent: marketing_consent ?? false,
@@ -66,7 +72,26 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     logger.warn("Error en registro de usuario");
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ error: "Error al crear la cuenta. Inténtalo de nuevo." }, { status: 400 });
+  }
+
+  if (data.user) {
+    const identities = data.user.identities ?? [];
+    const hasEmailIdentity = identities.some((i) => i.provider === "email");
+
+    if (!hasEmailIdentity) {
+      const hasGoogleIdentity = identities.some((i) => i.provider === "google");
+      if (hasGoogleIdentity) {
+        return NextResponse.json(
+          { error: "Este email ya está registrado con Google. Usa el botón 'Registrarse con Google' para acceder." },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json(
+        { error: "Ya existe una cuenta con este email. Inicia sesión o recupera tu contraseña." },
+        { status: 400 }
+      );
+    }
   }
 
   if (data.user) {
@@ -77,5 +102,5 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, sessionCreated: !!data.session });
 }

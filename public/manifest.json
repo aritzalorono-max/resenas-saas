@@ -1,6 +1,6 @@
 {
-  "name": "ReseñasYa",
-  "short_name": "ReseñasYa",
+  "name": "ResenasYa",
+  "short_name": "ResenasYa",
   "description": "Recoge reseñas de Google Maps por WhatsApp automáticamente",
   "start_url": "/dashboard",
   "display": "standalone",
