@@ -1,12 +1,18 @@
+import { NextIntlClientProvider } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, getMessages } from "next-intl/server";
 import { localizedPath } from "@/lib/localized-paths";
 
 export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
   const t = await getTranslations();
   const locale = await getLocale();
+  const all = await getMessages();
+  // Client components inside <main> (ConversationTabs, PricingPlans, etc.) need these.
+  // Nav/footer client components (LanguageSwitcher, ManageCookiesButton) use the
+  // locale-level provider which already has `common` and `cookieBanner`.
+  const pageMessages = { home: all.home, precios: all.precios };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -29,14 +35,18 @@ export default async function MarketingLayout({ children }: { children: React.Re
               {t("nav.login")}
             </Link>
             <LanguageSwitcher />
-            <Link href="/register" className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+            <Link href="/register" className="bg-brand-700 hover:bg-brand-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
               {t("nav.startFree")}
             </Link>
           </div>
         </div>
       </nav>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <NextIntlClientProvider locale={locale} messages={pageMessages}>
+          {children}
+        </NextIntlClientProvider>
+      </main>
 
       <footer className="border-t border-gray-100 bg-gray-50 py-12 px-6">
         <div className="max-w-6xl mx-auto">
@@ -84,6 +94,14 @@ export default async function MarketingLayout({ children }: { children: React.Re
               <Link href={localizedPath("/terminos", locale)} className="hover:text-gray-600 transition">{t("footer.terms")}</Link>
               <Link href="/cookies" className="hover:text-gray-600 transition">{t("footer.cookies")}</Link>
               <ManageCookiesButton />
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 mt-6 pt-6 flex flex-col sm:flex-row items-start gap-4">
+            <img src="/bizkaia-foru-aldundia.jpeg" alt="Bizkaia Foru Aldundia · Diputación Foral de Bizkaia" className="h-10 w-auto shrink-0" />
+            <div className="text-xs text-gray-400 leading-relaxed space-y-1">
+              <p>Bizkaiko Foru Aldundiak finantzatu du proiektu hau, 2025eko Trantsizio Digitala Programaren barruan. / Este proyecto ha sido financiado por la Diputación Foral de Bizkaia dentro del Programa Transición Digital 2025.</p>
+              <p><span className="font-semibold">Enpresa / Empresa:</span> Buy and Click, S.L. &nbsp;|&nbsp; <span className="font-semibold">Proiektua / Proyecto:</span> Creación de Asistente Virtual automatizado destinado a facilitar la interacción postventa.</p>
             </div>
           </div>
         </div>

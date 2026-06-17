@@ -152,10 +152,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <Tag className="w-3 h-3" />
                 {post.category}
               </span>
-              <span className="flex items-center gap-1 text-xs text-gray-400">
+              <span className="flex items-center gap-1 text-xs text-gray-500">
                 <Clock className="w-3.5 h-3.5" /> {post.readTime} {t("readTime")}
               </span>
-              <span className="text-xs text-gray-400">{formatPostDate(post.date, locale)}</span>
+              <span className="text-xs text-gray-500">{formatPostDate(post.date, locale)}</span>
             </div>
             <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">{post.title}</h1>
             <p className="text-lg text-gray-500 leading-relaxed border-l-4 border-brand-300 pl-4">{post.description}</p>
@@ -188,7 +188,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <Link href={`/blog/${prevPost.slug}`} className="group flex items-start gap-3 p-4 rounded-xl border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 transition">
                   <ArrowLeft className="w-4 h-4 text-gray-300 group-hover:text-brand-400 transition shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-xs text-gray-400 mb-1">{t("prevPost") || "Anterior"}</p>
+                    <p className="text-xs text-gray-500 mb-1">{t("prevPost") || "Anterior"}</p>
                     <p className="text-sm font-semibold text-gray-800 group-hover:text-brand-700 transition leading-snug line-clamp-2">{prevPost.title}</p>
                   </div>
                 </Link>
@@ -197,7 +197,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <Link href={`/blog/${nextPost.slug}`} className="group flex items-start gap-3 p-4 rounded-xl border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 transition sm:text-right sm:flex-row-reverse">
                   <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-brand-400 transition shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-xs text-gray-400 mb-1">{t("nextPost") || "Siguiente"}</p>
+                    <p className="text-xs text-gray-500 mb-1">{t("nextPost") || "Siguiente"}</p>
                     <p className="text-sm font-semibold text-gray-800 group-hover:text-brand-700 transition leading-snug line-clamp-2">{nextPost.title}</p>
                   </div>
                 </Link>
@@ -215,7 +215,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     <div className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 transition">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-900 group-hover:text-brand-700 transition leading-snug mb-1">{p.title}</p>
-                        <p className="text-xs text-gray-400 flex items-center gap-2">
+                        <p className="text-xs text-gray-500 flex items-center gap-2">
                           <Clock className="w-3 h-3" /> {p.readTime} · {p.category}
                         </p>
                       </div>

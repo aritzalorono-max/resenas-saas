@@ -22,7 +22,6 @@ export interface RateLimitResult {
 const MAX_PER_WINDOW = 20;
 const WINDOW_MINUTES = 5;
 const MAX_PER_DAY    = 200;
-const DAY_MINUTES    = 24 * 60;
 
 export async function checkRateLimit(
   supabase: SupabaseClient,

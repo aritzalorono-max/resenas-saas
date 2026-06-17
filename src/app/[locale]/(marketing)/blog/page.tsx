@@ -91,7 +91,7 @@ export default async function BlogPage() {
                 {featured.title}
               </h2>
               <p className="text-gray-600 mb-5 leading-relaxed">{featured.description}</p>
-              <div className="flex items-center gap-4 text-xs text-gray-400">
+              <div className="flex items-center gap-4 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" /> {featured.readTime} {t("readTime")}
                 </span>
@@ -116,7 +116,7 @@ export default async function BlogPage() {
                   {post.title}
                 </h2>
                 <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">{post.description}</p>
-                <div className="flex items-center gap-3 text-xs text-gray-400 mt-auto">
+                <div className="flex items-center gap-3 text-xs text-gray-500 mt-auto">
                   <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {post.readTime}</span>
                   <span>{formatPostDate(post.date, locale)}</span>
                 </div>
@@ -128,7 +128,7 @@ export default async function BlogPage() {
         {/* CTA */}
         <div className="mt-16 bg-gray-900 rounded-3xl p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-3">{t("ctaTitle")}</h2>
-          <p className="text-gray-400 mb-6">{t("ctaDesc")}</p>
+          <p className="text-gray-500 mb-6">{t("ctaDesc")}</p>
           <Link
             href="/register"
             className="bg-brand-600 hover:bg-brand-500 text-white font-bold px-7 py-3.5 rounded-xl transition inline-block"

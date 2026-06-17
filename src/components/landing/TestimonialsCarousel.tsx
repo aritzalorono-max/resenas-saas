@@ -100,7 +100,7 @@ export function TestimonialsCarousel() {
             </div>
             <div className="border-t border-gray-100 pt-4">
               <p className="font-semibold text-gray-900 text-sm">{name}</p>
-              <p className="text-gray-400 text-xs mt-0.5">{role} · {business}</p>
+              <p className="text-gray-500 text-xs mt-0.5">{role} · {business}</p>
             </div>
           </div>
         ))}

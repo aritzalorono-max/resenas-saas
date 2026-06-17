@@ -1,9 +1,11 @@
+import { NextIntlClientProvider } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getMessages } from "next-intl/server";
 import { localizedPath } from "@/lib/localized-paths";
 import { ManageCookiesButton } from "@/components/cookies/ManageCookiesButton";
+import { YoutubeEmbed } from "@/components/landing/YoutubeEmbed";
 import dynamic from "next/dynamic";
 import { hreflangAlternates, buildUrl } from "@/lib/seo";
 
@@ -199,9 +201,26 @@ const sectorIcons = [
 
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const t = await getTranslations("home");
-  const nav = await getTranslations("nav");
-  const footer = await getTranslations("footer");
+  const [t, nav, footer, all] = await Promise.all([
+    getTranslations("home"),
+    getTranslations("nav"),
+    getTranslations("footer"),
+    getMessages(),
+  ]);
+  // Dynamic client components (ConversationTabs, PricingPlans, etc.) need these
+  // namespaces. The locale-level provider only ships universal namespaces, so we
+  // add a page-scoped provider here.
+  // Inner provider replaces (does not inherit) the locale-level outer provider.
+  // Include all namespaces used by client components inside this page:
+  // - home / precios: ConversationTabs, PricingPlans, TestimonialsCarousel, CaseStudiesCarousel
+  // - common: LanguageSwitcher
+  // - cookieBanner: ManageCookiesButton
+  const pageMessages = {
+    home: all.home,
+    precios: all.precios,
+    common: all.common,
+    cookieBanner: all.cookieBanner,
+  };
 
   const sectors = sectorIcons.map(({ Icon, key }) => ({ Icon, name: t(key), key }));
 
@@ -229,7 +248,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
   ];
 
   return (
-    <>
+    <NextIntlClientProvider locale={locale} messages={pageMessages}>
       {/* Datos estructurados Schema.org */}
       <script
         type="application/ld+json"
@@ -259,7 +278,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
               <LanguageSwitcher />
               <Link
                 href="/register"
-                className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+                className="bg-brand-700 hover:bg-brand-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
               >
                 {nav("startFree")}
               </Link>
@@ -301,7 +320,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/register"
-                className="bg-brand-600 hover:bg-brand-700 text-white font-bold px-8 py-4 rounded-xl text-lg transition shadow-lg shadow-brand-200"
+                className="bg-brand-700 hover:bg-brand-800 text-white font-bold px-8 py-4 rounded-xl text-lg transition shadow-lg shadow-brand-200"
               >
                 {t("startFree")}
               </Link>
@@ -320,7 +339,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
               {steps.map((step) => (
                 <div key={step.number} className="text-center">
-                  <div className="text-4xl font-extrabold text-brand-200 mb-3">{step.number}</div>
+                  <div className="text-4xl font-extrabold text-brand-600 mb-3">{step.number}</div>
                   <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">{step.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
                 </div>
@@ -330,15 +349,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             {/* Vídeo demostrativo — solo en español */}
             {locale === "es" && (
               <div className="mt-14">
-                <div className="relative w-full rounded-2xl overflow-hidden shadow-xl aspect-video">
-                  <iframe
-                    src="https://www.youtube.com/embed/Hu52ipdFzjk"
-                    title="Demostración ResenasYa"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full"
-                  />
+                <div className="relative w-full rounded-2xl overflow-hidden shadow-xl aspect-video bg-gray-900">
+                  <YoutubeEmbed videoId="Hu52ipdFzjk" title="Demostración ResenasYa" />
                 </div>
               </div>
             )}
@@ -446,7 +458,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                     <span className="bg-red-100 text-red-600 text-xs font-semibold px-2.5 py-1 rounded-full">
                       {t("removeExampleBadge")}
                     </span>
-                    <span className="text-xs text-gray-400">{t("removeExampleMeta")}</span>
+                    <span className="text-xs text-gray-500">{t("removeExampleMeta")}</span>
                   </div>
                   <div className="w-full bg-red-500 text-white text-xs font-semibold py-2 rounded-lg text-center">
                     {t("removeBtn")}
@@ -507,7 +519,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
               </Link>
               <Link
                 href="/register"
-                className="bg-brand-600 hover:bg-brand-700 text-white font-bold px-7 py-3.5 rounded-xl text-base transition shadow-lg shadow-brand-200 inline-block"
+                className="bg-brand-700 hover:bg-brand-800 text-white font-bold px-7 py-3.5 rounded-xl text-base transition shadow-lg shadow-brand-200 inline-block"
               >
                 {t("startFree")}
               </Link>
@@ -643,9 +655,17 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                 <ManageCookiesButton />
               </div>
             </div>
+
+            <div className="border-t border-gray-200 mt-6 pt-6 flex flex-col sm:flex-row items-start gap-4">
+              <img src="/bizkaia-foru-aldundia.jpeg" alt="Bizkaia Foru Aldundia · Diputación Foral de Bizkaia" className="h-10 w-auto shrink-0" />
+              <div className="text-xs text-gray-400 leading-relaxed space-y-1">
+                <p>Bizkaiko Foru Aldundiak finantzatu du proiektu hau, 2025eko Trantsizio Digitala Programaren barruan. / Este proyecto ha sido financiado por la Diputación Foral de Bizkaia dentro del Programa Transición Digital 2025.</p>
+                <p><span className="font-semibold">Enpresa / Empresa:</span> Buy and Click, S.L. &nbsp;|&nbsp; <span className="font-semibold">Proiektua / Proyecto:</span> Creación de Asistente Virtual automatizado destinado a facilitar la interacción postventa.</p>
+              </div>
+            </div>
           </div>
         </footer>
       </div>
-    </>
+    </NextIntlClientProvider>
   );
 }

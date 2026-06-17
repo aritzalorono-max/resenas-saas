@@ -18,7 +18,14 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
 
-  const messages = await getMessages();
+  const all = await getMessages();
+  // Only ship universal namespaces at this level — sub-layouts add their own.
+  // CookieBanner and LanguageSwitcher are the only client components here.
+  const messages = {
+    common: all.common,
+    cookieBanner: all.cookieBanner,
+    cookieCategories: all.cookieCategories,
+  };
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

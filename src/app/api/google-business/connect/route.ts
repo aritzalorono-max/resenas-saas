@@ -33,10 +33,13 @@ export async function GET(): Promise<never | NextResponse> {
   logger.info("[GoogleBusiness] Redirigiendo a Google OAuth", { userId: user.id });
 
   const response = NextResponse.redirect(authUrl);
+  // sameSite must be "lax" (not "strict") so the cookie is sent when Google
+  // redirects the user back to the callback. With "strict", the browser omits
+  // the cookie on cross-site top-level navigations → invalid_state error.
   response.cookies.set("__gb_oauth_state", JSON.stringify({ nonce, userId: user.id }), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     maxAge: 300,
     path: "/",
   });

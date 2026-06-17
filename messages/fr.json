@@ -69,8 +69,8 @@
     "replyExampleLabel": "Réponse du propriétaire · générée par IA",
     "replyExampleResponse": "Merci beaucoup, Sophie ! Nous sommes ravis que vous ayez apprécié. À bientôt 😊",
     "removeCardBadge": "Protection",
-    "removeCardTitle": "Supprimez les avis faux ou injustes",
-    "removeCardDesc": "Nous détectons quels avis négatifs enfreignent les politiques de Google. En un clic, demandez officiellement leur suppression depuis votre tableau de bord.",
+    "removeCardTitle": "Demandez la suppression d'avis faux ou injustes",
+    "removeCardDesc": "Nous détectons quels avis négatifs peuvent enfreindre les politiques de Google et générons la demande officielle. La décision finale appartient toujours à Google.",
     "removeFeature1": "Analyse automatique des politiques Google",
     "removeFeature2": "Demande de suppression en 1 clic",
     "removeFeature3": "Suivi de l'état de chaque demande",
@@ -725,7 +725,8 @@
     "ctaTitle": "Envie d'être le prochain cas de succès ?",
     "ctaDesc": "Commencez gratuitement aujourd'hui et obtenez vos premiers avis cette semaine.",
     "ctaBtn": "Créer un compte gratuit →",
-    "noContract": "Sans engagement · Annulez quand vous voulez"
+    "noContract": "Sans engagement · Annulez quand vous voulez",
+    "disclaimer": "Les cas présentés sont représentatifs de résultats réels obtenus par des entreprises utilisant ResenasYa. Les résultats individuels peuvent varier selon le secteur, la base de clients et d'autres facteurs. ResenasYa ne garantit pas de résultats spécifiques. Les statistiques globales reflètent les données cumulées depuis le lancement de la plateforme."
   },
   "precios": {
     "title": "Tarifs simples et transparents",

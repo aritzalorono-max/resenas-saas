@@ -146,7 +146,7 @@ export default async function CookiesPage() {
       <header className="mb-10 pb-6 border-b border-gray-100">
         <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">{t("legalDoc")}</p>
         <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{t("pageTitle")}</h1>
-        <p className="text-sm text-gray-400">{t("lastUpdatedLabel")} {t("lastUpdatedDate")}</p>
+        <p className="text-sm text-gray-500">{t("lastUpdatedLabel")} {t("lastUpdatedDate")}</p>
 
         <div className="mt-4 inline-flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
           <span className="text-sm text-gray-500">{t("managePrefsPrompt")}</span>
@@ -297,7 +297,7 @@ function CookieTable({ cookies, headers, consentLabels, statusLabels }: {
               </td>
               <td className="p-2.5 border border-gray-200 whitespace-nowrap">
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  c.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"
+                  c.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
                 }`}>
                   {c.active ? statusLabels.active : statusLabels.pending}
                 </span>

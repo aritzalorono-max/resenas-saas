@@ -69,8 +69,8 @@
     "replyExampleLabel": "Owner reply · AI-generated",
     "replyExampleResponse": "Thank you so much, Alex! We're so glad you enjoyed it. See you soon 😊",
     "removeCardBadge": "Protection",
-    "removeCardTitle": "Remove fake or unfair reviews",
-    "removeCardDesc": "We detect which negative reviews violate Google's policies. With one click you can officially request their removal directly from the dashboard.",
+    "removeCardTitle": "Request removal of fake or unfair reviews",
+    "removeCardDesc": "We detect which negative reviews may violate Google's policies and generate the official removal request. The final decision always rests with Google.",
     "removeFeature1": "Automatic analysis against Google policies",
     "removeFeature2": "Removal request in 1 click",
     "removeFeature3": "Track the status of each request",
@@ -725,7 +725,8 @@
     "ctaTitle": "Want to be the next success story?",
     "ctaDesc": "Start for free today and get your first reviews this week.",
     "ctaBtn": "Create free account →",
-    "noContract": "No contracts · Cancel anytime"
+    "noContract": "No contracts · Cancel anytime",
+    "disclaimer": "The cases presented are representative of real results obtained by businesses using ResenasYa. Individual results may vary depending on industry, customer base, and other factors. ResenasYa does not guarantee specific results. Global statistics reflect cumulative data since the platform launch."
   },
   "precios": {
     "title": "Simple, transparent pricing",

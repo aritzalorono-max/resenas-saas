@@ -34,7 +34,7 @@ export default async function TerminosPage() {
       <header className="mb-10 pb-6 border-b border-gray-100">
         <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">{c.legalDoc}</p>
         <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{c.pageTitle}</h1>
-        <p className="text-sm text-gray-400">{c.lastUpdatedDate}</p>
+        <p className="text-sm text-gray-500">{c.lastUpdatedDate}</p>
       </header>
 
       {/* Section 1 — always rendered with hardcoded JSX for inline links */}
@@ -126,7 +126,7 @@ export default async function TerminosPage() {
       </Section>
 
       {/* ODR link for EU consumers */}
-      <p className="text-xs text-gray-400 mt-6">
+      <p className="text-xs text-gray-500 mt-6">
         {locale === "es" ? "Resolución de litigios en línea UE: " :
          locale === "en" ? "EU online dispute resolution: " :
          locale === "fr" ? "Résolution des litiges en ligne UE : " :
